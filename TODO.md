@@ -1,7 +1,7 @@
 # TODO
 
 Status of the client-side document toolkit in `lib/` (Markdown/HTML → .doc / .docx / .pdf,
-RTL-first) and of the web page that presents it. Last updated: 2026-09-26. Version 1.0 everywhere until the first release (no changelog before it).
+RTL-first) and of the web page that presents it. Last updated: 2026-09-28. Version 1.0 everywhere until the first release (no changelog before it).
 
 ## lib/ — current state
 
@@ -92,12 +92,12 @@ Done (2026-09-26):
 | 5 | ✅ Test in Word / Acrobat and the browsers | Done by the author; the feedback went into #6 |
 | 6 | ✅ Feedback of #5 | List indents and spacing, justify, header/footer defaults, cell alignment, column and table widths, table of contents (Word content control, RTL entries), Vazir Code Hack, guessed code labels, a number joining the Persian phrase after it in LTR text |
 | 7 | ✅ Licenses, README, tests | `LICENSE` (MIT), `THIRD-PARTY-NOTICES.md`, README (en + fa) with screenshots, `lib/README.md`, `tests/index.html` (+ `tests/test-corpus.js`), `tools/build_pdf_fonts.py`; Arabic interface and about document |
-| 8 | Author e-mail → the repository's address; `config.repoUrl` | Author line in the 7 lib/ headers (BidiCore, BidiView, BuilderBase, WordHtmlBuilder, DocxBuilder, PdfBuilder, HtmlBuilder) |
+| 8 | ✅ Repository and contact | github.com/mohsen-1984/kelk; `config.repoUrl`; contact e-mail in README and `<meta name="author">`; author/license lines removed from lib headers (one `LICENSE`, copied into `lib/`) |
 
 After the release: GPOS kerning and marks on ligatures (MarkLigPos); PDF `#anchor` links, rowspan.
 
 ## Release (GitHub)
 
-- README (English + Persian), screenshots, live demo on GitHub Pages
-- Licenses: code (e.g. MIT), fonts (OFL, Bitstream Vera/Arev) listed in one place
-- Browser test page that runs the corpus and downloads the three outputs (no Python needed)
+- 1.0: repository https://github.com/mohsen-1984/kelk, GitHub Pages https://mohsen-1984.github.io/kelk/,
+  release `v1.0` with `kelk_1.0.zip` (the README links `releases/latest/download/kelk_1.0.zip`).
+- Arabic texts (interface and about document) to be read by a native speaker.

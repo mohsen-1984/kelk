@@ -1,58 +1,65 @@
-# Kelk — کِلک
+# Kelk — Markdown to Word (DOCX, DOC), PDF and HTML, in the browser
 
-**Markdown to Word, PDF and HTML — right-to-left first, entirely in your browser.**
-Write or paste Markdown (an AI model's answer, notes, a report), see it, and export it as
-**DOCX, PDF, DOC or HTML**; or bring a Word file or a web page back to Markdown.
-Made first for Persian, and for every right-to-left language — Arabic, Hebrew, Urdu, Kurdish — and
-their mix with left-to-right text; just as good for purely left-to-right documents.
-Interface in English, Persian and Arabic.
+**Kelk** (کِلک) converts **Markdown** — full **GitHub Flavored Markdown (GFM)** — into
+**Word DOCX**, **Word DOC (MHTML)**, **PDF** and a **standalone HTML** page, and converts
+**Word .docx, HTML and rich text back to Markdown**. It runs **100% client-side in your browser**:
+no server, no upload, no account, no installation — it even works **offline** from `file://`.
 
-[فارسی ↓](#fa)
+It gets **right-to-left and bidirectional text** right — **Persian (Farsi), Arabic, Hebrew, Urdu,
+Kurdish** mixed with English — and works just as well for **every left-to-right language**
+(English, French, German, Spanish, Greek, Russian …). Interface in **English, فارسی and العربية**.
+Free and open source (MIT).
 
-![Kelk in English](docs/screenshots/kelk-en.png)
+**▶ [Open Kelk online](https://mohsen-1984.github.io/kelk/)** ·
+**⬇ [Download kelk_1.0.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_1.0.zip)** ·
+[فارسی ↓](#fa) · [العربية ↓](#ar) · Contact: [mhn.com@gmail.com](mailto:mhn.com@gmail.com)
 
-## Why
+![Kelk — Markdown to DOCX and PDF converter, English interface](docs/screenshots/kelk-en.png)
 
-- **Markdown is how AI writes**, but raw Markdown is hard to read and awkward to send. Kelk hides
-  the syntax and delivers the formats everyone opens, edits and shares.
-- **Right-to-left text done right**: the direction of every paragraph, list item, quote and table
-  cell; numbers, brackets, formulas and English words inside Persian or Arabic keep their order.
-- **The way back**: .docx, HTML and rich text pasted from Word or the web become clean Markdown —
-  fewer tokens and better structure for a model.
-- **Private**: nothing leaves your browser. No server, no account, no installation.
+## What it does
 
-## Outputs
+- **Markdown → DOCX** with real Word styles (Heading, Quote, List Paragraph, TOC) — ready to edit.
+- **Markdown → PDF** with its own layout engine: Arabic-script shaping, diacritics (harakat),
+  embedded fonts, page numbers, a **table of contents with page numbers and links**, bookmarks.
+- **Markdown → DOC (MHTML)** for Microsoft Word with a completely free-form header and footer.
+- **Markdown → HTML**: one standalone file with fonts, styles and images embedded.
+- **DOCX / HTML / pasted rich text → Markdown** — clean input for AI models (fewer tokens, clear structure).
+- **Full GFM** ([spec](https://github.github.com/gfm/)): tables with alignment, task lists,
+  nested lists, strikethrough, fenced code with syntax highlighting, quotes, links, images.
+- **Images**: drop or paste a picture into the text (embedded in every output), use a public web
+  URL, or add a logo to the header.
+- **Bidirectional text done right**: the direction of every paragraph, list item, quote and table
+  cell; numbers, brackets, formulas and English words inside RTL text keep their order.
+- Header and footer (structured, simple or custom HTML), automatic title and edition, fonts chosen
+  apart for PDF and Word, A3–A5/Letter/Legal pages, a monospace code font made for Persian and Arabic.
 
-| Format | Best for | Fonts |
+| Output | Best for | Fonts |
 |---|---|---|
 | **PDF** | sending, sharing, printing — the easiest | embedded |
-| **DOCX** | editing in Word (real Word styles) | must be installed on the reader's computer |
-| **DOC** (MHTML) | a completely free-form header/footer; Microsoft Word only | must be installed |
-| **HTML** | one standalone page: fonts, styles and images inside | embedded |
-| **MD** | the text itself | — |
+| **DOCX** | editing in Word | must be installed on the reader's computer |
+| **DOC** (MHTML) | a free-form header/footer; Microsoft Word only | must be installed |
+| **HTML** | a standalone page for the web or an archive | embedded |
 
-Also: a table of contents (with page numbers in the PDF), structured or custom header and footer
-with a logo, automatic title and edition, Persian/Arabic/Latin fonts chosen apart for PDF and Word,
-code blocks in Vazir Code, images dropped or pasted into the text.
-
-![A PDF made by Kelk](docs/screenshots/kelk-pdf.png)
+![A PDF made by Kelk: table of contents, mixed Persian and English, tables](docs/screenshots/kelk-pdf.png)
 
 ## Use it
 
-- **Online:** open the published page (GitHub Pages).
-- **On your computer:** download `kelk_1.0.zip`, unpack it and open `index.html` — it works offline,
-  straight from `file://`, for personal use or inside a company network.
+- **Online:** [mohsen-1984.github.io/kelk](https://mohsen-1984.github.io/kelk/).
+- **On your computer:** [download kelk_1.0.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_1.0.zip),
+  unpack it and open `index.html` — offline, for personal use or inside a company network.
 - **On your own host:** upload the folder to any static web host.
 
-The about/guide document opens on the first visit (the book button reloads it), in the interface
-language: [English](docs/about-kelk-and-samples.en.md) ·
-[فارسی](docs/about-kelk-and-samples.fa.md) · [العربية](docs/about-kelk-and-samples.ar.md).
+The about-and-guide document opens on the first visit, in the interface language:
+[English](docs/about-kelk-and-samples.en.md) · [فارسی](docs/about-kelk-and-samples.fa.md) ·
+[العربية](docs/about-kelk-and-samples.ar.md).
 
 ## For developers
 
-`lib/` is a standalone library — four builders with one API (`WordHtmlBuilder`, `DocxBuilder`,
-`PdfBuilder`, `HtmlBuilder`), `BidiCore` for every direction decision and `MarkdownImporter` for
-the way back. See **[`lib/README.md`](lib/README.md)**.
+`lib/` is a **standalone JavaScript library** with no build step: four builders with one API —
+`DocxBuilder` (.docx, on docx.js), `PdfBuilder` (.pdf, on jsPDF), `WordHtmlBuilder` (.doc),
+`HtmlBuilder` (.html) — plus `BidiCore` (every direction decision) and `MarkdownImporter`
+(.docx/HTML → Markdown). Any font can be prepared for the PDF with `tools/build_pdf_fonts.py`.
+Documentation: **[`lib/README.md`](lib/README.md)**.
 
 ```js
 const pdf = await PdfBuilder.create()
@@ -63,19 +70,20 @@ const pdf = await PdfBuilder.create()
 ```
 
 ```text
-index.html     the page            scripts/, styles/   the page's code (namespace window.Kelk)
-lib/           the library         assets/             icons (generated) and web fonts
-vendor/        third-party libraries (pinned versions; sources listed in index.html)
-docs/          about + guide + samples (fa / en / ar) and screenshots
+index.html     the page            scripts/, styles/   the page's code (window.Kelk)
+lib/           the library         assets/             icons and web fonts
+vendor/        third-party libraries (pinned versions, sources listed in index.html)
+docs/          about + guide + samples (en / fa / ar) and screenshots
 tests/         index.html — every test case through the four builders, in the browser
-tools/         bidi-lab.html (every direction rule, with cases) · build_pdf_fonts.py (PDF fonts)
-               build-icons.js · build-samples.js (Node)
+tools/         bidi-lab.html (every direction rule) · build_pdf_fonts.py · build-icons.js · build-samples.js
 ```
 
-## Credits and license
+## Contact, credits, license
 
-Kelk's code is under the **MIT License** ([`LICENSE`](LICENSE)). Libraries and fonts keep their
-own licenses: [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).
+Questions and suggestions: **[mhn.com@gmail.com](mailto:mhn.com@gmail.com)** (e-mail is the best
+way; this repository is not watched every day).
+Code: **MIT** ([`LICENSE`](LICENSE)); libraries and fonts keep their own licenses
+([`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md)).
 Vazirmatn, Vazir Code and Sahel are the work of the late
 [Saber Rastikerdar](https://github.com/rastikerdar) — in his memory.
 
@@ -84,41 +92,93 @@ Vazirmatn, Vazir Code and Sahel are the work of the late
 <a id="fa"></a>
 <div dir="rtl">
 
-## کِلک — فارسی
+## کِلک — تبدیل مارک‌داون به Word، PDF و HTML در مرورگر
 
-**مارک‌داون به Word، PDF و HTML؛ راست‌به‌چپ، کاملاً در مرورگر شما.**
-مارک‌داون را بنویسید یا بچسبانید (پاسخ یک مدل هوش مصنوعی، یادداشت، گزارش)، ببینید و به
-**DOCX، PDF، DOC یا HTML** خروجی بگیرید؛ یا فایل Word و صفحهٔ وب را به مارک‌داون برگردانید.
-کِلک برای فارسی ساخته شده، برای همهٔ زبان‌های راست‌به‌چپ و آمیختهٔ آن‌ها با متن لاتین کار می‌کند
-و برای سندهای کاملاً چپ‌به‌راست هم به همان خوبی. رابط کاربری به فارسی، انگلیسی و عربی است.
+**کِلک** متن **مارک‌داون** — با پشتیبانی کامل از **GitHub Flavored Markdown (GFM)** — را به
+**Word DOCX**، **Word DOC (MHTML)**، **PDF** و یک صفحهٔ **HTML مستقل** تبدیل می‌کند، و فایل
+**Word (.docx)، HTML و متن کپی‌شده از Word یا وب را به مارک‌داون** برمی‌گرداند. همه‌چیز
+**کاملاً در مرورگر شما (client-side)** انجام می‌شود: بدون سرور، بدون بارگذاری فایل، بدون حساب کاربری
+و بدون نصب؛ حتی **بدون اینترنت** و مستقیم از `file://` کار می‌کند.
 
-![کِلک به فارسی](docs/screenshots/kelk-fa.png)
+متن **راست‌به‌چپ و دوجهتی (BiDi)** — **فارسی، عربی، عبری، اردو، کردی** در کنار انگلیسی — را درست
+می‌چیند و برای **همهٔ زبان‌های چپ‌به‌راست** هم به همان خوبی کار می‌کند. رابط کاربری به فارسی،
+English و العربية است. رایگان و متن‌باز (MIT).
 
-### چرا کِلک؟
+**▶ [کِلک برخط](https://mohsen-1984.github.io/kelk/)** ·
+**⬇ [دریافت kelk_1.0.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_1.0.zip)** ·
+تماس: [mhn.com@gmail.com](mailto:mhn.com@gmail.com)
 
-- **مدل‌ها به مارک‌داون می‌نویسند**، ولی متن خام مارک‌داون برای خواندن و فرستادن مناسب نیست. کِلک نحو آن را پنهان می‌کند و قالب‌هایی تحویل می‌دهد که همه باز می‌کنند، ویرایش می‌کنند و می‌فرستند.
-- **راست‌به‌چپ درست:** جهت هر پاراگراف، آیتم فهرست، نقل‌قول و سلول جدول؛ عددها، پرانتزها، فرمول‌ها و واژه‌های انگلیسی میان متن فارسی یا عربی ترتیبشان را حفظ می‌کنند.
-- **مسیر برعکس:** فایل docx، صفحهٔ HTML و متن کپی‌شده از Word یا وب به مارک‌داون تمیز تبدیل می‌شود؛ توکن کمتر و ساختار روشن‌تر برای مدل.
-- **حریم خصوصی:** هیچ داده‌ای از مرورگر شما بیرون نمی‌رود؛ نه سرور، نه حساب کاربری، نه نصب.
+![کِلک — رابط فارسی](docs/screenshots/kelk-fa.png)
 
-### خروجی‌ها
+### قابلیت‌ها
 
-- **PDF:** برای ارسال، اشتراک و چاپ؛ راحت‌ترین گزینه، با قلم‌های درون فایل.
-- **DOCX:** برای ویرایش در Word، با سبک‌های واقعی Word؛ قلم‌ها باید روی رایانهٔ خواننده نصب باشند.
-- **DOC** (MHTML): سربرگ و پانویس کاملاً آزاد؛ فقط Microsoft Word.
-- **HTML:** یک صفحهٔ مستقل با قلم‌ها، سبک‌ها و تصویرهای درون فایل.
+- **مارک‌داون به DOCX** با سبک‌های واقعی Word؛ آمادهٔ ویرایش.
+- **مارک‌داون به PDF** با موتور چیدمان خود کِلک: شکل‌دهی حروف، حرکت‌گذاری، قلم‌های درون فایل، شمارهٔ صفحه و **فهرست مطالب با شمارهٔ صفحه و پیوند**.
+- **مارک‌داون به DOC (MHTML)** برای Microsoft Word، با سربرگ و پانویس کاملاً آزاد.
+- **مارک‌داون به HTML**: یک فایل مستقل با قلم‌ها، سبک‌ها و تصویرهای درون فایل.
+- **DOCX، HTML و متن کپی‌شده به مارک‌داون**: ورودی تمیز برای مدل‌های هوش مصنوعی؛ توکن کمتر و ساختار روشن‌تر.
+- **پشتیبانی کامل از GFM** ([مشخصات](https://github.github.com/gfm/)): جدول با ترازبندی، فهرست کارها، فهرست تودرتو، خط‌خوردگی، بلوک کد با رنگ‌آمیزی، نقل‌قول، پیوند و تصویر.
+- **تصویر:** کشیدن یا چسباندن تصویر در متن (در همهٔ خروجی‌ها جاسازی می‌شود)، نشانی عمومی وب، یا لوگو در سربرگ.
+- **دوجهتی درست:** جهت هر پاراگراف، آیتم فهرست، نقل‌قول و سلول جدول؛ عددها، پرانتزها، فرمول‌ها و واژه‌های انگلیسی ترتیبشان را حفظ می‌کنند.
 
 ### استفاده
 
-- **برخط:** صفحهٔ منتشرشده (GitHub Pages) را باز کنید.
-- **روی رایانه:** `kelk_1.0.zip` را دریافت کنید، باز کنید و `index.html` را باز کنید؛ بدون اینترنت و مستقیم از `file://` کار می‌کند، برای استفادهٔ شخصی یا در شبکهٔ داخلی شرکت.
+- **برخط:** [mohsen-1984.github.io/kelk](https://mohsen-1984.github.io/kelk/)
+- **روی رایانه:** [kelk_1.0.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_1.0.zip) را دریافت کنید، باز کنید و `index.html` را باز کنید؛ بدون اینترنت، برای استفادهٔ شخصی یا در شبکهٔ داخلی شرکت.
 - **روی میزبان خودتان:** پوشه را روی هر میزبان وب ایستا بارگذاری کنید.
 
-سند «معرفی و راهنما» در اولین بازدید به زبان رابط کاربری باز می‌شود و با دکمهٔ کتاب دوباره بارگذاری می‌شود.
+### تماس، قدردانی و مجوز
 
-### قدردانی و مجوز
-
-کد کِلک با **مجوز MIT** منتشر شده است. کتابخانه‌ها و قلم‌ها مجوز خودشان را دارند (`THIRD-PARTY-NOTICES.md`).
+پرسش و پیشنهاد: **[mhn.com@gmail.com](mailto:mhn.com@gmail.com)** (بهترین راه ارتباط ایمیل است).
+کد با **مجوز MIT** منتشر شده؛ کتابخانه‌ها و قلم‌ها مجوز خودشان را دارند (`THIRD-PARTY-NOTICES.md`).
 Vazirmatn، Vazir Code و Sahel کار زنده‌یاد [صابر راستی‌کردار](https://github.com/rastikerdar) است؛ یادش گرامی.
+
+</div>
+
+---
+
+<a id="ar"></a>
+<div dir="rtl">
+
+## كِلك — تحويل ماركداون إلى Word وPDF وHTML في المتصفح
+
+يحوّل **كِلك** نص **ماركداون** — مع دعم كامل لـ **GitHub Flavored Markdown (GFM)** — إلى
+**Word DOCX** و**Word DOC (MHTML)** و**PDF** وصفحة **HTML مستقلة**، ويعيد **ملفات Word (.docx)
+وHTML والنص المنسوخ من Word أو الويب إلى ماركداون**. يعمل كل شيء **بالكامل في متصفحك
+(client-side)**: بلا خادم، ولا رفع ملفات، ولا حساب، ولا تثبيت؛ ويعمل حتى **دون إنترنت** من `file://`.
+
+يعالج **النصوص من اليمين إلى اليسار وثنائية الاتجاه (BiDi)** — **العربية والفارسية والعبرية
+والأردية والكردية** مع الإنجليزية — ويعمل بالجودة نفسها **لكل لغات الكتابة من اليسار إلى اليمين**.
+الواجهة بالعربية والفارسية والإنجليزية. مجاني ومفتوح المصدر (MIT).
+
+**▶ [كِلك على الإنترنت](https://mohsen-1984.github.io/kelk/)** ·
+**⬇ [تنزيل kelk_1.0.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_1.0.zip)** ·
+للتواصل: [mhn.com@gmail.com](mailto:mhn.com@gmail.com)
+
+![كِلك — الواجهة العربية](docs/screenshots/kelk-ar.png)
+
+### القدرات
+
+- **ماركداون إلى DOCX** بأنماط Word حقيقية، جاهز للتحرير.
+- **ماركداون إلى PDF** بمحرّك تخطيط خاص: تشكيل الحروف العربية، والحركات، والخطوط المضمَّنة، وأرقام الصفحات، و**جدول محتويات بأرقام الصفحات والروابط**.
+- **ماركداون إلى DOC (MHTML)** لبرنامج Microsoft Word، برأس وتذييل حرّين تمامًا.
+- **ماركداون إلى HTML**: ملف واحد مستقل بخطوطه وأنماطه وصوره.
+- **DOCX وHTML والنص الملصوق إلى ماركداون**: مدخلات نظيفة لنماذج الذكاء الاصطناعي؛ رموز أقل وبنية أوضح.
+- **دعم كامل لـ GFM** ([المواصفات](https://github.github.com/gfm/)): جداول بمحاذاة، وقوائم مهام، وقوائم متداخلة، وشطب، وكتل شيفرة ملوّنة، واقتباسات، وروابط، وصور.
+- **الصور:** سحب الصورة أو لصقها في النص (تُضمَّن في كل الصيغ)، أو عنوان ويب عام، أو شعار في الرأس.
+- **ثنائية اتجاه صحيحة:** اتجاه كل فقرة وعنصر قائمة واقتباس وخلية جدول؛ وتحافظ الأرقام والأقواس والمعادلات والكلمات الإنجليزية على ترتيبها.
+- **الخطوط:** Vazirmatn، الخط الافتراضي، يدعم العربية؛ ويمكن تجهيز خطوط عربية مثل Cairo وAmiri وNoto Naskh Arabic لملفات PDF.
+
+### الاستخدام
+
+- **على الإنترنت:** [mohsen-1984.github.io/kelk](https://mohsen-1984.github.io/kelk/)
+- **على حاسوبك:** نزّل [kelk_1.0.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_1.0.zip) وافتحه ثم افتح `index.html`؛ يعمل دون إنترنت، للاستخدام الشخصي أو داخل شبكة المؤسسة.
+- **على استضافتك:** ارفع المجلد إلى أي استضافة ويب ثابتة.
+
+### التواصل والشكر والترخيص
+
+للأسئلة والاقتراحات: **[mhn.com@gmail.com](mailto:mhn.com@gmail.com)** (البريد الإلكتروني أفضل وسيلة للتواصل).
+الشيفرة بترخيص **MIT**؛ وللمكتبات والخطوط تراخيصها الخاصة (`THIRD-PARTY-NOTICES.md`).
+Vazirmatn وVazir Code وSahel من عمل الراحل [صابر راستي كردار](https://github.com/rastikerdar)، رحمه الله.
 
 </div>

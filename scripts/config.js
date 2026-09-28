@@ -9,7 +9,7 @@
 
     K.config = {
         version: '1.0',
-        repoUrl: '',                    // GitHub repository; the footer link is hidden while empty
+        repoUrl: 'https://github.com/mohsen-1984/kelk',   // the footer link (hidden when empty)
         storagePrefix: 'kelk.',
         maxFileMB: 10,
         maxImageMB: 5,

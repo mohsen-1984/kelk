@@ -20,7 +20,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-This license covers Kelk’s own code and documents (index.html, scripts/,
-styles/, lib/, tools/, tests/, docs/). The libraries in vendor/ and the fonts in
-assets/fonts/ and lib/pdf-base64-ttf-fonts/ keep their own licenses — see
-THIRD-PARTY-NOTICES.md.
+This license covers the Kelk library (lib/). The fonts in
+lib/pdf-base64-ttf-fonts/ keep their own licenses — the license file of each
+font is next to it; the whole list is in THIRD-PARTY-NOTICES.md of the project.

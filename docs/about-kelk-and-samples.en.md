@@ -69,6 +69,18 @@ The road runs both ways. Kelk turns a Word file (.docx), an HTML page, or text c
 
 > 💡 **How to:** shortcuts — `Ctrl+S` saves the Markdown, `Ctrl+Enter` exports DOCX, `Ctrl+Shift+Enter` exports PDF, `F1` lists them all. Side-by-side or single-column layout and the light or dark theme are in the top bar.
 
+### 2.1 Markdown and images
+
+Kelk supports **GitHub Flavored Markdown** in full ([GFM spec](https://github.github.com/gfm/)): headings, nested and numbered lists, task lists, tables with column alignment, strikethrough, inline code and fenced code with a language, quotes, links and autolinks. Plain HTML inside the text is accepted too.
+
+**Images** go into the text three ways:
+
+- **Drop or paste** an image into the Markdown panel: Kelk registers it under a short name and inserts `![name](name)`; the image is kept in this browser and embedded in all four outputs.
+- **A web address:** `![description](https://example.com/picture.png)`.
+- **The logo:** in the Logo section of Settings, and in the text as `![logo](logo)`.
+
+> ⚠️ **An image address must be reachable by this page:** a public web URL — not a local path (such as `C:\pictures\a.png`) and not a link behind a login or inside a private network. For pictures on your computer, drop them into the panel.
+
 ---
 
 ## 3. Outputs and import
