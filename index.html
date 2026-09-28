@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Kelk — RTL-first Markdown to DOCX, PDF and DOC, entirely in the browser.">
+    <title>Kelk</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231f6f5c'/%3E%3Cpath d='M9 24 L21 8 L25 11 L13 27 Z' fill='%23fff'/%3E%3Cpath d='M9 24 L7 29 L13 27 Z' fill='%23fff' opacity='.7'/%3E%3C/svg%3E">
+
+    <link rel="stylesheet" href="styles/tokens.css">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/preview.css">
+    <link rel="stylesheet" href="vendor/highlight.js/github.min_11.11.1.css">
+</head>
+<body>
+<div class="app">
+
+    <!-- ═══ top bar ═══ -->
+    <header class="topbar">
+        <div class="brand">
+            <div class="glyph" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
+                    <path d="M5 19 L15 5 L19 8 L9 22 Z" fill="currentColor" fill-opacity=".25"/>
+                    <path d="M5 19 L4 23 L9 22"/>
+                    <path d="M12 9 L16 12"/>
+                </svg>
+            </div>
+            <div>
+                <h1 data-i18n="appName">کِلک</h1>
+                <div class="sub" data-i18n="tagline"></div>
+            </div>
+        </div>
+        <div class="spacer"></div>
+        <span class="lang-switch" id="lang-switch" role="group" aria-label="Language"><i data-lucide="languages"></i></span>
+        <button class="btn ghost icon" id="btn-theme" type="button" data-i18n-attr="title:theme;aria-label:theme"></button>
+        <button class="btn ghost icon layout-toggle" id="btn-layout" type="button"></button>
+        <button class="btn ghost icon" id="btn-app" type="button" data-i18n-attr="title:appSettings;aria-label:appSettings"><i data-lucide="settings-2"></i></button>
+        <button class="btn ghost icon" id="btn-help" type="button" data-i18n-attr="title:help;aria-label:help"><i data-lucide="keyboard"></i></button>
+    </header>
+
+    <!-- ═══ workspace ═══ -->
+    <main class="workspace" id="workspace">
+
+        <!-- editor -->
+        <section class="panel editor-panel" aria-labelledby="h-editor">
+            <button class="rail" id="editor-rail" type="button" aria-controls="editor-body" data-i18n-attr="title:openEditor;aria-label:openEditor">
+                <span class="flip-rtl"><i data-lucide="panel-left-open"></i></span><span class="rail-label" data-i18n="editor"></span>
+            </button>
+            <div class="panel-head pane-head">
+                <button class="btn ghost icon pane-toggle" id="editor-close" type="button" data-i18n-attr="title:closeEditor;aria-label:closeEditor"><span class="flip-rtl"><i data-lucide="panel-left-close"></i></span></button>
+                <h2 id="h-editor"><i data-lucide="pencil-line"></i><span data-i18n="editor"></span></h2>
+                <div class="actions">
+                    <button class="btn ghost icon" id="btn-sample" type="button" data-i18n-attr="title:sampleHint;aria-label:sampleHint"><i data-lucide="book-open"></i></button>
+                    <button class="btn" id="btn-import" type="button"><i data-lucide="file-up"></i><span data-i18n="import"></span></button>
+                    <button class="btn" id="btn-paste" type="button"><i data-lucide="clipboard-paste"></i><span data-i18n="paste"></span></button>
+                    <button class="btn ghost danger icon" id="btn-clear" type="button" data-i18n-attr="title:clear;aria-label:clear"><i data-lucide="eraser"></i></button>
+                </div>
+            </div>
+            <div class="pane-body editor-body" id="editor-body">
+                <div class="editor-wrap">
+                    <textarea id="editor" dir="auto" spellcheck="false" data-i18n-attr="placeholder:editorPlaceholder;aria-label:editor"></textarea>
+                    <div class="dropzone-overlay"><span data-i18n="dropHere"></span></div>
+                </div>
+                <div class="panel-foot editor-foot">
+                    <div class="stats" aria-live="polite">
+                        <span><span data-i18n="words"></span>: <b id="st-words">0</b></span>
+                        <span><span data-i18n="chars"></span>: <b id="st-chars">0</b></span>
+                        <span><span data-i18n="size"></span>: <b id="st-size" dir="ltr">0 KB</b></span>
+                        <span id="st-file" hidden><span data-i18n="file"></span>: <b id="st-file-name" dir="auto"></b></span>
+                    </div>
+                    <span class="sep" aria-hidden="true"></span>
+                    <button class="btn soft" id="btn-md" type="button" data-export="md" data-i18n-attr="title:mdHint"><i data-lucide="file-down"></i>MD</button>
+                </div>
+            </div>
+            <input type="file" id="file-import" hidden accept=".md,.markdown,.txt,.html,.htm,.docx,text/markdown,text/plain,text/html">
+        </section>
+
+        <!-- preview -->
+        <section class="panel preview-panel" aria-labelledby="h-preview">
+            <div class="panel-head">
+                <h2 id="h-preview"><i data-lucide="eye"></i><span data-i18n="preview"></span></h2>
+                <div class="actions">
+                    <button class="btn ghost icon" id="btn-copy-preview" type="button" data-i18n-attr="title:copy;aria-label:copy"><i data-lucide="copy"></i></button>
+                </div>
+            </div>
+            <div class="preview-scroll">
+                <article id="preview" class="doc" data-i18n-attr="data-empty:previewEmpty"></article>
+            </div>
+            <div class="panel-foot export-foot">
+                <div class="namebox" data-i18n-attr="title:fileName">
+                    <input class="stem" id="nb-stem" dir="auto" spellcheck="false" data-i18n-attr="aria-label:fileName">
+                    <span class="ext" aria-disabled="true" data-i18n-attr="title:extHint"><span id="nb-ext">.docx</span></span>
+                </div>
+                <div class="export-bar" role="group" data-i18n-attr="aria-label:exportAs">
+                    <button class="btn primary" type="button" data-export="docx" data-i18n-attr="title:docxHint"><i data-lucide="file-text"></i>DOCX</button>
+                    <button class="btn" type="button" data-export="pdf" data-i18n-attr="title:pdfHint"><i data-lucide="file-type"></i>PDF</button>
+                    <button class="btn" type="button" data-export="doc" data-i18n-attr="title:docHint"><i data-lucide="file"></i>DOC</button>
+                    <span class="sep" aria-hidden="true"></span>
+                    <button class="btn ghost" type="button" data-export="html"><i data-lucide="code-xml"></i>HTML</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- settings (export profile) -->
+        <aside class="panel settings" aria-labelledby="h-settings">
+            <button class="rail" id="pane-rail" type="button" aria-controls="pane-body" data-i18n-attr="title:openSettings;aria-label:openSettings">
+                <i data-lucide="sliders-horizontal"></i><span class="rail-label" data-i18n="settings"></span>
+            </button>
+            <div class="panel-head pane-head">
+                <h2 id="h-settings"><i data-lucide="sliders-horizontal"></i><span data-i18n="settings"></span></h2>
+                <div class="actions">
+                    <span class="btn-pair">
+                        <button class="btn ghost icon" id="groups-open" type="button" data-i18n-attr="title:expandAll;aria-label:expandAll"><i data-lucide="square-chevron-down"></i></button>
+                        <button class="btn ghost icon" id="groups-close" type="button" data-i18n-attr="title:collapseAll;aria-label:collapseAll"><i data-lucide="square-chevron-up"></i></button>
+                    </span>
+                    <span class="sep" aria-hidden="true"></span>
+                    <button class="btn ghost icon pane-toggle" id="pane-close" type="button" data-i18n-attr="title:closeSettings;aria-label:closeSettings"><span class="flip-rtl"><i data-lucide="panel-right-close"></i></span></button>
+                </div>
+            </div>
+            <div class="pane-body" id="pane-body">
+
+                <details class="group">
+                    <summary><i data-lucide="file-text"></i><span data-i18n="gDocument"></span></summary>
+                    <div class="fields">
+                        <div class="field"><span class="label-row"><label for="f-title" data-i18n="docTitle"></label>
+                            <button class="mini" type="button" data-reset="document.title" hidden data-i18n-attr="title:resetDefault;aria-label:resetDefault"><i data-lucide="rotate-ccw"></i></button></span>
+                            <input type="text" id="f-title" dir="auto" data-setting="document.title"></div>
+                        <div class="row2">
+                            <div class="field"><span class="label-row"><label for="f-edition" data-i18n="docEdition"></label>
+                                <button class="mini" type="button" data-reset="document.edition" hidden data-i18n-attr="title:editionReset;aria-label:editionReset"><i data-lucide="rotate-ccw"></i></button></span>
+                                <input type="text" id="f-edition" dir="auto" data-setting="document.edition"></div>
+                            <label class="field"><span data-i18n="docAuthor"></span><input type="text" dir="auto" data-setting="document.author"></label>
+                        </div>
+                        <label class="field"><span data-i18n="docLink"></span><input type="text" dir="ltr" data-setting="document.link" placeholder="example.com / name@example.com"></label>
+                        <div class="field"><span class="hint" data-i18n="optional"></span></div>
+                        <div class="row2">
+                            <label class="check"><input type="checkbox" data-setting="toc.enabled"><span data-i18n="tocEnabled"></span></label>
+                            <label class="field"><span data-i18n="tocLevels"></span>
+                                <select data-setting="toc.levels"><option value="1">H1</option><option value="2">H1–H2</option><option value="3">H1–H3</option></select></label>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="group">
+                    <summary><i data-lucide="image"></i><span data-i18n="gLogo"></span></summary>
+                    <div class="fields">
+                        <div class="logo-box" id="logo-box" tabindex="0">
+                            <div class="thumb" id="logo-thumb"></div>
+                            <div class="btns">
+                                <label class="btn"><i data-lucide="upload"></i><span data-i18n="logoUpload"></span>
+                                    <input type="file" id="logo-file" hidden accept="image/png,image/jpeg,image/svg+xml,image/webp,image/gif"></label>
+                                <button class="btn ghost danger" id="logo-remove" type="button"><span data-i18n="logoRemove"></span></button>
+                            </div>
+                        </div>
+                        <div class="field"><span class="hint" data-i18n="logoHint"></span></div>
+                        <label class="field"><span data-i18n="logoHeight"></span>
+                            <select data-setting="logoHeight"><option>0.8cm</option><option>1cm</option><option>1.2cm</option><option>1.5cm</option><option>2cm</option></select></label>
+                    </div>
+                </details>
+
+                <details class="group">
+                    <summary><i data-lucide="panel-top"></i><span data-i18n="gHeaderFooter"></span></summary>
+                    <div class="fields">
+                        <label class="field"><span data-i18n="hfMode"></span>
+                            <select data-setting="headerFooter.mode">
+                                <option value="structured" data-i18n="hfStructured"></option>
+                                <option value="simple" data-i18n="hfSimple"></option>
+                                <option value="none" data-i18n="hfNone"></option>
+                                <option value="custom" data-i18n="hfCustom"></option>
+                            </select></label>
+                        <label class="field"><span data-i18n="hfDirection"></span>
+                            <select data-setting="headerFooter.direction">
+                                <option value="rtl" data-i18n="dirRtl"></option>
+                                <option value="ltr" data-i18n="dirLtr"></option>
+                                <option value="auto" data-i18n="dirAuto"></option>
+                            </select></label>
+                        <div id="hf-custom" class="fields" hidden>
+                            <div class="field"><span class="label-row"><label for="f-hf-header" data-i18n="customHeader"></label>
+                                <button class="mini" type="button" data-reset="headerFooter.header" hidden data-i18n-attr="title:resetSample;aria-label:resetSample"><i data-lucide="rotate-ccw"></i></button></span>
+                                <textarea id="f-hf-header" dir="ltr" data-setting="headerFooter.header" spellcheck="false"></textarea></div>
+                            <div class="field"><span class="label-row"><label for="f-hf-footer" data-i18n="customFooter"></label>
+                                <button class="mini" type="button" data-reset="headerFooter.footer" hidden data-i18n-attr="title:resetSample;aria-label:resetSample"><i data-lucide="rotate-ccw"></i></button></span>
+                                <textarea id="f-hf-footer" dir="ltr" data-setting="headerFooter.footer" spellcheck="false"></textarea></div>
+                            <div class="field"><span class="hint" data-i18n="customHint"></span></div>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="group">
+                    <summary><i data-lucide="type"></i><span data-i18n="gTypography"></span></summary>
+                    <div class="fields">
+                        <div class="sub-head" data-i18n="tPdf"></div>
+                        <label class="field"><span data-i18n="fontBidi"></span><select data-setting="fonts.bidi"></select></label>
+                        <label class="field"><span data-i18n="fontLatin"></span><select data-setting="fonts.latin"></select></label>
+
+                        <div class="sub-head" data-i18n="tWord"></div>
+                        <div class="field"><span class="label-row"><label for="f-word-bidi" data-i18n="fontBidi"></label>
+                            <button class="mini" type="button" data-reset="fonts.wordBidi" hidden data-i18n-attr="title:resetDefault;aria-label:resetDefault"><i data-lucide="rotate-ccw"></i></button></span>
+                            <input type="text" id="f-word-bidi" dir="auto" list="dl-word-fonts" data-setting="fonts.wordBidi" data-font-check="#nf-word-bidi" data-i18n-attr="placeholder:sameAsPdf"></div>
+                        <div class="field" id="nf-word-bidi" hidden><span class="hint warn" data-i18n="notInstalled"></span></div>
+                        <div class="field"><span class="label-row"><label for="f-word-latin" data-i18n="fontLatin"></label>
+                            <button class="mini" type="button" data-reset="fonts.wordLatin" hidden data-i18n-attr="title:resetDefault;aria-label:resetDefault"><i data-lucide="rotate-ccw"></i></button></span>
+                            <input type="text" id="f-word-latin" dir="auto" list="dl-word-fonts" data-setting="fonts.wordLatin" data-font-check="#nf-word-latin" data-i18n-attr="placeholder:sameAsPdf"></div>
+                        <div class="field" id="nf-word-latin" hidden><span class="hint warn" data-i18n="notInstalled"></span></div>
+                        <div class="field"><span class="hint" data-i18n="wordFontsHint"></span></div>
+
+                        <div class="sub-head"></div>
+                        <div class="row2">
+                            <label class="field"><span data-i18n="sizeBidi"></span><input type="number" min="6" max="36" step="0.5" dir="ltr" data-setting="fonts.bidiSize"></label>
+                            <label class="field"><span data-i18n="sizeLatin"></span><input type="number" min="6" max="36" step="0.5" dir="ltr" data-setting="fonts.latinSize"></label>
+                        </div>
+                        <label class="check"><input type="checkbox" data-ui="previewWordFont"><span data-i18n="previewWordFont"></span></label>
+                    </div>
+                </details>
+
+                <details class="group">
+                    <summary><i data-lucide="file-cog"></i><span data-i18n="gPage"></span></summary>
+                    <div class="fields">
+                        <div class="row2">
+                            <label class="field"><span data-i18n="pageSize"></span>
+                                <select data-setting="page.size"><option>A4</option><option>A5</option><option>A3</option><option>Letter</option><option>Legal</option></select></label>
+                            <label class="field"><span data-i18n="orientation"></span>
+                                <select data-setting="page.orientation"><option value="portrait" data-i18n="portrait"></option><option value="landscape" data-i18n="landscape"></option></select></label>
+                        </div>
+                        <label class="field"><span data-i18n="margins"></span><input type="text" dir="ltr" data-setting="page.margin" placeholder="20mm 15mm"></label>
+                        <label class="field"><span data-i18n="tableWidth"></span>
+                            <select data-setting="page.tableWidth">
+                                <option value="auto" data-i18n="tableWidthAuto"></option>
+                                <option value="100%">100%</option><option value="98%">98%</option>
+                                <option value="90%">90%</option><option value="75%">75%</option><option value="50%">50%</option>
+                            </select></label>
+                        <label class="field"><span data-i18n="docDirection"></span>
+                            <select data-setting="direction">
+                                <option value="auto" data-i18n="dirAuto"></option>
+                                <option value="rtl" data-i18n="dirRtl"></option>
+                                <option value="ltr" data-i18n="dirLtr"></option>
+                            </select></label>
+                    </div>
+                </details>
+
+                <details class="group">
+                    <summary><i data-lucide="code"></i><span data-i18n="gCode"></span></summary>
+                    <div class="fields">
+                        <label class="field"><span data-i18n="codeFontPdf"></span><select data-setting="code.font"></select></label>
+                        <label class="field"><span data-i18n="codeFontWord"></span>
+                            <input type="text" dir="auto" list="dl-word-code-fonts" data-setting="code.wordFont" data-font-check="#nf-word-code" data-i18n-attr="placeholder:sameAsPdf"></label>
+                        <div class="field" id="nf-word-code" hidden><span class="hint warn" data-i18n="notInstalled"></span></div>
+                        <div class="row2">
+                            <label class="field"><span data-i18n="codeSize"></span><input type="number" min="6" max="24" step="0.5" dir="ltr" data-setting="code.size"></label>
+                        </div>
+                        <label class="check"><input type="checkbox" data-setting="code.showLanguage"><span data-i18n="showLanguage"></span></label>
+                        <label class="field"><span data-i18n="rtlInCode"></span>
+                            <select data-setting="code.rtlFont"><option value="code" data-i18n="rtlInCodeCode"></option><option value="document" data-i18n="rtlInCodeDoc"></option></select></label>
+                    </div>
+                </details>
+
+            </div>
+        </aside>
+    </main>
+
+    <datalist id="dl-word-fonts"></datalist>
+    <datalist id="dl-word-code-fonts"></datalist>
+
+    <footer class="note">
+        <span data-i18n="footerOffline"></span>
+        <span data-i18n="footerLib"></span>
+        <a id="repo-link" href="#" rel="noopener" target="_blank">GitHub</a>
+    </footer>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<!-- app settings: page behaviour (not part of the export profile) -->
+<dialog id="app-dlg" aria-labelledby="app-title">
+    <div class="dlg-head">
+        <h2 id="app-title" data-i18n="appSettings"></h2>
+        <button class="btn ghost icon" id="app-close" type="button" data-i18n-attr="aria-label:close"><i data-lucide="x"></i></button>
+    </div>
+    <div class="dlg-body fields">
+        <div class="sub-head" data-i18n="gView"></div>
+        <label class="check"><input type="checkbox" data-ui="scrollSync"><span data-i18n="scrollSync"></span></label>
+
+        <div class="sub-head" data-i18n="gImport"></div>
+        <label class="check"><input type="checkbox" data-ui="importer.richPaste"><span data-i18n="richPaste"></span></label>
+        <div class="field"><span class="hint" data-i18n="richPasteHint"></span></div>
+        <div class="row2">
+            <label class="field"><span data-i18n="nestedTables"></span>
+                <select data-ui="importer.nestedTables"><option value="extract" data-i18n="nestedExtract"></option><option value="html" data-i18n="nestedHtml"></option></select></label>
+            <label class="field"><span data-i18n="images"></span>
+                <select data-ui="importer.images"><option value="markdown" data-i18n="imagesMd"></option><option value="html" data-i18n="imagesHtml"></option><option value="drop" data-i18n="imagesDrop"></option></select></label>
+        </div>
+
+        <div class="sub-head" data-i18n="gBackup"></div>
+        <div class="btn-row">
+            <button class="btn" id="set-export" type="button"><i data-lucide="download"></i><span data-i18n="exportSettings"></span></button>
+            <label class="btn"><i data-lucide="upload"></i><span data-i18n="importSettings"></span><input type="file" id="set-import-file" hidden accept="application/json,.json"></label>
+            <button class="btn ghost danger" id="set-reset" type="button"><i data-lucide="rotate-ccw"></i><span data-i18n="resetSettings"></span></button>
+        </div>
+        <div class="field"><span class="hint" data-i18n="backupHint"></span></div>
+    </div>
+</dialog>
+
+<dialog id="help" aria-labelledby="help-title">
+    <div class="dlg-head">
+        <h2 id="help-title" data-i18n="shortcuts"></h2>
+        <button class="btn ghost icon" id="help-close" type="button" data-i18n-attr="aria-label:close"><i data-lucide="x"></i></button>
+    </div>
+    <div class="dlg-body">
+        <table>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>S</kbd></td><td data-i18n="kMd"></td></tr>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>Enter</kbd></td><td data-i18n="kDocx"></td></tr>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Enter</kbd></td><td data-i18n="kPdf"></td></tr>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>O</kbd></td><td data-i18n="kOpen"></td></tr>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>V</kbd></td><td data-i18n="kPastePlain"></td></tr>
+            <tr><td><kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd></td><td data-i18n="kTab"></td></tr>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>,</kbd></td><td data-i18n="kSettings"></td></tr>
+            <tr><td><kbd>F1</kbd></td><td data-i18n="kHelp"></td></tr>
+        </table>
+    </div>
+</dialog>
+
+<!-- vendor — local copies, so the page works offline and from file://.
+     Pinned versions (not "latest"): the version in each file name is the one fetched,
+     so an update is a deliberate step and can be traced. Sources (for the next update):
+       https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css
+       https://cdn.rawgit.com/rastikerdar/sahel-font/v3.4.0/dist/font-face.css
+       https://cdn.jsdelivr.net/npm/highlight.js@11.12.0/styles/default.min.css
+       https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.12.0/build/highlight.min.js
+       https://cdn.jsdelivr.net/npm/marked@18.0.14/lib/marked.umd.min.js
+       https://cdn.jsdelivr.net/npm/lucide@1.48.0/dist/umd/lucide.min.js   (→ assets/icons.js, tools/build-icons.js)
+       https://cdn.jsdelivr.net/npm/turndown@7.2.4/dist/turndown.js
+       https://unpkg.com/turndown-plugin-gfm/dist/turndown-plugin-gfm.js    (1.0.2)
+       https://cdn.jsdelivr.net/npm/dompurify@3.4.16/dist/purify.min.js
+       https://cdn.jsdelivr.net/npm/mammoth@1.12.3/mammoth.browser.min.js   (loaded on first use)
+       https://cdn.jsdelivr.net/npm/docx@9.7.1/dist/index.iife.min.js       (loaded on first use)
+       https://cdn.jsdelivr.net/npm/jspdf@4.2.1/dist/jspdf.umd.min.js       (loaded on first use)
+     highlight.js theme: vendor/highlight.js/github.min_11.11.1.css (the preview's colours; default.min kept for reference) -->
+<script src="vendor/marked.umd.min_18.0.14.js"></script>
+<script src="vendor/purify.min_3.4.16.js"></script>
+<script src="vendor/highlight.js/highlight.min_11.12.0.js"></script>
+<script src="assets/icons.js"></script>
+<script src="vendor/turndown/turndown_7.2.4.js"></script>
+<script src="vendor/turndown/turndown-plugin-gfm_1.0.2.js"></script>
+
+<!-- library (standalone; the PDF fonts load on first PDF export) -->
+<script src="lib/ImageCore.js"></script>
+<script src="lib/BidiCore.js"></script>
+<script src="lib/BidiView.js"></script>
+<script src="lib/msOfficeWordHtmlTemplate.js"></script>
+<script src="lib/BuilderBase.js"></script>
+<script src="lib/WordHtmlBuilder.js"></script>
+<script src="lib/DocxBuilder.js"></script>
+<script src="lib/PdfBuilder.js"></script>
+<script src="lib/HtmlBuilder.js"></script>
+<script src="lib/MarkdownImporter.js"></script>
+
+<!-- page -->
+<script src="scripts/config.js"></script>
+<script src="scripts/i18n.js"></script>
+<script src="scripts/storage.js"></script>
+<script src="scripts/ui.js"></script>
+<script src="scripts/fonts-loader.js"></script>
+<script src="scripts/names.js"></script>
+<script src="scripts/images.js"></script>
+<script src="scripts/editor.js"></script>
+<script src="scripts/preview.js"></script>
+<script src="scripts/importer.js"></script>
+<script src="scripts/exporter.js"></script>
+<script src="scripts/settings.js"></script>
+<script src="scripts/main.js"></script>
+</body>
+</html>

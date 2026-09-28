@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kelk — library tests</title>
+<style>
+  body { font: 14px/1.5 system-ui, 'Segoe UI', sans-serif; margin: 24px; color: #1c1b1a; background: #f7f6f3; }
+  h1 { font-size: 20px; margin: 0 0 4px; } p.sub { margin: 0 0 14px; color: #666; }
+  .bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+  button { font: inherit; padding: 6px 14px; border: 1px solid #c9c4ba; border-radius: 6px; background: #fff; cursor: pointer; }
+  button.primary { background: #1f6f5c; color: #fff; border-color: #1f6f5c; }
+  table { border-collapse: collapse; background: #fff; width: 100%; }
+  th, td { border: 1px solid #e0dcd4; padding: 4px 8px; text-align: left; vertical-align: top; }
+  th { background: #efece6; } td.ok { color: #1f6f5c; } td.err { color: #b00020; } td.skip { color: #999; }
+  td a { color: inherit; } .sum { font-weight: 600; } code { background: #efece6; padding: 0 4px; border-radius: 3px; }
+</style>
+</head>
+<body>
+<h1>Kelk — library tests</h1>
+<p class="sub">Every case of <code>tests/test-corpus.js</code> and the three about/guide documents through the four builders
+  (.docx, .doc, .pdf, .html), in this browser. Each cell: size and time, a download link, or the error.
+  The direction column checks that the preview (<code>BidiView</code>) and the builders (<code>BidiCore</code>) decide the same.</p>
+<div class="bar">
+  <button class="primary" id="run" type="button">Run all</button>
+  <label><input type="checkbox" id="toc"> with a table of contents</label>
+  <span class="sum" id="sum"></span>
+</div>
+<table id="out"><thead><tr><th>case</th><th>direction</th><th>DOCX</th><th>DOC</th><th>PDF</th><th>HTML</th></tr></thead><tbody></tbody></table>
+
+<!-- vendor (all loaded up front here) -->
+<script src="../vendor/marked.umd.min_18.0.14.js"></script>
+<script src="../vendor/purify.min_3.4.16.js"></script>
+<script src="../vendor/docx.index.iife.min_9.7.1.js"></script>
+<script src="../vendor/jspdf.umd.min_4.2.1.js"></script>
+<!-- PDF fonts and web fonts -->
+<script src="../lib/pdf-base64-ttf-fonts/pdf-font-vazirmatn.js"></script>
+<script src="../lib/pdf-base64-ttf-fonts/pdf-font-sahel.js"></script>
+<script src="../lib/pdf-base64-ttf-fonts/pdf-font-dejavu-sans.js"></script>
+<script src="../lib/pdf-base64-ttf-fonts/pdf-font-vazir-code-hack.js"></script>
+<script src="../lib/pdf-base64-ttf-fonts/pdf-font-noto-emoji.js"></script>
+<script src="../assets/fonts/embed/vazirmatn.js"></script>
+<script src="../assets/fonts/embed/vazir-code-hack.js"></script>
+<!-- the library, in its load order -->
+<script src="../lib/ImageCore.js"></script>
+<script src="../lib/BidiCore.js"></script>
+<script src="../lib/BidiView.js"></script>
+<script src="../lib/msOfficeWordHtmlTemplate.js"></script>
+<script src="../lib/BuilderBase.js"></script>
+<script src="../lib/WordHtmlBuilder.js"></script>
+<script src="../lib/DocxBuilder.js"></script>
+<script src="../lib/PdfBuilder.js"></script>
+<script src="../lib/HtmlBuilder.js"></script>
+<!-- cases -->
+<script src="test-corpus.js"></script>
+<script src="../docs/about-kelk-and-samples.js"></script>
+<script>
+(function () {
+  'use strict';
+  const FONTS = { bidi: 'Vazirmatn', latin: 'Vazirmatn', code: 'Vazir Code Hack' };
+  const $ = function (s) { return document.querySelector(s); };
+  const st = document.createElement('style'); st.textContent = BidiView.css(); document.head.appendChild(st);   // the classes' CSS
+
+  function cases() {
+    const list = CORPUS.map(function (c) { return { name: c.name, md: c.md, html: c.html, setup: c.setup }; });
+    Object.keys(window.KelkSamples || {}).forEach(function (lang) {
+      list.push({ name: 'about-kelk-and-samples.' + lang, md: KelkSamples[lang].markdown });
+    });
+    return list;
+  }
+  function htmlOf(c) {
+    const h = c.html || marked.parse(c.md, { gfm: true });
+    return window.DOMPurify ? DOMPurify.sanitize(h, { ADD_ATTR: ['target', 'dir', 'align'] }) : h;
+  }
+  function configure(b, kind, toc) {
+    if (kind === 'pdf') b.registerFonts(window.PdfFonts || {});
+    if (kind === 'html') b.registerWebFonts(window.KelkWebFonts || {});
+    b.configure({ fonts: FONTS, toc: toc ? { levels: 2 } : null });
+    return b;
+  }
+  /** BidiView (preview) and BidiCore (builders): the same block directions? */
+  function directionCheck(html) {
+    const a = document.createElement('div'); a.innerHTML = html; document.body.appendChild(a);
+    const docRtl = BidiCore.detectDirection(a) === 'rtl';
+    const plan = BidiCore.planToMaps(BidiCore.planDirections(a, docRtl));
+    const eff = function (el) { for (let x = el; x && x !== a; x = x.parentElement) if (plan.dir.has(x)) return plan.dir.get(x); return docRtl ? 'rtl' : 'ltr'; };
+    const before = Array.from(a.querySelectorAll('p,h1,h2,h3,h4,h5,h6,li,td,th')).map(eff);
+    BidiView.apply(a, {});
+    const after = Array.from(a.querySelectorAll('p,h1,h2,h3,h4,h5,h6,li,td,th')).map(function (el) {
+      const cs = getComputedStyle(el).direction; return cs;
+    });
+    a.remove();
+    let diff = 0; before.forEach(function (d, i) { if (after[i] && d !== after[i]) diff++; });
+    return { blocks: before.length, diff: diff, doc: docRtl ? 'rtl' : 'ltr' };
+  }
+  function cell(td, text, cls, blob, file) {
+    td.className = cls;
+    if (blob) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file; a.textContent = text; td.appendChild(a); }
+    else td.textContent = text;
+  }
+
+  async function run() {
+    const body = $('#out tbody'); body.innerHTML = '';
+    const toc = $('#toc').checked;
+    let ok = 0, bad = 0;
+    for (const c of cases()) {
+      const tr = document.createElement('tr');
+      const name = document.createElement('td'); name.textContent = c.name; tr.appendChild(name);
+      const dirTd = document.createElement('td'); tr.appendChild(dirTd);
+      body.appendChild(tr);
+      const html = htmlOf(c);
+      try { const d = directionCheck(html); cell(dirTd, d.doc + ' · ' + d.blocks + ' blocks' + (d.diff ? ' · ' + d.diff + ' differ' : ''), d.diff ? 'err' : 'ok'); if (d.diff) bad++; else ok++; }
+      catch (e) { cell(dirTd, e.message, 'err'); bad++; }
+      for (const [kind, B, ext] of [['docx', DocxBuilder, 'docx'], ['doc', WordHtmlBuilder, 'doc'], ['pdf', PdfBuilder, 'pdf'], ['html', HtmlBuilder, 'html']]) {
+        const td = document.createElement('td'); tr.appendChild(td);
+        const t0 = performance.now();
+        try {
+          const b = configure(B.create(), kind, toc);
+          if (c.setup) c.setup(b);
+          const blob = await b.addFromHtml(html).toBlob();
+          cell(td, (blob.size / 1024).toFixed(0) + ' KB · ' + Math.round(performance.now() - t0) + ' ms', 'ok', blob, c.name + '.' + ext);
+          ok++;
+        } catch (e) { cell(td, e.message, 'err'); bad++; console.error(c.name, kind, e); }
+        await new Promise(function (r) { setTimeout(r, 0); });   // let the table paint
+      }
+      $('#sum').textContent = ok + ' passed, ' + bad + ' failed';
+    }
+  }
+  $('#run').addEventListener('click', run);
+})();
+</script>
+</body>
+</html>

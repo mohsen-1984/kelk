@@ -1,0 +1,162 @@
+/**
+ * Kelk — startup: language, theme, layout, modules, buttons and keyboard shortcuts.
+ */
+(function (K) {
+    'use strict';
+
+    function on(sel, ev, fn) { const el = K.$(sel); if (el) el.addEventListener(ev, fn); }
+
+    /** Load the about/guide/sample document of the interface language (a script, so file:// works). */
+    async function loadSample(ask) {
+        if (ask && K.editor.value().trim() && !confirm(K.i18n.t('confirmSample'))) return;
+        try {
+            await K.ui.loadScript(K.config.sample);
+            // the document of the interface language (about Kelk + guide + samples)
+            const all = window.KelkSamples || {};
+            const doc = all[K.i18n.lang] || all.en || all.fa;
+            K.names.reset();
+            K.editor.set(doc.markdown, doc.name);
+            K.editor.markConverted(false);
+            K.$('.preview-scroll').scrollTop = 0;
+            K.$('#editor').scrollTop = 0;
+        } catch (e) {
+            K.ui.toast(K.i18n.t('failed', e.message), 'error');
+        }
+    }
+
+    /**
+     * First visit: the language from the browser's locale. Any Persian entry
+     * in the user's language list (fa, fa-IR, fa-AF, prs) → Persian; an English
+     * browser with an Iranian or Afghan time zone (common: an English UI on a
+     * Persian speaker's system) → Persian too; otherwise English.
+     */
+    function firstLanguage() {
+        const langs = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''])
+            .map(function (l) { return String(l).toLowerCase(); });
+        if (langs.some(function (l) { return /^(fa|prs)\b/.test(l); })) return 'fa';
+        if (langs.some(function (l) { return /^ar\b/.test(l); })) return 'ar';
+        let tz = '';
+        try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { /* none */ }
+        if (/^Asia\/(Tehran|Kabul)$/.test(tz)) return 'fa';
+        return langs[0] ? 'en' : 'fa';
+    }
+
+    function start() {
+        const u = K.store.ui();
+        const lang = u.lang || firstLanguage();
+        K.i18n.apply(lang);
+        K.ui.theme(u.theme || '');
+        K.ui.layout(u.layout);
+        K.ui.pane(u.paneOpen !== false);
+        K.ui.editorPane(u.editorOpen !== false);
+
+        K.images.init();
+        K.editor.init();
+        K.preview.init();
+        K.names.init();
+        K.settings.init();
+
+        const repo = K.$('#repo-link');
+        if (repo) { if (K.config.repoUrl) repo.href = K.config.repoUrl; else repo.hidden = true; }
+
+        // top bar
+        // language: one button for each OTHER interface language, named in its own language
+        const langButtons = function () {
+            const box = K.$('#lang-switch');
+            K.$$('button', box).forEach(function (b) { b.remove(); });
+            Object.keys(K.i18n.languages).forEach(function (code) {
+                if (code === K.i18n.lang) return;
+                const b = document.createElement('button');
+                b.type = 'button'; b.className = 'btn ghost'; b.lang = code;
+                b.dir = code === 'en' ? 'ltr' : 'rtl';
+                b.textContent = K.i18n.languages[code];
+                b.addEventListener('click', function () { switchLang(code); });
+                box.appendChild(b);
+            });
+        };
+        const switchLang = function (next) {
+            const prev = K.i18n.lang;
+            // the about/sample document on screen, unchanged → the one of the new language
+            const showingSample = window.KelkSamples && KelkSamples[prev] && K.editor.value() === KelkSamples[prev].markdown;
+            K.store.setUi('lang', next);
+            K.i18n.apply(next);
+            langButtons();
+            K.ui.layout(K.store.getUi('layout'));
+            K.settings.showLogo();
+            if (showingSample) loadSample(false); else K.preview.render();
+        };
+        langButtons();
+
+        on('#btn-theme', 'click', function () {
+            const cur = document.documentElement.getAttribute('data-theme');
+            K.store.setUi('theme', K.ui.theme(cur === 'dark' ? 'light' : 'dark'));
+        });
+        on('#btn-layout', 'click', function () {
+            K.store.setUi('layout', K.ui.layout(K.$('#workspace').classList.contains('stack') ? 'side' : 'stack'));
+        });
+        on('#btn-app', 'click', function () { K.ui.dialog('#app-dlg', true); });
+        on('#app-close', 'click', function () { K.ui.dialog('#app-dlg', false); });
+        on('#btn-help', 'click', function () { K.ui.help(true); });
+        on('#help-close', 'click', function () { K.ui.help(false); });
+
+        // panes
+        const togglePane = function () {
+            const open = K.$('#workspace').classList.contains('pane-closed');
+            K.ui.pane(open);
+            K.store.setUi('paneOpen', open);
+        };
+        on('#pane-rail', 'click', togglePane);
+        const groups = function (open) { K.$$('#pane-body details.group').forEach(function (d) { d.open = open; }); };
+        on('#groups-open', 'click', function () { groups(true); });
+        on('#groups-close', 'click', function () { groups(false); });
+        on('#pane-close', 'click', togglePane);
+        const toggleEditor = function () {
+            const open = K.$('#workspace').classList.contains('editor-closed');
+            K.ui.editorPane(open);
+            K.store.setUi('editorOpen', open);
+            if (open) K.$('#editor').focus();
+        };
+        on('#editor-rail', 'click', toggleEditor);
+        on('#editor-close', 'click', toggleEditor);
+
+        // editor actions
+        on('#btn-sample', 'click', function () { loadSample(true); });
+        on('#btn-import', 'click', function () { K.$('#file-import').click(); });
+        on('#file-import', 'change', function () { const f = this.files[0]; this.value = ''; K.importer.fromFile(f); });
+        on('#btn-paste', 'click', function () { K.importer.fromClipboardButton(); });
+        on('#btn-clear', 'click', function () {
+            if (K.editor.value() && !confirm(K.i18n.t('confirmClear'))) return;
+            K.names.reset();
+            K.editor.set('', '');
+            K.editor.markConverted(false);
+        });
+
+        // preview / export
+        on('#btn-copy-preview', 'click', function () { K.preview.copyAll(); });
+        K.$$('[data-export]').forEach(function (b) {
+            b.addEventListener('click', function () { K.exporter.run(b.getAttribute('data-export'), b); });
+        });
+
+        // shortcuts (Ctrl+Enter is free in every browser; Ctrl+S saves the Markdown)
+        const exp = function (kind) { K.exporter.run(kind, K.$('[data-export="' + kind + '"]')); };
+        document.addEventListener('keydown', function (e) {
+            const mod = e.ctrlKey || e.metaKey, k = e.key.toLowerCase();
+            if (mod && !e.shiftKey && !e.altKey && k === 's') { e.preventDefault(); exp('md'); }
+            else if (mod && e.key === 'Enter') { e.preventDefault(); exp(e.shiftKey ? 'pdf' : 'docx'); }
+            else if (mod && !e.shiftKey && k === 'o') { e.preventDefault(); K.$('#file-import').click(); }
+            else if (mod && e.key === ',') { e.preventDefault(); togglePane(); }
+            else if (e.key === 'F1') { e.preventDefault(); K.ui.help(true); }
+        });
+
+        K.ui.icons();
+
+        // first visit: show what Kelk does
+        if (!K.editor.value().trim() && !u.sampleSeen) {
+            K.store.setUi('sampleSeen', true);
+            loadSample(false);
+        }
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+    else start();
+})(window.Kelk = window.Kelk || {});

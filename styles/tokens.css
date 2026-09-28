@@ -1,0 +1,110 @@
+/* Kelk — design tokens: colors (light / dark), fonts, radii, spacing.
+   Two font variables drive the whole page:
+     --font-ui       interface (buttons, labels, settings)
+     --font-content  the document: editor + preview (set from Settings → Typography)
+   --font-mono is the code font of the preview (and of the exports). */
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('../assets/fonts/rastikerdar/webfonts/Vazirmatn[wght].woff2') format('woff2');
+  font-weight: 100 900; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Sahel';
+  src: url('../assets/fonts/rastikerdar/webfonts/Sahel-VF.woff2') format('woff2');
+  font-weight: 100 900; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'DejaVu Sans';
+  src: url('../assets/fonts/dejavu/DejaVuSans-Regular.woff') format('woff');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'DejaVu Sans';
+  src: url('../assets/fonts/dejavu/DejaVuSans-Bold.woff') format('woff');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'DejaVu Sans';
+  src: url('../assets/fonts/dejavu/DejaVuSans-Oblique.woff') format('woff');
+  font-weight: 400; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: 'DejaVu Sans';
+  src: url('../assets/fonts/dejavu/DejaVuSans-BoldOblique.woff') format('woff');
+  font-weight: 700; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: 'Vazir Code Hack';
+  src: url('../assets/fonts/vazir-code/Vazir-Code-Hack.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'DejaVu Sans Mono';
+  src: url('../assets/fonts/dejavu/DejaVuSansMono-Regular.woff') format('woff');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'DejaVu Sans Mono';
+  src: url('../assets/fonts/dejavu/DejaVuSansMono-Bold.woff') format('woff');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+
+:root {
+  --font-ui: 'Vazirmatn', system-ui, sans-serif;
+  --font-content: 'Sahel', 'Vazirmatn', system-ui, sans-serif;
+  --font-latin: 'Vazirmatn', system-ui, sans-serif;
+  --font-mono: 'Vazir Code Hack', 'DejaVu Sans Mono', ui-monospace, Consolas, monospace;
+
+  --bg: #f7f6f3;
+  --panel: #ffffff;
+  --panel-2: #fcfbf9;
+  --ink: #1c1b1a;
+  --muted: #6b6862;
+  --placeholder: #b6b1a8;
+  --line: #e6e3dd;
+  --line-strong: #d4d0c8;
+  --accent: #1f6f5c;
+  --accent-soft: #e7f1ee;
+  --accent-ink: #114b3e;
+  --on-accent: #ffffff;
+  --danger: #b42318;
+  --warn: #b45309;
+  --code-bg: #f4f2ee;
+  --code-head: #ebe8e2;
+  --quote-bar: #c9a227;
+  --table-head: #e2efd9;
+  --toast-bg: #114b3e;
+  --toast-ink: #ffffff;
+
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow: 0 1px 2px rgba(28, 27, 26, .04), 0 4px 16px rgba(28, 27, 26, .05);
+  --gap: 14px;
+  --pane-w: 340px;
+  --rail-w: 44px;
+}
+
+[data-theme="dark"] {
+  --bg: #16181a;
+  --panel: #1e2124;
+  --panel-2: #23262a;
+  --ink: #e6e4df;
+  --muted: #9a958c;
+  --placeholder: #6b6862;
+  --line: #2d3136;
+  --line-strong: #3c4147;
+  --accent: #4db396;
+  --accent-soft: #1a3129;
+  --accent-ink: #83d5bd;
+  --on-accent: #0f1416;
+  --danger: #f97066;
+  --warn: #f0b429;
+  --code-bg: #25292d;
+  --code-head: #2d3136;
+  --quote-bar: #d4b43f;
+  --table-head: #24382c;
+  --toast-bg: #4db396;
+  --toast-ink: #0f1416;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .25), 0 4px 16px rgba(0, 0, 0, .3);
+}
