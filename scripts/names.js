@@ -115,14 +115,28 @@
         stem: function () { return sanitize(user) || this.autoStem() || K.i18n.t('untitled'); },
 
         /** A file was imported: its name becomes the default stem. */
-        setSource: function (fileName) {
+        /**
+         * A NEW document replaced the text (import, sample, clear): everything the
+         * name box and the title took from the old one goes — the imported
+         * file's name, a typed stem, a typed title (back to automatic) — and the
+         * page remembers whether the new text is an about/sample document, and of
+         * which language (so a language switch can swap it for the right one).
+         * @param {string} [fileName]   imported file: its name becomes the default stem
+         * @param {string} [sampleLang] the about/sample document's language
+         */
+        newDocument: function (fileName, sampleLang) {
             source = String(fileName || '').replace(/\.[^.]+$/, '');
             user = null;
+            if (K.store.get('document.title') != null) K.store.set('document.title', null);
+            K.store.setUi('sampleLang', sampleLang || null);
             this.refresh();
         },
 
-        /** The text was cleared or replaced by a sample. */
-        reset: function () { source = ''; user = null; this.refresh(); },
+        /** Kept for callers: an imported file. */
+        setSource: function (fileName) { this.newDocument(fileName, null); },
+
+        /** Kept for callers: cleared text. */
+        reset: function () { this.newDocument('', null); },
 
         setExt: function (ext) {
             const el = K.$('#nb-ext');

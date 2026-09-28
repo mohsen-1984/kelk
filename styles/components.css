@@ -22,6 +22,7 @@
 .btn.ghost:hover { background: var(--accent-soft); }
 .btn.icon { width: 32px; padding: 0; justify-content: center; }
 .btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+.btn.soft.danger:hover { background: color-mix(in srgb, var(--danger) 10%, transparent); }   /* soft accent → soft red */
 .btn svg { width: 16px; height: 16px; flex: none; }
 .btn.busy { pointer-events: none; opacity: .7; }
 .btn.busy::after {

@@ -63,25 +63,44 @@
         },
 
         /** "Paste" button: rich text when the clipboard has it, else plain. */
+        /**
+         * The Paste button. ONE clipboard call: every navigator.clipboard.read /
+         * readText is a separate browser prompt (Firefox's "Paste" menu, Chrome's
+         * paste bubble), so the HTML, the plain text and an image all come from
+         * the same read(); readText() only where read() does not exist.
+         */
         fromClipboardButton: async function () {
             try {
                 if (navigator.clipboard && navigator.clipboard.read) {
                     const items = await navigator.clipboard.read();
+                    let html = '', text = '', image = null;
                     for (const it of items) {
-                        if (it.types.indexOf('text/html') >= 0 && K.store.getUi('importer.richPaste')) {
-                            const html = await (await it.getType('text/html')).text();
-                            if (MarkdownImporter.isRich(html)) {
-                                K.editor.insert(importer().fromHtml(html).markdown);
-                                K.editor.markConverted(true);
-                                K.ui.toast(K.i18n.t('imported'));
-                                return;
-                            }
+                        if (!html && it.types.indexOf('text/html') >= 0) html = await (await it.getType('text/html')).text();
+                        if (!text && it.types.indexOf('text/plain') >= 0) text = await (await it.getType('text/plain')).text();
+                        if (!image) {
+                            const t = it.types.find(function (x) { return /^image\//.test(x); });
+                            if (t) { const blob = await it.getType(t); image = new File([blob], 'image.' + t.split('/')[1], { type: t }); }
                         }
                     }
+                    if (html && K.store.getUi('importer.richPaste') && MarkdownImporter.isRich(html)) {
+                        K.editor.insert(importer().fromHtml(html).markdown);
+                        K.editor.markConverted(true);
+                        K.ui.toast(K.i18n.t('imported'));
+                    } else if (text) {
+                        K.editor.insert(text);
+                    } else if (image) {
+                        const name = await K.images.add(image);
+                        K.editor.insert('![' + name + '](' + name + ')');
+                        K.ui.toast(K.i18n.t('imageAdded', name));
+                    }
+                    return;
                 }
-                const text = await navigator.clipboard.readText();
-                if (text) K.editor.insert(text);
+                if (navigator.clipboard && navigator.clipboard.readText) {
+                    const text = await navigator.clipboard.readText();
+                    if (text) K.editor.insert(text);
+                }
             } catch (e) {
+                if (e && e.name === 'NotAllowedError') return;       // the user declined the prompt
                 K.ui.toast(K.i18n.t('failed', e.message), 'error');
             }
         }

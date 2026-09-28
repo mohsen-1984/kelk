@@ -209,7 +209,7 @@
                     el.value = auto[path]();
                     el.classList.add('auto');
                 } else if (!isAuto) el.classList.remove('auto');
-                if (path === 'document.title') el.placeholder = K.i18n.t('titleNone');
+                if (path === 'document.title') el.placeholder = K.i18n.t('untitled');   // سند / document / مستند
             });
         },
 

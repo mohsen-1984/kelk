@@ -26,6 +26,7 @@
             scrollSync: true,
             previewWordFont: false,     // preview with the Word fonts when installed
             sampleSeen: false,
+            sampleLang: null,           // the about/sample document on screen (its language), if any
             importer: { richPaste: true, nestedTables: 'extract', images: 'markdown' }
         },
 

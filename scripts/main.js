@@ -13,8 +13,9 @@
             await K.ui.loadScript(K.config.sample);
             // the document of the interface language (about Kelk + guide + samples)
             const all = window.KelkSamples || {};
-            const doc = all[K.i18n.lang] || all.en || all.fa;
-            K.names.reset();
+            const lang = all[K.i18n.lang] ? K.i18n.lang : (all.en ? 'en' : 'fa');
+            const doc = all[lang];
+            K.names.newDocument('', lang);          // remembered: this text IS the sample of `lang`
             K.editor.set(doc.markdown, doc.name);
             K.editor.markConverted(false);
             K.$('.preview-scroll').scrollTop = 0;
@@ -74,16 +75,38 @@
                 box.appendChild(b);
             });
         };
-        const switchLang = function (next) {
-            const prev = K.i18n.lang;
-            // the about/sample document on screen, unchanged → the one of the new language
-            const showingSample = window.KelkSamples && KelkSamples[prev] && K.editor.value() === KelkSamples[prev].markdown;
+        /**
+         * Switch the interface language. If the text on screen is an about/sample
+         * document, unchanged, it is swapped for the one of the new language. The
+         * page remembers which sample it loaded (ui.sampleLang) and loads the
+         * samples script before comparing — the comparison used to run against a
+         * script that was not loaded yet after a reload, so the swap was skipped.
+         */
+        let switching = Promise.resolve();
+        const switchLang = function (next) {                 // one switch at a time, in click order
+            switching = switching.then(function () { return doSwitchLang(next); }, function () { return doSwitchLang(next); });
+            return switching;
+        };
+        const doSwitchLang = async function (next) {
+            if (next === K.i18n.lang) return;
+            let showingSample = false;
+            const text = K.editor.value();
+            if (text.trim()) {
+                try {
+                    await K.ui.loadScript(K.config.sample);      // cached after the first time
+                    const all = window.KelkSamples || {};
+                    const sl = K.store.getUi('sampleLang');
+                    // the remembered sample first; any sample otherwise (text saved before this was tracked)
+                    showingSample = !!(sl && all[sl] && text === all[sl].markdown) ||
+                        Object.keys(all).some(function (k) { return text === all[k].markdown; });
+                } catch (e) { /* no samples: keep the text */ }
+            }
             K.store.setUi('lang', next);
             K.i18n.apply(next);
             langButtons();
             K.ui.layout(K.store.getUi('layout'));
             K.settings.showLogo();
-            if (showingSample) loadSample(false); else K.preview.render();
+            if (showingSample) await loadSample(false); else K.preview.render();
         };
         langButtons();
 
