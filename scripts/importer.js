@@ -69,7 +69,10 @@
          * paste bubble), so the HTML, the plain text and an image all come from
          * the same read(); readText() only where read() does not exist.
          */
-        fromClipboardButton: async function () {
+        /** The Paste button (o.replace: the Clear & paste button — the clipboard becomes the document). */
+        fromClipboardButton: async function (o) {
+            const replace = !!(o && o.replace);
+            const clear = function () { if (replace) { K.names.reset(); K.editor.set('', ''); K.editor.markConverted(false); } };
             try {
                 if (navigator.clipboard && navigator.clipboard.read) {
                     const items = await navigator.clipboard.read();
@@ -83,12 +86,16 @@
                         }
                     }
                     if (html && K.store.getUi('importer.richPaste') && MarkdownImporter.isRich(html)) {
-                        K.editor.insert(importer().fromHtml(html).markdown);
+                        const md = importer().fromHtml(html).markdown;
+                        clear();
+                        K.editor.insert(md);
                         K.editor.markConverted(true);
                         K.ui.toast(K.i18n.t('imported'));
                     } else if (text) {
+                        clear();
                         K.editor.insert(text);
                     } else if (image) {
+                        clear();
                         const name = await K.images.add(image);
                         K.editor.insert('![' + name + '](' + name + ')');
                         K.ui.toast(K.i18n.t('imageAdded', name));
@@ -97,7 +104,7 @@
                 }
                 if (navigator.clipboard && navigator.clipboard.readText) {
                     const text = await navigator.clipboard.readText();
-                    if (text) K.editor.insert(text);
+                    if (text) { clear(); K.editor.insert(text); }
                 }
             } catch (e) {
                 if (e && e.name === 'NotAllowedError') return;       // the user declined the prompt

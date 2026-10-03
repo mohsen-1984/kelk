@@ -1,6 +1,6 @@
 /**
  * Kelk.store — everything the page remembers, in localStorage under "kelk.*":
- *   ui        (JSON) page behaviour, merged over config.uiDefaults
+ *   ui        (JSON) page behavior, merged over config.uiDefaults
  *   settings  (JSON) export profile, merged over config.defaults
  *   content   the Markdown text
  *   logo      data URI of the uploaded logo
@@ -102,7 +102,7 @@
         replaceSettings: function (obj) { raw.set('settings', JSON.stringify(merge(K.config.defaults, obj || {}))); },
         resetSettings: function () { raw.remove('settings'); },
 
-        // ── page behaviour ─────────────────────────────────────────────
+        // ── page behavior ─────────────────────────────────────────────
         ui: function () { return merge(K.config.uiDefaults, readJson('ui')); },
         setUi: function (path, value) {
             const u = setPath(this.ui(), path, value);

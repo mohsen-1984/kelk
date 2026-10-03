@@ -1,80 +1,54 @@
-/* Kelk — the rendered document (preview). The HTML export embeds this file. */
+/* Kelk — the preview pane.
+   The document's own look comes from HtmlBuilder's stylesheet (lib/PreviewBuilder → <style id="kelk-doc-css">),
+   the same one the .html export embeds. This file adds only what belongs to the pane: spacing, the
+   empty hint, the copy buttons, the source view, and the dark theme of the app. */
 
 .doc {
-  font-family: var(--font-content);
-  font-size: var(--doc-size, 16px);     /* Settings → Typography, Complex scripts size (pt → px) */
-  line-height: 1.9;
   padding: 18px 22px 28px;
   color: var(--ink);
   overflow-wrap: anywhere;
 }
-.doc:empty::before { content: attr(data-empty); color: var(--placeholder); }
-
-/* Latin text in the Latin font: LTR blocks and LTR runs (lib/BidiView classes) */
-.doc :lang(en), .doc [dir="ltr"], .doc .bd-ltr, .doc .bd-iso-ltr:not(code) { font-family: var(--font-latin); }
-.doc .bd-rtl, .doc .bd-iso-rtl:not(code) { font-family: var(--font-content); }
-
-.doc h1, .doc h2, .doc h3, .doc h4, .doc h5, .doc h6 { line-height: 1.4; margin: 1.2em 0 .5em; }
-.doc h1 { font-size: 1.6em; color: #44546a; }
-.doc h2 { font-size: 1.35em; color: #385623; }
-.doc h3 { font-size: 1.15em; color: #1f3864; }
-[data-theme="dark"] .doc h1, [data-theme="dark"] .doc h2, [data-theme="dark"] .doc h3 { color: var(--accent-ink); }
+.doc:empty::before { content: attr(data-empty); color: var(--placeholder); font-family: var(--font-ui); }
 .doc > :first-child { margin-top: 0; }
-.doc p { margin: 0 0 .8em; }
-.doc hr { border: 0; border-top: 1px solid var(--line-strong); margin: 1.4em 0; }
-.doc img { max-width: 100%; height: auto; }
 
-.doc { --bd-base: 2em; --bd-step: 1.5em; }        /* lists ≈ 24pt / 18pt like the exports (lib/BidiView: by level, per item side) */
-.doc ul, .doc ol { padding-inline-start: 1.6em; margin: 0 0 .8em; }
-.doc li { margin-block: .15em; }
-.doc li > ul, .doc li > ol { margin-block: .15em; margin-inline: 0; }
-.doc ol ol, .doc ol ol ol { list-style-type: decimal; }       /* decimal at every level, as the exports */
-.doc li:has(> input[type="checkbox"]) { list-style: none; }
-.doc li > input[type="checkbox"] { margin-inline-end: .4em; }
+/* wide tables scroll inside the pane */
+.doc table:not(.kelk-fit) { display: block; overflow-x: auto; }
 
-.doc blockquote {
-  margin: 0 0 1em; padding: .4em 1em;
-  border-inline-start: 4px solid var(--quote-bar);
-  background: var(--panel-2); color: var(--muted);
-}
-.doc blockquote > :last-child { margin-bottom: 0; }
-
-.doc table { border-collapse: collapse; margin: 0 auto 1em; max-width: 100%; display: block; overflow-x: auto; }
-.doc th, .doc td { border: 1px solid var(--line-strong); padding: 4px 10px; vertical-align: top; }
-.doc th { background: var(--table-head); font-weight: 700; }
-
-.doc code { font-family: var(--font-mono); font-size: .88em; background: var(--code-bg); padding: .1em .35em; border-radius: 4px; }
-.doc pre {
-  direction: ltr; text-align: left;
-  font-family: var(--font-mono); font-size: 13px; line-height: 1.55;
-  background: var(--code-bg); margin: 0; padding: 10px 12px; overflow-x: auto; white-space: pre;
-}
-.doc pre code { background: none; padding: 0; font-size: inherit; }
-
-/* code block frame (language bar + copy) */
-.code-block-wrapper { border: 1px solid var(--line-strong); border-radius: var(--radius-sm); overflow: hidden; margin: 0 0 1em; direction: ltr; }
-.code-block-header {
-  display: flex; align-items: center; justify-content: space-between;
-  background: var(--code-head); padding: 2px 6px 2px 10px; font-size: 12px; color: var(--muted); font-family: var(--font-mono);
-}
+/* code frame bar: the language on one side, the copy button on the other */
+.doc .code-lang { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 1.6em; }
 .code-copy-btn {
   display: inline-flex; align-items: center; gap: 4px; border: 0; background: transparent; color: inherit; cursor: pointer;
-  font-size: 12px; padding: 2px 6px; border-radius: 4px; font-family: var(--font-ui);
+  font-size: 12px; padding: 1px 6px; border-radius: 4px; font-family: var(--font-ui); margin-inline-start: auto;
 }
 .code-copy-btn:hover { background: var(--accent-soft); color: var(--accent-ink); }
 .code-copy-btn svg { width: 14px; height: 14px; }
-
-/* fenced block written inside a code block: a frame, text unchanged */
-.code-nested {
-  display: inline-block; width: 100%; box-sizing: border-box; position: relative;
-  border: 1px solid var(--accent); border-radius: 4px; padding: 2px 6px; margin: 2px 0; vertical-align: top;
-}
+.code-copy-btn.copied { color: var(--accent); }
+.doc .code-nested { position: relative; }
 .code-nested-copy { position: absolute; top: 2px; right: 4px; padding: 1px 3px; opacity: .55; }
 .code-nested:hover > .code-nested-copy { opacity: 1; }
-.code-copy-btn.copied { color: var(--accent); }
 
 /* Markdown shown as source (reverse view) */
 .doc.source { font-family: var(--font-mono); font-size: 13px; white-space: pre-wrap; direction: ltr; text-align: left; unicode-bidi: plaintext; }
 
-/* cells: the Markdown alignment wins; without one, th center and td start (as in the exports) */
-.doc th:not([align]), .doc.bd-root th:not([align]):is(.bd-ltr, .bd-rtl) { text-align: center; }
+/* dark theme of the app. The document's own colors (tables, code, quotes, ToC) are translated
+   for the dark page by scripts/preview.js (darkPaper) — the exports keep the chosen colors; here,
+   only what the document stylesheet does not color: text on the page, code text and syntax colors. */
+[data-theme="dark"] .doc h1, [data-theme="dark"] .doc h2, [data-theme="dark"] .doc h3,
+[data-theme="dark"] .doc h4, [data-theme="dark"] .doc h5, [data-theme="dark"] .doc h6 { color: var(--accent-ink); }
+[data-theme="dark"] .doc :not(pre) > code { background: var(--code-bg); color: var(--ink); }
+[data-theme="dark"] .doc a { color: var(--accent-ink); }
+[data-theme="dark"] .doc .code, [data-theme="dark"] .doc .code code.hljs { color: var(--ink); }
+/* syntax colors for a dark box (GitHub dark) */
+[data-theme="dark"] .doc .code .hljs-keyword, [data-theme="dark"] .doc .code .hljs-doctag, [data-theme="dark"] .doc .code .hljs-type,
+[data-theme="dark"] .doc .code .hljs-meta .hljs-keyword, [data-theme="dark"] .doc .code .hljs-template-tag { color: #ff7b72; }
+[data-theme="dark"] .doc .code .hljs-string, [data-theme="dark"] .doc .code .hljs-regexp, [data-theme="dark"] .doc .code .hljs-meta .hljs-string { color: #a5d6ff; }
+[data-theme="dark"] .doc .code .hljs-title, [data-theme="dark"] .doc .code .hljs-title.function_, [data-theme="dark"] .doc .code .hljs-title.class_ { color: #d2a8ff; }
+[data-theme="dark"] .doc .code .hljs-number, [data-theme="dark"] .doc .code .hljs-literal, [data-theme="dark"] .doc .code .hljs-attr,
+[data-theme="dark"] .doc .code .hljs-attribute, [data-theme="dark"] .doc .code .hljs-variable, [data-theme="dark"] .doc .code .hljs-built_in,
+[data-theme="dark"] .doc .code .hljs-selector-class, [data-theme="dark"] .doc .code .hljs-operator { color: #79c0ff; }
+[data-theme="dark"] .doc .code .hljs-comment, [data-theme="dark"] .doc .code .hljs-quote { color: #8b949e; }
+[data-theme="dark"] .doc .code .hljs-name, [data-theme="dark"] .doc .code .hljs-selector-tag, [data-theme="dark"] .doc .code .hljs-section { color: #7ee787; }
+[data-theme="dark"] .doc .code .hljs-subst, [data-theme="dark"] .doc .code .hljs-params { color: var(--ink); }
+
+/* highlight.js's page theme adds padding and a background to code.hljs: the frame has its own */
+.doc pre code.hljs { padding: 0; background: none; }

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kelk — formulas: SVG vs MathML</title>
+<style>
+  @font-face { font-family: Vazirmatn; src: url("../assets/fonts/rastikerdar/webfonts/Vazirmatn[wght].woff2") format("woff2"); font-weight: 100 900; }
+  body { font: 14px/1.5 system-ui, sans-serif; margin: 20px; color: #1c1b1a; }
+  h1 { font-size: 18px; margin: 0 0 6px; }
+  table { border-collapse: collapse; width: 100%; }
+  td, th { border: 1px solid #ddd; padding: 6px 8px; vertical-align: middle; text-align: left; }
+  th { background: #f4f2ee; } td.g { color: #777; font-size: 12px; }
+  td.tex { font: 11px ui-monospace, monospace; max-width: 300px; word-break: break-all; color: #555; }
+  td.out { font-size: 17px; }
+  .flag { color: #b00020; font-size: 12px; }
+</style>
+<script src="../lib/MathCore.js"></script>
+<script src="math-cases.js"></script>
+</head>
+<body>
+<h1>Kelk — formulas: SVG vs MathML (lib/MathCore.js)</h1>
+<p>The same TeX in both modes, side by side. MathML is drawn by the browser itself (its math font); a formula the browser cannot draw is shown as SVG and flagged in red. Compare each row by eye.</p>
+<table><thead><tr><th>#</th><th>group</th><th>case</th><th>SVG</th><th>MathML</th><th>TeX</th></tr></thead><tbody id="rows"></tbody></table>
+<style id="mc"></style>
+<script>
+(async function () {
+  MathCore.configure({ mathjax: '../vendor/mathjax_4.1.3/' });
+  document.getElementById('mc').textContent = MathCore.css({ textFont: 'Vazirmatn' });
+  const rows = document.getElementById('rows');
+  for (let i = 0; i < MATH_CASES.length; i++) {
+    const [group, name, tex, display] = MATH_CASES[i];
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td>' + (i + 1) + '</td><td class="g"></td><td></td><td class="out"></td><td class="out"></td><td class="tex"></td>';
+    tr.children[1].textContent = group; tr.children[2].textContent = name; tr.children[5].textContent = tex;
+    rows.appendChild(tr);
+    for (const [col, mode] of [[3, 'svg'], [4, 'mathml']]) {
+      const ph = document.createElement(display ? 'div' : 'span');
+      ph.className = 'kelk-math'; ph.setAttribute('data-tex', tex); ph.setAttribute('data-display', display ? 'block' : 'inline');
+      tr.children[col].appendChild(ph);
+      await MathCore.typeset(tr.children[col], { mode: mode, textFont: 'Vazirmatn' });
+      if (mode === 'mathml' && ph.getAttribute('data-math-svg')) {
+        const f = document.createElement('div'); f.className = 'flag'; f.textContent = 'SVG: ' + ph.getAttribute('data-math-svg');
+        tr.children[col].appendChild(f);
+      }
+    }
+  }
+  window.__done = true;
+})();
+</script>
+</body>
+</html>

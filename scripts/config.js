@@ -8,7 +8,7 @@
     'use strict';
 
     K.config = {
-        version: '1.0',
+        version: '1.5',
         repoUrl: 'https://github.com/mohsen-1984/kelk',   // the footer link (hidden when empty)
         storagePrefix: 'kelk.',
         maxFileMB: 10,
@@ -17,7 +17,7 @@
         autosaveMs: 600,
         renderMs: 250,
 
-        /** Page behaviour (Kelk.store.ui). */
+        /** Page behavior (Kelk.store.ui). */
         uiDefaults: {
             lang: '', theme: '',        // '' → from the browser
             layout: 'side',             // side | stack
@@ -48,10 +48,16 @@
                 bidiSize: 12,           // pt
                 latinSize: 11.5
             },
-            page: { size: 'A4', orientation: 'portrait', margin: '20mm 15mm', tableWidth: 'auto' },
+            page: { size: 'A4', orientation: 'portrait', margin: '20mm 15mm', tableWidth: 'auto', tableAlign: 'center' },
+            // table style (BuilderBase.setTableStyle): lines × fill, a total row, three colors (text on a dark fill turns white)
+            tableStyle: { lines: 'grid', fill: 'header-stripes', headerCenter: true, headerBold: true, total: false,
+                          headerColor: '#E4E9EF', stripeColor: '#F5F7FA', borderColor: '#A9B5C4' },
             direction: 'auto',          // auto | rtl | ltr
             toc: { enabled: false, levels: 2 },   // table of contents after the opening H1
-            code: { showLanguage: true, rtlFont: 'code', font: 'Vazir Code Hack', wordFont: 'Consolas', size: 10 }
+            code: { showLanguage: true, rtlFont: 'code', font: 'Vazir Code Hack', wordFont: 'Consolas', size: 10,
+                    bg: '#FCFCFC', headerBg: '#E7F1EE', border: '#D4D0C8' },   // colors: box, language bar (its text follows), frame (0.75pt)
+            quote: { border: '#1F6F5C', width: '3.5pt', bg: '#F6F9F8', text: '#4A4A4A' },   // the bar beside a quote, the box's fill, its text
+            math: { html: 'svg', word: 'native' }   // formulas: HTML svg | mathml; .docx native (Word equations) | image
         },
 
         /** Default edition: LTR header → Draft; RTL header → by interface language (Persian unless Arabic). */
@@ -100,6 +106,9 @@
         },
 
         sample: 'docs/about-kelk-and-samples.js',   // KelkSamples[lang] (tools/build-samples.js)
+
+        /** LaTeX formulas: the local MathJax 4 (lib/MathCore loads it with the first formula). */
+        math: { mathjax: 'vendor/mathjax_4.1.3/' },
 
         /** Large libraries, loaded on first use (Kelk.libs.need). */
         libs: {

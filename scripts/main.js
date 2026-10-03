@@ -49,7 +49,7 @@
         K.ui.theme(u.theme || '');
         K.ui.layout(u.layout);
         K.ui.pane(u.paneOpen !== false);
-        K.ui.editorPane(u.editorOpen !== false);
+        K.ui.editorPane(true);                          // no close button any more: maximize the preview instead
 
         K.images.init();
         K.editor.init();
@@ -113,18 +113,25 @@
         on('#btn-theme', 'click', function () {
             const cur = document.documentElement.getAttribute('data-theme');
             K.store.setUi('theme', K.ui.theme(cur === 'dark' ? 'light' : 'dark'));
+            K.preview.render();                 // the document's colors follow the theme (preview only)
         });
         on('#btn-layout', 'click', function () {
             K.store.setUi('layout', K.ui.layout(K.$('#workspace').classList.contains('stack') ? 'side' : 'stack'));
         });
-        on('#btn-app', 'click', function () { K.ui.dialog('#app-dlg', true); });
-        on('#app-close', 'click', function () { K.ui.dialog('#app-dlg', false); });
         on('#btn-help', 'click', function () { K.ui.help(true); });
         on('#help-close', 'click', function () { K.ui.help(false); });
 
         // panes
         const togglePane = function () {
-            const open = K.$('#workspace').classList.contains('pane-closed');
+            const ws = K.$('#workspace');
+            // a maximized panel first steps back (as Esc does), so Settings opens at its full width
+            if (ws.className.indexOf('max-') >= 0) {
+                K.ui.maximize(null);
+                K.ui.pane(true);
+                K.store.setUi('paneOpen', true);
+                return;
+            }
+            const open = ws.classList.contains('pane-closed');
             K.ui.pane(open);
             K.store.setUi('paneOpen', open);
         };
@@ -140,13 +147,26 @@
             if (open) K.$('#editor').focus();
         };
         on('#editor-rail', 'click', toggleEditor);
-        on('#editor-close', 'click', toggleEditor);
+        // maximize one panel (the other and Settings step aside); again or Esc restores
+        K.$$('[data-max]').forEach(function (b) {
+            b.addEventListener('click', function () {
+                const w = b.getAttribute('data-max');
+                K.ui.maximize(K.$('#workspace').classList.contains('max-' + w) ? null : w);
+            });
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && K.$('#workspace').className.indexOf('max-') >= 0 && !document.querySelector('dialog[open]')) K.ui.maximize(null);
+        });
 
         // editor actions
         on('#btn-sample', 'click', function () { loadSample(true); });
         on('#btn-import', 'click', function () { K.$('#file-import').click(); });
         on('#file-import', 'change', function () { const f = this.files[0]; this.value = ''; K.importer.fromFile(f); });
         on('#btn-paste', 'click', function () { K.importer.fromClipboardButton(); });
+        on('#btn-replace', 'click', function () {           // clear, then paste: the clipboard becomes the document
+            if (K.editor.value() && !confirm(K.i18n.t('confirmReplace'))) return;
+            K.importer.fromClipboardButton({ replace: true });
+        });
         on('#btn-clear', 'click', function () {
             if (K.editor.value() && !confirm(K.i18n.t('confirmClear'))) return;
             K.names.reset();
@@ -156,6 +176,12 @@
 
         // preview / export
         on('#btn-copy-preview', 'click', function () { K.preview.copyAll(); });
+        on('#btn-copy-editor', 'click', function () {       // the Markdown as it is
+            const text = K.editor.value();
+            if (!text || !navigator.clipboard || !navigator.clipboard.writeText) return;
+            navigator.clipboard.writeText(text).then(function () { K.ui.toast(K.i18n.t('copied')); },
+                function (e) { K.ui.toast(K.i18n.t('failed', e && e.message || ''), 'error'); });
+        });
         K.$$('[data-export]').forEach(function (b) {
             b.addEventListener('click', function () { K.exporter.run(b.getAttribute('data-export'), b); });
         });

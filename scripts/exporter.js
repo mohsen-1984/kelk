@@ -45,6 +45,35 @@
     }
 
     /** Fonts for a builder: PDF and HTML use the shipped fonts, Word the Word names (installed fonts). */
+    /** The stored table style, only the keys setTableStyle knows (older stores may hold others). */
+    function tableStyleOf(s) {
+        const t = s.tableStyle || {}, d = K.config.defaults.tableStyle;
+        return { lines: t.lines || d.lines, fill: t.fill || d.fill, total: !!t.total,
+                 headerCenter: t.headerCenter == null ? d.headerCenter : !!t.headerCenter,
+                 headerBold: t.headerBold == null ? d.headerBold : !!t.headerBold,
+                 headerColor: t.headerColor || d.headerColor, stripeColor: t.stripeColor || d.stripeColor, borderColor: t.borderColor || d.borderColor };
+    }
+
+    /**
+     * Code and quote colors as template options (every builder reads them):
+     * the language bar's text turns light on a dark bar.
+     */
+    function colorTemplate(s) {
+        const c = s.code || {}, q = s.quote || {}, D = K.config.defaults;
+        const headerBg = c.headerBg || D.code.headerBg;
+        const dark = typeof BuilderBase !== 'undefined' && BuilderBase.isDarkColor ? BuilderBase.isDarkColor(headerBg) : false;
+        return {
+            codeBlockBg: c.bg || D.code.bg,
+            codeHeaderBg: headerBg,
+            codeHeaderColor: dark ? '#E8E8E8' : '#595959',
+            codeBlockBorder: '0.75pt solid ' + (c.border || D.code.border),
+            quoteBorderColor: q.border || D.quote.border,
+            quoteBorderWidth: q.width || D.quote.width,
+            quoteBg: q.bg == null ? D.quote.bg : q.bg,
+            quoteTextColor: q.text || D.quote.text
+        };
+    }
+
     function fontsFor(kind, s) {
         if (kind === 'pdf' || kind === 'html') return { bidi: s.fonts.bidi, latin: s.fonts.latin, code: s.code.font };
         // null → the automatic Word font of the interface language; '' (emptied) → as PDF
@@ -91,7 +120,11 @@
             direction: s.direction,
             page: { size: s.page.size, orientation: s.page.orientation, margin: s.page.margin },
             tableWidth: s.page.tableWidth || '98%',
+            tableAlign: s.page.tableAlign || 'center',
+            tableStyle: tableStyleOf(s),                     // Settings → Tables → Table style
+            template: colorTemplate(s),                      // Settings → Code / Quotes: colors
             codeBlock: { showLanguage: !!s.code.showLanguage, rtlFont: s.code.rtlFont },
+            math: { mode: (s.math && s.math.html) || 'svg', word: (s.math && s.math.word) || 'native', textFont: s.fonts.bidi },   // HTML: svg | mathml; Word/PDF: images (RTL \text in the web font)
             headerFooterDirection: s.headerFooter.direction,
             fonts: fontsFor(kind, s),
             fontSizes: { bidi: +s.fonts.bidiSize || 12, latin: +s.fonts.latinSize || 11.5, code: +s.code.size || 10 },
@@ -99,7 +132,9 @@
             footer: hf.footer,
             toc: s.toc && s.toc.enabled ? {
                 levels: +s.toc.levels || 2,
-                title: K.preview.dir() === 'ltr' ? 'Contents' : K.names.rtlWords().toc
+                // both: the builder takes the one of the document's direction (the preview's last
+                // direction may be the previous document's — the about text of another language)
+                title: { ltr: 'Contents', rtl: K.names.rtlWords().toc }
             } : null
         });
     }
@@ -111,6 +146,8 @@
             K.ui.busy(btn, true);
             try {
                 const html = K.preview.html();
+                // Word / PDF: a formula with right-to-left \text embeds the web font in its image
+                if (kind !== 'html' && /data-tex="[^"]*[\u0590-\u08FF]/.test(html)) await K.fonts.forHtml(md);
                 let blob;
                 if (kind === 'docx') {
                     await K.libs.need('docx');

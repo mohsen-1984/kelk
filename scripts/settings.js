@@ -1,6 +1,6 @@
 /**
- * Kelk.settings — the Settings pane (export profile, data-setting="path")
- * and the App settings dialog (page behaviour, data-ui="path"). Every control
+ * Kelk.settings — the Settings pane: the export profile (data-setting="path")
+ * and, in its last group, App settings (page behavior, data-ui="path"). Every control
  * is saved on change. The logo is uploaded, dropped or pasted, scaled down
  * and kept in localStorage as a data URI.
  */
@@ -56,6 +56,26 @@
         if (el) el.innerHTML = items.map(function (f) { return '<option>' + f + '</option>'; }).join('');
     }
 
+    /**
+     * Which outputs a setting reaches (P = the preview, H = HTML, F = PDF,
+     * W = Word .docx/.doc). The pane's groups say it by where a setting sits;
+     * this table is what the code reads: every setting that reaches the
+     * preview redraws it at once (onChange), so no setting waits for another.
+     */
+    const SCOPES = {
+        'direction': 'PHFW', 'document.title': 'HFW', 'document.author': 'HFW', 'document.edition': 'HFW', 'document.link': 'HFW',
+        'logoHeight': 'HFW', 'headerFooter.mode': 'HFW', 'headerFooter.header': 'HFW', 'headerFooter.footer': 'HFW', 'headerFooter.direction': 'HFW',
+        'fonts.bidi': 'PHF', 'fonts.latin': 'PHF', 'fonts.bidiSize': 'PHFW', 'fonts.latinSize': 'PHFW', 'fonts.wordBidi': 'W', 'fonts.wordLatin': 'W',
+        'toc.enabled': 'PHFW', 'toc.levels': 'PHFW', 'page.size': 'HFW', 'page.orientation': 'HFW', 'page.margin': 'HFW',
+        'page.tableWidth': 'PHFW', 'page.tableAlign': 'PHFW',
+        'tableStyle.lines': 'PHFW', 'tableStyle.fill': 'PHFW', 'tableStyle.total': 'PHFW', 'tableStyle.headerCenter': 'PHFW', 'tableStyle.headerBold': 'PHFW', 'tableStyle.headerColor': 'PHFW', 'tableStyle.stripeColor': 'PHFW', 'tableStyle.borderColor': 'PHFW',
+        'code.showLanguage': 'PHFW', 'code.rtlFont': 'PHFW', 'code.font': 'PHF', 'code.wordFont': 'W', 'code.size': 'PHFW',
+        'code.bg': 'PHFW', 'code.headerBg': 'PHFW', 'code.border': 'PHFW', 'quote.border': 'PHFW', 'quote.width': 'PHFW', 'quote.bg': 'PHFW', 'quote.text': 'PHFW',
+        'math.html': 'PH', 'math.word': 'W', 'ui.previewWordFont': 'P'
+    };
+    const reachesPreview = function (path) { return (SCOPES[path] || '').indexOf('P') >= 0; };
+    let renderTimer = 0;
+
     K.settings = {
         init: function () {
             const self = this;
@@ -72,7 +92,7 @@
                     if (v === undefined) return;
                     K.store.set(path, v);
                     el.classList.remove('auto');
-                    self.onChange(path);
+                    self.onChange(path, live(el) === 'input');     // typing: redraw after a short pause
                 });
             });
             K.$$('[data-ui]').forEach(function (el) {
@@ -84,6 +104,32 @@
 
             // automatic values (title, edition, custom header/footer): typed — even
             // emptied — is kept as it is; ↺ brings the automatic value back
+            // a link in a hint opens another group and brings it into view (Text → Word)
+            K.$$('[data-open-group]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    const label = K.$('details.group > summary [data-i18n="' + btn.getAttribute('data-open-group') + '"]');
+                    const group = label && label.closest('details');
+                    if (!group) return;
+                    group.open = true;
+                    group.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            });
+
+            // a group of values (table style, code colors, quote box): one ↺ for all of them,
+            // shown once any differs from the default (data-reset-keys="path,path,…")
+            K.$$('[data-reset-keys]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    const keys = btn.getAttribute('data-reset-keys').split(',');
+                    keys.forEach(function (path) {
+                        const d = pathGet(K.config.defaults, path);
+                        K.store.set(path, d);
+                        const el = K.$('[data-setting="' + path + '"]');
+                        if (el) write(el, d);
+                    });
+                    self.onChange(keys[0]);
+                });
+            });
+
             K.$$('[data-reset]').forEach(function (btn) {
                 btn.addEventListener('click', function () {
                     const path = btn.getAttribute('data-reset');
@@ -124,7 +170,7 @@
             });
             K.$('#logo-remove').addEventListener('click', function () { K.store.saveLogo(''); self.showLogo(); K.preview.render(); });
 
-            // backup: the export profile and the logo (page behaviour is not part of it)
+            // backup: the export profile and the logo (page behavior is not part of it)
             K.$('#set-export').addEventListener('click', function () {
                 const data = { app: 'kelk', version: K.config.version, settings: K.store.settings(), logo: K.store.logo() };
                 K.ui.download(JSON.stringify(data, null, 2), 'application/json', 'kelk-settings.json');
@@ -213,6 +259,25 @@
             });
         },
 
+        /**
+         * Color pickers the table style does not use are dimmed and disabled
+         * (no header fill, no stripes, no lines); their color is kept for later.
+         * @param {{ lines, fill, total }} t - the stored table style
+         */
+        tableColorsInUse: function (t) {
+            const F = (typeof BuilderBase !== 'undefined' && BuilderBase.TABLE_FILLS) || null;
+            if (!F) return;
+            const fill = F[t.fill] || {}, used = {};
+            Object.keys(fill).forEach(function (k) { used[fill[k]] = true; });       // 'header' | 'stripe'
+            const uses = { headerColor: !!used.header, stripeColor: !!used.stripe, borderColor: t.lines !== 'none' || !!t.total };
+            Object.keys(uses).forEach(function (key) {
+                const el = K.$('[data-setting="tableStyle.' + key + '"]');
+                if (!el) return;
+                el.disabled = !uses[key];
+                el.closest('.field').classList.toggle('unused', el.disabled);
+            });
+        },
+
         /** The automatic Word font of a role ('bidi' | 'latin') for the interface language. */
         wordFontDefault: function (role) {
             const d = K.config.wordFontDefaults[K.i18n.lang] || K.config.wordFontDefaults.en;
@@ -228,38 +293,63 @@
             });
         },
 
-        /** Fonts of the page (editor + preview): PDF fonts, or the Word fonts when asked and installed. */
-        applyFonts: function () {
-            const s = K.store.settings(), root = document.documentElement.style;
-            const word = K.store.getUi('previewWordFont');
+        /**
+         * The document fonts of the editor and the preview: the Text and Code
+         * groups' fonts, or — with "Preview with the Word fonts" — the Word
+         * fonts, each where it is installed on this system.
+         * @returns {{ bidi: string, latin: string, code: string, word: boolean }}
+         */
+        previewFonts: function () {
+            const s = K.store.settings();
+            const word = !!K.store.getUi('previewWordFont');
             const pick = function (wordName, pdfName) {
                 const w = (wordName || '').trim();
                 return word && w && K.fonts.installed(w) ? w : pdfName;
             };
-            const self = this;
-            const wb = s.fonts.wordBidi == null ? self.wordFontDefault('bidi') : s.fonts.wordBidi;
-            const wl = s.fonts.wordLatin == null ? self.wordFontDefault('latin') : s.fonts.wordLatin;
-            const bidi = pick(wb, s.fonts.bidi), latin = pick(wl, s.fonts.latin);
-            const code = pick(s.code.wordFont, s.code.font);
+            const wb = s.fonts.wordBidi == null ? this.wordFontDefault('bidi') : s.fonts.wordBidi;
+            const wl = s.fonts.wordLatin == null ? this.wordFontDefault('latin') : s.fonts.wordLatin;
+            return { bidi: pick(wb, s.fonts.bidi), latin: pick(wl, s.fonts.latin), code: pick(s.code.wordFont, s.code.font), word: word };
+        },
+
+        /** Fonts of the page (editor + preview): see previewFonts. */
+        applyFonts: function () {
+            const s = K.store.settings(), root = document.documentElement.style;
+            const f = this.previewFonts(), bidi = f.bidi, latin = f.latin, code = f.code;
             root.setProperty('--font-content', '"' + bidi + '", "' + latin + '", system-ui, sans-serif');
             root.setProperty('--font-latin', '"' + latin + '", system-ui, sans-serif');
             root.setProperty('--font-mono', '"' + code + '", ui-monospace, Consolas, monospace');
             root.setProperty('--doc-size', ((+s.fonts.bidiSize || 12) * 4 / 3).toFixed(1) + 'px');
         },
 
-        /** Side effects of a changed setting. */
-        onChange: function (path) {
+        /**
+         * Side effects of a changed setting. `typing` (text and number fields)
+         * redraws the preview after a short pause instead of on every key.
+         */
+        onChange: function (path, typing) {
             const s = K.store.settings();
             const all = path === '*';
             if (all || path.indexOf('fonts.') === 0 || path.indexOf('code.') === 0 || path === 'ui.previewWordFont') {
                 this.applyFonts();
                 this.checkWordFonts();
             }
+            if (all || path.indexOf('tableStyle.') === 0) this.tableColorsInUse(s.tableStyle || {});
+            K.$$('[data-reset-keys]').forEach(function (btn) {
+                const keys = btn.getAttribute('data-reset-keys').split(',');
+                if (!all && keys.indexOf(path) < 0) return;
+                btn.hidden = !keys.some(function (p) {
+                    const d = pathGet(K.config.defaults, p), v = pathGet(s, p);
+                    return String(v === undefined ? d : v).toLowerCase() !== String(d).toLowerCase();
+                });
+            });
             if (all || path === 'headerFooter.mode') {
                 K.$('#hf-custom').hidden = s.headerFooter.mode !== 'custom';
             }
-            if (all || path === 'direction' || path === 'code.showLanguage' || path === 'code.rtlFont') K.preview.render();
-            else K.names.refresh();
+            const wordFont = path === 'fonts.wordBidi' || path === 'fonts.wordLatin' || path === 'code.wordFont';
+            if (all || reachesPreview(path) || (wordFont && K.store.getUi('previewWordFont'))) {
+                clearTimeout(renderTimer);
+                if (typing) renderTimer = setTimeout(function () { K.preview.render(); }, 200);
+                else K.preview.render();
+            } else K.names.refresh();
         }
     };
 })(window.Kelk = window.Kelk || {});

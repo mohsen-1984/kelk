@@ -13,7 +13,7 @@
     const scripts = new Map();      // src → Promise
 
     /**
-     * Kelk.libs — the large libraries (docx 0.4 MB, jsPDF 1.2 MB, mammoth
+     * Kelk.libs — the large libraries (docx 0.4 MB, jsPDF 0.4 MB, mammoth
      * 0.6 MB) load on first use, not with the page:
      *   await K.libs.need('docx')     .docx export
      *   await K.libs.need('jspdf')    .pdf export
@@ -79,7 +79,8 @@
 
         theme: function (name) {
             // const t = name || (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-            // For now: light by default, whatever the system's matchMedia says (dark styles are not tuned yet); users can still switch to dark.
+            // Light by default, whatever the system's matchMedia says; the dark theme is a choice (the
+            // preview then shows the document's colors in a dark version — scripts/preview.js darkPaper).
             const t = name || 'light';
             document.documentElement.setAttribute('data-theme', t);
             this.setIcon($('#btn-theme'), t === 'dark' ? 'sun' : 'moon');
@@ -105,6 +106,27 @@
             $('#workspace').classList.toggle('pane-closed', !open);
             const rail = $('#pane-rail');
             if (rail) rail.setAttribute('aria-expanded', open ? 'true' : 'false');
+        },
+
+        /**
+         * Maximize a panel ('editor' | 'preview') or restore (null): the other
+         * panel and the Settings pane step aside, and come back as they were.
+         */
+        maximize: function (which) {
+            const ws = $('#workspace');
+            const was = ws.classList.contains('max-editor') ? 'editor' : ws.classList.contains('max-preview') ? 'preview' : null;
+            if (which && !was) this._paneBefore = !ws.classList.contains('pane-closed');
+            ws.classList.toggle('max-editor', which === 'editor');
+            ws.classList.toggle('max-preview', which === 'preview');
+            if (which) this.pane(false);
+            else if (was) this.pane(this._paneBefore !== false && K.store.getUi('paneOpen') !== false);
+            K.$$('[data-max]').forEach(function (b) {
+                const on = b.getAttribute('data-max') === which;
+                K.ui.setIcon(b, on ? 'minimize-2' : 'maximize-2');
+                const label = K.i18n.t(on ? 'restore' : 'maximize');
+                b.title = label; b.setAttribute('aria-label', label);
+            });
+            return which;
         },
 
         /** Editor panel open / closed (side layout only). */

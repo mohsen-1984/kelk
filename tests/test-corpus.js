@@ -398,3 +398,122 @@ CORPUS.push({ name: 'lists-direction', md: "# آزمون قواعد جهت فه�
 CORPUS.push({ name: 'box-edges', md: "متن آغاز.\n\n1. گام با کد در پایان:\n\n   ```\n   code in list\n   ```\n\n| الف | ب |\n|---|---|\n| 1 | 2 |\n\n- مورد با نقل‌قول در پایان\n\n  > نقل‌قول درون فهرست\n\n```\ncode after list\n```\n\n- مورد اول\n  - زیرمورد با کد:\n\n    ```\n    nested code\n    ```\n\n> نقل‌قول بلافاصله پس از فهرست تودرتو\n\n1. مورد با جدول:\n\n   | x | y |\n   |---|---|\n   | 3 | 4 |\n\n2. مورد دوم با کد:\n\n   ```\n   second\n   ```\n\nپایان.\n" });
 CORPUS.push({ name: 'harakat', md: "زبانِ تازه را با زبانی که بلدی بشناس\n\n*زبانِ تازه را با زبانی که بلدی بشناس*\n\n**مُحَمَّدٌ رَسُولُ اللَّهِ و رَبِّ العالَمِین**\n\n***بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِیمِ***\n\nבְּרֵאשִׁית בָּרָא אֱלֹהִים\n", setup: function (b) { b.setFonts({ bidi: 'Sahel', latin: 'Sahel' }); } });
 CORPUS.push({ name: 'nested-fence-frames', md: "متن آغاز.\n\n````md\nنمونهٔ مستندات:\n\n```js\nlet a = 1;\n```\n\nو یک بلوک دیگر:\n\n~~~~markdown\n# عنوان\n```py\nx = 1\n```\n~~~~\n````\n\nپایان.\n", setup: function (b) { b.setFonts({ code: 'DejaVu Sans Mono' }); } });
+// LaTeX formulas: every case of math-cases.js (inline and display) inside Persian and English prose
+(function () {
+  if (typeof MATH_CASES === 'undefined') return;
+  var md = '# فرمول‌ها — Formulas\n\n';
+  MATH_CASES.forEach(function (c, i) {
+    md += (i % 2 ? 'Case ' + (i + 1) + ' (' + c[1] + '): ' : 'مورد ' + (i + 1) + ' (' + c[1] + '): ') +
+      (c[3] ? '\n\n$$\n' + c[2] + '\n$$\n\n' : '$' + c[2] + '$ پایان.\n\n');
+  });
+  CORPUS.push({ name: 'latex-formulas', md: md });
+  CORPUS.push({ name: 'latex-formulas-mathml', md: md, setup: function (b) { b.setMath({ mode: 'mathml' }); } });
+})();
+
+// table styles (BuilderBase.setTableStyle): every lines option, every fill, the total row,
+// dark and custom colors — an RTL table and an LTR table in RTL text in each case
+(function () {
+  const md = `جدول نمونه:
+
+| ردیف | نام | مقدار |
+|---|---|---:|
+| 1 | آلفا | 1,234 |
+| 2 | بتا | 98.6% |
+| 3 | گاما | 42 |
+| جمع | | 1,383 |
+
+| Name | Value |
+|------|------:|
+| alpha | 1 |
+| beta | 2 |
+| Total | 3 |
+`;
+  [
+    ['default', { }],                                                             // underline + header-stripes
+    ['grid-header', { lines: 'grid', fill: 'header' }],
+    ['grid-header-stripes', { lines: 'grid', fill: 'header-stripes' }],
+    ['frame-header', { lines: 'frame', fill: 'header' }],
+    ['underline-none-total', { lines: 'underline', fill: 'none', total: true }],
+    ['horizontal-none-total', { lines: 'horizontal', fill: 'none', total: true }],
+    ['vertical-stripes', { lines: 'vertical', fill: 'stripes' }],
+    ['none-header-stripes-dark', { lines: 'none', fill: 'header-stripes', headerColor: '#1F3864', stripeColor: '#DDEBF7' }],
+    ['grid-header-red-lines', { lines: 'grid', fill: 'header', headerColor: '#FCE4D6', borderColor: '#C00000', borderWidth: 1 }]
+  ].forEach(function (c) {
+    CORPUS.push({ name: 'table-style-' + c[0], md: md, setup: function (b) { b.setTableStyle(c[1]); } });
+  });
+})();
+
+// code and quote colors (Settings → Code / Quotes: template options) — a dark language bar
+CORPUS.push({ name: 'colors-code-quote', md:
+`متن پیش از کد:
+
+\`\`\`python
+def total(rows):
+    return sum(r["value"] for r in rows)   # جمع مقادیر
+\`\`\`
+
+> نقل‌قول با نوار ضخیم و رنگ دیگر.
+>
+> - با یک فهرست
+> - و مورد دوم
+
+> A left-to-right quote in the same style.
+`, setup: function (b) {
+  b.setTemplateOptions({ codeBlockBg: '#F7F9FC', codeHeaderBg: '#2F3B52', codeHeaderColor: '#E8E8E8',
+                         codeBlockBorder: '1px solid #2F3B52', quoteBorderColor: '#2F5496', quoteBorderWidth: '5pt', quoteTextColor: '#1F3864' });
+} });
+
+// table cell directions (c.cells: every td/th in document order). A cell without letters — digits of
+// any script, signs, empty — takes its table's direction; letters decide every other cell.
+CORPUS.push({ name: 'table-dir-rtl-doc', md:
+`ارقام در سه نوع جدول:
+
+| شکل | ارقام | نام انگلیسی | یونیکد |
+|---|---|---|---|
+| لاتین | 0123456789 | Western Arabic numerals | U+0030–0039 (همان ASCII) |
+| عربی | ٠١٢٣٤٥٦٧٨٩ | Eastern Arabic (Arabic-Indic) | U+0660–0669 |
+| فارسی | ۰۱۲۳۴۵۶۷۸۹ | Extended Arabic-Indic | U+06F0–06F9 |
+
+| ردیف | مبلغ | تاریخ |
+|---|---:|---|
+| 1 | ۱٬۲۳۴ | ۱۴۰۵/۰۷/۰۹ |
+| 2 | 98.6% | — |
+
+| Item | Value | Date |
+|---|---:|---|
+| alpha | ۱۲ | 2026-10-01 |
+| beta | 1,234 | |
+`, cells: [
+  'rtl', 'rtl', 'rtl', 'rtl',
+  'rtl', 'rtl', 'ltr', 'ltr',       // "U+0030–0039 (همان ASCII)": LTR-led, mostly Latin letters
+  'rtl', 'rtl', 'ltr', 'ltr',
+  'rtl', 'rtl', 'ltr', 'ltr',
+  'rtl', 'rtl', 'rtl',  'rtl', 'rtl', 'rtl',  'rtl', 'rtl', 'rtl',
+  'ltr', 'ltr', 'ltr',  'ltr', 'ltr', 'ltr',  'ltr', 'ltr', 'ltr'
+] });
+CORPUS.push({ name: 'table-dir-ltr-doc', md:
+`Digits in an English document:
+
+| Name | نام | Amount |
+|---|---|---:|
+| alpha | آلفا | ۱۲ |
+| 12 | ۱۲ | 3.5% |
+
+| Item | Value |
+|---|---:|
+| one | 1 |
+`, cells: [
+  'ltr', 'rtl', 'ltr',
+  'ltr', 'rtl', 'ltr',
+  'ltr', 'ltr', 'ltr',
+  'ltr', 'ltr',  'ltr', 'ltr'
+] });
+
+// edge documents: only a table; a header-only (one-row) table — styled as a body row, no
+// repeated header; a single line; inline code with RTL text and brackets (Word, PDF); a code
+// block inside a list item (one frame in the .html export)
+CORPUS.push({ name: 'only-table', md: '| نام | مقدار |\n|---|---:|\n| آلفا | 12 |\n| بتا | 3.5 |\n' });
+CORPUS.push({ name: 'one-row-table', md: 'جدول یک‌سطری:\n\n| فقط | یک | سطر |\n|---|:---:|---|\n\n| One | row | only |\n|---|---|---|\n' });
+CORPUS.push({ name: 'single-line', md: 'فقط یک سطر.' });
+CORPUS.push({ name: 'code-span-rtl', md: 'تصویر را با `![نام](نام)` در متن می‌گذارد؛ نیز `(متن)` و `f({ a: \'متن فارسی\' })`.\n\nEnglish with `![name](نام)` too.\n' });
+CORPUS.push({ name: 'code-in-list-item', md: '- مورد ششم:\n  ```javascript\n  // کد درون لیست\n  const array = [1, 2, 3];\n  ```\n' });

@@ -143,3 +143,16 @@ footer.note {
   display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
 }
 footer.note a { color: inherit; }
+
+/* one panel maximized (Kelk.ui.maximize): the other panel hidden, Settings as its rail */
+.workspace.max-editor, .workspace.max-preview {
+  grid-template-columns: minmax(0, 1fr) var(--rail-w);
+  grid-template-rows: minmax(0, 1fr);
+}
+.workspace.max-editor { grid-template-areas: "editor settings"; }
+.workspace.max-preview { grid-template-areas: "preview settings"; }
+.workspace.max-editor .preview-panel, .workspace.max-preview .editor-panel { display: none; }
+@media (max-width: 760px) {
+  .workspace.max-editor, .workspace.max-preview { grid-template-columns: minmax(0, 1fr); grid-template-areas: none; }
+  .btn-max { display: none; }
+}

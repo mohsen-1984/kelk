@@ -20,13 +20,17 @@
 <h1>Kelk — library tests</h1>
 <p class="sub">Every case of <code>tests/test-corpus.js</code> and the three about/guide documents through the four builders
   (.docx, .doc, .pdf, .html), in this browser. Each cell: size and time, a download link, or the error.
-  The direction column checks that the preview (<code>BidiView</code>) and the builders (<code>BidiCore</code>) decide the same.</p>
+  The direction column checks that the preview (<code>BidiView</code>) and the builders (<code>BidiCore</code>) decide the same,
+  and — for the <code>table-dir-*</code> cases — that every table cell takes the stated direction (a cell without letters follows its table).
+  The preview column checks that the preview (<code>PreviewBuilder</code>) and the .html export (<code>HtmlBuilder</code>) give every
+  block the same direction and every table cell the same lines, fill, weight and text color (<code>setTableStyle</code>;
+  the <code>table-style-*</code> cases cover every lines and fill option and the total row).</p>
 <div class="bar">
   <button class="primary" id="run" type="button">Run all</button>
   <label><input type="checkbox" id="toc"> with a table of contents</label>
   <span class="sum" id="sum"></span>
 </div>
-<table id="out"><thead><tr><th>case</th><th>direction</th><th>DOCX</th><th>DOC</th><th>PDF</th><th>HTML</th></tr></thead><tbody></tbody></table>
+<table id="out"><thead><tr><th>case</th><th>direction</th><th>preview</th><th>DOCX</th><th>DOC</th><th>PDF</th><th>HTML</th></tr></thead><tbody></tbody></table>
 
 <!-- vendor (all loaded up front here) -->
 <script src="../vendor/marked.umd.min_18.0.14.js"></script>
@@ -43,6 +47,7 @@
 <script src="../assets/fonts/embed/vazir-code-hack.js"></script>
 <!-- the library, in its load order -->
 <script src="../lib/ImageCore.js"></script>
+<script src="../lib/MathCore.js"></script>
 <script src="../lib/BidiCore.js"></script>
 <script src="../lib/BidiView.js"></script>
 <script src="../lib/msOfficeWordHtmlTemplate.js"></script>
@@ -51,7 +56,9 @@
 <script src="../lib/DocxBuilder.js"></script>
 <script src="../lib/PdfBuilder.js"></script>
 <script src="../lib/HtmlBuilder.js"></script>
+<script src="../lib/PreviewBuilder.js"></script>
 <!-- cases -->
+<script src="math-cases.js"></script>
 <script src="test-corpus.js"></script>
 <script src="../docs/about-kelk-and-samples.js"></script>
 <script>
@@ -62,12 +69,13 @@
   const st = document.createElement('style'); st.textContent = BidiView.css(); document.head.appendChild(st);   // the classes' CSS
 
   function cases() {
-    const list = CORPUS.map(function (c) { return { name: c.name, md: c.md, html: c.html, setup: c.setup }; });
+    const list = CORPUS.map(function (c) { return { name: c.name, md: c.md, html: c.html, setup: c.setup, cells: c.cells }; });
     Object.keys(window.KelkSamples || {}).forEach(function (lang) {
       list.push({ name: 'about-kelk-and-samples.' + lang, md: KelkSamples[lang].markdown });
     });
     return list;
   }
+  if (window.MathCore) marked.use(MathCore.markedExtension());      // formulas as in the page
   function htmlOf(c) {
     const h = c.html || marked.parse(c.md, { gfm: true });
     return window.DOMPurify ? DOMPurify.sanitize(h, { ADD_ATTR: ['target', 'dir', 'align'] }) : h;
@@ -79,7 +87,7 @@
     return b;
   }
   /** BidiView (preview) and BidiCore (builders): the same block directions? */
-  function directionCheck(html) {
+  function directionCheck(html, cells) {
     const a = document.createElement('div'); a.innerHTML = html; document.body.appendChild(a);
     const docRtl = BidiCore.detectDirection(a) === 'rtl';
     const plan = BidiCore.planToMaps(BidiCore.planDirections(a, docRtl));
@@ -89,9 +97,55 @@
     const after = Array.from(a.querySelectorAll('p,h1,h2,h3,h4,h5,h6,li,td,th')).map(function (el) {
       const cs = getComputedStyle(el).direction; return cs;
     });
-    a.remove();
     let diff = 0; before.forEach(function (d, i) { if (after[i] && d !== after[i]) diff++; });
-    return { blocks: before.length, diff: diff, doc: docRtl ? 'rtl' : 'ltr' };
+    // a case may state the direction every table cell must take (c.cells, document order)
+    let wrong = [];
+    if (cells) {
+      const got = Array.from(a.querySelectorAll('td,th')).map(eff);
+      wrong = cells.map(function (d, i) { return got[i] === d ? null : (i + 1) + ':' + got[i]; }).filter(Boolean);
+      if (got.length !== cells.length) wrong.push('cells ' + got.length + '≠' + cells.length);
+    }
+    a.remove();
+    return { blocks: before.length, diff: diff, doc: docRtl ? 'rtl' : 'ltr', wrong: wrong };
+  }
+  /**
+   * PreviewBuilder and HtmlBuilder: the same block directions (BidiView classes) and the same
+   * table-cell paint? Widths are left out (px in the pane, pt in the file); formulas are typeset
+   * by the export only, so a formula case may differ in direction and is reported, not failed.
+   */
+  async function previewCheck(c, html, toc) {
+    const sig = function (root) {
+      const blocks = Array.from(root.querySelectorAll('p,h1,h2,h3,h4,h5,h6,li,td,th')).map(function (el) {
+        return el.tagName + ':' + Array.from(el.classList).filter(function (k) { return /^bd-(ltr|rtl)$/.test(k); }).join('');
+      });
+      const cells = Array.from(root.querySelectorAll('td,th')).map(function (el) {
+        const st = el.style;
+        return [st.borderTop, st.borderBottom, st.borderLeft, st.borderRight, st.background, st.color, st.fontWeight].join('|');
+      });
+      return { blocks: blocks, cells: cells };
+    };
+    const hb = configure(HtmlBuilder.create(), 'html', toc);
+    if (c.setup) c.setup(hb);
+    const page = new DOMParser().parseFromString(await hb.addFromHtml(html).toHtml(), 'text/html');
+    const a = sig(page.querySelector('article.doc') || page.body);
+
+    const pb = configure(PreviewBuilder.create(), 'html', toc);
+    if (c.setup) c.setup(pb);
+    const box = document.createElement('article');
+    box.className = 'doc';
+    box.style.cssText = 'position:absolute;left:-9999px;width:700px';
+    box.innerHTML = html;
+    document.body.appendChild(box);
+    pb.decorate(box, { width: 700, fontSize: 16 });
+    const b = sig(box);
+    box.remove();
+
+    let dirDiff = 0, cellDiff = 0;
+    a.blocks.forEach(function (x, i) { if (x !== b.blocks[i]) dirDiff++; });
+    a.cells.forEach(function (x, i) { if (x !== b.cells[i]) cellDiff++; });
+    if (a.blocks.length !== b.blocks.length) dirDiff++;
+    if (a.cells.length !== b.cells.length) cellDiff++;
+    return { blocks: a.blocks.length, cells: a.cells.length, dirDiff: dirDiff, cellDiff: cellDiff, math: /kelk-math/.test(html) };
   }
   function cell(td, text, cls, blob, file) {
     td.className = cls;
@@ -109,8 +163,22 @@
       const dirTd = document.createElement('td'); tr.appendChild(dirTd);
       body.appendChild(tr);
       const html = htmlOf(c);
-      try { const d = directionCheck(html); cell(dirTd, d.doc + ' · ' + d.blocks + ' blocks' + (d.diff ? ' · ' + d.diff + ' differ' : ''), d.diff ? 'err' : 'ok'); if (d.diff) bad++; else ok++; }
+      try {
+        const d = directionCheck(html, c.cells);
+        const fail = d.diff || d.wrong.length;
+        cell(dirTd, d.doc + ' · ' + d.blocks + ' blocks' + (d.diff ? ' · ' + d.diff + ' differ' : '') +
+          (c.cells ? (d.wrong.length ? ' · cells wrong: ' + d.wrong.join(' ') : ' · ' + c.cells.length + ' cells as expected') : ''), fail ? 'err' : 'ok');
+        if (fail) bad++; else ok++;
+      }
       catch (e) { cell(dirTd, e.message, 'err'); bad++; }
+      const pvTd = document.createElement('td'); tr.appendChild(pvTd);
+      try {
+        const p = await previewCheck(c, html, toc);
+        const text = p.blocks + ' blocks · ' + p.cells + ' cells' + (p.dirDiff ? ' · ' + p.dirDiff + ' dir differ' : '') + (p.cellDiff ? ' · ' + p.cellDiff + ' cells differ' : '');
+        if (p.cellDiff || (p.dirDiff && !p.math)) { cell(pvTd, text, 'err'); bad++; }
+        else if (p.dirDiff) cell(pvTd, text + ' (formulas: typeset by the export only)', 'skip');
+        else { cell(pvTd, text, 'ok'); ok++; }
+      } catch (e) { cell(pvTd, e.message, 'err'); bad++; console.error(c.name, 'preview', e); }
       for (const [kind, B, ext] of [['docx', DocxBuilder, 'docx'], ['doc', WordHtmlBuilder, 'doc'], ['pdf', PdfBuilder, 'pdf'], ['html', HtmlBuilder, 'html']]) {
         const td = document.createElement('td'); tr.appendChild(td);
         const t0 = performance.now();

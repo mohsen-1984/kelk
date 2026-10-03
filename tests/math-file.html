@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kelk — MathCore test (MathJax 4 from file://)</title>
+<style>
+    body { font-family: system-ui, sans-serif; margin: 24px; color: #222; }
+    h1 { font-size: 18px; margin: 0 0 4px; }
+    .sum { font-size: 15px; margin: 8px 0 16px; padding: 10px 12px; border-radius: 6px; background: #f3f3f3; }
+    .sum.ok { background: #e6f4ea; } .sum.bad { background: #fce8e6; }
+    table { border-collapse: collapse; width: 100%; font-size: 13px; }
+    td, th { border: 1px solid #ddd; padding: 6px 8px; vertical-align: middle; text-align: left; }
+    th { background: #fafafa; }
+    td.tex { font-family: ui-monospace, monospace; font-size: 12px; max-width: 380px; word-break: break-all; }
+    td.out { min-width: 260px; }
+    .pass { color: #137333; font-weight: 600; } .fail { color: #c5221f; font-weight: 600; }
+    code { background: #f3f3f3; padding: 1px 4px; border-radius: 3px; }
+</style>
+<script src="../lib/MathCore.js"></script>
+<script src="../vendor/turndown/turndown_7.2.4.js"></script>
+<script src="../vendor/turndown/turndown-plugin-gfm_1.0.2.js"></script>
+<script src="../vendor/purify.min_3.4.16.js"></script>
+<script src="../lib/MarkdownImporter.js"></script>
+</head>
+<body>
+<h1>Kelk — MathCore test</h1>
+<div>lib/MathCore.js + MathJax 4 from <code>vendor/</code>, page opened from <code>file://</code> — no network.</div>
+<div id="sum" class="sum">running…</div>
+<table>
+    <thead><tr><th>#</th><th>case</th><th>TeX</th><th>render</th><th>result</th></tr></thead>
+    <tbody id="rows"></tbody>
+</table>
+
+<script>
+(async function () {
+    const CASES = [
+        ['inline', 'E = mc^2', false],
+        ['attention', '\\mathrm{Attention}(Q, K, V) = \\operatorname{softmax}\\left(\\frac{QK^{\\top}}{\\sqrt{d_k}}\\right)V', true],
+        ['softmax', '\\operatorname{softmax}(z)_i = \\frac{e^{z_i}}{\\sum_{j=1}^{n} e^{z_j}}', true],
+        ['multi-head', '\\mathrm{MultiHead}(Q,K,V) = \\mathrm{Concat}(\\mathrm{head}_1, \\dots, \\mathrm{head}_h)\\,W^{O}', true],
+        ['positional enc.', 'PE_{(pos,\\,2i)} = \\sin\\!\\left(\\frac{pos}{10000^{2i/d_{\\mathrm{model}}}}\\right)', true],
+        ['cases', '\\mathrm{ReLU}(x) = \\begin{cases} x & \\text{if } x > 0 \\\\ 0 & \\text{otherwise} \\end{cases}', true],
+        ['pmatrix', 'W = \\begin{pmatrix} w_{11} & w_{12} \\\\ w_{21} & w_{22} \\end{pmatrix}', true],
+        ['cross-entropy (\\mathcal: dynamic font)', '\\mathcal{L} = -\\sum_{i=1}^{N} \\sum_{c=1}^{C} y_{i,c} \\log \\hat{y}_{i,c}', true],
+        ['gaussian', '\\int_{-\\infty}^{\\infty} e^{-x^2}\\,dx = \\sqrt{\\pi}', true],
+        ['\\mathbb, \\mathfrak (dynamic font)', '\\mathbb{R}^n,\\ \\mathfrak{g}', false],
+        ['aligned', '\\begin{aligned} a &= b + c \\\\ &= d \\end{aligned}', true],
+        ['extension: cancel', '\\cancel{x} + y', false],
+        ['extension: boldsymbol', '\\boldsymbol{\\alpha} + \\alpha', false],
+        ['extension: mhchem', '\\ce{H2O -> H+ + OH-}', false],
+        ['autoload: braket', '\\braket{\\psi|\\phi}', false],
+        ['Persian in \\text', '\\text{دقت} = \\frac{TP}{TP + FP}', true],
+        ['safe: \\href javascript', '\\href{javascript:alert(1)}{x}', false]
+    ];
+
+    const rows = document.getElementById('rows');
+    const sum = document.getElementById('sum');
+    const results = [];
+    const t0 = performance.now();
+
+    function row(i, name, tex, node, ok, note) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td>' + i + '</td><td></td><td class="tex"></td><td class="out"></td><td></td>';
+        tr.children[1].textContent = name;
+        tr.children[2].textContent = tex;
+        if (node) tr.children[3].appendChild(node);
+        tr.children[4].innerHTML = '<span class="' + (ok ? 'pass' : 'fail') + '">' + (ok ? 'PASS' : 'FAIL') + '</span>' + (note ? ' — ' : '');
+        if (note) tr.children[4].appendChild(document.createTextNode(note));
+        rows.appendChild(tr);
+    }
+
+    MathCore.configure({ mathjax: '../vendor/mathjax_4.1.3/' });
+    for (let i = 0; i < CASES.length; i++) {
+        const [name, tex, display] = CASES[i];
+        let node = null, ok = false, note = '';
+        try {
+            const rec = await MathCore.render(tex, display);
+            const box = document.createElement('span');
+            box.innerHTML = rec.svg;
+            node = box;
+            const svg = box.querySelector('svg');
+            ok = !!svg && !rec.error && !svg.querySelector('use') && /<math/.test(rec.mathml) && rec.width > 0;
+            note = rec.error ? 'TeX error: ' + rec.error : 'w ' + rec.width.toFixed(2) + 'em, d ' + rec.depth.toFixed(2) + 'em';
+            if (name.indexOf('safe:') === 0) {
+                const a = svg && svg.querySelector('a');
+                const href = a ? (a.getAttribute('href') || a.getAttribute('xlink:href') || '') : '';
+                ok = !/javascript:/i.test(href);
+                note = href ? 'href kept: ' + href : 'javascript: link removed';
+            }
+            if (name.indexOf('Persian') === 0) {
+                const t = svg.querySelector('text');
+                ok = ok && !!t && t.textContent.charAt(0) === '\u2067';
+                note += t ? ' — one RTL run in the document font' : ' — no <text>';
+            }
+        } catch (e) {
+            note = e.message || String(e);
+        }
+        results.push({ name, ok, note });
+        row(i + 1, name, tex, node, ok, note);
+    }
+
+    // OMML (Word equations): every case well-formed; mhchem → null (picture)
+    for (let i = 0; i < CASES.length; i++) {
+        const [name, tex, display] = CASES[i];
+        let ok = false, note = '';
+        try {
+            const rec = await MathCore.render(tex, display);
+            const o = MathCore.toOmml(rec.mathml, { display: display });
+            if (/\\ce\b/.test(tex) || rec.error) { ok = true; note = o.xml ? 'OMML' : 'picture: ' + o.reason; }
+            else {
+                const d = o.xml && new DOMParser().parseFromString(o.xml, 'application/xml');
+                ok = !!o.xml && !d.querySelector('parsererror') && /<m:oMath/.test(o.xml);
+                note = o.xml ? o.xml.length + ' chars' : o.reason;
+            }
+        } catch (e) { note = e.message; }
+        results.push({ name: 'omml: ' + name, ok: ok, note: note });
+        row(results.length, 'omml: ' + name, tex, null, ok, note);
+    }
+
+    // OMML → TeX (Word equations back, MarkdownImporter): the round trip renders without errors
+    for (let i = 0; i < CASES.length; i++) {
+        const [name, tex, display] = CASES[i];
+        let ok = false, note = '';
+        try {
+            const rec = await MathCore.render(tex, display);
+            const o = MathCore.toOmml(rec.mathml, { display: display });
+            if (!o.xml || rec.error) { ok = true; note = 'not an equation'; }
+            else {
+                const back = MathCore.ommlToTex(new DOMParser().parseFromString(o.xml, 'application/xml').documentElement);
+                const r2 = await MathCore.render(back.tex, back.display);
+                ok = !r2.error && back.display === display;
+                note = r2.error ? 'TeX error: ' + r2.error + ' — ' + back.tex : back.tex;
+            }
+        } catch (e) { note = e.message; }
+        results.push({ name: 'omml→tex: ' + name, ok: ok, note: note });
+        row(results.length, 'omml→tex: ' + name, tex, null, ok, note);
+    }
+
+    // import: formulas from KaTeX (ChatGPT, Claude), Wikipedia (MathML), Kelk → $…$
+    const IMPORTS = [
+        ['import: KaTeX inline', '<p>a <span class="katex"><span class="katex-mathml"><math><semantics><mrow></mrow><annotation encoding="application/x-tex">E = mc^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true">E=mc2</span></span> b</p>', 'a $E = mc^2$ b'],
+        ['import: KaTeX display', '<span class="katex-display"><span class="katex"><span class="katex-mathml"><math display="block"><semantics><mrow></mrow><annotation encoding="application/x-tex">\\frac{a}{b}</annotation></semantics></math></span></span></span>', '$$\n\\frac{a}{b}\n$$'],
+        ['import: Wikipedia MathML', '<p>x <span class="mwe-math-element"><math alttext="{\\displaystyle x^{2}}"><semantics><mrow></mrow><annotation encoding="application/x-tex">{\\displaystyle x^{2}}</annotation></semantics></math></span> y</p>', 'x $x^{2}$ y'],
+        ['import: Kelk HTML', '<p>k <span class="kelk-math" data-display="inline" data-tex="\\alpha_i"><svg></svg></span></p>', 'k $\\alpha_i$'],
+        ['import: Kelk formula picture', '<p>p <img alt="\\ce{H2O}" src="x.png"> q</p>', 'p $\\ce{H2O}$ q']
+    ];
+    IMPORTS.forEach(function (c) {
+        let ok = false, note = '';
+        try {
+            const md = MarkdownImporter.create().fromHtml(c[1]).markdown.trim();
+            ok = md === c[2];
+            note = ok ? '' : 'got: ' + md;
+        } catch (e) { note = e.message; }
+        results.push({ name: c[0], ok: ok, note: note });
+        row(results.length, c[0], c[2], null, ok, note);
+    });
+
+    const failed = results.filter(function (r) { return !r.ok; });
+    const ms = Math.round(performance.now() - t0);
+    sum.className = 'sum ' + (failed.length ? 'bad' : 'ok');
+    sum.textContent = (failed.length ? failed.length + ' FAILED of ' : 'ALL PASSED: ') + results.length +
+        ' checks — MathCore ' + MathCore.version + ', MathJax ' + MathJax.version + ', ' + ms + ' ms — ' + navigator.userAgent;
+    window.__result = { ok: !failed.length, results: results, version: MathJax.version, ms: ms };
+})();
+</script>
+</body>
+</html>

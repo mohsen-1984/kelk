@@ -47,7 +47,7 @@ and this is the same text, converted:
 | Design | 80% |
 | Build | 35% |
 
-Right-to-left text adds one more difficulty: **bidirectional text (BiDi)**. When English sits next to Persian, Arabic or Hebrew, numbers and words swap places, brackets flip, the final full stop jumps to the other end of the line, and lists and tables take the wrong direction. Kelk decides the direction of every paragraph, table cell and list item on its own, isolates the words that run the other way, and builds the document with real Word styles, so it stays editable.
+Right-to-left text adds one more difficulty: **bidirectional text (BiDi)**. When English sits next to Persian, Arabic or Hebrew, numbers and words swap places, brackets flip, the final period jumps to the other end of the line, and lists and tables take the wrong direction. Kelk decides the direction of every paragraph, table cell and list item on its own, isolates the words that run the other way, and builds the document with real Word styles, so it stays editable.
 
 Kelk was made first for Persian, and it works for every right-to-left language — Arabic, Hebrew, Urdu, Kurdish — and their mix with left-to-right text; it is just as good for purely left-to-right documents: English, French, German, Spanish, Greek, Russian and the rest.
 
@@ -109,9 +109,10 @@ Kelk supports **GitHub Flavored Markdown** in full ([GFM spec](https://github.gi
 - **Title and edition** are automatic: the title comes from the first H1 or the opening words, the edition is "Draft". Change them or leave them empty on purpose; ↺ brings the automatic value back.
 - **Header and footer:** structured (logo, title, edition; author and page numbers), simple, or custom HTML that starts from a sample.
 - **Table of contents:** after the document title, with the heading levels you choose (H1, H1–H2, H1–H3).
-- **Typography:** the PDF and page fonts are separate from the Word fonts. PDF and HTML carry their fonts and need nothing installed; a Word file only names its fonts, so they must be installed on the reader's computer.
-- **Table width:** automatic (as the content needs, up to 100%) or a fixed share; column widths always follow the content.
-- **Code:** the code font is Vazir Code, made for code with Persian and Arabic in it, which keeps the columns aligned.
+- **Text and Word fonts:** the *Text* group sets the fonts of the preview, PDF and HTML; the *Word* group sets the fonts a Word file names. PDF and HTML carry their fonts and need nothing installed; a Word file only names its fonts, so they must be installed on the reader's computer.
+- **Tables:** width (automatic, as the content needs, up to 100%, or a fixed share — column widths always follow the content), alignment, and a **table style**: lines (none, under the header, horizontal, vertical, outer frame, grid) × fill (none, colored header, zebra stripes, or both), three colors, a centered and bold header row (each can be turned off) and an optional total row — the same in the preview and every output.
+- **Code and quotes:** the code font is Vazir Code, made for code with Persian and Arabic in it, which keeps the columns aligned. The *Code* group also changes the colors of code blocks (background, language bar, frame), and the *Quotes* group the quote box (bar color and width, fill, text color).
+- **Formulas:** SVG or MathML in the preview and HTML; editable Word equations or pictures in Word.
 - **Arabic:** Vazirmatn, the default font, covers Arabic too; Arabic fonts such as Cairo, Amiri or Noto Naskh Arabic can be prepared for the PDF (see *For developers*), and in Word any installed Arabic font works.
 
 > 💡 **How to:** this document has numbered headings — turn on "Table of contents" in the Document section of Settings and export a PDF.
@@ -192,7 +193,136 @@ In the PDF each shape is drawn with a font that has it: Vazirmatn, the default, 
 - In Persian — مجموع: ∑ (i=1 → n) i = n(n+1)/2
 - Sets: A ∩ B ⊆ A ∪ B, x ∈ ℝ, ∀ε > 0 ∃δ > 0
 
-### 6.5 Symbols and emoji
+### 6.5 LaTeX formulas
+
+LaTeX is the typesetting language built on Donald Knuth's TeX and brought to its present form by Leslie Lamport in the 1980s; ever since, it has been the common language for formulas in scientific and educational papers, books and course notes. With the spread of AI models it is used more than ever: every large language model (LLM) reads and writes formulas in LaTeX, and their answers in mathematics, physics, chemistry and programming are full of `$…$` and `$$…$$`.
+
+The three examples in this section — mathematics, chemistry and machine learning — come from real problems and are deliberately varied: from a simple inline formula to a matrix, a numbered equation and a chemical reaction, inside a paragraph, a list, a quote and a table cell. Reading the Markdown of these samples shows how Kelk works, and helps elsewhere too: an inline formula between `$…$` or `\(…\)`, a display formula between `$$…$$` or `\[…\]` on its own lines; an amount like $5 is not a formula. To have language models deliver formulas exactly this way, send them the code block at the end of this introduction at the start of the conversation.
+
+In Word (.docx and .doc), Kelk writes every formula as Word's own equation, editable with a double click; for the look of the preview instead, choose "Pictures" under "Word (.docx / .doc)" in the "Formulas" group of Kelk's settings panel. Chemical formulas (written with mhchem, the LaTeX package for reactions, as `\ce{…}`) are always inserted as pictures, since their special reaction arrows have no character in Word's equations.
+
+```prompt
+When your answer contains mathematical, scientific or chemical formulas, write them in LaTeX so they can be rendered:
+- Inline formulas: wrap them in single dollar signs, with no space just inside, e.g. $E = mc^2$
+- Display formulas: put $$ alone on the line before and on the line after the formula, e.g.
+  $$
+  \int_0^1 x^2\,dx = \frac{1}{3}
+  $$
+- Chemistry: use the mhchem notation, e.g. $\ce{2H2 + O2 -> 2H2O}$
+- Never put formulas in code blocks or inline code (no backticks), and do not escape their backslashes.
+- Write amounts of money as plain text, e.g. 5 USD, so a dollar sign is never read as a formula.
+```
+
+#### Mathematics: probability, analysis and linear algebra
+
+Adult height in a city is normally distributed with mean $\mu = 170$ and standard deviation $\sigma = 8$ cm, so $P(162 \le X \le 178)$ is the one-sigma probability, about $0.683$. For a sample of $n = 64$, the standard error of the mean is $\sigma_{\bar{x}} = \sigma / \sqrt{n} = 1$ and the 95% confidence interval is $\bar{x} \pm 1.96$.
+
+$$
+f(x) = \frac{1}{\sigma\sqrt{2\pi}}\, e^{-\frac{(x-\mu)^2}{2\sigma^2}}
+$$
+
+A test with sensitivity $P(+ \mid D) = 0.99$ and false-positive rate $P(+ \mid \neg D) = 0.01$, for a disease with prevalence $P(D) = 0.01$: Bayes' theorem shows a positive result is right only half the time.
+
+$$
+P(D \mid +) = \frac{P(+ \mid D)\,P(D)}{P(+ \mid D)\,P(D) + P(+ \mid \neg D)\,P(\neg D)} = \frac{0.0099}{0.0198} = 0.5
+$$
+
+The Taylor series of $e^x$ in three steps:
+
+1. Every derivative is the same: $\frac{d^n}{dx^n} e^x = e^x$, so $f^{(n)}(0) = 1$.
+2. The series: $e^x = \sum_{n=0}^{\infty} \frac{x^n}{n!}$ for every $x \in \mathbb{R}$, absolutely convergent.
+3. With $x = i\pi$ and $e^{i\theta} = \cos\theta + i\sin\theta$ we reach Euler's identity.
+
+> "The most beautiful formula" is often said to be $e^{i\pi} + 1 = 0$: it brings the five fundamental constants $0$, $1$, $\pi$, $e$ and $i$ together with three basic operations.
+
+$$
+A = \begin{pmatrix} 2 & 1 \\ 1 & 2 \end{pmatrix}, \qquad
+\det(A - \lambda I) = \begin{vmatrix} 2-\lambda & 1 \\ 1 & 2-\lambda \end{vmatrix} = (\lambda - 1)(\lambda - 3) = 0
+$$
+
+\[
+\begin{aligned}
+\int_0^1 x^2\,dx &= \left[\frac{x^3}{3}\right]_0^1 = \frac{1}{3} \\
+\lim_{n \to \infty} \left(1 + \frac{1}{n}\right)^n &= e \approx 2.718
+\end{aligned}
+\]
+
+$$
+\underbrace{1 + 2 + \cdots + n}_{n\ \text{terms}} = \frac{n(n+1)}{2}, \qquad
+\nabla \cdot \mathbf{E} = \frac{\rho}{\varepsilon_0} \tag{1}
+$$
+
+#### Chemistry: the Haber process
+
+In the Haber process nitrogen $\ce{N2}$ and hydrogen $\ce{H2}$ become ammonia $\ce{NH3}$ over an iron catalyst. The reaction is exothermic ($\Delta H^\circ = -92\ \mathrm{kJ\,mol^{-1}}$), so by Le Chatelier's principle a lower temperature favors the product but slows the reaction; industry runs at about $450\,^{\circ}\mathrm{C}$ and $200\ \mathrm{atm}$.
+
+$$
+\ce{N2(g) + 3H2(g) <=>[\text{Fe}][450^\circ\text{C}] 2NH3(g)}
+$$
+
+$$
+K_c = \frac{[\ce{NH3}]^2}{[\ce{N2}]\,[\ce{H2}]^3}, \qquad
+\Delta G^\circ = -RT \ln K = \Delta H^\circ - T\,\Delta S^\circ
+$$
+
+How the rate depends on temperature (the Arrhenius equation):
+
+$$
+k = A\, e^{-E_a / RT} \quad\Longrightarrow\quad \ln\frac{k_2}{k_1} = \frac{E_a}{R}\left(\frac{1}{T_1} - \frac{1}{T_2}\right)
+$$
+
+| Substance | Formula | Role |
+|---|:---:|---|
+| Nitrogen | $\ce{N2}$ | reactant |
+| Hydrogen | $\ce{H2}$ | reactant |
+| Ammonia | $\ce{NH3}$ | product |
+| Gas constant | $R = 8.314\ \mathrm{J\,mol^{-1}\,K^{-1}}$ | in $\Delta G^\circ = -RT\ln K$ |
+
+Other reactions — thermal decomposition, a precipitate and beta decay:
+
+$$
+\begin{gathered}
+\ce{CaCO3(s) ->[\Delta] CaO(s) + CO2 ^} \qquad \ce{Ag+(aq) + Cl-(aq) -> AgCl v} \\
+\ce{^{14}_{6}C -> ^{14}_{7}N + e-} + \bar{\nu}_e
+\end{gathered}
+$$
+
+#### Machine learning: training a classifier
+
+A model with parameters $\theta$ gives each input $x$ the scores $z = Wx + b$, and softmax turns them into probabilities $\hat{y}_k = e^{z_k} / \sum_{j} e^{z_j}$. Training minimizes the cross-entropy loss $\mathcal{L}(\theta)$ with small steps $\eta$ against the gradient $\nabla_\theta \mathcal{L}$, toward $\theta^{*} = \arg\min_\theta \mathcal{L}(\theta)$.
+
+$$
+\mathcal{L}(\theta) = -\frac{1}{N} \sum_{i=1}^{N} \sum_{k=1}^{K} y_{ik} \log \hat{y}_{ik} + \frac{\lambda}{2} \lVert \theta \rVert_2^2
+$$
+
+The Adam optimizer, at each step $t$:
+
+1. Gradient: $g_t = \nabla_\theta \mathcal{L}(\theta_{t-1})$
+2. Moments: $m_t = \beta_1 m_{t-1} + (1-\beta_1)\, g_t$ and $v_t = \beta_2 v_{t-1} + (1-\beta_2)\, g_t^2$
+3. Update: $\theta_t = \theta_{t-1} - \eta\, \hat{m}_t / (\sqrt{\hat{v}_t} + \epsilon)$ with $\hat{m}_t = \frac{m_t}{1-\beta_1^t}$ and $\hat{v}_t = \frac{v_t}{1-\beta_2^t}$
+
+$$
+\mathrm{Attention}(Q, K, V) = \operatorname{softmax}\!\left(\frac{QK^{\top}}{\sqrt{d_k}}\right)V
+$$
+
+\[
+PE_{(pos,\,i)} = \begin{cases} \sin\!\left(pos / 10000^{i/d}\right) & i \text{ even} \\ \cos\!\left(pos / 10000^{(i-1)/d}\right) & i \text{ odd} \end{cases}
+\]
+
+| Metric | Formula |
+|---|:---:|
+| Precision | $P = \frac{TP}{TP + FP}$ |
+| Recall | $R = \frac{TP}{TP + FN}$ |
+| F1 | $F_1 = \frac{2PR}{P + R}$ |
+| Accuracy | $\frac{TP + TN}{TP + TN + FP + FN}$ |
+
+> Rule of thumb: a low training loss with a high validation loss means the model overfits — raise the regularization weight $\lambda$ or add data.
+
+$$
+\text{Precision} = \frac{\text{true positives}}{\text{all predicted positives}}
+$$
+
+### 6.6 Symbols and emoji
 
 A browser finds another font by itself when a character is missing, and Word on Windows draws emoji with Segoe UI Emoji. A PDF has no such help: every character must come from a font embedded in the file. So Kelk embeds two helper fonts: DejaVu Sans for text symbols and Noto Emoji for emoji (monochrome in the PDF).
 
@@ -202,7 +332,9 @@ Emoji: 👍 👍🏽 👨‍👩‍👧 🏳️‍🌈 🇮🇷 🇩🇪 1️⃣
 
 **Bold ✓ 😀**, *italic ✓ 😀*, ***both ✓ 😀***.
 
-### 6.6 Tables
+### 6.7 Tables
+
+The look of these tables — lines, fill and colors — is the **table style** in *Settings → Tables*: choose lines and a fill (for example a line under the header with a colored header and zebra stripes, or a full grid) and every output follows. A cell holding only digits, of any script, takes the direction of its table.
 
 | Right (---:) | Center (:---:) | Left (:---) | Default (---) |
 |---:|:---:|:---|---|
@@ -216,7 +348,7 @@ Emoji: 👍 👍🏽 👨‍👩‍👧 🏳️‍🌈 🇮🇷 🇩🇪 1️⃣
 | 2 | PDF | موتور چیدمان خود کِلک: شکل‌دهی حروف، حرکت‌گذاری و قلم‌های جاسازی‌شده. |
 | 3 | HTML | One standalone file. |
 
-### 6.7 Lists
+### 6.8 Lists
 
 - The first item is written long on purpose, to check line breaking inside a list item: the second and third lines must align with the text, not with the bullet.
 - مورد دوم فارسی است و علامت و تورفتگی آن سمت راست است.
@@ -236,7 +368,7 @@ Emoji: 👍 👍🏽 👨‍👩‍👧 🏳️‍🌈 🇮🇷 🇩🇪 1️⃣
 - [x] پیش‌نمایش را ببینید
 - [ ] Review in Word
 
-### 6.8 Quotes
+### 6.9 Quotes
 
 > This is an English quote with a Persian phrase «سند آماده» inside it.
 
@@ -248,7 +380,14 @@ Emoji: 👍 👍🏽 👨‍👩‍👧 🏳️‍🌈 🇮🇷 🇩🇪 1️⃣
 >
 > > A nested quote with **bold text** and `inline code`.
 
-### 6.9 Code
+> A quote with a table — the table stands at the start of the quote box:
+>
+> | Version | Date | Change |
+> |---|---|---|
+> | 1.0 | 2026-09-30 | First release |
+> | 1.1 | 2026-10-23 | LaTeX formulas |
+
+### 6.10 Code
 
 Inline code in English text: `value = 2`, and in Persian `متغیر = 1`.
 
@@ -277,7 +416,7 @@ def greet(name):
 ```
 ````
 
-### 6.10 Images and links
+### 6.11 Images and links
 
 ![Kelk logo — نشان کِلک][kelk-logo]
 
@@ -304,6 +443,7 @@ const blob = await PdfBuilder.create()
 
 ## 8. What to check
 
+- **Formulas:** the formulas of 6.5 look as in the preview in all four outputs — inline ones on the baseline, display ones centered, sharp when zoomed in Word (.docx).
 - **Direction:** mixed paragraphs, numbers and brackets, nested Persian and English lists, tables and quotes look in all four outputs as in the preview.
 - **Word:** the styles (Heading, Quote, List Paragraph, TOC) appear in the style gallery, and the table of contents stays right-to-left in right-to-left documents after "Update entire table".
 - **PDF:** text can be selected and searched in Acrobat, diacritics sit on their letters, and the table of contents links work.
@@ -313,7 +453,7 @@ const blob = await PdfBuilder.create()
 
 ## 9. In memory of Saber Rastikerdar
 
-Three of Kelk's fonts — Vazirmatn, Vazir Code and Sahel — are the work of the late [Saber Rastikerdar](https://github.com/rastikerdar), whose free and open fonts have made Persian text readable on the web, in software and in documents for years. May his memory be honoured.
+Three of Kelk's fonts — Vazirmatn, Vazir Code and Sahel — are the work of the late [Saber Rastikerdar](https://github.com/rastikerdar), whose free and open fonts have made Persian text readable on the web, in software and in documents for years. May his memory be honored.
 
 End of document. ✓
 

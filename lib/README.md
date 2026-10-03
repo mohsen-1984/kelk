@@ -14,6 +14,7 @@ nothing here depends on it.
 vendor      docx (for .docx) · jsPDF (for .pdf) · mammoth + turndown (+ gfm) (for import)
 fonts       pdf-base64-ttf-fonts/pdf-font-*.js        PDF fonts (window.PdfFonts)
 lib         ImageCore.js        images: registered names, data URIs, URLs, SVG → PNG
+            MathCore.js         LaTeX formulas: marked extension, MathJax 4 (local) → SVG / MathML, OMML ↔ TeX (see LATEX.md)
             BidiCore.js         every direction decision (document, blocks, runs), ToC, table widths
             BidiView.js         BidiCore's decisions applied to HTML in a browser (classes)
             msOfficeWordHtmlTemplate.js   styling defaults (createMsoTemplate.DEFAULTS)
@@ -22,6 +23,7 @@ lib         ImageCore.js        images: registered names, data URIs, URLs, SVG �
             DocxBuilder.js      .docx (Office Open XML, docx.js)
             PdfBuilder.js       .pdf  (own layout engine on jsPDF)
             HtmlBuilder.js      .html (standalone page, fonts and images embedded)
+            PreviewBuilder.js   a live preview on HtmlBuilder's logic and stylesheet (after HtmlBuilder)
             MarkdownImporter.js .docx / HTML / pasted rich text → Markdown
 ```
 
@@ -86,7 +88,7 @@ in every output. `configure(options)` takes them all at once; an unknown key thr
 | `tableWidth` | `setTableWidth` | `'auto'` (default: the content's width, up to 100%) · `'98%'` … |
 | `images` | `registerImage` | `{ name: File \| Blob \| ArrayBuffer \| dataURI \| URL }` |
 | `imageOptions` | `setImageOptions` | `{ baseUrl, svgScale, timeout }` |
-| `template` | `setTemplateOptions` | any `createMsoTemplate.DEFAULTS` key (colors, spacing, list indents …) |
+| `template` | `setTemplateOptions` | any `createMsoTemplate.DEFAULTS` key (colors, spacing, list indents …) — e.g. code `codeBlockBg`, `codeHeaderBg`, `codeHeaderColor`, `codeBlockBorder`; quotes `quoteBorderColor`, `quoteBorderWidth`, `quoteBg` (`''`: no fill), `quoteTextColor` |
 | `styles` | `setStyles` | builder-level overrides |
 | `content` | `addFromHtml` | HTML string or element (copied, never modified) |
 
@@ -124,6 +126,88 @@ contents layout (after the opening H1: `<hr>`, contents, `<hr>`, an empty line).
 - **HTML** fonts are embedded as base64 `@font-face` rules from `registerWebFonts({ family: [...] })`;
   Kelk's page keeps them in `../assets/fonts/embed/*.js`. Any web font can be added the same way.
 
+## Formulas: `MathCore`
+
+> The whole story — every output, the importer, Word's undocumented HTML form of equations and
+> the findings behind each decision — is in **[`LATEX.md`](LATEX.md)**.
+
+LaTeX math as AI models and scientists write it — `$…$`, `\(…\)` inline; `$$…$$`, and
+`\[…\]` on its own lines, for display. `marked.use(MathCore.markedExtension())` turns each
+formula into an empty placeholder carrying its TeX (`<span class="kelk-math" data-tex="…">`);
+BidiCore treats it as one left-to-right atom (`isMathAtom`). The engine is a local copy of
+MathJax 4 (`vendor/mathjax_4.1.3/`, loaded on the first formula, no CDN, works from `file://`):
+
+```js
+marked.use(MathCore.markedExtension());
+const rec = await MathCore.render('\\frac{a}{b}', true);   // { svg, mathml, width, height, depth, error }
+await MathCore.typeset(element, { mode: 'svg' });          // or 'mathml'
+```
+
+`HtmlBuilder` writes formulas as SVG or MathML (`setMath({ mode })`). MathML is written for what
+browsers draw (MathML Core: letter styles as Unicode math letters, primes, column alignment);
+a formula they cannot draw (`\cancel`, `\boxed`, tags, table rules, wide accents and braces,
+extensible arrows, mhchem) is written as SVG. `tests/math-modes.html` shows both, side by side.
+
+The Word and PDF builders draw each formula as an image (`BuilderBase._mathToImages` →
+`MathCore.toImages`: SVG at the size it has on a page, next to the body text), inline formulas
+on the baseline and display formulas centered; tagged equations span the text column. `.docx`
+and `.doc` write each formula as **Word's own equation** (in `.doc` inside Word's conditional
+comments, with the picture for other readers, as Word's "Save as Web Page" writes it) (OMML from `MathCore.toOmml` — editable in Word,
+drawn in Cambria Math); with `setMath({ word: 'image' })`, and always for mhchem (`\ce`), it
+stores the SVG itself (sharp at any zoom in Word 2016+) with a PNG fallback; `.pdf` draws the
+SVG's paths with jsPDF's own path operators (vector, sharp at any zoom — `svgToPdf` in
+PdfBuilder); `.doc` uses the PNG ImageCore rasterizes (about 576 dpi). A formula with right-to-left `\text` carries
+its font inside the image (`window.KelkWebFonts`, or `MathCore.configure({ fonts })`) and stays
+PNG in `.docx` and `.pdf`. Inline, TeX sets nested fractions in script sizes (`\frac{\frac{a}{b}}{…}`
+is small by design); `\dfrac` or `\displaystyle` gives full-size parts. Word lowers an inline picture twice as far as its run position says:
+`BuilderBase.WORD_PICTURE_LOWER` (0.5) compensates. A TeX error is written as code.
+
+`MarkdownImporter` keeps formulas: KaTeX (pasted from ChatGPT, Claude …), MathML with a TeX
+annotation (Wikipedia), MathJax 4, Kelk's own HTML and formula pictures, and **Word's equations in
+a .docx** (read from the zip before mammoth, `MathCore.ommlToTex`) come back as `$…$` / `$$…$$`.
+
+## The preview: `PreviewBuilder`
+
+`PreviewBuilder` is `HtmlBuilder` drawing into an element of an app page instead of a file: the
+same directions, code frames, table widths and sides, formulas and document styles. `css(dir)` is
+only the document's rules (no embedded fonts, page box or print rules); `decorate(root, { width,
+fontSize, onCopy })` works in place and synchronously (code frames get copy buttons);
+`typeset(root)` draws the formulas afterwards, in the export's mode (SVG or MathML). Take the HTML for the exports before `decorate`.
+
+## Tables
+
+Every builder sizes columns from the content (`BidiCore.tableColumnShares` — formulas and images
+count as unbreakable words) and places tables the same way: `setTableWidth('auto' | 'NN%')` and
+`setTableAlign('center' | 'text' | 'right' | 'left')`, where `text` is the document's own side. A
+table in a list item or a quote stands at the start of that item or quote. In `.doc` the side is a
+`<div align>` around the table (an `align` on the table is Word's "text wrapping: around").
+
+`setTableStyle({ lines, fill, total, headerCenter, headerBold, headerColor, stripeColor, borderColor, borderWidth })` gives
+every content table its lines, fills and bold — the same in all outputs. Two independent choices
+and one switch:
+
+| Option | Values |
+|---|---|
+| `lines` | `none`, `underline` (under the header), `horizontal`, `vertical`, `frame` (outer box), `grid` (default) |
+| `fill` | `none`, `header`, `stripes` (even body rows), `header-stripes` (default) |
+| `total` | `true`: the last row is bold, with a line above it |
+| `headerCenter`, `headerBold` | the header row centered (a column's own alignment wins) and bold — both `true` by default |
+
+Colors: `headerColor` (default: the template's `tableHeaderBg`, `#E4E9EF`), `stripeColor` (`#F5F7FA`),
+`borderColor` (`#A9B5C4`); `borderWidth` in points (0.5). Every key is optional
+(`BuilderBase.TABLE_STYLE_DEFAULTS`); an unknown key is an error. Text on a dark fill turns white.
+A table whose only row is its header has no header: that row is styled as a body row.
+`BuilderBase._tableStyleGrid(table)` resolves the style once per table — four kinds of row (header,
+odd, even, last), a line between two rows drawn when either asks for it, start and end on the
+table's own sides — and each builder only paints the result: inline cell styles in HTML and `.doc`,
+cell borders and shading in `.docx` (direct formatting, no Word table style), lines and fills in
+the PDF.
+
+```js
+builder.setTableStyle({ lines: 'horizontal', fill: 'none', total: true });          // a report table
+builder.setTableStyle({ lines: 'grid', fill: 'header-stripes', headerColor: '#1F3864' });
+```
+
 ## Direction: `BidiCore` and `BidiView`
 
 `BidiCore` makes every direction decision for all outputs: the document direction (the first
@@ -132,6 +216,12 @@ the counter-direction runs inside a block (greedy run, bracket and quote guard, 
 "4k", formulas "∑ (i=1 → n)", a number joining the Persian phrase after it in LTR text, end
 punctuation). `BidiView` applies the same decisions to HTML in a browser as `bd-*` classes
 (`apply`, `clear`, `css`, `toAttributes`). `../tools/bidi-lab.html` shows every rule with test cases.
+
+Tables: a table with any right-to-left letter keeps the document's direction (columns from the
+right in a right-to-left document); a table without one is left-to-right as a whole. A cell
+decides by its own letters, and a cell with no letter at all — digits of any script (`0-9`,
+`٠-٩`, `۰-۹`), signs, symbols, an empty cell — takes its table's direction, so a column of
+numbers lines up with its table in every case.
 
 ## Import: `MarkdownImporter`
 

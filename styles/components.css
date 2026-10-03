@@ -184,6 +184,18 @@ html[dir="rtl"] input[dir="auto"]:placeholder-shown { direction: rtl; }
 .btn-row { display: flex; gap: 6px; flex-wrap: wrap; }
 .field .hint code { font-family: var(--font-mono); font-size: 11px; background: var(--code-bg); padding: 0 4px; border-radius: 4px; }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.row3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+/* color pickers (table style): a swatch the width of its column */
+.field.color input[type="color"] {
+  width: 100%; height: 32px; padding: 3px; cursor: pointer;
+  border: 1px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--panel-2);
+}
+.field.color input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+.field.color input[type="color"]::-webkit-color-swatch { border: 0; border-radius: 3px; }
+.field.color input[type="color"]::-moz-color-swatch { border: 0; border-radius: 3px; }
+/* a color the chosen preset does not use */
+.field.color.unused { opacity: .45; }
+.field.color.unused input { cursor: not-allowed; }
 
 .check { display: flex; align-items: center; gap: 8px; cursor: pointer; }
 .check input { accent-color: var(--accent); width: 16px; height: 16px; }
@@ -218,6 +230,7 @@ dialog {
   box-shadow: var(--shadow); padding: 0; width: min(560px, 92vw);
 }
 dialog::backdrop { background: rgba(0, 0, 0, .35); }
+[data-theme="dark"] dialog::backdrop { background: rgba(0, 0, 0, .6); }
 dialog .dlg-head { display: flex; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--line); }
 dialog .dlg-head h2 { margin: 0; font-size: 15px; }
 dialog .dlg-head .btn { margin-inline-start: auto; }
@@ -234,3 +247,12 @@ kbd {
 .lang-switch { display: inline-flex; align-items: center; gap: 2px; color: var(--muted); }
 .lang-switch svg { width: 16px; height: 16px; margin-inline-end: 2px; }
 .lang-switch .btn { padding: 0 8px; }
+
+/* the App group: last in Settings — only its heading is tinted (the app's own behavior, not the document's) */
+details.group.app-group { margin-top: 14px; }
+/* the tint reaches 6px beyond the text column on both sides, so icon and chevron stay in line with the other groups */
+details.group.app-group > summary { color: var(--accent-ink); background: var(--accent-soft); border-radius: var(--radius-sm); margin-inline: -6px; padding-inline: 8px; }
+
+/* a link inside a hint that opens another Settings group (Text → Word) */
+.link-btn { border: 0; background: none; padding: 0; font: inherit; color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+.link-btn:hover { color: var(--accent); }
