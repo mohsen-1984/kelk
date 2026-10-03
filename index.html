@@ -1,14 +1,35 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-<meta name="description" content="Kelk: convert Markdown (GFM) to Word DOCX, Word DOC (MHTML), PDF and standalone HTML — and Word/HTML back to Markdown — entirely client-side in your browser. Right-to-left first (Persian, Arabic, Hebrew, Urdu) and every left-to-right language; offline, no upload, open source.">
-<meta name="keywords" content="markdown to docx, markdown to pdf, markdown to word, markdown to html, docx to markdown, GFM, RTL, bidi, Persian, Farsi, Arabic, Hebrew, Urdu, client-side, offline, jsPDF, docx">
-<meta name="author" content="mhn.com@gmail.com">
-<meta name="contributor" content="Anthropic Claude Opus 5.5">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Kelk — RTL-first Markdown to DOCX, PDF and DOC, entirely in the browser.">
-    <title>Kelk</title>
+    <title>Kelk — Markdown to Word, PDF and HTML, right-to-left first</title>
+    <meta name="description" content="Kelk: convert Markdown (GFM) to Word DOCX, Word DOC (MHTML), PDF and standalone HTML — and Word/HTML back to Markdown — entirely client-side in your browser. Right-to-left first (Persian, Arabic, Hebrew, Urdu) and every left-to-right language; LaTeX formulas; offline, no upload, open source.">
+    <meta name="keywords" content="markdown to docx, markdown to pdf, markdown to word, markdown to html, docx to markdown, LaTeX, MathJax, Word equations, GFM, RTL, bidi, Persian, Farsi, Arabic, Hebrew, Urdu, client-side, offline">
+    <meta name="author" content="mhn.com@gmail.com">
+    <meta name="contributor" content="Anthropic Claude Opus 5.5">
+    <meta name="theme-color" content="#1f6f5c">
+    <link rel="canonical" href="https://mohsen-1984.github.io/kelk/">
+
+    <!-- link previews: Open Graph (Telegram, WhatsApp, LinkedIn, Facebook …) and X / Twitter -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Kelk">
+    <meta property="og:title" content="Kelk — Markdown to Word, PDF and HTML, right-to-left first">
+    <meta property="og:description" content="Markdown to DOCX, DOC, PDF and HTML — and back — in your browser. Right-to-left first, LaTeX formulas as Word equations, offline, open source.">
+    <meta property="og:url" content="https://mohsen-1984.github.io/kelk/">
+    <meta property="og:image" content="https://mohsen-1984.github.io/kelk/assets/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Kelk — کِلک: Markdown to Word, PDF and HTML">
+    <meta property="og:locale" content="fa_IR">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta property="og:locale:alternate" content="ar_AR">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Kelk — Markdown to Word, PDF and HTML, right-to-left first">
+    <meta name="twitter:description" content="Markdown to DOCX, DOC, PDF and HTML — and back — in your browser. Right-to-left first, LaTeX formulas, offline, open source.">
+    <meta name="twitter:image" content="https://mohsen-1984.github.io/kelk/assets/og-image.png">
+    <meta name="twitter:image:alt" content="Kelk — کِلک: Markdown to Word, PDF and HTML">
+
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231f6f5c'/%3E%3Cpath d='M9 24 L21 8 L25 11 L13 27 Z' fill='%23fff'/%3E%3Cpath d='M9 24 L7 29 L13 27 Z' fill='%23fff' opacity='.7'/%3E%3C/svg%3E">
 
     <link rel="stylesheet" href="styles/tokens.css">
@@ -39,7 +60,6 @@
         <span class="lang-switch" id="lang-switch" role="group" aria-label="Language"><i data-lucide="languages"></i></span>
         <button class="btn ghost icon" id="btn-theme" type="button" data-i18n-attr="title:theme;aria-label:theme"></button>
         <button class="btn ghost icon layout-toggle" id="btn-layout" type="button"></button>
-        <button class="btn ghost icon" id="btn-app" type="button" data-i18n-attr="title:appSettings;aria-label:appSettings"><i data-lucide="settings-2"></i></button>
         <button class="btn ghost icon" id="btn-help" type="button" data-i18n-attr="title:help;aria-label:help"><i data-lucide="keyboard"></i></button>
     </header>
 
@@ -52,12 +72,14 @@
                 <span class="flip-rtl"><i data-lucide="panel-left-open"></i></span><span class="rail-label" data-i18n="editor"></span>
             </button>
             <div class="panel-head pane-head">
-                <button class="btn ghost icon pane-toggle" id="editor-close" type="button" data-i18n-attr="title:closeEditor;aria-label:closeEditor"><span class="flip-rtl"><i data-lucide="panel-left-close"></i></span></button>
                 <h2 id="h-editor"><i data-lucide="pencil-line"></i><span data-i18n="editor"></span></h2>
                 <div class="actions">
                     <button class="btn ghost icon" id="btn-sample" type="button" data-i18n-attr="title:sampleHint;aria-label:sampleHint"><i data-lucide="book-open"></i></button>
                     <button class="btn" id="btn-import" type="button"><i data-lucide="file-up"></i><span data-i18n="import"></span></button>
                     <button class="btn" id="btn-paste" type="button"><i data-lucide="clipboard-paste"></i><span data-i18n="paste"></span></button>
+                    <button class="btn ghost icon" id="btn-replace" type="button" data-i18n-attr="title:replacePaste;aria-label:replacePaste"><i data-lucide="replace-all"></i></button>
+                    <button class="btn ghost icon" id="btn-copy-editor" type="button" data-i18n-attr="title:copyMd;aria-label:copyMd"><i data-lucide="copy"></i></button>
+                    <button class="btn ghost icon btn-max" id="max-editor" type="button" data-max="editor" data-i18n-attr="title:maximize;aria-label:maximize"><i data-lucide="maximize-2"></i></button>
                     <button class="btn soft danger icon" id="btn-clear" type="button" data-i18n-attr="title:clear;aria-label:clear"><i data-lucide="eraser"></i></button>
                 </div>
             </div>
@@ -86,6 +108,7 @@
                 <h2 id="h-preview"><i data-lucide="eye"></i><span data-i18n="preview"></span></h2>
                 <div class="actions">
                     <button class="btn ghost icon" id="btn-copy-preview" type="button" data-i18n-attr="title:copy;aria-label:copy"><i data-lucide="copy"></i></button>
+                    <button class="btn ghost icon btn-max" id="max-preview" type="button" data-max="preview" data-i18n-attr="title:maximize;aria-label:maximize"><i data-lucide="maximize-2"></i></button>
                 </div>
             </div>
             <div class="preview-scroll">
@@ -98,10 +121,10 @@
                 </div>
                 <div class="export-bar" role="group" data-i18n-attr="aria-label:exportAs">
                     <button class="btn primary" type="button" data-export="docx" data-i18n-attr="title:docxHint"><i data-lucide="file-text"></i>DOCX</button>
-                    <button class="btn" type="button" data-export="pdf" data-i18n-attr="title:pdfHint"><i data-lucide="file-type"></i>PDF</button>
-                    <button class="btn" type="button" data-export="doc" data-i18n-attr="title:docHint"><i data-lucide="file"></i>DOC</button>
+                    <button class="btn soft" type="button" data-export="pdf" data-i18n-attr="title:pdfHint"><i data-lucide="file-type"></i>PDF</button>
                     <span class="sep" aria-hidden="true"></span>
-                    <button class="btn ghost" type="button" data-export="html"><i data-lucide="code-xml"></i>HTML</button>
+                    <button class="btn" type="button" data-export="html" data-i18n-attr="title:htmlHint"><i data-lucide="code-xml"></i>HTML</button>
+                    <button class="btn ghost" type="button" data-export="doc" data-i18n-attr="title:docHint"><i data-lucide="file"></i>DOC</button>
                 </div>
             </div>
         </section>
@@ -138,6 +161,12 @@
                         </div>
                         <label class="field"><span data-i18n="docLink"></span><input type="text" dir="ltr" data-setting="document.link" placeholder="example.com / name@example.com"></label>
                         <div class="field"><span class="hint" data-i18n="optional"></span></div>
+                        <label class="field"><span data-i18n="docDirection"></span>
+                            <select data-setting="direction">
+                                <option value="auto" data-i18n="dirAuto"></option>
+                                <option value="rtl" data-i18n="dirRtl"></option>
+                                <option value="ltr" data-i18n="dirLtr"></option>
+                            </select></label>
                         <div class="row2">
                             <label class="check"><input type="checkbox" data-setting="toc.enabled"><span data-i18n="tocEnabled"></span></label>
                             <label class="field"><span data-i18n="tocLevels"></span>
@@ -147,25 +176,133 @@
                 </details>
 
                 <details class="group">
-                    <summary><i data-lucide="image"></i><span data-i18n="gLogo"></span></summary>
+                    <summary><i data-lucide="type"></i><span data-i18n="gText"></span></summary>
                     <div class="fields">
-                        <div class="logo-box" id="logo-box" tabindex="0">
-                            <div class="thumb" id="logo-thumb"></div>
-                            <div class="btns">
-                                <label class="btn"><i data-lucide="upload"></i><span data-i18n="logoUpload"></span>
-                                    <input type="file" id="logo-file" hidden accept="image/png,image/jpeg,image/svg+xml,image/webp,image/gif"></label>
-                                <button class="btn ghost danger" id="logo-remove" type="button"><span data-i18n="logoRemove"></span></button>
-                            </div>
+                        <label class="field"><span data-i18n="fontBidi"></span><select data-setting="fonts.bidi"></select></label>
+                        <label class="field"><span data-i18n="fontLatin"></span><select data-setting="fonts.latin"></select></label>
+                        <div class="row2">
+                            <label class="field"><span data-i18n="sizeBidi"></span><input type="number" min="6" max="36" step="0.5" dir="ltr" data-setting="fonts.bidiSize"></label>
+                            <label class="field"><span data-i18n="sizeLatin"></span><input type="number" min="6" max="36" step="0.5" dir="ltr" data-setting="fonts.latinSize"></label>
                         </div>
-                        <div class="field"><span class="hint" data-i18n="logoHint"></span></div>
-                        <label class="field"><span data-i18n="logoHeight"></span>
-                            <select data-setting="logoHeight"><option>0.8cm</option><option>1cm</option><option>1.2cm</option><option>1.5cm</option><option>2cm</option></select></label>
+                        <div class="field"><span class="hint"><span data-i18n="textFontsHint"></span>
+                            <button type="button" class="link-btn" data-open-group="gWord" data-i18n="gWord"></button></span></div>
                     </div>
                 </details>
 
                 <details class="group">
-                    <summary><i data-lucide="panel-top"></i><span data-i18n="gHeaderFooter"></span></summary>
+                    <summary><i data-lucide="code"></i><span data-i18n="gCode"></span></summary>
                     <div class="fields">
+                        <label class="field"><span data-i18n="codeFont"></span><select data-setting="code.font"></select></label>
+                        <div class="row2">
+                            <label class="field"><span data-i18n="codeSize"></span><input type="number" min="6" max="24" step="0.5" dir="ltr" data-setting="code.size"></label>
+                        </div>
+                        <label class="check"><input type="checkbox" data-setting="code.showLanguage"><span data-i18n="showLanguage"></span></label>
+                        <label class="field"><span data-i18n="rtlInCode"></span>
+                            <select data-setting="code.rtlFont"><option value="code" data-i18n="rtlInCodeCode"></option><option value="document" data-i18n="rtlInCodeDoc"></option></select></label>
+                        <div class="sub-head label-row"><span data-i18n="colorsHead"></span>
+                            <button class="mini" type="button" hidden data-reset-keys="code.bg,code.headerBg,code.border" data-i18n-attr="title:colorsReset;aria-label:colorsReset"><i data-lucide="rotate-ccw"></i></button></div>
+                        <div class="row3">
+                            <label class="field color"><span data-i18n="codeBg"></span><input type="color" data-setting="code.bg"></label>
+                            <label class="field color"><span data-i18n="codeHeaderBg"></span><input type="color" data-setting="code.headerBg"></label>
+                            <label class="field color"><span data-i18n="codeBorder"></span><input type="color" data-setting="code.border"></label>
+                        </div>
+                        <div class="field"><span class="hint" data-i18n="codeColorsHint"></span></div>
+                    </div>
+                </details>
+
+                <details class="group">
+                    <summary><i data-lucide="text-quote"></i><span data-i18n="gQuote"></span></summary>
+                    <div class="fields">
+                        <div class="sub-head label-row"><span data-i18n="quoteBar"></span>
+                            <button class="mini" type="button" hidden data-reset-keys="quote.border,quote.width,quote.bg,quote.text" data-i18n-attr="title:colorsReset;aria-label:colorsReset"><i data-lucide="rotate-ccw"></i></button></div>
+                        <div class="row2">
+                            <label class="field color"><span data-i18n="quoteBorder"></span><input type="color" data-setting="quote.border"></label>
+                            <label class="field"><span data-i18n="quoteWidth"></span>
+                                <select data-setting="quote.width"><option value="2pt" data-i18n="widthThin"></option><option value="3.5pt" data-i18n="widthMedium"></option><option value="5pt" data-i18n="widthThick"></option></select></label>
+                        </div>
+                        <div class="row2">
+                            <label class="field color"><span data-i18n="quoteBg"></span><input type="color" data-setting="quote.bg"></label>
+                            <label class="field color"><span data-i18n="quoteText"></span><input type="color" data-setting="quote.text"></label>
+                        </div>
+                        <div class="field"><span class="hint" data-i18n="quoteHint"></span></div>
+                    </div>
+                </details>
+
+                <details class="group">
+                    <summary><i data-lucide="table"></i><span data-i18n="gTable"></span></summary>
+                    <div class="fields">
+                        <label class="field"><span data-i18n="tableWidth"></span>
+                            <select data-setting="page.tableWidth">
+                                <option value="auto" data-i18n="tableWidthAuto"></option>
+                                <option value="100%">100%</option><option value="98%">98%</option>
+                                <option value="90%">90%</option><option value="75%">75%</option><option value="50%">50%</option>
+                            </select></label>
+                        <label class="field"><span data-i18n="tableAlign"></span>
+                            <select data-setting="page.tableAlign">
+                                <option value="center" data-i18n="tableAlignCenter"></option>
+                                <option value="text" data-i18n="tableAlignText"></option>
+                                <option value="right" data-i18n="tableAlignRight"></option>
+                                <option value="left" data-i18n="tableAlignLeft"></option>
+                            </select></label>
+                        <div class="field"><span class="hint" data-i18n="tableNestedHint"></span></div>
+                        <div class="sub-head label-row"><span data-i18n="tableStyle"></span>
+                            <button class="mini" type="button" hidden data-reset-keys="tableStyle.lines,tableStyle.fill,tableStyle.headerCenter,tableStyle.headerBold,tableStyle.total,tableStyle.headerColor,tableStyle.stripeColor,tableStyle.borderColor" data-i18n-attr="title:tsReset;aria-label:tsReset"><i data-lucide="rotate-ccw"></i></button></div>
+                        <div class="row2">
+                            <label class="field"><span data-i18n="tsLines"></span>
+                                <select data-setting="tableStyle.lines">
+                                    <option value="none" data-i18n="tlNone"></option>
+                                    <option value="underline" data-i18n="tlUnderline"></option>
+                                    <option value="horizontal" data-i18n="tlHorizontal"></option>
+                                    <option value="vertical" data-i18n="tlVertical"></option>
+                                    <option value="frame" data-i18n="tlFrame"></option>
+                                    <option value="grid" data-i18n="tlGrid"></option>
+                                </select></label>
+                            <label class="field"><span data-i18n="tsFill"></span>
+                                <select data-setting="tableStyle.fill">
+                                    <option value="none" data-i18n="tfNone"></option>
+                                    <option value="header" data-i18n="tfHeader"></option>
+                                    <option value="stripes" data-i18n="tfStripes"></option>
+                                    <option value="header-stripes" data-i18n="tfHeaderStripes"></option>
+                                </select></label>
+                        </div>
+                        <div class="row3">
+                            <label class="field color"><span data-i18n="tsHeaderColor"></span><input type="color" data-setting="tableStyle.headerColor"></label>
+                            <label class="field color"><span data-i18n="tsStripeColor"></span><input type="color" data-setting="tableStyle.stripeColor"></label>
+                            <label class="field color"><span data-i18n="tsBorderColor"></span><input type="color" data-setting="tableStyle.borderColor"></label>
+                        </div>
+                        <label class="check"><input type="checkbox" data-setting="tableStyle.headerCenter"><span data-i18n="tsHeaderCenter"></span></label>
+                        <label class="check"><input type="checkbox" data-setting="tableStyle.headerBold"><span data-i18n="tsHeaderBold"></span></label>
+                        <label class="check"><input type="checkbox" data-setting="tableStyle.total"><span data-i18n="tsTotal"></span></label>
+                        <div class="field"><span class="hint" data-i18n="tsColorsHint"></span></div>
+                    </div>
+                </details>
+
+                <details class="group">
+                    <summary><i data-lucide="sigma"></i><span data-i18n="gMath"></span></summary>
+                    <div class="fields">
+                        <div class="field"><span class="hint" dir="auto" data-i18n="mathHint"></span></div>
+                        <div class="sub-head" id="sh-math-web" data-i18n="mathWebHead"></div>
+                        <div class="field"><span class="hint" data-i18n="mathWebHint"></span>
+                            <select data-setting="math.html" aria-labelledby="sh-math-web"><option value="svg" data-i18n="mathHtmlSvg"></option><option value="mathml" data-i18n="mathHtmlMathml"></option></select></div>
+                        <div class="sub-head" id="sh-math-word" data-i18n="mathWordHead"></div>
+                        <div class="field"><span class="hint" data-i18n="mathWordHint"></span>
+                            <select data-setting="math.word" aria-labelledby="sh-math-word"><option value="native" data-i18n="mathWordNative"></option><option value="image" data-i18n="mathWordImage"></option></select></div>
+                    </div>
+                </details>
+
+                <details class="group">
+                    <summary><i data-lucide="file-cog"></i><span data-i18n="gPageHeader"></span></summary>
+                    <div class="fields">
+                        <div class="field"><span class="hint" data-i18n="exportsOnly"></span></div>
+                        <div class="row2">
+                            <label class="field"><span data-i18n="pageSize"></span>
+                                <select data-setting="page.size"><option>A4</option><option>A5</option><option>A3</option><option>Letter</option><option>Legal</option></select></label>
+                            <label class="field"><span data-i18n="orientation"></span>
+                                <select data-setting="page.orientation"><option value="portrait" data-i18n="portrait"></option><option value="landscape" data-i18n="landscape"></option></select></label>
+                        </div>
+                        <label class="field"><span data-i18n="margins"></span><input type="text" dir="ltr" data-setting="page.margin" placeholder="20mm 15mm"></label>
+
+                        <div class="sub-head" data-i18n="gHeaderFooter"></div>
                         <label class="field"><span data-i18n="hfMode"></span>
                             <select data-setting="headerFooter.mode">
                                 <option value="structured" data-i18n="hfStructured"></option>
@@ -188,17 +325,25 @@
                                 <textarea id="f-hf-footer" dir="ltr" data-setting="headerFooter.footer" spellcheck="false"></textarea></div>
                             <div class="field"><span class="hint" data-i18n="customHint"></span></div>
                         </div>
+
+                        <div class="sub-head" data-i18n="gLogo"></div>
+                        <div class="logo-box" id="logo-box" tabindex="0">
+                            <div class="thumb" id="logo-thumb"></div>
+                            <div class="btns">
+                                <label class="btn"><i data-lucide="upload"></i><span data-i18n="logoUpload"></span>
+                                    <input type="file" id="logo-file" hidden accept="image/png,image/jpeg,image/svg+xml,image/webp,image/gif"></label>
+                                <button class="btn ghost danger" id="logo-remove" type="button"><span data-i18n="logoRemove"></span></button>
+                            </div>
+                        </div>
+                        <div class="field"><span class="hint" data-i18n="logoHint"></span></div>
+                        <label class="field"><span data-i18n="logoHeight"></span>
+                            <select data-setting="logoHeight"><option>0.8cm</option><option>1cm</option><option>1.2cm</option><option>1.5cm</option><option>2cm</option></select></label>
                     </div>
                 </details>
 
                 <details class="group">
-                    <summary><i data-lucide="type"></i><span data-i18n="gTypography"></span></summary>
+                    <summary><i data-lucide="file-type"></i><span data-i18n="gWord"></span></summary>
                     <div class="fields">
-                        <div class="sub-head" data-i18n="tPdf"></div>
-                        <label class="field"><span data-i18n="fontBidi"></span><select data-setting="fonts.bidi"></select></label>
-                        <label class="field"><span data-i18n="fontLatin"></span><select data-setting="fonts.latin"></select></label>
-
-                        <div class="sub-head" data-i18n="tWord"></div>
                         <div class="field"><span class="label-row"><label for="f-word-bidi" data-i18n="fontBidi"></label>
                             <button class="mini" type="button" data-reset="fonts.wordBidi" hidden data-i18n-attr="title:resetDefault;aria-label:resetDefault"><i data-lucide="rotate-ccw"></i></button></span>
                             <input type="text" id="f-word-bidi" dir="auto" list="dl-word-fonts" data-setting="fonts.wordBidi" data-font-check="#nf-word-bidi" data-i18n-attr="placeholder:sameAsPdf"></div>
@@ -207,81 +352,18 @@
                             <button class="mini" type="button" data-reset="fonts.wordLatin" hidden data-i18n-attr="title:resetDefault;aria-label:resetDefault"><i data-lucide="rotate-ccw"></i></button></span>
                             <input type="text" id="f-word-latin" dir="auto" list="dl-word-fonts" data-setting="fonts.wordLatin" data-font-check="#nf-word-latin" data-i18n-attr="placeholder:sameAsPdf"></div>
                         <div class="field" id="nf-word-latin" hidden><span class="hint warn" data-i18n="notInstalled"></span></div>
+                        <label class="field"><span data-i18n="codeFont"></span>
+                            <input type="text" dir="auto" list="dl-word-code-fonts" data-setting="code.wordFont" data-font-check="#nf-word-code" data-i18n-attr="placeholder:sameAsPdf"></label>
+                        <div class="field" id="nf-word-code" hidden><span class="hint warn" data-i18n="notInstalled"></span></div>
                         <div class="field"><span class="hint" data-i18n="wordFontsHint"></span></div>
-
-                        <div class="sub-head"></div>
-                        <div class="row2">
-                            <label class="field"><span data-i18n="sizeBidi"></span><input type="number" min="6" max="36" step="0.5" dir="ltr" data-setting="fonts.bidiSize"></label>
-                            <label class="field"><span data-i18n="sizeLatin"></span><input type="number" min="6" max="36" step="0.5" dir="ltr" data-setting="fonts.latinSize"></label>
-                        </div>
                         <label class="check"><input type="checkbox" data-ui="previewWordFont"><span data-i18n="previewWordFont"></span></label>
                     </div>
                 </details>
 
-                <details class="group">
-                    <summary><i data-lucide="file-cog"></i><span data-i18n="gPage"></span></summary>
+                <details class="group app-group" id="app-group">
+                    <summary><i data-lucide="settings-2"></i><span data-i18n="appSettings"></span></summary>
                     <div class="fields">
-                        <div class="row2">
-                            <label class="field"><span data-i18n="pageSize"></span>
-                                <select data-setting="page.size"><option>A4</option><option>A5</option><option>A3</option><option>Letter</option><option>Legal</option></select></label>
-                            <label class="field"><span data-i18n="orientation"></span>
-                                <select data-setting="page.orientation"><option value="portrait" data-i18n="portrait"></option><option value="landscape" data-i18n="landscape"></option></select></label>
-                        </div>
-                        <label class="field"><span data-i18n="margins"></span><input type="text" dir="ltr" data-setting="page.margin" placeholder="20mm 15mm"></label>
-                        <label class="field"><span data-i18n="tableWidth"></span>
-                            <select data-setting="page.tableWidth">
-                                <option value="auto" data-i18n="tableWidthAuto"></option>
-                                <option value="100%">100%</option><option value="98%">98%</option>
-                                <option value="90%">90%</option><option value="75%">75%</option><option value="50%">50%</option>
-                            </select></label>
-                        <label class="field"><span data-i18n="docDirection"></span>
-                            <select data-setting="direction">
-                                <option value="auto" data-i18n="dirAuto"></option>
-                                <option value="rtl" data-i18n="dirRtl"></option>
-                                <option value="ltr" data-i18n="dirLtr"></option>
-                            </select></label>
-                    </div>
-                </details>
-
-                <details class="group">
-                    <summary><i data-lucide="code"></i><span data-i18n="gCode"></span></summary>
-                    <div class="fields">
-                        <label class="field"><span data-i18n="codeFontPdf"></span><select data-setting="code.font"></select></label>
-                        <label class="field"><span data-i18n="codeFontWord"></span>
-                            <input type="text" dir="auto" list="dl-word-code-fonts" data-setting="code.wordFont" data-font-check="#nf-word-code" data-i18n-attr="placeholder:sameAsPdf"></label>
-                        <div class="field" id="nf-word-code" hidden><span class="hint warn" data-i18n="notInstalled"></span></div>
-                        <div class="row2">
-                            <label class="field"><span data-i18n="codeSize"></span><input type="number" min="6" max="24" step="0.5" dir="ltr" data-setting="code.size"></label>
-                        </div>
-                        <label class="check"><input type="checkbox" data-setting="code.showLanguage"><span data-i18n="showLanguage"></span></label>
-                        <label class="field"><span data-i18n="rtlInCode"></span>
-                            <select data-setting="code.rtlFont"><option value="code" data-i18n="rtlInCodeCode"></option><option value="document" data-i18n="rtlInCodeDoc"></option></select></label>
-                    </div>
-                </details>
-
-            </div>
-        </aside>
-    </main>
-
-    <datalist id="dl-word-fonts"></datalist>
-    <datalist id="dl-word-code-fonts"></datalist>
-
-    <footer class="note">
-        <span data-i18n="footerOffline"></span>
-        <span data-i18n="footerLib"></span>
-        <a id="repo-link" href="#" rel="noopener" target="_blank">GitHub</a>
-    </footer>
-</div>
-
-<div class="toasts" id="toasts" aria-live="polite"></div>
-
-<!-- app settings: page behaviour (not part of the export profile) -->
-<dialog id="app-dlg" aria-labelledby="app-title">
-    <div class="dlg-head">
-        <h2 id="app-title" data-i18n="appSettings"></h2>
-        <button class="btn ghost icon" id="app-close" type="button" data-i18n-attr="aria-label:close"><i data-lucide="x"></i></button>
-    </div>
-    <div class="dlg-body fields">
+                        <div class="field"><span class="hint" data-i18n="appHint"></span></div>
         <div class="sub-head" data-i18n="gView"></div>
         <label class="check"><input type="checkbox" data-ui="scrollSync"><span data-i18n="scrollSync"></span></label>
 
@@ -302,8 +384,25 @@
             <button class="btn ghost danger" id="set-reset" type="button"><i data-lucide="rotate-ccw"></i><span data-i18n="resetSettings"></span></button>
         </div>
         <div class="field"><span class="hint" data-i18n="backupHint"></span></div>
-    </div>
-</dialog>
+                    </div>
+                </details>
+
+
+            </div>
+        </aside>
+    </main>
+
+    <datalist id="dl-word-fonts"></datalist>
+    <datalist id="dl-word-code-fonts"></datalist>
+
+    <footer class="note">
+        <span data-i18n="footerOffline"></span>
+        <span data-i18n="footerLib"></span>
+        <a id="repo-link" href="#" rel="noopener" target="_blank">GitHub</a>
+    </footer>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
 
 <dialog id="help" aria-labelledby="help-title">
     <div class="dlg-head">
@@ -328,18 +427,22 @@
      Pinned versions (not "latest"): the version in each file name is the one fetched,
      so an update is a deliberate step and can be traced. Sources (for the next update):
        https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css
-       https://cdn.rawgit.com/rastikerdar/sahel-font/v3.4.0/dist/font-face.css
+       https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css
        https://cdn.jsdelivr.net/npm/highlight.js@11.12.0/styles/default.min.css
        https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.12.0/build/highlight.min.js
        https://cdn.jsdelivr.net/npm/marked@18.0.14/lib/marked.umd.min.js
        https://cdn.jsdelivr.net/npm/lucide@1.48.0/dist/umd/lucide.min.js   (→ assets/icons.js, tools/build-icons.js)
        https://cdn.jsdelivr.net/npm/turndown@7.2.4/dist/turndown.js
-       https://unpkg.com/turndown-plugin-gfm/dist/turndown-plugin-gfm.js    (1.0.2)
+       https://cdn.jsdelivr.net/npm/turndown-plugin-gfm@1.0.2/dist/turndown-plugin-gfm.js
        https://cdn.jsdelivr.net/npm/dompurify@3.4.16/dist/purify.min.js
        https://cdn.jsdelivr.net/npm/mammoth@1.12.3/mammoth.browser.min.js   (loaded on first use)
        https://cdn.jsdelivr.net/npm/docx@9.7.1/dist/index.iife.min.js       (loaded on first use)
        https://cdn.jsdelivr.net/npm/jspdf@4.2.1/dist/jspdf.umd.min.js       (loaded on first use)
-     highlight.js theme: vendor/highlight.js/github.min_11.11.1.css (the preview's colours; default.min kept for reference) -->
+       https://registry.npmjs.org/mathjax/-/mathjax-4.1.3.tgz               (→ vendor/mathjax_4.1.3: startup, core,
+       https://registry.npmjs.org/@mathjax/mathjax-newcm-font/-/mathjax-newcm-font-4.1.3.tgz        input/tex + extensions,
+       https://registry.npmjs.org/@mathjax/mathjax-mhchem-font-extension/-/mathjax-mhchem-font-extension-4.1.3.tgz
+                                                                              output/svg, ui/safe, fonts/…/svg; loaded on first formula)
+     highlight.js theme: vendor/highlight.js/github.min_11.11.1.css (the preview's colors; default.min kept for reference) -->
 <script src="vendor/marked.umd.min_18.0.14.js"></script>
 <script src="vendor/purify.min_3.4.16.js"></script>
 <script src="vendor/highlight.js/highlight.min_11.12.0.js"></script>
@@ -349,6 +452,7 @@
 
 <!-- library (standalone; the PDF fonts load on first PDF export) -->
 <script src="lib/ImageCore.js"></script>
+<script src="lib/MathCore.js"></script>
 <script src="lib/BidiCore.js"></script>
 <script src="lib/BidiView.js"></script>
 <script src="lib/msOfficeWordHtmlTemplate.js"></script>
@@ -357,6 +461,7 @@
 <script src="lib/DocxBuilder.js"></script>
 <script src="lib/PdfBuilder.js"></script>
 <script src="lib/HtmlBuilder.js"></script>
+<script src="lib/PreviewBuilder.js"></script>
 <script src="lib/MarkdownImporter.js"></script>
 
 <!-- page -->

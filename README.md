@@ -11,7 +11,7 @@ Kurdish** mixed with English — and works just as well for **every left-to-righ
 Free and open source (MIT).
 
 **▶ [Open Kelk online](https://mohsen-1984.github.io/kelk/)** ·
-**⬇ [Download kelk_1.0.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_1.0.zip)** ·
+**⬇ [Download kelk_1.5.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_1.5.zip)** ·
 [فارسی ↓](#fa) · [العربية ↓](#ar) · Contact: [mhn.com@gmail.com](mailto:mhn.com@gmail.com)
 
 ![Kelk — Markdown to DOCX and PDF converter, English interface](docs/screenshots/kelk-en.png)
@@ -30,6 +30,13 @@ Free and open source (MIT).
   URL, or add a logo to the header.
 - **Bidirectional text done right**: the direction of every paragraph, list item, quote and table
   cell; numbers, brackets, formulas and English words inside RTL text keep their order.
+- **LaTeX formulas** (`$…$`, `$$…$$`, `\(…\)`, `\[…\]`) in the preview and all four outputs:
+  editable **Word equations** in DOCX and DOC, vectors in PDF, SVG or MathML in HTML — and Word
+  equations come back as LaTeX on import. Local MathJax, no network.
+- **Table styles**: lines (none, under the header, horizontal, vertical, frame, grid) × fill (none,
+  colored header, zebra stripes, both), three colors and a total row — the same in every output;
+  code blocks and quotes have their own colors.
+- Maximize the editor or the preview; *Clear & paste* turns the clipboard into the document.
 - Header and footer (structured, simple or custom HTML), automatic title and edition, fonts chosen
   apart for PDF and Word, A3–A5/Letter/Legal pages, a monospace code font made for Persian and Arabic.
 
@@ -42,10 +49,12 @@ Free and open source (MIT).
 
 ![A PDF made by Kelk: table of contents, mixed Persian and English, tables](docs/screenshots/kelk-pdf.png)
 
+![LaTeX formulas in Kelk: preview of the samples' section 6.5](docs/screenshots/kelk-math-en.png)
+
 ## Use it
 
 - **Online:** [mohsen-1984.github.io/kelk](https://mohsen-1984.github.io/kelk/).
-- **On your computer:** [download kelk_1.0.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_1.0.zip),
+- **On your computer:** [download kelk_1.5.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_1.5.zip),
   unpack it and open `index.html` — offline, for personal use or inside a company network.
 - **On your own host:** upload the folder to any static web host.
 
@@ -105,7 +114,7 @@ Vazirmatn, Vazir Code and Sahel are the work of the late
 English و العربية است. رایگان و متن‌باز (MIT).
 
 **▶ [کِلک برخط](https://mohsen-1984.github.io/kelk/)** ·
-**⬇ [دریافت kelk_1.0.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_1.0.zip)** ·
+**⬇ [دریافت kelk_1.5.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_1.5.zip)** ·
 تماس: [mhn.com@gmail.com](mailto:mhn.com@gmail.com)
 
 ![کِلک — رابط فارسی](docs/screenshots/kelk-fa.png)
@@ -120,11 +129,16 @@ English و العربية است. رایگان و متن‌باز (MIT).
 - **پشتیبانی کامل از GFM** ([مشخصات](https://github.github.com/gfm/)): جدول با ترازبندی، فهرست کارها، فهرست تودرتو، خط‌خوردگی، بلوک کد با رنگ‌آمیزی، نقل‌قول، پیوند و تصویر.
 - **تصویر:** کشیدن یا چسباندن تصویر در متن (در همهٔ خروجی‌ها جاسازی می‌شود)، نشانی عمومی وب، یا لوگو در سربرگ.
 - **دوجهتی درست:** جهت هر پاراگراف، آیتم فهرست، نقل‌قول و سلول جدول؛ عددها، پرانتزها، فرمول‌ها و واژه‌های انگلیسی ترتیبشان را حفظ می‌کنند.
+- **فرمول‌های LaTeX** (`$…$` و `$$…$$`) در پیش‌نمایش و هر چهار خروجی: **معادلهٔ قابل ویرایش Word** در DOCX و DOC، برداری (vector) در PDF، و SVG یا MathML در HTML؛ معادله‌های Word هنگام ورود به LaTeX برمی‌گردند. MathJax محلی، بدون اینترنت.
+- **سبک جدول (Table style):** خطوط (بدون خط، زیر عنوان، افقی، عمودی، قاب، شبکه‌ای) × پس‌زمینه (بدون رنگ، عنوان رنگی، راه‌راه یا هر دو)، سه رنگ و سطر جمع؛ در همهٔ خروجی‌ها یکسان. بلوک کد و نقل‌قول هم رنگ‌های خودشان را دارند.
+- بزرگ‌کردن ویرایشگر یا پیش‌نمایش؛ «پاک کردن و چسباندن» (Clear & paste) محتوای کلیپ‌بورد را سند می‌کند.
+
+![فرمول‌های LaTeX در کِلک: پیش‌نمایش بخش 6.5 نمونه‌ها](docs/screenshots/kelk-math-fa.png)
 
 ### استفاده
 
 - **برخط:** [mohsen-1984.github.io/kelk](https://mohsen-1984.github.io/kelk/)
-- **روی رایانه:** [kelk_1.0.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_1.0.zip) را دریافت کنید، باز کنید و `index.html` را باز کنید؛ بدون اینترنت، برای استفادهٔ شخصی یا در شبکهٔ داخلی شرکت.
+- **روی رایانه:** [kelk_1.5.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_1.5.zip) را دریافت کنید، باز کنید و `index.html` را باز کنید؛ بدون اینترنت، برای استفادهٔ شخصی یا در شبکهٔ داخلی شرکت.
 - **روی میزبان خودتان:** پوشه را روی هر میزبان وب ایستا بارگذاری کنید.
 
 ### تماس، قدردانی و مجوز
@@ -152,7 +166,7 @@ Vazirmatn، Vazir Code و Sahel کار زنده‌یاد [صابر راستی‌
 الواجهة بالعربية والفارسية والإنجليزية. مجاني ومفتوح المصدر (MIT).
 
 **▶ [كِلك على الإنترنت](https://mohsen-1984.github.io/kelk/)** ·
-**⬇ [تنزيل kelk_1.0.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_1.0.zip)** ·
+**⬇ [تنزيل kelk_1.5.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_1.5.zip)** ·
 للتواصل: [mhn.com@gmail.com](mailto:mhn.com@gmail.com)
 
 ![كِلك — الواجهة العربية](docs/screenshots/kelk-ar.png)
@@ -167,12 +181,17 @@ Vazirmatn، Vazir Code و Sahel کار زنده‌یاد [صابر راستی‌
 - **دعم كامل لـ GFM** ([المواصفات](https://github.github.com/gfm/)): جداول بمحاذاة، وقوائم مهام، وقوائم متداخلة، وشطب، وكتل شيفرة ملوّنة، واقتباسات، وروابط، وصور.
 - **الصور:** سحب الصورة أو لصقها في النص (تُضمَّن في كل الصيغ)، أو عنوان ويب عام، أو شعار في الرأس.
 - **ثنائية اتجاه صحيحة:** اتجاه كل فقرة وعنصر قائمة واقتباس وخلية جدول؛ وتحافظ الأرقام والأقواس والمعادلات والكلمات الإنجليزية على ترتيبها.
+- **صيغ LaTeX** (`$…$` و`$$…$$`) في المعاينة والمخرجات الأربعة: **معادلات Word قابلة للتحرير** في DOCX وDOC، ومتجهات (vector) في PDF، وSVG أو MathML في HTML؛ وتعود معادلات Word إلى LaTeX عند الاستيراد. MathJax محلي، بلا إنترنت.
+- **نمط الجدول (Table style):** الخطوط (بلا خطوط، تحت الرأس، أفقية، عمودية، إطار، شبكي) × التعبئة (بلا تعبئة، رأس ملوَّن، تخطيط أو كلاهما)، وثلاثة ألوان، وصف مجموع؛ واحد في كل المخرجات. ولكتل الشيفرة والاقتباسات ألوانها أيضًا.
+- تكبير المحرّر أو المعاينة؛ و«مسح ولصق» يجعل محتوى الحافظة هو المستند.
+
+![صيغ LaTeX في كِلك: معاينة القسم 6.5 من النماذج](docs/screenshots/kelk-math-ar.png)
 - **الخطوط:** Vazirmatn، الخط الافتراضي، يدعم العربية؛ ويمكن تجهيز خطوط عربية مثل Cairo وAmiri وNoto Naskh Arabic لملفات PDF.
 
 ### الاستخدام
 
 - **على الإنترنت:** [mohsen-1984.github.io/kelk](https://mohsen-1984.github.io/kelk/)
-- **على حاسوبك:** نزّل [kelk_1.0.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_1.0.zip) وافتحه ثم افتح `index.html`؛ يعمل دون إنترنت، للاستخدام الشخصي أو داخل شبكة المؤسسة.
+- **على حاسوبك:** نزّل [kelk_1.5.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_1.5.zip) وافتحه ثم افتح `index.html`؛ يعمل دون إنترنت، للاستخدام الشخصي أو داخل شبكة المؤسسة.
 - **على استضافتك:** ارفع المجلد إلى أي استضافة ويب ثابتة.
 
 ### التواصل والشكر والترخيص

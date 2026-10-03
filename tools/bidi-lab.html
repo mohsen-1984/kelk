@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BiDi Lab 1.0 — BidiCore + BidiView</title>
+<title>BiDi Lab 1.5 — BidiCore + BidiView</title>
 <style>
   /* Vazirmatn: installed → local copy in a Kelk checkout → CDN */
   @font-face{font-family:'Vazirmatn';font-weight:100 900;font-display:swap;
@@ -108,6 +108,7 @@
   </span>
   <span class="grp">نقطهٔ پایانی:
     <button class="mini on" data-end=".">.</button>
+    <button class="mini on" data-end=":">:</button>
     <button class="mini" data-end="?">?</button>
     <button class="mini" data-end="!">!</button>
     <button class="mini" data-end="…">…</button>
@@ -144,7 +145,7 @@
  * BidiCore - Shared direction & BiDi analysis for WordHtmlBuilder, DocxBuilder and PdfBuilder
  * ==============================================================================
  *
- * Version: 1.0
+ * Version: 1.5
  *
  * One engine, two renderers. Everything here DECIDES; nothing here renders:
  *
@@ -152,10 +153,12 @@
  *   planDirections(root, docIsRTL)   ordered per-element direction decisions
  *   isComplexQuote(bq)               simple (paragraphs) vs table-form quote
  *   flattenBlock(el)                 a block's own text as ONE string + node map
+ *   isMathAtom(node)                 a formula (.kelk-math, <svg>, <math>): an opaque LTR atom
  *   findIsolateRanges(text, dir, o)  counter-direction runs inside a block
  *   codeLanguage(pre)                code block language ('' if none)
  *   unwrapCodeBlocks(root)           strip preview wrappers (mutates)
  *   codeRtlRanges(text)              RTL runs inside code (UBA, LTR context)
+ *   codeForWord(text)                code text with LRE/LRM marks for Word (no isolates there)
  *   nestedFences / codeSegments      fenced blocks written inside a code block
  *   codeFragment(code, from, to)     lines of a highlighted code element
  *
@@ -219,10 +222,11 @@
         ']');
 
     /**
-     * "Numbers-only" cell text: digits with common separators. In an RTL table
-     * such cells keep the table direction ("1,234", "98.6%", "2024-01-15").
+     * "Numbers-only" text: digits of any script (0-9, ٠-٩, ۰-۹) with common
+     * separators ("1,234", "98.6%", "۱۴۰۵/۰۷/۰۹", "٣٫٥"). Kept for API users;
+     * tables now go further: any cell without a letter follows its table.
      */
-    const NUMBERS_ONLY_PATTERN = /^[\s0-9%.,#\-–—\/:\\+×x]+$/;
+    const NUMBERS_ONLY_PATTERN = /^[\s0-9\u0660-\u0669\u06F0-\u06F9%\u066A-\u066C\u060C.,#\-–—\/:\\+×x()]+$/;
 
     /** Blocks the BiDi engine processes, and what a block walk must not enter. */
     const BLOCK_SEL = 'p, h1, h2, h3, h4, h5, h6, li, td, th, blockquote';
@@ -230,6 +234,16 @@
 
     /** Quote content a paragraph border cannot follow in one straight line. */
     const COMPLEX_QUOTE_SEL = 'ul, ol, blockquote, pre, table, hr, dl, figure';
+
+    /**
+     * A formula (MathCore's .kelk-math placeholder or its rendering, an <svg>
+     * or <math>): an opaque left-to-right atom. Direction decisions, isolate
+     * ranges and document detection never read inside it — its TeX lives in
+     * data-tex, and the text an SVG draws is not document text.
+     */
+    function isMathAtom(n) {
+        return !!n && n.nodeType === 1 && ((n.classList && n.classList.contains('kelk-math')) || /^(svg|math)$/i.test(n.tagName));
+    }
 
     function hasRTL(text) { return RTL_CHAR_PATTERN.test(text); }
     function hasLatin(text) { return LATIN_LETTER_PATTERN.test(text); }
@@ -296,7 +310,9 @@
         box.setAttribute('data-levels', String(levels));
         const title = doc.createElement('p');
         title.className = 'kelk-toc-title';
-        title.textContent = o.title || TOC_TITLES[o.dir === 'ltr' ? 'ltr' : 'rtl'];
+        const side = o.dir === 'ltr' ? 'ltr' : 'rtl';
+        const own = o.title && typeof o.title === 'object' ? o.title[side] : o.title;     // text, or { rtl, ltr }
+        title.textContent = own || TOC_TITLES[side];
         box.appendChild(title);
         entries.forEach(function (e) {
             const p = doc.createElement('p');
@@ -360,12 +376,22 @@
     }
 
     /** Text of a cell with <br> as line breaks, code included. */
-    function cellLines(cell) {
+    function cellLines(cell, em) {
         let t = '';
+        // a formula or an image: one unbreakable "word" as wide as it is (em: points per character)
+        const atom = function (pt) { return pt > 0 && em > 0 ? ' ' + 'x'.repeat(Math.max(1, Math.ceil(pt / em))) + ' ' : ''; };
         (function walk(n) {
             for (let c = n.firstChild; c; c = c.nextSibling) {
                 if (c.nodeType === 3) t += c.nodeValue;
                 else if (c.nodeType === 1) {
+                    if (c.tagName === 'IMG') { t += atom((parseFloat(c.getAttribute('width')) || 0) * 0.75); continue; }
+                    if (isMathAtom(c)) {
+                        // width in em (MathCore.typeset writes it), else a guess from the TeX
+                        const fs = em / 0.6, tex = c.getAttribute('data-tex') || '';
+                        const w = parseFloat(c.getAttribute('data-width')) || tex.replace(/\\[a-zA-Z]+|[{}^_\s]/g, '').length * 0.55;
+                        t += atom(w * 1.2 * fs);
+                        continue;
+                    }
                     if (c.tagName === 'BR') t += '\n';
                     else if (c.tagName !== 'TABLE') { if (/^(P|DIV|LI|H[1-6])$/.test(c.tagName) && t && !/\n$/.test(t)) t += '\n'; walk(c); }
                 }
@@ -404,10 +430,18 @@
         const n = Math.max(1, occ.reduce(function (m, r) { return Math.max(m, (r || []).length); }, 0));
         const base = o.pad + em * 2;
         const minC = Array(n).fill(base), maxC = Array(n).fill(base);
+        // Arabic-script letters run wider than the 0.6 em average, and a header cell is bold
+        const RTLW = /[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/;
+        const len = function (t, bold) {
+            let n = 0;
+            for (const ch of t) n += RTLW.test(ch) ? 1.15 : 1;
+            return n * (bold ? 1.1 : 1);
+        };
         cells.forEach(function (c) {
-            const lines = cellLines(c.el);
-            const maxW = Math.max.apply(null, lines.map(function (l) { return l.length; }).concat([0])) * em + o.pad;
-            const minW = Math.max.apply(null, lines.join(' ').split(/\s+/).map(function (w) { return w.length; }).concat([0])) * em + o.pad;
+            const lines = cellLines(c.el, em);
+            const bold = c.el.tagName === 'TH';
+            const maxW = Math.max.apply(null, lines.map(function (l) { return len(l, bold); }).concat([0])) * em + o.pad;
+            const minW = Math.max.apply(null, lines.join(' ').split(/\s+/).map(function (w) { return len(w, bold); }).concat([0])) * em + o.pad;
             for (let k = 0; k < c.span; k++) {
                 minC[c.col + k] = Math.max(minC[c.col + k], minW / c.span);
                 maxC[c.col + k] = Math.max(maxC[c.col + k], maxW / c.span);
@@ -470,7 +504,7 @@
                 text += node.nodeValue;
             } else if (node.nodeType === 1) {
                 const tag = node.tagName.toLowerCase();
-                if (tag === 'pre' || tag === 'code') continue;
+                if (tag === 'pre' || tag === 'code' || isMathAtom(node)) continue;
                 text += getVisibleText(node, memo);
             }
         }
@@ -552,8 +586,9 @@
      *      follow. In an RTL quote, English-only paragraphs → LTR; in an LTR
      *      quote of an LTR document, Persian paragraphs → RTL.
      *   3. tables: cells with RTL letters stay (explicit RTL in an LTR
-     *      document); numbers-only cells in an RTL table stay; every other
-     *      cell → LTR. A table without RTL letters → ltrTable.
+     *      document); cells without any letter (digits of every script, signs,
+     *      symbols — no code or formula) take the table's direction; every
+     *      other cell → LTR. A table without RTL letters → ltrTable.
      *   4. lists: each item by its OWN text (nested lists, tables, quotes and
      *      code excluded), strong letters only. No RTL letter in any item →
      *      whole tree LTR; otherwise LTR-only items (and English-only
@@ -573,9 +608,11 @@
         const actions = [];
         const text = function (el) { return getVisibleText(el, memo); };
         const elementHasRTL = function (el) { return isRtlText(text(el)); };
-        const isNumbersOnly = function (el) {
-            const t = text(el).trim();
-            return t.length > 0 && NUMBERS_ONLY_PATTERN.test(t);
+        /** A table cell with no letter (digits, signs, symbols, empty) and no code, formula or image. */
+        const neutralCell = function (el) {
+            const t = text(el);
+            if (RTL_LETTER_PATTERN.test(t) || LATIN_LETTER_PATTERN.test(t)) return false;
+            return !el.querySelector('code, pre, img, .kelk-math, mjx-container');
         };
         const ltr = function (el) { actions.push({ op: 'ltr', el: el }); };
 
@@ -611,9 +648,9 @@
             if (el.closest('ul') || el.closest('ol')) return;
             if (el.closest('td') || el.closest('th')) return;
             if (el.closest('blockquote')) return;
-            // a paragraph holding only images keeps the document direction
+            // a paragraph holding only images (or formulas) keeps the document direction
             // (an image in an RTL document sits at the right, as in the preview)
-            if (!/\S/.test(el.textContent) && el.querySelector('img')) return;
+            if (!/\S/.test(getVisibleText(el)) && el.querySelector('img, .kelk-math')) return;
             const r = elementHasRTL(el);
             if (!r) ltr(el);
             else if (!docIsRTL) actions.push({ op: 'rtl', el: el });        // Persian paragraph in an LTR document
@@ -649,7 +686,9 @@
                     if (!docIsRTL) actions.push({ op: 'rtl', el: cell });   // Persian cell in an LTR document
                     return;
                 }
-                if (tableHasRTL && isNumbersOnly(cell)) return;
+                // no letter at all (digits of any script, signs, symbols, empty) and no code or
+                // formula: the cell takes the TABLE's direction, in every table and document
+                if (neutralCell(cell)) { if (!tableHasRTL) ltr(cell); return; }
                 ltr(cell);
             });
             if (!tableHasRTL) actions.push({ op: 'ltrTable', el: table });
@@ -769,7 +808,7 @@
     const DIGIT_PREFIX = /[0-9]+(?:[.,][0-9]+)*[-_]?$/;
     // Math operators (∑ √ ∫ ∂ ∇ ≤ ≠ ∈ …, ± × ÷) opening a formula before its
     // first Latin letter. ASCII operators and arrows do not count: "قیمت = Price",
-    // "انجام شد → next" keep their plain UBA behaviour.
+    // "انجام شد → next" keep their plain UBA behavior.
     const MATH_START = /[\u2200-\u22FF\u2A00-\u2AFF\u00B1\u00D7\u00F7]/;
     // An opening quote glued to the front of the counter-direction run
     // ("Future …" / "حرم …") belongs INSIDE the isolate; left outside at a
@@ -977,14 +1016,39 @@
      * @param {string} text
      * @returns {Array<[number, number]>} [start, end) ranges
      */
+    const CODE_BRACKETS = /[()[\]{}<>]/;
+
+    /**
+     * Code text for Word, which has no isolates: an LTR embedding (LRE … PDF)
+     * around it, and LRM marks around each neutral stretch between two RTL runs
+     * (codeRtlRanges), so `![نام](نام)` inside a Persian sentence keeps its
+     * order and brackets. Text without RTL letters comes back unchanged.
+     */
+    function codeForWord(text) {
+        if (!text || !hasRtlLetter(text)) return text;
+        const r = codeRtlRanges(text);
+        let out = '', pos = 0;
+        r.forEach(function (x, k) {
+            const gap = text.slice(pos, x[0]);
+            out += k > 0 && gap ? '\u200E' + gap + '\u200E' : gap;
+            out += text.slice(x[0], x[1]);
+            pos = x[1];
+        });
+        out += text.slice(pos);
+        return '\u202A' + out + '\u202C';
+    }
+
     function codeRtlRanges(text) {
         const out = [];
         const n = text.length;
         let i = 0;
         while (i < n) {
             if (!STRONG_R.test(text[i])) { i++; continue; }
+            // a run goes on over spaces and neutrals, not past a Latin letter or a bracket:
+            // brackets around RTL text in code take the code's LTR side (UBA N0 with an LTR
+            // context), so `![نام](نام)` keeps its brackets in place
             let j = i + 1, last = i;
-            while (j < n && !STRONG_L.test(text[j])) {
+            while (j < n && !STRONG_L.test(text[j]) && !CODE_BRACKETS.test(text[j])) {
                 if (STRONG_R.test(text[j])) last = j;
                 j++;
             }
@@ -1013,12 +1077,12 @@
      * @param {string} text - ONE continuous string for the whole block
      * @param {'rtl'|'ltr'} baseDir - the block's effective direction
      * @param {object} [opts]
-     * @param {string[]} [opts.endPunctuation=['.']] - end-of-block marks kept
+     * @param {string[]} [opts.endPunctuation=['.', ':']] - end-of-block marks kept
      *        outside the last isolate in RTL blocks ([] disables)
      * @returns {Array<[number, number]>} [start, end) ranges
      */
     function findIsolateRanges(text, baseDir, opts) {
-        const chars = opts && opts.endPunctuation !== undefined ? opts.endPunctuation : ['.'];
+        const chars = opts && opts.endPunctuation !== undefined ? opts.endPunctuation : ['.', ':'];
         return findIsolateRangesImpl(text, baseDir, endPunctuationRe(chars));
     }
 
@@ -1040,7 +1104,7 @@
                         nodeMap.push({ node: c, start: flatText.length, end: flatText.length + val.length });
                         flatText += val;
                     }
-                } else if (c.nodeType === 1 && !NON_DESCEND.test(c.tagName)) {
+                } else if (c.nodeType === 1 && !NON_DESCEND.test(c.tagName) && !isMathAtom(c)) {
                     collect(c);
                 }
             }
@@ -1095,6 +1159,17 @@
      * @param {Element} root
      */
     function unwrapCodeBlocks(root) {
+        // PreviewBuilder / HtmlBuilder frames: <div class="code"><div class="code-lang">lang <button></div><pre>
+        root.querySelectorAll('div.code').forEach(function (w) {
+            const pre = w.querySelector(':scope > pre');
+            if (!pre) return;
+            if (!codeLanguage(pre)) {
+                const l = w.querySelector(':scope > .code-lang');
+                const t = l ? Array.from(l.childNodes).filter(function (n) { return n.nodeType === 3; }).map(function (n) { return n.nodeValue; }).join('').trim() : '';
+                if (t && t !== 'code') pre.setAttribute('data-lang', t);
+            }
+            w.parentNode.replaceChild(pre, w);
+        });
         root.querySelectorAll('.code-block-wrapper').forEach(function (w) {
             const pre = w.querySelector('pre');
             if (!pre) { w.parentNode.removeChild(w); return; }
@@ -1545,10 +1620,12 @@
         isComplexQuote: isComplexQuote,
         findIsolateRanges: findIsolateRanges,
         codeRtlRanges: codeRtlRanges,
+        codeForWord: codeForWord,
         nestedFences: nestedFences,
         codeSegments: codeSegments,
         codeFragment: codeFragment,
         flattenBlock: flattenBlock,
+        isMathAtom: isMathAtom,
         resolvePosition: resolvePosition,
         deepMerge: deepMerge,
         codeLanguage: codeLanguage,
@@ -1579,7 +1656,7 @@
 /**
  * BidiView - direction for HTML shown in a browser (preview, standalone HTML)
  * ============================================================================
- * Version: 1.0
+ * Version: 1.5
  *
  * The browser already runs the Unicode BiDi Algorithm; BidiView applies the
  * decisions of BidiCore — the same ones the .doc / .docx / .pdf builders
@@ -1597,7 +1674,7 @@
  * Output is CLASSES only (bd-*), never a dir attribute, so the HTML handed to
  * other tools stays clean:
  *
- *   BidiView.apply(root, { dir: 'auto'|'rtl'|'ltr', endPunctuation: ['.'],
+ *   BidiView.apply(root, { dir: 'auto'|'rtl'|'ltr', endPunctuation: ['.', ':'],
  *                          isolate: true, inlineCode: true }) → { dir, blocks, isolates }
  *   BidiView.clear(root)          remove everything apply() added
  *   BidiView.css()                the CSS the classes need
@@ -1715,7 +1792,7 @@
   }
 
   function apply(root, options) {
-    var o = Object.assign({ dir: 'auto', endPunctuation: ['.'], isolate: true, inlineCode: true }, options || {});
+    var o = Object.assign({ dir: 'auto', endPunctuation: ['.', ':'], isolate: true, inlineCode: true }, options || {});
     var B = core();
     clear(root);
     var doc = o.dir === 'rtl' || o.dir === 'ltr' ? o.dir : B.detectDirection(root);
@@ -1749,19 +1826,18 @@
     ].join('\n');
   }
 
-  var BidiView = { version: '1.0', apply: apply, clear: clear, css: css, toAttributes: toAttributes };
+  var BidiView = { version: '1.5', apply: apply, clear: clear, css: css, toAttributes: toAttributes };
 
   if (typeof module !== 'undefined' && module.exports) module.exports = BidiView;
   else if (typeof define === 'function' && define.amd) define([], function () { return BidiView; });
   else global.BidiView = BidiView;
 })(typeof window !== 'undefined' ? window : this);
-
 /* ═══════════════ engine — end ═══════════════ */
 </script>
 
 <script>
 /* ============================ the lab ============================ */
-var CONFIG = { endPunctuation: ['.'] };
+var CONFIG = { endPunctuation: ['.', ':'] };
 var ENGINE = true, INLINE_CODE = true;
 
 var CASES = [
@@ -1772,6 +1848,8 @@ var CASES = [
   { tag: 'EN-led, EN-majority, one Persian word → LTR (majority rule, new vs v7)', md: 'English text that ends with a Persian word پایان.', expect: 'v7 این را RTL می‌کرد؛ Word و PDF آن را LTR می‌گیرند.' },
   { tag: 'EN-led but FA-majority → RTL', md: 'API یک رابط برنامه‌نویسی است که دو نرم‌افزار از راه آن با هم گفتگو می‌کنند.', expect: 'با واژهٔ انگلیسی شروع می‌شود ولی فارسی است.' },
   { tag: 'number-led Persian → RTL', md: '2026 سالی است که این نمونه در آن نوشته شد.' },
+  { tag: 'end punctuation: "." and ":" after a final English word', md: 'یک جملهٔ فارسی را آزمایش می‌کنیم که با کلمهٔ انگلیسی تمام می‌شود end.\n\nسازوکار توجه (Attention)، ستون فقرات معماری Transformer:', expect: 'نقطه و دونقطهٔ پایانی در انتهای سطر راست‌به‌چپ (سمت چپ عبارت انگلیسی) می‌نشینند.' },
+  { tag: 'end punctuation: "?" and "!" stay with the English phrase', md: 'پرسیدم are you ready?\n\nو او گفت surprise!', expect: '? و ! بخشی از عبارت انگلیسی می‌مانند (مثل قبل).' },
   { tag: 'numbers only → LTR in an RTL document', md: '1,234,567 — 98.6% — 2026-09-26' },
   { tag: 'lone foreign word', md: 'این فعل به‌صورت dog نوشته می‌شود و چیز خاصی لازم نیست.' },
 

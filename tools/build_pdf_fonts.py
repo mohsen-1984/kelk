@@ -50,11 +50,11 @@ Worked around here:
   • GSUB: never applied, so ligature-built glyphs (emoji sequences) are
     unreachable → same PUA remap. (Arabic shaping is done by PdfBuilder.)
   • Italic: jsPDF cannot slant a font → generated oblique (step 2).
-  • Hinting: some viewers honour TrueType hinting and snap outlines → dehint.
+  • Hinting: some viewers honor TrueType hinting and snap outlines → dehint.
   • Size: every registered style that is drawn is embedded as a glyph subset;
     fallback fonts are subset further here (step 3) to keep the .js small.
 Not fixable here (documented in PdfBuilder):
-  • Colour fonts (COLR/CPAL, CBDT, sbix, SVG) are not supported → monochrome
+  • Color fonts (COLR/CPAL, CBDT, sbix, SVG) are not supported → monochrome
     emoji only. Variable fonts (gvar) are not supported → static instances.
   • GPOS is ignored by jsPDF. Mark attachment is worked around: the
     MarkBasePos / MarkMarkPos anchors (harakat, Hebrew points) are read here

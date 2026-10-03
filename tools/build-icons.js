@@ -7,7 +7,7 @@
  */
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
-const EXTRA = ['sun', 'moon', 'columns-2', 'rows-2', 'copy', 'check'];
+const EXTRA = ['sun', 'moon', 'columns-2', 'rows-2', 'copy', 'check', 'maximize-2', 'minimize-2'];
 
 const sandbox = { window: {}, self: {}, globalThis: {} };
 sandbox.globalThis = sandbox;

@@ -16,6 +16,9 @@ unchanged unless noted; each keeps its own license.
 | mammoth | 1.12.3 | BSD-2-Clause | `vendor/mammoth.browser.min_1.12.3.js` | https://github.com/mwilliamson/mammoth.js |
 | docx | 9.7.1 | MIT | `vendor/docx.index.iife.min_9.7.1.js` | https://github.com/dolanmiu/docx |
 | jsPDF | 4.2.1 | MIT | `vendor/jspdf.umd.min_4.2.1.js` | https://github.com/parallax/jsPDF |
+| MathJax (startup, core, TeX input + extensions, SVG output, ui/safe) | 4.1.3 | Apache-2.0 | `vendor/mathjax_4.1.3/` (`LICENSE` there) | https://github.com/mathjax/MathJax |
+| MathJax New Computer Modern font (SVG data) | 4.1.3 | Apache-2.0 | `vendor/mathjax_4.1.3/fonts/mathjax-newcm-font/` | https://github.com/mathjax/MathJax-fonts |
+| MathJax mhchem font extension (SVG data) | 4.1.3 | Apache-2.0 | `vendor/mathjax_4.1.3/fonts/mathjax-mhchem-font-extension/` | https://github.com/mathjax/MathJax-fonts |
 
 The license text of each library is in its file header or at its source.
 
