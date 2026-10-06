@@ -337,7 +337,7 @@ CORPUS.push({ name: 'emoji', md:
 
 English text with 😀, 🪟, 🧭, ⚠️ vs ⚠, ✏️ vs ✏, ☑️ vs ☑, ✓ and ✅ ❌ ⭐ ⚡.
 
-Sequences: 👍🏽 👍 🇮🇷 🇩🇪 👨‍👩‍👧 1️⃣ 1⃣ #️⃣ 🏳️‍🌈 🏳‍🌈 ❤️‍🔥 🏴󠁧󠁢󠁥󠁮󠁧󠁿 unknown 🪟‍🧭.
+Sequences: 👍🏽 👍 🇮🇷 🇩🇪 👨‍👩‍👧 1️⃣ 1⃣ #️⃣ 👁️‍🗨️ 👁‍🗨 ❤️‍🔥 🏴󠁧󠁢󠁥󠁮󠁧󠁿 unknown 🪟‍🧭.
 
 Text stays text: © 2024 ™ #1 *note* 12:30 and a private-use char \uE000 here.
 

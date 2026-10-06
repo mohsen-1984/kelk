@@ -328,7 +328,7 @@ A browser finds another font by itself when a character is missing, and Word on 
 
 Status: ✓ done → next, ✗ failed, ☐ open, ☑ closed, ★ starred, ⚠ warning, ← ↑ ↓ ↔, ① ② ③, ░▒▓█.
 
-Emoji: 👍 👍🏽 👨‍👩‍👧 🏳️‍🌈 🇮🇷 🇩🇪 1️⃣ in English text, and 😀 🚀 ✅ در متن فارسی.
+Emoji: 👍 👍🏽 👨‍👩‍👧 🧑‍💻 🇮🇷 🇩🇪 1️⃣ in English text, and 😀 🚀 ✅ در متن فارسی.
 
 **Bold ✓ 😀**, *italic ✓ 😀*, ***both ✓ 😀***.
 

@@ -135,6 +135,7 @@
             resetSettings: 'بازنشانی',
             confirmReset: 'همهٔ تنظیمات به حالت پیش‌فرض برگردد؟',
             confirmClear: 'متن پاک شود؟',
+            sampleNote: 'این سند معرفی و نمونهٔ کِلک است. برای شروع، آن را پاک کنید و متن خودتان را بنویسید یا بچسبانید.',
 
             loaded: 'فایل «{0}» بارگذاری شد',
             imported: 'متن غنی به مارک‌داون تبدیل شد',
@@ -359,6 +360,7 @@
             resetSettings: 'Reset',
             confirmReset: 'Reset all settings to their defaults?',
             confirmClear: 'Clear the text?',
+            sampleNote: 'This is Kelk’s about-and-samples document. To start, clear it and write or paste your own text.',
 
             loaded: '“{0}” loaded',
             imported: 'Rich text converted to Markdown',
@@ -575,6 +577,7 @@
             resetSettings: 'إعادة الضبط',
             confirmReset: 'إعادة جميع الإعدادات إلى قيمها الافتراضية؟',
             confirmClear: 'مسح النص؟',
+            sampleNote: 'هذا مستند التعريف والنماذج في Kelk. للبدء، امسحه واكتب نصك أو الصقه.',
             loaded: 'تم تحميل «{0}»',
             imported: 'تحوّل النص المنسَّق إلى ماركداون',
             exported: 'تم إنشاء ملف {0}',

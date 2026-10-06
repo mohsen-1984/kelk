@@ -6,6 +6,25 @@
 
     function on(sel, ev, fn) { const el = K.$(sel); if (el) el.addEventListener(ev, fn); }
 
+    /**
+     * The hint above the editor while the text on screen is an about/sample
+     * document, unchanged: the eraser starts a document of one's own. It goes
+     * with the first edit; the samples script is loaded only when the text
+     * could be one (a remembered sample language, or the script already in).
+     */
+    async function sampleNote() {
+        const note = K.$('#sample-note');
+        if (!note) return;
+        const text = K.editor.value();
+        let all = window.KelkSamples;
+        if (!all && text.trim() && K.store.getUi('sampleLang')) {
+            try { await K.ui.loadScript(K.config.sample); all = window.KelkSamples; } catch (e) { all = null; }
+        }
+        const isSample = !!all && !!text.trim() && Object.keys(all).some(function (k) { return all[k] && text === all[k].markdown; });
+        if (text !== K.editor.value()) return;              // edited meanwhile: the next call decides
+        note.hidden = !isSample;
+    }
+
     /** Load the about/guide/sample document of the interface language (a script, so file:// works). */
     async function loadSample(ask) {
         if (ask && K.editor.value().trim() && !confirm(K.i18n.t('confirmSample'))) return;
@@ -173,6 +192,17 @@
             K.editor.set('', '');
             K.editor.markConverted(false);
         });
+        // the sample hint: shown and hidden with the text (set: sample, import, clear; typing)
+        on('#sample-note-clear', 'click', function () {   // the sample is one click away (book button): no confirm
+            K.names.reset();
+            K.editor.set('', '');
+            K.editor.markConverted(false);
+            K.$('#editor').focus();
+        });
+        const editorSet = K.editor.set;
+        K.editor.set = function () { const r = editorSet.apply(this, arguments); sampleNote(); return r; };
+        on('#editor', 'input', function () { sampleNote(); });
+        sampleNote();
 
         // preview / export
         on('#btn-copy-preview', 'click', function () { K.preview.copyAll(); });

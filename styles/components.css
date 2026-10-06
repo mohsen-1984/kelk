@@ -42,6 +42,15 @@
 
 /* ── editor ──────────────────────────────────────────────────────────── */
 .editor-body { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+/* the about/sample document is on screen: a short hint that the eraser starts a document of one's own */
+.sample-note {
+  display: flex; align-items: center; gap: 8px; margin: 0 0 8px; padding: 6px 8px 6px 12px;
+  border: 1px solid var(--accent); border-inline-start-width: 4px; border-radius: var(--radius);
+  background: var(--accent-soft); color: var(--accent-ink); font-size: 0.9em; line-height: 1.5;
+}
+.sample-note > span { flex: 1; }
+.sample-note > svg, .sample-note > i { flex: none; width: 18px; height: 18px; }
+.sample-note .btn { flex: none; }
 .editor-wrap { position: relative; flex: 1; min-height: 240px; display: flex; }
 .stack .editor-wrap, .stack .preview-scroll { min-height: 120px; }
 /* narrow screens: the page scrolls, each panel gets a fixed share of the screen */
