@@ -66,7 +66,8 @@ The about-and-guide document opens on the first visit, in the interface language
 
 `lib/` is a **standalone JavaScript library** with no build step: four builders with one API —
 `DocxBuilder` (.docx, on docx.js), `PdfBuilder` (.pdf, on jsPDF), `WordHtmlBuilder` (.doc),
-`HtmlBuilder` (.html) — plus `BidiCore` (every direction decision) and `MarkdownImporter`
+`HtmlBuilder` (.html) — plus `PreviewBuilder` (a live preview in a page element, on
+`HtmlBuilder`'s logic and stylesheet), `BidiCore` (every direction decision) and `MarkdownImporter`
 (.docx/HTML → Markdown). Any font can be prepared for the PDF with `tools/build_pdf_fonts.py`.
 Documentation: **[`lib/README.md`](lib/README.md)**.
 
@@ -84,7 +85,7 @@ lib/           the library         assets/             icons and web fonts
 vendor/        third-party libraries (pinned versions, sources listed in index.html)
 docs/          about + guide + samples (en / fa / ar) and screenshots
 tests/         index.html — every test case through the four builders, in the browser
-tools/         bidi-lab.html (every direction rule) · build_pdf_fonts.py · build-icons.js · build-samples.js
+tools/         bidi-lab.html (every direction rule) · build_pdf_fonts.py · build-icons.js · build-samples.js · og-image.html (source of assets/og-image.png)
 ```
 
 ## Contact, credits, license

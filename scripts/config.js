@@ -35,7 +35,7 @@
             document: { title: null, edition: null, author: '', link: '' },   // null → automatic (first H1 / words; Draft / پیش‌نویس)
             logoHeight: '1cm',
             headerFooter: {
-                mode: 'structured',     // structured | simple | none | custom
+                mode: 'simple',         // simple (title + page number) | structured | none | custom
                 direction: 'auto',      // rtl | ltr | auto (the document's)
                 header: null,           // custom header/footer HTML; null → the sample below
                 footer: null

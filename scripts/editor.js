@@ -8,6 +8,47 @@
 
     let area, fileName = '', storageWarned = false;
 
+    /**
+     * Undo / redo of the text, kept here because the browser's own undo stops
+     * at the first programmatic change (sample, import, clear, rich paste, Tab
+     * indent): every change — typed or not — is one history. Typing is grouped
+     * (a pause, a new line or a word boundary after a while closes a step); a
+     * programmatic change is a step of its own. Memory only (not saved), at
+     * most LIMIT steps and about CHARS characters in all, oldest dropped first.
+     */
+    const history = { steps: [], at: -1, timer: 0 };
+    const LIMIT = 200, CHARS = 20e6;
+    function snapshot() { return { text: area.value, s: area.selectionStart, e: area.selectionEnd, name: fileName }; }
+    function record() {
+        clearTimeout(history.timer); history.timer = 0;
+        const cur = history.steps[history.at];
+        if (cur && cur.text === area.value) { cur.s = area.selectionStart; cur.e = area.selectionEnd; cur.name = fileName; return; }
+        history.steps.length = history.at + 1;                    // a new change drops the redo steps
+        history.steps.push(snapshot());
+        let total = history.steps.reduce(function (n, x) { return n + x.text.length; }, 0);
+        while (history.steps.length > 1 && (history.steps.length > LIMIT || total > CHARS)) total -= history.steps.shift().text.length;
+        history.at = history.steps.length - 1;
+        undoButtons();
+    }
+    /** Typing: a step closes after a pause. */
+    function recordLater() { clearTimeout(history.timer); history.timer = setTimeout(record, 600); undoButtons(true); }
+    function undoButtons(pending) {
+        const u = K.$('#btn-undo'), r = K.$('#btn-redo');
+        if (u) u.disabled = !(history.at > 0 || pending || (history.timer && history.steps[history.at] && history.steps[history.at].text !== area.value));
+        if (r) r.disabled = !!history.timer || history.at >= history.steps.length - 1;
+    }
+    function restore(st) {
+        area.value = st.text;
+        fileName = st.name || '';
+        area.focus();
+        area.setSelectionRange(Math.min(st.s, st.text.length), Math.min(st.e, st.text.length));
+        persist(st.text);
+        K.images.prune(st.text);
+        K.editor.stats();
+        K.preview.render();
+        undoButtons();
+    }
+
     function debounce(fn, ms) {
         let t = null;
         return function () { clearTimeout(t); t = setTimeout(fn, ms); };
@@ -60,7 +101,25 @@
             area.value = K.store.content();
             const save = debounce(function () { persist(area.value); }, K.config.autosaveMs);
             const render = debounce(function () { K.preview.render(); }, K.config.renderMs);
-            area.addEventListener('input', function () { K.editor.stats(); save(); render(); });
+            area.addEventListener('input', function (e) {
+                K.editor.stats(); save(); render();
+                // a programmatic change (insert, indent) records itself; typing is grouped
+                if (K.editor._quiet) return;
+                if (/^(insertFromPaste|insertFromDrop|deleteByCut|deleteByDrag)$/.test(e.inputType || '')) record();
+                else recordLater();
+            });
+            // Ctrl+Z / Ctrl+Y / Ctrl+Shift+Z: this history, not the browser's
+            area.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey) { if (history.timer) record(); return; }   // a new line closes a typing step
+                if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+                const k = e.key.toLowerCase();
+                if (k === 'z' && !e.shiftKey) { e.preventDefault(); K.editor.undo(); }
+                else if (k === 'y' || (k === 'z' && e.shiftKey)) { e.preventDefault(); K.editor.redo(); }
+            });
+            area.addEventListener('beforeinput', function (e) {          // the browser's own undo (menu, gestures)
+                if (e.inputType === 'historyUndo') { e.preventDefault(); K.editor.undo(); }
+                else if (e.inputType === 'historyRedo') { e.preventDefault(); K.editor.redo(); }
+            });
 
             // Tab / Shift+Tab: indent / outdent the selected lines
             area.addEventListener('keydown', function (e) {
@@ -74,7 +133,9 @@
             document.addEventListener('keydown', function (e) { if (e.key === 'Shift') shift = true; });
             document.addEventListener('keyup', function (e) { if (e.key === 'Shift') shift = false; });
             window.addEventListener('blur', function () { shift = false; });
+            area.addEventListener('cut', function () { record(); });
             area.addEventListener('paste', function (e) {
+                record();                                    // a paste is a step of its own
                 const dt = e.clipboardData;
                 const imgs = dt ? Array.from(dt.files || []).filter(K.images.isImage) : [];
                 if (imgs.length && !(dt.getData('text/html') || '').trim()) {
@@ -114,36 +175,62 @@
 
             scrollSync(K.$('.preview-scroll'));
             this.stats();
+            record();                                        // the text the page opened with
+        },
+
+        /** One step back / forward in the text's history (typing in progress closes first). */
+        undo: function () {
+            if (history.timer) record();
+            if (history.at <= 0) return;
+            history.at--;
+            restore(history.steps[history.at]);
+        },
+        redo: function () {
+            if (history.timer) record();
+            if (history.at >= history.steps.length - 1) return;
+            history.at++;
+            restore(history.steps[history.at]);
         },
 
         value: function () { return area ? area.value : ''; },
 
         /** Replace the whole text (import, sample, clear). */
         set: function (text, name) {
+            record();                                        // typing in progress: its own step first
             area.value = text;
             fileName = name || '';
             persist(text);
             K.images.prune(text);
             this.stats();
             K.preview.render();
+            record();
         },
 
         /** Insert at the cursor (paste, images). */
         insert: function (text) {
             area.focus();
+            record();
             const s = area.selectionStart, e = area.selectionEnd;
             area.setRangeText(text, s, e, 'end');
-            area.dispatchEvent(new Event('input'));
+            this._change();
+        },
+
+        /** A programmatic edit happened: redraw and save, as one history step. */
+        _change: function () {
+            this._quiet = true;
+            try { area.dispatchEvent(new Event('input')); } finally { this._quiet = false; }
+            record();
         },
 
         indent: function (out) {
+            record();
             const v = area.value, s = area.selectionStart, e = area.selectionEnd;
             const ls = v.lastIndexOf('\n', s - 1) + 1;
             const block = v.slice(ls, e);
             const next = out ? block.replace(/^( {1,4}|\t)/gm, '') : block.replace(/^/gm, '    ');
             area.setRangeText(next, ls, e, 'select');
             if (s === e && !out) area.setSelectionRange(s + 4, s + 4);
-            area.dispatchEvent(new Event('input'));
+            this._change();
         },
 
         /**
@@ -167,6 +254,7 @@
             const f = K.$('#st-file');
             f.hidden = !fileName;
             K.$('#st-file-name').textContent = fileName;
+            K.$('#st-file-name').title = fileName;
         }
     };
 })(window.Kelk = window.Kelk || {});

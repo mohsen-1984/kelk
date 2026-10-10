@@ -15,6 +15,12 @@
 
     function merge(base, over) {
         const out = Array.isArray(base) ? base.slice() : Object.assign({}, base);
+        // nested objects copied too: a caller that changes the result (setPath) must never
+        // change K.config.defaults through a shared reference
+        Object.keys(out).forEach(function (k) {
+            const v = out[k];
+            if (v && typeof v === 'object' && !Array.isArray(v)) out[k] = merge(v, null);
+        });
         Object.keys(over || {}).forEach(function (k) {
             const b = base ? base[k] : undefined, v = over[k];
             out[k] = (b && typeof b === 'object' && !Array.isArray(b) && v && typeof v === 'object') ? merge(b, v) : v;

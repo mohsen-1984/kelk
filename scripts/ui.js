@@ -32,14 +32,22 @@
     };
 
     K.ui = {
-        /** type: 'info' | 'warn' | 'error' */
-        toast: function (message, type, ms) {
+        /** type: 'info' | 'warn' | 'error'; action: { label, run } — a button in the toast (e.g. Undo) */
+        toast: function (message, type, ms, action) {
             const box = $('#toasts');
             if (!box) return;
             const el = document.createElement('div');
             el.className = 'toast' + (type && type !== 'info' ? ' ' + type : '');
             el.setAttribute('role', type === 'error' ? 'alert' : 'status');
-            el.textContent = message;
+            el.appendChild(document.createElement('span')).textContent = message;
+            if (action) {
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'toast-action';
+                b.textContent = action.label;
+                b.addEventListener('click', function () { el.remove(); action.run(); });
+                el.appendChild(b);
+            }
             box.appendChild(el);
             setTimeout(function () { el.remove(); }, ms || (type === 'error' || type === 'warn' ? 6000 : 2800));
         },
@@ -127,6 +135,41 @@
                 b.title = label; b.setAttribute('aria-label', label);
             });
             return which;
+        },
+
+        /**
+         * The editor's and the preview's bars, matched: when the two panels stand
+         * side by side, each top bar takes the taller one's height, and so does
+         * each bottom bar — a bar that wraps (a narrow screen, a long file name,
+         * the stats) wraps both. One above the other, each keeps its own height.
+         * Runs on every size change of the bars and the panels (ResizeObserver).
+         */
+        syncBars: function () {
+            const ed = $('.editor-panel'), pv = $('.preview-panel');
+            if (!ed || !pv) return;
+            const pairs = [[$('.editor-panel > .pane-head'), $('.preview-panel > .panel-head')],
+                           [$('.editor-panel .editor-foot'), $('.preview-panel > .export-foot')]];
+            const a = ed.getBoundingClientRect(), b = pv.getBoundingClientRect();
+            const side = a.width > 0 && b.width > 0 && Math.abs(a.top - b.top) < 2 && pairs[0][0].offsetParent !== null;
+            pairs.forEach(function (p) {
+                if (!p[0] || !p[1]) return;
+                p[0].style.minHeight = p[1].style.minHeight = '';
+                if (!side || !p[0].offsetHeight || !p[1].offsetHeight) return;
+                const h = Math.max(p[0].offsetHeight, p[1].offsetHeight) + 'px';
+                p[0].style.minHeight = p[1].style.minHeight = h;
+            });
+        },
+        watchBars: function () {
+            if (typeof ResizeObserver === 'undefined') return;
+            let raf = 0;
+            const self = this;
+            const ro = new ResizeObserver(function () {
+                cancelAnimationFrame(raf);
+                raf = requestAnimationFrame(function () { self.syncBars(); });
+            });
+            // the bars' contents (their natural height) and the panels (side by side or not)
+            K.$$('.editor-panel, .preview-panel, .editor-panel > .pane-head .actions, .preview-panel > .panel-head .actions, .editor-foot .stats, .export-foot .export-bar, .export-foot .namebox').forEach(function (el) { ro.observe(el); });
+            this.syncBars();
         },
 
         /** Editor panel open / closed (side layout only). */

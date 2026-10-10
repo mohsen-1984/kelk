@@ -62,52 +62,68 @@
             }
         },
 
-        /** "Paste" button: rich text when the clipboard has it, else plain. */
         /**
-         * The Paste button. ONE clipboard call: every navigator.clipboard.read /
+         * The Paste button (o.replace: the Clear & paste button — the clipboard
+         * becomes the document). One clipboard call where it works: every read /
          * readText is a separate browser prompt (Firefox's "Paste" menu, Chrome's
          * paste bubble), so the HTML, the plain text and an image all come from
-         * the same read(); readText() only where read() does not exist.
+         * the same read(). Mobile browsers (Chrome and Opera on Android) often
+         * refuse read() — or give items whose types cannot be read — while
+         * readText() works: then the plain text. When neither works the editor
+         * gets the focus and a hint: the system's own paste (long press, Ctrl+V)
+         * always works and takes the rich-paste path.
          */
-        /** The Paste button (o.replace: the Clear & paste button — the clipboard becomes the document). */
         fromClipboardButton: async function (o) {
             const replace = !!(o && o.replace);
             const clear = function () { if (replace) { K.names.reset(); K.editor.set('', ''); K.editor.markConverted(false); } };
-            try {
-                if (navigator.clipboard && navigator.clipboard.read) {
+            const coarse = window.matchMedia && matchMedia('(pointer: coarse)').matches;
+            const blocked = function () {
+                K.$('#editor').focus();
+                K.ui.toast(K.i18n.t('pasteBlocked'), 'warn');
+            };
+            const getText = async function (it, type) {
+                try { return await (await it.getType(type)).text(); } catch (e) { return ''; }
+            };
+            let html = '', text = '', image = null, readFailed = null;
+            if (navigator.clipboard && navigator.clipboard.read) {
+                try {
                     const items = await navigator.clipboard.read();
-                    let html = '', text = '', image = null;
                     for (const it of items) {
-                        if (!html && it.types.indexOf('text/html') >= 0) html = await (await it.getType('text/html')).text();
-                        if (!text && it.types.indexOf('text/plain') >= 0) text = await (await it.getType('text/plain')).text();
+                        const types = Array.from(it.types || []);
+                        if (!html && types.indexOf('text/html') >= 0) html = await getText(it, 'text/html');
+                        if (!text && types.indexOf('text/plain') >= 0) text = await getText(it, 'text/plain');
                         if (!image) {
-                            const t = it.types.find(function (x) { return /^image\//.test(x); });
-                            if (t) { const blob = await it.getType(t); image = new File([blob], 'image.' + t.split('/')[1], { type: t }); }
+                            const t = types.find(function (x) { return /^image\//.test(x); });
+                            if (t) { try { const blob = await it.getType(t); image = new File([blob], 'image.' + t.split('/')[1], { type: t }); } catch (e) { /* unreadable */ } }
                         }
                     }
-                    if (html && K.store.getUi('importer.richPaste') && MarkdownImporter.isRich(html)) {
-                        const md = importer().fromHtml(html).markdown;
-                        clear();
-                        K.editor.insert(md);
-                        K.editor.markConverted(true);
-                        K.ui.toast(K.i18n.t('imported'));
-                    } else if (text) {
-                        clear();
-                        K.editor.insert(text);
-                    } else if (image) {
-                        clear();
-                        const name = await K.images.add(image);
-                        K.editor.insert('![' + name + '](' + name + ')');
-                        K.ui.toast(K.i18n.t('imageAdded', name));
-                    }
-                    return;
-                }
-                if (navigator.clipboard && navigator.clipboard.readText) {
-                    const text = await navigator.clipboard.readText();
-                    if (text) { clear(); K.editor.insert(text); }
+                } catch (e) { readFailed = e; }
+                // the user declined the prompt on a desktop browser: nothing more to ask
+                if (readFailed && readFailed.name === 'NotAllowedError' && !coarse) return;
+            }
+            // no read(), read() refused, or nothing readable in it: the plain text
+            if (!html && !text && !image && navigator.clipboard && navigator.clipboard.readText) {
+                try { text = await navigator.clipboard.readText(); } catch (e) { if (!readFailed) readFailed = e; }
+            }
+            try {
+                if (html && K.store.getUi('importer.richPaste') && MarkdownImporter.isRich(html)) {
+                    const md = importer().fromHtml(html).markdown;
+                    clear();
+                    K.editor.insert(md);
+                    K.editor.markConverted(true);
+                    K.ui.toast(K.i18n.t('imported'));
+                } else if (text) {
+                    clear();
+                    K.editor.insert(text);
+                } else if (image) {
+                    clear();
+                    const name = await K.images.add(image);
+                    K.editor.insert('![' + name + '](' + name + ')');
+                    K.ui.toast(K.i18n.t('imageAdded', name));
+                } else if (readFailed || !navigator.clipboard || (!navigator.clipboard.read && !navigator.clipboard.readText)) {
+                    blocked();
                 }
             } catch (e) {
-                if (e && e.name === 'NotAllowedError') return;       // the user declined the prompt
                 K.ui.toast(K.i18n.t('failed', e.message), 'error');
             }
         }

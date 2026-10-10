@@ -30,7 +30,7 @@
     <meta name="twitter:image" content="https://mohsen-1984.github.io/kelk/assets/og-image.png">
     <meta name="twitter:image:alt" content="Kelk — کِلک: Markdown to Word, PDF and HTML">
 
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231f6f5c'/%3E%3Cpath d='M9 24 L21 8 L25 11 L13 27 Z' fill='%23fff'/%3E%3Cpath d='M9 24 L7 29 L13 27 Z' fill='%23fff' opacity='.7'/%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231f6f5c'/%3E%3Cg transform='translate(4 4) rotate(40 12 12)'%3E%3Cpath d='M7.4 2.2h9.2v5.6c0 1.6-.7 2.8-1.5 4.1L12 21.8l-3.1-9.9c-.8-1.3-1.5-2.5-1.5-4.1z' fill='%23fff'/%3E%3Cpath d='M12 12.6v8' stroke='%231f6f5c' stroke-width='1.3' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='11.2' r='1.5' fill='%231f6f5c'/%3E%3C/g%3E%3C/svg%3E">
 
     <link rel="stylesheet" href="styles/tokens.css">
     <link rel="stylesheet" href="styles/base.css">
@@ -44,23 +44,35 @@
     <!-- ═══ top bar ═══ -->
     <header class="topbar">
         <div class="brand">
-            <div class="glyph" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
-                    <path d="M5 19 L15 5 L19 8 L9 22 Z" fill="currentColor" fill-opacity=".25"/>
-                    <path d="M5 19 L4 23 L9 22"/>
-                    <path d="M12 9 L16 12"/>
-                </svg>
-            </div>
+            <!-- the mark: hover, focus or a tap shows what it is (a reed pen's nib) -->
+            <span class="glyph-wrap">
+                <button class="glyph" type="button" aria-describedby="brand-tip" data-i18n-attr="aria-label:appName">
+                    <!-- a reed pen's cut nib (kelk = the reed pen), solid — unlike the editor's outlined pencil -->
+                    <svg viewBox="0 0 24 24">
+                        <g transform="rotate(40 12 12)">
+                            <path d="M7.4 2.2h9.2v5.6c0 1.6-.7 2.8-1.5 4.1L12 21.8l-3.1-9.9c-.8-1.3-1.5-2.5-1.5-4.1z" fill="currentColor"/>
+                            <path d="M12 12.6v8" style="stroke:var(--accent)" stroke-width="1.3" stroke-linecap="round"/>
+                            <circle cx="12" cy="11.2" r="1.5" style="fill:var(--accent)"/>
+                        </g>
+                    </svg>
+                </button>
+                <span class="brand-tip" id="brand-tip" role="tooltip" data-i18n="logoTip"></span>
+            </span>
             <div>
                 <h1 data-i18n="appName">کِلک</h1>
                 <div class="sub" data-i18n="tagline"></div>
             </div>
         </div>
         <div class="spacer"></div>
-        <span class="lang-switch" id="lang-switch" role="group" aria-label="Language"><i data-lucide="languages"></i></span>
-        <button class="btn ghost icon" id="btn-theme" type="button" data-i18n-attr="title:theme;aria-label:theme"></button>
-        <button class="btn ghost icon layout-toggle" id="btn-layout" type="button"></button>
-        <button class="btn ghost icon" id="btn-help" type="button" data-i18n-attr="title:help;aria-label:help"><i data-lucide="keyboard"></i></button>
+        <!-- the page's own controls: one group that stays on one line (wraps under the name as a whole) -->
+        <div class="top-tools">
+            <span class="lang-switch" id="lang-switch" role="group" aria-label="Language"><i data-lucide="languages"></i></span>
+            <span class="sep" aria-hidden="true"></span>
+            <button class="btn ghost icon" id="btn-theme" type="button" data-i18n-attr="title:theme;aria-label:theme"></button>
+            <button class="btn ghost icon layout-toggle" id="btn-layout" type="button"></button>
+            <button class="btn ghost icon" id="btn-keys" type="button" data-i18n-attr="title:shortcuts;aria-label:shortcuts"><i data-lucide="keyboard"></i></button>
+            <button class="btn ghost icon" id="btn-help" type="button" data-i18n-attr="title:help;aria-label:help"><i data-lucide="circle-help"></i></button>
+        </div>
     </header>
 
     <!-- ═══ workspace ═══ -->
@@ -75,17 +87,21 @@
                 <h2 id="h-editor"><i data-lucide="pencil-line"></i><span data-i18n="editor"></span></h2>
                 <div class="actions">
                     <button class="btn ghost icon" id="btn-sample" type="button" data-i18n-attr="title:sampleHint;aria-label:sampleHint"><i data-lucide="book-open"></i></button>
-                    <button class="btn" id="btn-import" type="button"><i data-lucide="file-up"></i><span data-i18n="import"></span></button>
-                    <button class="btn" id="btn-paste" type="button"><i data-lucide="clipboard-paste"></i><span data-i18n="paste"></span></button>
+                    <button class="btn cap" id="btn-import" type="button" data-i18n-attr="title:import;aria-label:import"><i data-lucide="file-up"></i><span data-i18n="import"></span></button>
+                    <button class="btn cap" id="btn-paste" type="button" data-i18n-attr="title:paste;aria-label:paste"><i data-lucide="clipboard-paste"></i><span data-i18n="paste"></span></button>
                     <button class="btn ghost icon" id="btn-replace" type="button" data-i18n-attr="title:replacePaste;aria-label:replacePaste"><i data-lucide="replace-all"></i></button>
                     <button class="btn ghost icon" id="btn-copy-editor" type="button" data-i18n-attr="title:copyMd;aria-label:copyMd"><i data-lucide="copy"></i></button>
+                    <span class="btn-pair">
+                        <button class="btn ghost icon flip-rtl-btn" id="btn-undo" type="button" disabled data-i18n-attr="title:undo;aria-label:undo"><i data-lucide="undo-2"></i></button>
+                        <button class="btn ghost icon flip-rtl-btn" id="btn-redo" type="button" disabled data-i18n-attr="title:redo;aria-label:redo"><i data-lucide="redo-2"></i></button>
+                    </span>
                     <button class="btn ghost icon btn-max" id="max-editor" type="button" data-max="editor" data-i18n-attr="title:maximize;aria-label:maximize"><i data-lucide="maximize-2"></i></button>
                     <button class="btn soft danger icon" id="btn-clear" type="button" data-i18n-attr="title:clear;aria-label:clear"><i data-lucide="eraser"></i></button>
                 </div>
             </div>
             <div class="pane-body editor-body" id="editor-body">
                 <div class="sample-note" id="sample-note" role="note" hidden>
-                    <i data-lucide="book-open"></i><span data-i18n="sampleNote"></span>
+                    <i data-lucide="lightbulb"></i><span data-i18n="sampleNote"></span>
                     <button class="btn soft danger" id="sample-note-clear" type="button"><i data-lucide="eraser"></i><span data-i18n="clear"></span></button>
                 </div>
                 <div class="editor-wrap">
@@ -136,17 +152,17 @@
         <!-- settings (export profile) -->
         <aside class="panel settings" aria-labelledby="h-settings">
             <button class="rail" id="pane-rail" type="button" aria-controls="pane-body" data-i18n-attr="title:openSettings;aria-label:openSettings">
-                <i data-lucide="sliders-horizontal"></i><span class="rail-label" data-i18n="settings"></span>
+                <i data-lucide="sliders-horizontal"></i><span class="rail-label" data-i18n="settings"></span><i class="rail-chev" data-lucide="square-chevron-down"></i>
             </button>
             <div class="panel-head pane-head">
                 <h2 id="h-settings"><i data-lucide="sliders-horizontal"></i><span data-i18n="settings"></span></h2>
                 <div class="actions">
                     <span class="btn-pair">
-                        <button class="btn ghost icon" id="groups-open" type="button" data-i18n-attr="title:expandAll;aria-label:expandAll"><i data-lucide="square-chevron-down"></i></button>
-                        <button class="btn ghost icon" id="groups-close" type="button" data-i18n-attr="title:collapseAll;aria-label:collapseAll"><i data-lucide="square-chevron-up"></i></button>
+                        <button class="btn ghost icon" id="groups-open" type="button" data-i18n-attr="title:expandAll;aria-label:expandAll"><i data-lucide="list-chevrons-up-down"></i></button>
+                        <button class="btn ghost icon" id="groups-close" type="button" data-i18n-attr="title:collapseAll;aria-label:collapseAll"><i data-lucide="list-chevrons-down-up"></i></button>
                     </span>
                     <span class="sep" aria-hidden="true"></span>
-                    <button class="btn ghost icon pane-toggle" id="pane-close" type="button" data-i18n-attr="title:closeSettings;aria-label:closeSettings"><span class="flip-rtl"><i data-lucide="panel-right-close"></i></span></button>
+                    <button class="btn ghost icon pane-toggle" id="pane-close" type="button" data-i18n-attr="title:closeSettings;aria-label:closeSettings"><span class="flip-rtl wide-only"><i data-lucide="panel-right-close"></i></span><span class="narrow-only"><i data-lucide="square-chevron-up"></i></span></button>
                 </div>
             </div>
             <div class="pane-body" id="pane-body">
@@ -408,6 +424,29 @@
 
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
+<dialog id="guide" class="guide" aria-labelledby="guide-title">
+    <div class="dlg-head">
+        <h2 id="guide-title"><i data-lucide="circle-help"></i><span data-i18n="help"></span></h2>
+        <button class="btn ghost icon" id="guide-close" type="button" data-i18n-attr="aria-label:close"><i data-lucide="x"></i></button>
+    </div>
+    <div class="dlg-body">
+        <p class="guide-intro" data-i18n="guideIntro"></p>
+        <ol class="guide-steps">
+            <li><i data-lucide="pencil-line"></i><div><b data-i18n="g1t"></b><span data-i18n="g1"></span></div></li>
+            <li><i data-lucide="eye"></i><div><b data-i18n="g2t"></b><span data-i18n="g2"></span></div></li>
+            <li><i data-lucide="file-down"></i><div><b data-i18n="g3t"></b><span data-i18n="g3"></span></div></li>
+            <li><i data-lucide="sliders-horizontal"></i><div><b data-i18n="g4t"></b><span data-i18n="g4"></span></div></li>
+            <li><i class="rtl-mirror" data-lucide="undo-2"></i><div><b data-i18n="g5t"></b><span data-i18n="g5"></span></div></li>
+            <li><i data-lucide="shield-check"></i><div><b data-i18n="g6t"></b><span data-i18n="g6"></span></div></li>
+        </ol>
+        <p class="guide-more" data-i18n="guideMore"></p>
+        <div class="btn-row">
+            <button class="btn soft" id="guide-sample" type="button"><i data-lucide="book-open"></i><span data-i18n="guideSample"></span></button>
+            <button class="btn ghost" id="guide-keys" type="button"><i data-lucide="keyboard"></i><span data-i18n="shortcuts"></span></button>
+        </div>
+    </div>
+</dialog>
+
 <dialog id="help" aria-labelledby="help-title">
     <div class="dlg-head">
         <h2 id="help-title" data-i18n="shortcuts"></h2>
@@ -420,6 +459,8 @@
             <tr><td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Enter</kbd></td><td data-i18n="kPdf"></td></tr>
             <tr><td><kbd>Ctrl</kbd> + <kbd>O</kbd></td><td data-i18n="kOpen"></td></tr>
             <tr><td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>V</kbd></td><td data-i18n="kPastePlain"></td></tr>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>Z</kbd></td><td data-i18n="kUndo"></td></tr>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>Y</kbd> / <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd></td><td data-i18n="kRedo"></td></tr>
             <tr><td><kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd></td><td data-i18n="kTab"></td></tr>
             <tr><td><kbd>Ctrl</kbd> + <kbd>,</kbd></td><td data-i18n="kSettings"></td></tr>
             <tr><td><kbd>F1</kbd></td><td data-i18n="kHelp"></td></tr>

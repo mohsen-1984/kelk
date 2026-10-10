@@ -197,9 +197,14 @@
                 } catch (e) { K.ui.toast(K.i18n.t('failed', e.message), 'error'); }
             });
             K.$('#set-reset').addEventListener('click', function () {
-                if (!confirm(K.i18n.t('confirmReset'))) return;
+                // no confirm: the toast offers to undo it
+                const before = JSON.stringify(K.store.settings());
                 K.store.resetSettings();
                 self.load();
+                K.ui.toast(K.i18n.t('settingsReset'), 'info', 8000, {
+                    label: K.i18n.t('undoAction'),
+                    run: function () { K.store.replaceSettings(JSON.parse(before)); self.load(); }
+                });
             });
 
             this.load();

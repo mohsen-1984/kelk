@@ -26,8 +26,7 @@
     }
 
     /** Load the about/guide/sample document of the interface language (a script, so file:// works). */
-    async function loadSample(ask) {
-        if (ask && K.editor.value().trim() && !confirm(K.i18n.t('confirmSample'))) return;
+    async function loadSample() {                    // no confirm: the text before it is one Undo away
         try {
             await K.ui.loadScript(K.config.sample);
             // the document of the interface language (about Kelk + guide + samples)
@@ -137,7 +136,12 @@
         on('#btn-layout', 'click', function () {
             K.store.setUi('layout', K.ui.layout(K.$('#workspace').classList.contains('stack') ? 'side' : 'stack'));
         });
-        on('#btn-help', 'click', function () { K.ui.help(true); });
+        // ? : the help (a short guide; F1), ⌨ : the keyboard shortcuts
+        on('#btn-help', 'click', function () { K.ui.dialog('#guide', true); });
+        on('#guide-close', 'click', function () { K.ui.dialog('#guide', false); });
+        on('#guide-sample', 'click', function () { K.ui.dialog('#guide', false); loadSample(); });
+        on('#guide-keys', 'click', function () { K.ui.dialog('#guide', false); K.ui.help(true); });
+        on('#btn-keys', 'click', function () { K.ui.help(true); });
         on('#help-close', 'click', function () { K.ui.help(false); });
 
         // panes
@@ -159,6 +163,11 @@
         on('#groups-open', 'click', function () { groups(true); });
         on('#groups-close', 'click', function () { groups(false); });
         on('#pane-close', 'click', togglePane);
+        // Settings below the panels (≤1100px): the heading opens and closes it too (the rail opens it)
+        on('.settings > .pane-head', 'click', function (e) {
+            if (e.target.closest('button, a, input, select') || !window.matchMedia('(max-width: 1100px)').matches) return;
+            togglePane();
+        });
         const toggleEditor = function () {
             const open = K.$('#workspace').classList.contains('editor-closed');
             K.ui.editorPane(open);
@@ -178,27 +187,22 @@
         });
 
         // editor actions
-        on('#btn-sample', 'click', function () { loadSample(true); });
+        on('#btn-sample', 'click', function () { loadSample(); });
         on('#btn-import', 'click', function () { K.$('#file-import').click(); });
         on('#file-import', 'change', function () { const f = this.files[0]; this.value = ''; K.importer.fromFile(f); });
         on('#btn-paste', 'click', function () { K.importer.fromClipboardButton(); });
-        on('#btn-replace', 'click', function () {           // clear, then paste: the clipboard becomes the document
-            if (K.editor.value() && !confirm(K.i18n.t('confirmReplace'))) return;
-            K.importer.fromClipboardButton({ replace: true });
-        });
-        on('#btn-clear', 'click', function () {
-            if (K.editor.value() && !confirm(K.i18n.t('confirmClear'))) return;
-            K.names.reset();
-            K.editor.set('', '');
-            K.editor.markConverted(false);
-        });
-        // the sample hint: shown and hidden with the text (set: sample, import, clear; typing)
-        on('#sample-note-clear', 'click', function () {   // the sample is one click away (book button): no confirm
+        // no confirms on this page: every change of the text is one Undo away (Kelk.editor's history)
+        on('#btn-replace', 'click', function () { K.importer.fromClipboardButton({ replace: true }); });   // clear, then paste
+        const clearText = function () {
             K.names.reset();
             K.editor.set('', '');
             K.editor.markConverted(false);
             K.$('#editor').focus();
-        });
+        };
+        on('#btn-clear', 'click', clearText);
+        on('#sample-note-clear', 'click', clearText);       // the sample hint's own eraser
+        on('#btn-undo', 'click', function () { K.editor.undo(); });
+        on('#btn-redo', 'click', function () { K.editor.redo(); });
         const editorSet = K.editor.set;
         K.editor.set = function () { const r = editorSet.apply(this, arguments); sampleNote(); return r; };
         on('#editor', 'input', function () { sampleNote(); });
@@ -224,10 +228,11 @@
             else if (mod && e.key === 'Enter') { e.preventDefault(); exp(e.shiftKey ? 'pdf' : 'docx'); }
             else if (mod && !e.shiftKey && k === 'o') { e.preventDefault(); K.$('#file-import').click(); }
             else if (mod && e.key === ',') { e.preventDefault(); togglePane(); }
-            else if (e.key === 'F1') { e.preventDefault(); K.ui.help(true); }
+            else if (e.key === 'F1') { e.preventDefault(); K.ui.help(false); K.ui.dialog('#guide', true); }
         });
 
         K.ui.icons();
+        K.ui.watchBars();
 
         // first visit: show what Kelk does
         if (!K.editor.value().trim() && !u.sampleSeen) {

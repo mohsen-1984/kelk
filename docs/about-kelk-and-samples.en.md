@@ -61,7 +61,7 @@ The road runs both ways. Kelk turns a Word file (.docx), an HTML page, or text c
 
 ## 2. Quick start
 
-1. **Text:** write or paste Markdown, or import an md, docx or html file. Images can be dropped or pasted into the text too.
+1. **Text:** write or paste Markdown, or import an md, docx or html file. Images can be dropped or pasted into the text too. **Undo** and **Redo** (`Ctrl+Z`, `Ctrl+Y`) in the panel's bar cover every change of the text — the eraser, the sample, an import — so nothing asks for confirmation.
 2. **Preview:** what the exports get, with the same directions.
 3. **Settings:** open with the button at the side of the panel; the two buttons at its top expand or collapse all sections.
 4. **File name:** change it in the name box under the preview before downloading. It starts as the imported file's name, the document title or the opening words; the export button sets the extension.
@@ -426,7 +426,7 @@ Links: [CommonMark](https://commonmark.org) and [GitHub Flavored Markdown](https
 
 ## 7. For developers
 
-Kelk's core, the `lib` folder, is a standalone library that works in any web project without this page: four builders with one shared API — `WordHtmlBuilder` (.doc), `DocxBuilder` (.docx), `PdfBuilder` (.pdf) and `HtmlBuilder` (.html) — plus `BidiCore` (every direction decision) and `MarkdownImporter` (the way back).
+Kelk's core, the `lib` folder, is a standalone library that works in any web project without this page: four builders with one shared API — `WordHtmlBuilder` (.doc), `DocxBuilder` (.docx), `PdfBuilder` (.pdf) and `HtmlBuilder` (.html) — plus `PreviewBuilder` (a live preview inside an element of your page, on `HtmlBuilder`'s logic and stylesheet, so the preview and the .html export draw the same; the preview of this page is one), `BidiCore` (every direction decision) and `MarkdownImporter` (the way back).
 
 ```js
 const blob = await PdfBuilder.create()

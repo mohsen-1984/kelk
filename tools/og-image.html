@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<!--
+  Kelk — the source of assets/og-image.png (the link preview: Open Graph, X / Twitter).
+
+  The picture is this page at exactly 1200 × 630 CSS pixels. To make the PNG again after a change:
+    • any Chromium browser:  chrome --headless --disable-gpu --hide-scrollbars \
+                                --window-size=1200,630 --screenshot=assets/og-image.png tools/og-image.html
+      (run from the project root; Edge: msedge with the same flags)
+    • or open it in a browser, open the developer tools, set the device size to 1200 × 630 at 100 %
+      zoom, and use "Capture screenshot".
+  Fonts come from assets/fonts (as the app's), so it looks the same from file:// and offline.
+  Colors follow styles/tokens.css (light theme); the mark is the same reed-pen nib as index.html.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kelk — og-image</title>
+<style>
+  @font-face { font-family: 'Vazirmatn'; src: url('../assets/fonts/rastikerdar/webfonts/Vazirmatn[wght].woff2') format('woff2'); font-weight: 100 900; }
+  @font-face { font-family: 'DejaVu Sans'; src: url('../assets/fonts/dejavu/DejaVuSans-Oblique.woff') format('woff'); font-style: italic; }
+  :root {
+    --accent: #1f6f5c; --accent-soft: #e3efeb; --ink: #1c2421; --muted: #5d6a65;
+    --paper: #ffffff; --bg: #f5f4f0; --line: #d9e3df;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    font-family: 'Vazirmatn', sans-serif; color: var(--ink);
+    background: radial-gradient(circle at 85% 20%, #e6f0ec 0, transparent 55%), var(--bg);
+    position: relative;
+  }
+  body::before { content: ''; position: absolute; inset: 0 0 auto; height: 12px; background: var(--accent); }
+
+  /* left: the name and what it does */
+  .side { position: absolute; left: 72px; top: 82px; width: 560px; }
+  .brand { display: flex; align-items: center; gap: 28px; }
+  .mark { width: 132px; height: 132px; border-radius: 30px; background: var(--accent); display: grid; place-items: center; flex: none;
+          box-shadow: 0 14px 30px -14px rgba(31, 111, 92, .7); }
+  .mark svg { width: 92px; height: 92px; }
+  h1 { font-size: 86px; font-weight: 800; line-height: 1; letter-spacing: -1px; }
+  h1 .fa { color: var(--accent); margin-left: 14px; font-weight: 700; }
+  .meaning { margin-top: 12px; font-size: 21px; color: var(--muted); }
+  .meaning b { color: var(--accent); font-weight: 700; }
+  .tag { margin-top: 44px; font-size: 31px; font-weight: 700; line-height: 1.35; }
+  .tag-fa { margin-top: 10px; font-size: 25px; font-weight: 600; color: var(--muted); direction: rtl; text-align: left; }
+  .chips { margin-top: 40px; display: flex; gap: 12px; }
+  .chip { padding: 9px 20px; border-radius: 10px; font-size: 22px; font-weight: 800; color: var(--accent);
+          background: var(--paper); border: 2px solid var(--line); }
+  .chip.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  /* right: a page of a finished document — right to left, a formula, a table */
+  .page { position: absolute; right: 72px; top: 112px; width: 420px; background: var(--paper); border-radius: 14px;
+          box-shadow: 0 24px 50px -24px rgba(20, 40, 34, .45), 0 0 0 1px var(--line); padding: 30px 32px; direction: rtl;
+          transform: rotate(-2deg); }
+  .page .hd { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); border-bottom: 1px solid #222; padding-bottom: 6px; }
+  .page h2 { margin-top: 18px; font-size: 25px; font-weight: 800; color: #2f4f6f; }
+  .page p { margin-top: 8px; font-size: 15.5px; line-height: 1.9; text-align: justify; }
+  .page .ltr { direction: ltr; unicode-bidi: isolate; }
+  .page .q { margin-top: 12px; padding: 6px 14px; border-right: 4px solid var(--accent); background: #f3f8f6; border-radius: 3px 0 0 3px;
+             font-size: 15px; color: #444; }
+  .page .eq { margin: 14px 0 6px; text-align: center; direction: ltr; font: italic 23px 'DejaVu Sans', serif; color: #222; }
+  .page table { width: 100%; margin-top: 12px; border-collapse: collapse; font-size: 14px; }
+  .page th, .page td { border: 1px solid #a9b5c4; padding: 4px 8px; text-align: right; }
+  .page th { background: #e4e9ef; }
+  .page td.n { text-align: left; direction: ltr; }
+</style>
+</head>
+<body>
+  <div class="side">
+    <div class="brand">
+      <div class="mark">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <g transform="rotate(40 12 12)">
+            <path d="M7.4 2.2h9.2v5.6c0 1.6-.7 2.8-1.5 4.1L12 21.8l-3.1-9.9c-.8-1.3-1.5-2.5-1.5-4.1z" fill="#fff"/>
+            <path d="M12 12.6v8" stroke="#1f6f5c" stroke-width="1.3" stroke-linecap="round"/>
+            <circle cx="12" cy="11.2" r="1.5" fill="#1f6f5c"/>
+          </g>
+        </svg>
+      </div>
+      <div>
+        <h1>Kelk<span class="fa">کِلک</span></h1>
+        <div class="meaning"><b>kelk</b> — the reed pen of Persian calligraphy</div>
+      </div>
+    </div>
+    <div class="tag">Markdown → Word, PDF and HTML,<br>right-to-left first — in your browser</div>
+    <div class="tag-fa">از مارک‌داون تا سند آماده، با فرمول‌های LaTeX</div>
+    <div class="chips"><span class="chip on">DOCX</span><span class="chip">PDF</span><span class="chip">HTML</span><span class="chip">DOC</span></div>
+  </div>
+
+  <div class="page" aria-hidden="true">
+    <div class="hd"><span>گزارش هفتگی</span><span>صفحه 1 از 3</span></div>
+    <h2>1. خلاصه — <span class="ltr">Summary</span></h2>
+    <p>این هفته مدل <span class="ltr">v2.1</span> روی <span class="ltr">12,500</span> نمونه آموزش دید و دقت آن به <span class="ltr">94.3%</span> رسید.</p>
+    <div class="q">جهت هر پاراگراف، عدد و پرانتز درست می‌ماند.</div>
+    <div class="eq">σ<sub>x̄</sub> = σ / √n</div>
+    <table>
+      <tr><th>شاخص</th><th>مقدار</th></tr>
+      <tr><td>دقت (Accuracy)</td><td class="n">94.3%</td></tr>
+      <tr><td>زمان پاسخ</td><td class="n">120 ms</td></tr>
+      <tr><td>نمونه‌ها</td><td class="n">12,500</td></tr>
+    </table>
+  </div>
+</body>
+</html>

@@ -13,7 +13,10 @@
   white-space: nowrap;
 }
 .btn:hover { border-color: var(--accent); color: var(--accent-ink); }
-.btn:disabled { opacity: .55; cursor: default; }
+.btn:disabled { opacity: .4; cursor: default; }
+.btn:disabled:hover { border-color: var(--line-strong); color: inherit; }
+.btn.ghost:disabled:hover { border-color: transparent; background: transparent; }
+[dir="rtl"] .flip-rtl-btn svg { transform: scaleX(-1); }   /* undo points back: right in a right-to-left page */
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 600; }
 .btn.primary:hover { color: var(--on-accent); filter: brightness(1.06); }
 .btn.soft { background: var(--accent-soft); border-color: transparent; color: var(--accent-ink); font-weight: 600; }
@@ -44,7 +47,7 @@
 .editor-body { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 /* the about/sample document is on screen: a short hint that the eraser starts a document of one's own */
 .sample-note {
-  display: flex; align-items: center; gap: 8px; margin: 0 0 8px; padding: 6px 8px 6px 12px;
+  display: flex; align-items: center; gap: 8px; margin: 8px 10px 0; padding: 6px 8px 6px 12px;
   border: 1px solid var(--accent); border-inline-start-width: 4px; border-radius: var(--radius);
   background: var(--accent-soft); color: var(--accent-ink); font-size: 0.9em; line-height: 1.5;
 }
@@ -52,11 +55,46 @@
 .sample-note > svg, .sample-note > i { flex: none; width: 18px; height: 18px; }
 .sample-note .btn { flex: none; }
 .editor-wrap { position: relative; flex: 1; min-height: 240px; display: flex; }
-.stack .editor-wrap, .stack .preview-scroll { min-height: 120px; }
-/* narrow screens: the page scrolls, each panel gets a fixed share of the screen */
+.stack .editor-wrap { min-height: 90px; }
+.stack .preview-scroll { min-height: 100px; }
+/* one above the other (stack, or one column): the page scrolls and each panel gets a fixed share
+   of the screen — the editor a small one, so the preview and the export buttons are a short
+   scroll away even with a long document; the editor scrolls inside */
 @media (max-width: 1100px) {
-  .editor-wrap { flex: none; height: 60vh; }
-  .preview-scroll { flex: none; height: 70vh; }
+  .stack .editor-wrap { flex: none; height: 38vh; height: 38dvh; min-height: 200px; }
+  .stack .preview-scroll { flex: none; height: 72vh; height: 72dvh; }
+}
+@media (max-width: 900px) {
+  .editor-wrap { flex: none; height: 38vh; height: 38dvh; min-height: 200px; }
+  .preview-scroll { flex: none; height: 72vh; height: 72dvh; min-height: 280px; }
+}
+
+/* ── the two panels' bars ───────────────────────────────────────────────
+   Narrow panels (side by side on a small screen, or a phone): captions give way to icons
+   (their names stay as tooltips), the panel titles keep only their icon, the export bar
+   drops its icons. Kelk.ui.syncBars gives the editor's and the preview's top bars — and
+   their bottom bars — one height when they stand side by side, so a bar that wraps to two
+   rows in one panel is matched in the other. */
+.editor-panel { container: kelk-editor / inline-size; }
+.preview-panel { container: kelk-preview / inline-size; }
+@container kelk-editor (max-width: 640px) {
+  #h-editor > span { display: none; }                 /* the title first: its icon says it */
+}
+@container kelk-editor (max-width: 540px) {
+  .btn.cap { width: 32px; padding: 0; justify-content: center; }
+  .btn.cap > span { display: none; }
+}
+@container kelk-editor (max-width: 380px) {
+  .editor-panel .panel-head .actions { gap: 2px; }
+  .editor-panel .panel-head .btn.icon, .editor-panel .btn.cap { width: 30px; }
+}
+@container kelk-preview (max-width: 640px) {
+  #h-preview > span { display: none; }
+}
+@container kelk-preview (max-width: 540px) {
+  .export-bar .btn { padding: 0 9px; }
+  .export-bar .btn svg { display: none; }
+  .export-foot .namebox { flex-basis: 120px; }
 }
 #editor {
   flex: 1;
@@ -87,9 +125,15 @@ html[dir="rtl"] input[dir="auto"]:placeholder-shown { direction: rtl; }
 }
 .editor-wrap.dragging .dropzone-overlay { display: grid; }
 
-.stats { display: flex; gap: 12px; flex-wrap: wrap; }
-.editor-foot { gap: 8px; }
-.editor-foot > .sep { margin-inline-start: auto; }          /* MD at the edge opposite the stats */
+/* the editor's bottom bar: MD always on the stats' row, at the far edge; the stats wrap among
+   themselves and a long file name is cut with an ellipsis (its full name in the tooltip) */
+.stats { display: flex; gap: 2px 12px; flex-wrap: wrap; align-items: center; flex: 1 1 auto; min-width: 0; }
+.stats > span { white-space: nowrap; }
+.stats > #st-file { display: inline-flex; min-width: 0; max-width: 100%; }
+.stats > #st-file[hidden] { display: none; }
+#st-file-name { overflow: hidden; text-overflow: ellipsis; min-width: 0; margin-inline-start: .3em; }
+.editor-foot { gap: 8px; flex-wrap: nowrap; }
+.editor-foot > .sep, .editor-foot > .btn { flex: none; }
 .panel-head .actions { align-items: center; }
 /* editor and preview titles are labels, not buttons: muted */
 #h-editor, #h-preview { color: var(--muted); font-weight: 600; }
@@ -130,6 +174,10 @@ html[dir="rtl"] input[dir="auto"]:placeholder-shown { direction: rtl; }
 }
 .panel > .rail:hover { color: var(--accent-ink); background: var(--accent-soft); }
 .panel > .rail .rail-label { writing-mode: vertical-rl; font-weight: 600; font-size: 13px; }
+/* a vertical label starts at the top, beside its icon, in every language: vertical-rl turns a
+   line clockwise, which puts the start of a right-to-left line at the bottom — turned half a
+   turn more, its start is at the top again (Persian and Arabic read top to bottom, as English does) */
+[dir="rtl"] .panel > .rail .rail-label { transform: rotate(180deg); }
 .panel > .rail svg { width: 18px; height: 18px; }
 .pane-closed .settings > .rail { display: flex; }
 .pane-closed .settings > .pane-head,
@@ -141,9 +189,17 @@ html[dir="rtl"] input[dir="auto"]:placeholder-shown { direction: rtl; }
   .workspace.editor-closed:not(.stack) .editor-panel > .pane-head,
   .workspace.editor-closed:not(.stack) .editor-panel > .pane-body { display: none; }
 }
+/* Settings below the panels (≤1100px): a bar that opens downward — the rail's chevron points
+   down, the close button's up, and a click on the heading closes it again */
+.rail-chev, .narrow-only { display: none; }
 @media (max-width: 1100px) {
   .pane-closed .settings > .rail { flex-direction: row; min-height: 0; height: 44px; padding: 0 14px; }
-  .pane-closed .settings > .rail .rail-label { writing-mode: horizontal-tb; }
+  .pane-closed .settings > .rail .rail-label { writing-mode: horizontal-tb; transform: none; }
+  .settings > .rail .rail-chev { display: block; margin-inline-start: auto; }
+  .settings .wide-only { display: none; }
+  .settings .narrow-only { display: inline-flex; }
+  .settings > .pane-head { cursor: pointer; }
+  .settings > .pane-head:hover h2 { color: var(--accent-ink); }
 }
 @media (max-width: 760px) { .editor-panel .pane-toggle { display: none; } }
 
@@ -231,6 +287,11 @@ html[dir="rtl"] input[dir="auto"]:placeholder-shown { direction: rtl; }
   font-size: 13px; max-width: 520px;
 }
 .toast.error { background: var(--danger); color: #fff; }
+.toast { display: flex; align-items: center; gap: 12px; }
+.toast-action {
+  border: 0; background: none; padding: 2px 4px; color: inherit; font: inherit; font-weight: 700;
+  text-decoration: underline; text-underline-offset: 3px; cursor: pointer; flex: none;
+}
 .toast.warn { background: var(--warn); color: #fff; }
 
 /* ── dialog ──────────────────────────────────────────────────────────── */
@@ -246,6 +307,17 @@ dialog .dlg-head .btn { margin-inline-start: auto; }
 dialog .dlg-body { padding: 12px 14px 16px; }
 dialog .dlg-body.fields { display: grid; gap: 10px; }
 dialog table { width: 100%; border-collapse: collapse; font-size: 13px; }
+dialog .dlg-head h2 { display: flex; align-items: center; gap: 8px; }
+dialog .dlg-head h2 svg { width: 18px; height: 18px; color: var(--accent); }
+/* the help: a short guide */
+dialog.guide { width: min(620px, 94vw); }
+.guide-intro { margin: 0 0 10px; }
+.guide-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.guide-steps li { display: flex; gap: 10px; align-items: flex-start; }
+.guide-steps li > svg { width: 18px; height: 18px; flex: none; margin-top: 3px; color: var(--accent); }
+.guide-steps b { display: block; font-size: 13.5px; }
+.guide-steps span { color: var(--muted); font-size: 13px; }
+.guide-more { margin: 14px 0 10px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 13px; }
 dialog td { padding: 6px 4px; border-bottom: 1px solid var(--line); }
 kbd {
   font-family: var(--font-mono); font-size: 11.5px;
@@ -265,3 +337,4 @@ details.group.app-group > summary { color: var(--accent-ink); background: var(--
 /* a link inside a hint that opens another Settings group (Text → Word) */
 .link-btn { border: 0; background: none; padding: 0; font: inherit; color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
 .link-btn:hover { color: var(--accent); }
+[dir="rtl"] svg.rtl-mirror { transform: scaleX(-1); }
