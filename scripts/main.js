@@ -124,6 +124,7 @@
             langButtons();
             K.ui.layout(K.store.getUi('layout'));
             K.settings.showLogo();
+            K.settings.fontPack();
             if (showingSample) await loadSample(false); else K.preview.render();
         };
         langButtons();
@@ -165,7 +166,10 @@
         on('#pane-close', 'click', togglePane);
         // Settings below the panels (≤1100px): the heading opens and closes it too (the rail opens it)
         on('.settings > .pane-head', 'click', function (e) {
-            if (e.target.closest('button, a, input, select') || !window.matchMedia('(max-width: 1100px)').matches) return;
+            // the path, not e.target.closest: a button may swap its icon while handling the click,
+            // and a detached target finds no button above it
+            const onControl = e.composedPath().some(function (n) { return n.nodeType === 1 && /^(BUTTON|A|INPUT|SELECT)$/.test(n.tagName); });
+            if (onControl || !window.matchMedia('(max-width: 1100px)').matches) return;
             togglePane();
         });
         const toggleEditor = function () {
@@ -203,8 +207,8 @@
         on('#sample-note-clear', 'click', clearText);       // the sample hint's own eraser
         on('#btn-undo', 'click', function () { K.editor.undo(); });
         on('#btn-redo', 'click', function () { K.editor.redo(); });
-        const editorSet = K.editor.set;
-        K.editor.set = function () { const r = editorSet.apply(this, arguments); sampleNote(); return r; };
+        // the sample hint follows the text: typed, or replaced (sample, import, clear, undo, redo)
+        on('#editor', 'kelk:replaced', function () { sampleNote(); });
         on('#editor', 'input', function () { sampleNote(); });
         sampleNote();
 
@@ -233,6 +237,32 @@
 
         K.ui.icons();
         K.ui.watchBars();
+
+        // to the page's top / end: shown when the PAGE scrolls (one column, or editor above
+        // preview on a small screen) — side by side each panel scrolls inside and the page does not
+        (function () {
+            const box = K.$('#page-jump'), up = K.$('#jump-top'), down = K.$('#jump-end');
+            if (!box) return;
+            let raf = 0;
+            const update = function () {
+                raf = 0;
+                const el = document.scrollingElement || document.documentElement;
+                const max = el.scrollHeight - window.innerHeight, y = window.scrollY;
+                box.hidden = max < 240;
+                up.classList.toggle('off', y < 160);
+                down.classList.toggle('off', y > max - 160);
+            };
+            const later = function () { if (!raf) raf = requestAnimationFrame(update); };
+            window.addEventListener('scroll', later, { passive: true });
+            window.addEventListener('resize', later);
+            if (typeof ResizeObserver !== 'undefined') new ResizeObserver(later).observe(K.$('.app') || document.body);   // body is one screen high (height: 100%); .app grows
+            up.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+            down.addEventListener('click', function () {
+                const el = document.scrollingElement || document.documentElement;
+                window.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+            });
+            update();
+        })();
 
         // first visit: show what Kelk does
         if (!K.editor.value().trim() && !u.sampleSeen) {

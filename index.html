@@ -157,6 +157,9 @@
             <div class="panel-head pane-head">
                 <h2 id="h-settings"><i data-lucide="sliders-horizontal"></i><span data-i18n="settings"></span></h2>
                 <div class="actions">
+                    <!-- every setting back to its default (undo in the toast); also in the App group -->
+                    <button class="btn ghost icon danger" id="settings-reset" type="button" data-i18n-attr="title:resetAllSettings;aria-label:resetAllSettings"><i data-lucide="rotate-ccw"></i></button>
+                    <span class="sep" aria-hidden="true"></span>
                     <span class="btn-pair">
                         <button class="btn ghost icon" id="groups-open" type="button" data-i18n-attr="title:expandAll;aria-label:expandAll"><i data-lucide="list-chevrons-up-down"></i></button>
                         <button class="btn ghost icon" id="groups-close" type="button" data-i18n-attr="title:collapseAll;aria-label:collapseAll"><i data-lucide="list-chevrons-down-up"></i></button>
@@ -204,6 +207,21 @@
                             <label class="field"><span data-i18n="sizeBidi"></span><input type="number" min="6" max="36" step="0.5" dir="ltr" data-setting="fonts.bidiSize"></label>
                             <label class="field"><span data-i18n="sizeLatin"></span><input type="number" min="6" max="36" step="0.5" dir="ltr" data-setting="fonts.latinSize"></label>
                         </div>
+                        <!-- paragraphs (and list items: alignment) in every output; template textAlign / lineHeight -->
+                        <div class="row2">
+                            <label class="field"><span data-i18n="textAlign"></span>
+                                <select data-setting="text.align">
+                                    <option value="justify" data-i18n="alignJustify"></option>
+                                    <option value="start" data-i18n="alignStart"></option>
+                                </select></label>
+                            <label class="field"><span data-i18n="lineSpacing"></span>
+                                <select data-setting="text.lineHeight">
+                                    <option value="" data-i18n="lineAuto"></option>
+                                    <option value="100%">1.0</option><option value="110%">1.1</option><option value="115%">1.15</option>
+                                    <option value="125%">1.25</option><option value="150%">1.5</option><option value="175%">1.75</option><option value="200%">2.0</option>
+                                </select></label>
+                        </div>
+                        <div class="field"><span class="hint" data-i18n="textLayoutHint"></span></div>
                         <div class="field"><span class="hint"><span data-i18n="textFontsHint"></span>
                             <button type="button" class="link-btn" data-open-group="gWord" data-i18n="gWord"></button></span></div>
                     </div>
@@ -256,6 +274,12 @@
                                 <option value="auto" data-i18n="tableWidthAuto"></option>
                                 <option value="100%">100%</option><option value="98%">98%</option>
                                 <option value="90%">90%</option><option value="75%">75%</option><option value="50%">50%</option>
+                            </select></label>
+                        <!-- with "auto": the least width, so a table of a few numbers is not a sliver -->
+                        <label class="field" id="f-table-min"><span data-i18n="tableMinWidth"></span>
+                            <select data-setting="page.tableMinWidth">
+                                <option value="20%" data-i18n="tableMinNone"></option>
+                                <option value="33%">33%</option><option value="50%">50%</option><option value="75%">75%</option><option value="100%">100%</option>
                             </select></label>
                         <label class="field"><span data-i18n="tableAlign"></span>
                             <select data-setting="page.tableAlign">
@@ -376,6 +400,14 @@
                             <input type="text" dir="auto" list="dl-word-code-fonts" data-setting="code.wordFont" data-font-check="#nf-word-code" data-i18n-attr="placeholder:sameAsPdf"></label>
                         <div class="field" id="nf-word-code" hidden><span class="hint warn" data-i18n="notInstalled"></span></div>
                         <div class="field"><span class="hint" data-i18n="wordFontsHint"></span></div>
+                        <!-- fonts to install for Word (Kelk.config.wordFontPacks, by interface language) -->
+                        <div class="field font-pack" id="word-font-pack" hidden>
+                            <span class="hint" data-i18n="wordFontsGetHint"></span>
+                            <div class="btn-row">
+                                <a class="btn soft" id="word-font-zip" download><i data-lucide="download"></i><span data-i18n="wordFontsGet"></span></a>
+                                <a class="btn ghost" id="word-font-site" target="_blank" rel="noopener"><i data-lucide="external-link"></i><span data-i18n="wordFontsSite"></span></a>
+                            </div>
+                        </div>
                         <label class="check"><input type="checkbox" data-ui="previewWordFont"><span data-i18n="previewWordFont"></span></label>
                     </div>
                 </details>
@@ -423,6 +455,12 @@
 </div>
 
 <div class="toasts" id="toasts" aria-live="polite"></div>
+
+<!-- the page scrolls (one column, or one panel above the other): to its top and its end -->
+<div class="page-jump" id="page-jump" hidden>
+    <button class="btn icon" id="jump-top" type="button" data-i18n-attr="title:toTop;aria-label:toTop"><i data-lucide="arrow-up-to-line"></i></button>
+    <button class="btn icon" id="jump-end" type="button" data-i18n-attr="title:toEnd;aria-label:toEnd"><i data-lucide="arrow-down-to-line"></i></button>
+</div>
 
 <dialog id="guide" class="guide" aria-labelledby="guide-title">
     <div class="dlg-head">

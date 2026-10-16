@@ -26,8 +26,8 @@ The license text of each library is in its file header or at its source.
 
 | Font | Version | License | Where | License file |
 |---|---|---|---|---|
-| Vazirmatn | 33.003 | SIL Open Font License 1.1 | web font; PDF font | `assets/fonts/rastikerdar/webfonts/VAZIRMATN-LICENSE-OFL.txt`, `lib/pdf-base64-ttf-fonts/VAZIRMATN-LICENSE-OFL.txt` |
-| Sahel | 3.4.0 | SIL Open Font License 1.1 | web font; PDF font | `…/SAHEL-LICENSE-OFL.txt` (both folders) |
+| Vazirmatn | 33.003 | SIL Open Font License 1.1 | web font; PDF font; .ttf to install for Word | `assets/fonts/rastikerdar/webfonts/VAZIRMATN-LICENSE-OFL.txt`, `lib/pdf-base64-ttf-fonts/VAZIRMATN-LICENSE-OFL.txt`, `vazirmatn/OFL.txt` in `assets/fonts/download/vazirmatn-sahel-ttf.zip` |
+| Sahel | 3.4.0 | SIL Open Font License 1.1 | web font; PDF font; .ttf to install for Word | `…/SAHEL-LICENSE-OFL.txt` (both folders), `sahel/OFL.txt` in the zip |
 | Vazir Code (Hack variant) | 1.1.2 | changes in the public domain; Hack glyphs MIT; Bitstream Vera license | web font; PDF font | `assets/fonts/vazir-code/VAZIR-CODE-LICENSE.txt`, `lib/pdf-base64-ttf-fonts/VAZIR-CODE-LICENSE.txt` |
 | DejaVu Sans, DejaVu Sans Mono | 2.37 | Bitstream Vera and Arev licenses (DejaVu changes in the public domain) | web fonts; PDF fonts | `assets/fonts/dejavu/DEJAVU-LICENSE.txt`, `lib/pdf-base64-ttf-fonts/DEJAVU-LICENSE.txt` |
 | Noto Emoji | — | SIL Open Font License 1.1 | PDF font (monochrome) | `lib/pdf-base64-ttf-fonts/NOTO-EMOJI-LICENSE-OFL.txt` |

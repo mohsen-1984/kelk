@@ -193,7 +193,7 @@ html[dir="rtl"] input[dir="auto"]:placeholder-shown { direction: rtl; }
    down, the close button's up, and a click on the heading closes it again */
 .rail-chev, .narrow-only { display: none; }
 @media (max-width: 1100px) {
-  .pane-closed .settings > .rail { flex-direction: row; min-height: 0; height: 44px; padding: 0 14px; }
+  .pane-closed .settings > .rail { flex-direction: row; min-height: 0; height: 44px; padding: 0 11px 0 14px; padding-inline: 14px 11px; }   /* its chevron in the column of the open pane's button */
   .pane-closed .settings > .rail .rail-label { writing-mode: horizontal-tb; transform: none; }
   .settings > .rail .rail-chev { display: block; margin-inline-start: auto; }
   .settings .wide-only { display: none; }
@@ -249,6 +249,9 @@ html[dir="rtl"] input[dir="auto"]:placeholder-shown { direction: rtl; }
 .btn-row { display: flex; gap: 6px; flex-wrap: wrap; }
 .field .hint code { font-family: var(--font-mono); font-size: 11px; background: var(--code-bg); padding: 0 4px; border-radius: 4px; }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+/* side by side, a label that wraps to two lines must not stretch its neighbour's control:
+   each field keeps its natural height, the controls on one line at the bottom */
+.row2 > .field, .row3 > .field { align-content: end; }
 .row3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 /* color pickers (table style): a swatch the width of its column */
 .field.color input[type="color"] {
@@ -261,9 +264,11 @@ html[dir="rtl"] input[dir="auto"]:placeholder-shown { direction: rtl; }
 /* a color the chosen preset does not use */
 .field.color.unused { opacity: .45; }
 .field.color.unused input { cursor: not-allowed; }
+.field.unused { opacity: .45; }
+.field.unused select { cursor: not-allowed; }
 
 .check { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-.check input { accent-color: var(--accent); width: 16px; height: 16px; }
+.check input { accent-color: var(--accent); width: 16px; height: 16px; flex: none; margin: 0; }   /* one size, also beside a two-line label */
 
 .logo-box {
   display: flex; align-items: center; gap: 10px;
@@ -293,6 +298,21 @@ html[dir="rtl"] input[dir="auto"]:placeholder-shown { direction: rtl; }
   text-decoration: underline; text-underline-offset: 3px; cursor: pointer; flex: none;
 }
 .toast.warn { background: var(--warn); color: #fff; }
+
+/* ── to the page's top / end (only when the page itself scrolls) ─────── */
+.page-jump {
+  position: fixed; inset-inline-end: 14px; bottom: 16px; z-index: 45;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.page-jump .btn {
+  width: 38px; height: 38px; border-radius: 50%; padding: 0; justify-content: center;
+  background: color-mix(in srgb, var(--panel) 72%, transparent); box-shadow: var(--shadow); border-color: var(--line-strong);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  opacity: .78; transition: opacity .15s, visibility .15s;
+}
+.page-jump .btn:hover, .page-jump .btn:focus-visible { opacity: 1; background: var(--panel); }   /* solid under the pointer */
+.page-jump .btn.off { opacity: 0; visibility: hidden; }
+.page-jump .btn svg { width: 18px; height: 18px; }
 
 /* ── dialog ──────────────────────────────────────────────────────────── */
 dialog {
@@ -338,3 +358,8 @@ details.group.app-group > summary { color: var(--accent-ink); background: var(--
 .link-btn { border: 0; background: none; padding: 0; font: inherit; color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
 .link-btn:hover { color: var(--accent); }
 [dir="rtl"] svg.rtl-mirror { transform: scaleX(-1); }
+/* Settings: its open/close button in the column of the groups' chevrons (their centers 20px from
+   the panel's edge: body padding 12 + summary 2 + half the chevron) — the head's padding is 12px, 10px on phones */
+.settings > .pane-head #pane-close { margin-inline-end: -8px; }
+@media (max-width: 600px) { .settings > .pane-head #pane-close { margin-inline-end: -6px; } }
+.font-pack a.btn { text-decoration: none; color: var(--accent-ink); }

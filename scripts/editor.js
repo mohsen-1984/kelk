@@ -47,6 +47,7 @@
         K.editor.stats();
         K.preview.render();
         undoButtons();
+        area.dispatchEvent(new CustomEvent('kelk:replaced'));   // the whole text changed (the page's sample hint …)
     }
 
     function debounce(fn, ms) {
@@ -204,6 +205,7 @@
             this.stats();
             K.preview.render();
             record();
+            area.dispatchEvent(new CustomEvent('kelk:replaced'));
         },
 
         /** Insert at the cursor (paste, images). */

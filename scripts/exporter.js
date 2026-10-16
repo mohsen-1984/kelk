@@ -62,7 +62,7 @@
         const c = s.code || {}, q = s.quote || {}, D = K.config.defaults;
         const headerBg = c.headerBg || D.code.headerBg;
         const dark = typeof BuilderBase !== 'undefined' && BuilderBase.isDarkColor ? BuilderBase.isDarkColor(headerBg) : false;
-        return {
+        return Object.assign({
             codeBlockBg: c.bg || D.code.bg,
             codeHeaderBg: headerBg,
             codeHeaderColor: dark ? '#E8E8E8' : '#595959',
@@ -70,8 +70,17 @@
             quoteBorderColor: q.border || D.quote.border,
             quoteBorderWidth: q.width || D.quote.width,
             quoteBg: q.bg == null ? D.quote.bg : q.bg,
-            quoteTextColor: q.text || D.quote.text
-        };
+            quoteTextColor: q.text || D.quote.text,
+            // Settings → Text: paragraphs' alignment; a line spacing for everything (paragraphs,
+            // lists, tables, code, quote boxes) — automatic: each keeps its own
+            textAlign: (s.text && s.text.align) || D.text.align
+        }, lineSpacing(s));
+    }
+
+    /** Settings → Text → Line spacing: '' (automatic) leaves the template's two values. */
+    function lineSpacing(s) {
+        const v = s.text && s.text.lineHeight;
+        return /^\d+%$/.test(v || '') ? { lineHeight: v, lineHeightTight: v } : {};
     }
 
     function fontsFor(kind, s) {
@@ -120,6 +129,7 @@
             direction: s.direction,
             page: { size: s.page.size, orientation: s.page.orientation, margin: s.page.margin },
             tableWidth: s.page.tableWidth || '98%',
+            tableMinWidth: s.page.tableMinWidth || '50%',     // with 'auto': Settings → Tables → Minimum width
             tableAlign: s.page.tableAlign || 'center',
             tableStyle: tableStyleOf(s),                     // Settings → Tables → Table style
             template: colorTemplate(s),                      // Settings → Code / Quotes: colors

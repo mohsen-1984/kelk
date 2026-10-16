@@ -41,7 +41,7 @@ const docx = await DocxBuilder.create()
     .configure({
         direction: 'auto',                                  // 'auto' | 'rtl' | 'ltr'
         page: { size: 'A4', orientation: 'portrait', margin: '20mm 15mm' },
-        fonts: { bidi: 'B Nazanin', latin: 'Calibri', code: 'Consolas' },
+        fonts: { bidi: 'Vazirmatn', latin: 'Calibri', code: 'Consolas' },  // the defaults (installed fonts)
         fontSizes: { bidi: 12, latin: 11.5, code: 10 },    // points
         header: { title: 'Report', edition: 'Draft' },
         footer: { author: 'Kelk', link: 'https://example.com' },
@@ -86,9 +86,10 @@ in every output. `configure(options)` takes them all at once; an unknown key thr
 | `codeBlock` | `setCodeBlockOptions` | `{ showLanguage, fallbackLabel, nestedFrames, rtlFont: 'code'\|'document' }` |
 | `toc` | `setToc` | `{ levels: 1–6, title }` · `null` |
 | `tableWidth` | `setTableWidth` | `'auto'` (default: the content's width, up to 100%) · `'98%'` … |
+| `tableMinWidth` | `setTableMinWidth` | with `'auto'`: the least width, `'50%'` (default) · `'20%'` … |
 | `images` | `registerImage` | `{ name: File \| Blob \| ArrayBuffer \| dataURI \| URL }` |
 | `imageOptions` | `setImageOptions` | `{ baseUrl, svgScale, timeout }` |
-| `template` | `setTemplateOptions` | any `createMsoTemplate.DEFAULTS` key (colors, spacing, list indents …) — e.g. code `codeBlockBg`, `codeHeaderBg`, `codeHeaderColor`, `codeBlockBorder`; quotes `quoteBorderColor`, `quoteBorderWidth`, `quoteBg` (`''`: no fill), `quoteTextColor` |
+| `template` | `setTemplateOptions` | any `createMsoTemplate.DEFAULTS` key (colors, spacing, list indents …) — e.g. code `codeBlockBg`, `codeHeaderBg`, `codeHeaderColor`, `codeBlockBorder`; quotes `quoteBorderColor`, `quoteBorderWidth`, `quoteBg` (`''`: no fill), `quoteTextColor`; Word `boxGap` (`'6pt'`: the least air between a table, code or quote box and the list item or paragraph beside it) |
 | `styles` | `setStyles` | builder-level overrides |
 | `content` | `addFromHtml` | HTML string or element (copied, never modified) |
 
@@ -236,8 +237,10 @@ const md = imp.fromDataTransfer(event.clipboardData);    // null when there is n
 
 - **Table of contents in Word** (.doc, .docx): Word computes the page numbers — right-click the
   table → Update Field → Update entire table (a .docx offers the update when it opens).
-- **.docx bullets** are the builder's own list definitions (• filled, ○ hollow, ▪): they look
-  like Word's, but Word's Bullet Library shows them as custom bullets.
+- **.docx bullets** are Word's own library bullets (Symbol U+F0B7, Courier New o, Wingdings
+  U+F0A7) and look exactly like them — not docx.js's default Unicode bullets • (U+2022),
+  ○ (U+25CB) and ▪ (U+25AA) — but Word's Bullets menu still lists them under "Document Bullets",
+  as for any list defined in the file itself.
 - **.doc** (MHTML) opens in Microsoft Word only.
 - **PDF:** no kerning (GPOS) and no marks on ligatures (MarkLigPos); internal `#anchor` links
   and `rowspan` are not drawn yet; images inside a line of text are left out.

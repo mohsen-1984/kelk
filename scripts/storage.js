@@ -91,6 +91,11 @@
             if (s.headerFooter && s.headerFooter.direction === 'rtl') s.headerFooter.direction = 'auto';
             s._hfauto = 1; changed = true;
         }
+        // line spacing: automatic by default (an early 1.1 was the paragraphs' value only)
+        if (!s._lh && Object.keys(s).length) {
+            if (s.text && s.text.lineHeight === '110%') s.text.lineHeight = '';
+            s._lh = 1; changed = true;
+        }
         if (changed) raw.set('settings', JSON.stringify(s));
     })();
 

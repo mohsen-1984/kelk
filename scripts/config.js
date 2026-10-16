@@ -48,7 +48,10 @@
                 bidiSize: 12,           // pt
                 latinSize: 11.5
             },
-            page: { size: 'A4', orientation: 'portrait', margin: '20mm 15mm', tableWidth: 'auto', tableAlign: 'center' },
+            // paragraphs' alignment (template textAlign) and the line spacing of everything:
+            // '' → automatic, each its own (paragraphs 1.1, lists / tables / code / quote boxes 1.0)
+            text: { align: 'justify', lineHeight: '' },
+            page: { size: 'A4', orientation: 'portrait', margin: '20mm 15mm', tableWidth: 'auto', tableMinWidth: '50%', tableAlign: 'center' },
             // table style (BuilderBase.setTableStyle): lines × fill, a total row, three colors (text on a dark fill turns white)
             tableStyle: { lines: 'grid', fill: 'header-stripes', headerCenter: true, headerBold: true, total: false,
                           headerColor: '#E4E9EF', stripeColor: '#F5F7FA', borderColor: '#A9B5C4' },
@@ -76,9 +79,20 @@
 
         /** Word fonts until the user types their own (↺ brings them back), by interface language. */
         wordFontDefaults: {
-            fa: { bidi: 'B Nazanin', latin: 'Calibri' },
+            fa: { bidi: 'Vazirmatn', latin: 'Calibri' },    // Vazirmatn: the ttf pack under Settings → Word (assets/fonts/download)
             en: { bidi: 'Arial', latin: 'Calibri' },       // Arial has Arabic script on every Windows
             ar: { bidi: 'Arial', latin: 'Calibri' }
+        },
+
+        /**
+         * Fonts to install for Word, by interface language: a zip of .ttf files and the
+         * fonts' home page. Shown under Settings → Word when the language has a zip;
+         * en and ar: none yet (fill zip, site and the i18n keys wordFontsGet* to show them).
+         */
+        wordFontPacks: {
+            fa: { zip: 'assets/fonts/download/vazirmatn-sahel-ttf.zip', site: 'https://rastikerdar.github.io/' },
+            en: { zip: '', site: '' },
+            ar: { zip: '', site: '' }
         },
 
         /** Suggestions for the Word font fields (any installed font may be typed). */

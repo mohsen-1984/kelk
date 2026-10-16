@@ -67,7 +67,8 @@
         'logoHeight': 'HFW', 'headerFooter.mode': 'HFW', 'headerFooter.header': 'HFW', 'headerFooter.footer': 'HFW', 'headerFooter.direction': 'HFW',
         'fonts.bidi': 'PHF', 'fonts.latin': 'PHF', 'fonts.bidiSize': 'PHFW', 'fonts.latinSize': 'PHFW', 'fonts.wordBidi': 'W', 'fonts.wordLatin': 'W',
         'toc.enabled': 'PHFW', 'toc.levels': 'PHFW', 'page.size': 'HFW', 'page.orientation': 'HFW', 'page.margin': 'HFW',
-        'page.tableWidth': 'PHFW', 'page.tableAlign': 'PHFW',
+        'text.align': 'PHFW', 'text.lineHeight': 'PHFW',
+        'page.tableWidth': 'PHFW', 'page.tableMinWidth': 'PHFW', 'page.tableAlign': 'PHFW',
         'tableStyle.lines': 'PHFW', 'tableStyle.fill': 'PHFW', 'tableStyle.total': 'PHFW', 'tableStyle.headerCenter': 'PHFW', 'tableStyle.headerBold': 'PHFW', 'tableStyle.headerColor': 'PHFW', 'tableStyle.stripeColor': 'PHFW', 'tableStyle.borderColor': 'PHFW',
         'code.showLanguage': 'PHFW', 'code.rtlFont': 'PHFW', 'code.font': 'PHF', 'code.wordFont': 'W', 'code.size': 'PHFW',
         'code.bg': 'PHFW', 'code.headerBg': 'PHFW', 'code.border': 'PHFW', 'quote.border': 'PHFW', 'quote.width': 'PHFW', 'quote.bg': 'PHFW', 'quote.text': 'PHFW',
@@ -196,7 +197,9 @@
                     K.ui.toast(K.i18n.t('settingsLoaded'));
                 } catch (e) { K.ui.toast(K.i18n.t('failed', e.message), 'error'); }
             });
-            K.$('#set-reset').addEventListener('click', function () {
+            // every setting back to its default — from the App group and from the pane's bar;
+            // whatever was changed or not (the stored profile is dropped and read again)
+            const resetAll = function () {
                 // no confirm: the toast offers to undo it
                 const before = JSON.stringify(K.store.settings());
                 K.store.resetSettings();
@@ -205,10 +208,25 @@
                     label: K.i18n.t('undoAction'),
                     run: function () { K.store.replaceSettings(JSON.parse(before)); self.load(); }
                 });
-            });
+            };
+            K.$('#set-reset').addEventListener('click', resetAll);
+            const headReset = K.$('#settings-reset');
+            if (headReset) headReset.addEventListener('click', resetAll);
 
             this.load();
             if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { self.onChange('fonts.'); });
+        },
+
+        /** The font pack of the interface language under Settings → Word (hidden when it has none). */
+        fontPack: function () {
+            const box = K.$('#word-font-pack');
+            if (!box) return;
+            const p = (K.config.wordFontPacks || {})[K.i18n.lang] || {};
+            box.hidden = !p.zip;
+            const zip = K.$('#word-font-zip'), site = K.$('#word-font-site');
+            if (p.zip) zip.setAttribute('href', p.zip);
+            site.hidden = !p.site;
+            if (p.site) site.setAttribute('href', p.site);
         },
 
         /** Stored values → controls and page state. */
@@ -217,6 +235,7 @@
             K.$$('[data-setting]').forEach(function (el) { write(el, pathGet(s, el.getAttribute('data-setting'))); el.classList.remove('auto'); });
             K.$$('[data-ui]').forEach(function (el) { write(el, pathGet(u, el.getAttribute('data-ui'))); });
             this.showLogo();
+            this.fontPack();
             this.onChange('*');
             this.fillDefaults(true);
         },
@@ -338,6 +357,10 @@
                 this.checkWordFonts();
             }
             if (all || path.indexOf('tableStyle.') === 0) this.tableColorsInUse(s.tableStyle || {});
+            if (all || path === 'page.tableWidth') {           // the minimum width counts with "auto" only
+                const auto = (s.page.tableWidth || 'auto') === 'auto', f = K.$('#f-table-min');
+                if (f) { f.classList.toggle('unused', !auto); f.querySelector('select').disabled = !auto; }
+            }
             K.$$('[data-reset-keys]').forEach(function (btn) {
                 const keys = btn.getAttribute('data-reset-keys').split(',');
                 if (!all && keys.indexOf(path) < 0) return;
