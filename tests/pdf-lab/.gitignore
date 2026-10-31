@@ -1,0 +1,4 @@
+# made when run (scripts/env.js, make-fuzz.js)
+out/
+fuzz/
+meta/

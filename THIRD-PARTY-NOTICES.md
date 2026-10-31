@@ -16,6 +16,9 @@ unchanged unless noted; each keeps its own license.
 | mammoth | 1.12.3 | BSD-2-Clause | `vendor/mammoth.browser.min_1.12.3.js` | https://github.com/mwilliamson/mammoth.js |
 | docx | 9.7.1 | MIT | `vendor/docx.index.iife.min_9.7.1.js` | https://github.com/dolanmiu/docx |
 | jsPDF | 4.2.1 | MIT | `vendor/jspdf.umd.min_4.2.1.js` | https://github.com/parallax/jsPDF |
+| JSZip (with pako) | 3.10.2 | MIT (dual MIT / GPLv3; used under MIT) | `vendor/jszip.min_3.10.2.js` | https://github.com/Stuk/jszip |
+| PDF.js (pdfjs-dist; wrapped as classic scripts by `tools/build-pdfjs.js`, code unchanged) | 6.4.299 | Apache-2.0 | `vendor/pdfjs/` (`LICENSE` there) | https://github.com/mozilla/pdf.js |
+| OpenJPEG and PDFium JBIG2 decoders (WebAssembly builds shipped with PDF.js; base64) | PDF.js 6.4.299 | BSD-2-Clause (OpenJPEG), BSD-3-Clause (PDFium); PDF.js glue Apache-2.0 | `vendor/pdfjs/wasm/` (`LICENSE_*` there) | https://github.com/mozilla/pdf.js |
 | MathJax (startup, core, TeX input + extensions, SVG output, ui/safe) | 4.1.3 | Apache-2.0 | `vendor/mathjax_4.1.3/` (`LICENSE` there) | https://github.com/mathjax/MathJax |
 | MathJax New Computer Modern font (SVG data) | 4.1.3 | Apache-2.0 | `vendor/mathjax_4.1.3/fonts/mathjax-newcm-font/` | https://github.com/mathjax/MathJax-fonts |
 | MathJax mhchem font extension (SVG data) | 4.1.3 | Apache-2.0 | `vendor/mathjax_4.1.3/fonts/mathjax-mhchem-font-extension/` | https://github.com/mathjax/MathJax-fonts |

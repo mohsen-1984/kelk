@@ -55,13 +55,28 @@ Kelk was made first for Persian, and it works for every right-to-left language �
 
 The road runs both ways. Kelk turns a Word file (.docx), an HTML page, or text copied from Word or the web into clean Markdown. Models answer in Markdown, and they read it best too: structured text without Word's formatting costs far fewer tokens, keeps headings, lists and tables, and is understood more precisely. The circle closes: document to Markdown, Markdown to the model, the model's answer back to a document.
 
-> 💡 **How to:** drop a .docx or .html file on the Markdown panel, or pick it with the Import button. Rich text pasted from Word or a web page becomes Markdown by itself; paste plain text with `Ctrl+Shift+V`. After a conversion the MD button at the bottom of the panel turns solid, to save the Markdown.
+**PDF comes back too** (new in 2.0 — PDF import). Kelk reads a PDF's text in the browser, offline, and makes Markdown of it: headings, paragraphs, lists, quotes, code, tables (ruled or not, even broken over pages), links, footnotes, forms and letter heads. For Persian and Arabic it repairs what producers commonly get wrong: wrong character maps (ToUnicode), letter shapes, ZWNJs the file never drew, Arabic ي and ك, Arabic digits. Formulas in PDFs Kelk made itself come back as their exact LaTeX.
+
+> ⚠️ **A PDF is made for print, not for the way back.** Kelk reads what the file kept: review the result, complex tables above all. A scan without a text layer (OCR) is not read, and turned text or formulas in other programs' PDFs are not read well yet. At the end of each import Kelk says which pages may be wrong.
+
+> 💡 **How to:** drop a .docx, .html or .pdf file on the Markdown panel, or pick it with the Import button. Rich text pasted from Word or a web page becomes Markdown by itself; paste plain text with `Ctrl+Shift+V`. After a conversion the MD button at the bottom of the panel turns solid, to save the Markdown.
+
+### 1.5 Cleaning up a Word document
+
+The same round trip is a simple way to **tidy a messy Word document**: import the .docx and export DOCX again. What comes back is one consistent document:
+
+- **Direction and alignment set right:** every paragraph, table cell and list item takes its direction and alignment from its own text — a Persian paragraph left aligned, or a list numbered on the wrong side, comes out right.
+- **Real, uniform Word styles:** headings are Heading, quotes Quote, lists List Paragraph; scattered fonts, sizes, colors and manual spacing give way to one format — Kelk's settings.
+- **Tables alike:** every table in one table style, columns sized to their content.
+- **Clean text:** empty paragraphs and stray formatting are gone; bold, italic, links, images and Word equations (as LaTeX, and Word equations again) stay.
+
+> ⚠️ **What Markdown does not hold does not come back:** page layout, text boxes, the file's own header and footer, comments and tracked changes, and complex merged cells. Keep the original and review the result.
 
 ---
 
 ## 2. Quick start
 
-1. **Text:** write or paste Markdown, or import an md, docx or html file. Images can be dropped or pasted into the text too. **Undo** and **Redo** (`Ctrl+Z`, `Ctrl+Y`) in the panel's bar cover every change of the text — the eraser, the sample, an import — so nothing asks for confirmation.
+1. **Text:** write or paste Markdown, or import an md, docx, html or pdf file. Images can be dropped or pasted into the text too. **Undo** and **Redo** (`Ctrl+Z`, `Ctrl+Y`) in the panel's bar cover every change of the text — the eraser, the sample, an import — so nothing asks for confirmation.
 2. **Preview:** what the exports get, with the same directions.
 3. **Settings:** open with the button at the side of the panel; the two buttons at its top expand or collapse all sections.
 4. **File name:** change it in the name box under the preview before downloading. It starts as the imported file's name, the document title or the opening words; the export button sets the extension.
@@ -102,11 +117,24 @@ Kelk supports **GitHub Flavored Markdown** in full ([GFM spec](https://github.gi
 
 > 💡 **How to:** with "Table of contents" on in Settings, Word computes the page numbers itself: in DOC and DOCX right-click the table → Update Field → Update entire table. DOCX also offers the update when it opens. In the PDF the numbers are there from the start.
 
+| Import | What comes back |
+|---|---|
+| **md, txt** | the text itself |
+| **docx** | headings, lists, tables, images, and Word equations as LaTeX |
+| **html**, and text pasted from Word or the web | the page's structure as Markdown; KaTeX, MathJax and Wikipedia formulas as LaTeX |
+| **pdf** | the document's text and structure (section 1.4); formulas of Kelk's own PDFs as LaTeX |
+| **several files**, or a **zip** | one document, the files in name order with the separator of the app settings between them; a zip's images are found too |
+
+The MD button saves the text with its images (inside the file), and importing it again brings them back.
+
+> 💡 **How to:** two import settings in the app settings are for PDF text, both on: digits as Latin (ASCII), and Arabic ي and ك as Persian ی and ک in a Persian document. Turn them off to keep the file's own characters.
+
 ---
 
 ## 4. Settings worth knowing
 
 - **Title and edition** are automatic: the title comes from the first H1 or the opening words, the edition is "Draft". Change them or leave them empty on purpose; ↺ brings the automatic value back.
+- **Each new line is a new line:** on in the Text group — consecutive lines of a paragraph keep their breaks, as a model's answer shows in a chat. Turn it off for the GFM standard (lines join; only a blank line starts a paragraph).
 - **Header and footer:** structured (logo, title, edition; author and page numbers), simple, or custom HTML that starts from a sample.
 - **Table of contents:** after the document title, with the heading levels you choose (H1, H1–H2, H1–H3).
 - **Text and Word fonts:** the *Text* group sets the fonts of the preview, PDF and HTML; the *Word* group sets the fonts a Word file names. PDF and HTML carry their fonts and need nothing installed; a Word file only names its fonts, so they must be installed on the reader's computer.
@@ -437,6 +465,7 @@ const blob = await PdfBuilder.create()
 ```
 
 - **Fonts:** the PDF is not limited to the fonts that come with Kelk — for text, emoji, code or any other role, any font can be prepared with `tools/build_pdf_fonts.py`, as long as its owner's license allows it. Web fonts for the HTML output are added the same way (one base64 file).
+- **PDF import:** `PdfImporter` (with `lib/pdfimport/`) turns a PDF back into Markdown, on pdf.js, from `file://`; every rule and its limits are in `lib/PDFIMPORT.md`, its lab in `tests/pdf-lab/`.
 - **Details:** load order, every builder's API and more in `lib/README.md`.
 
 ---
@@ -448,6 +477,7 @@ const blob = await PdfBuilder.create()
 - **Word:** the styles (Heading, Quote, List Paragraph, TOC) appear in the style gallery, and the table of contents stays right-to-left in right-to-left documents after "Update entire table".
 - **PDF:** text can be selected and searched in Acrobat, diacritics sit on their letters, and the table of contents links work.
 - **HTML:** the file opens the same way offline and on another computer.
+- **The way back:** export this document as PDF and import that PDF again: headings, lists, tables and formulas should come back. Import a .docx and export it again too (section 1.5).
 
 ---
 

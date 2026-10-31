@@ -1,0 +1,94 @@
+# The PDF import lab on every push and pull request (tests/pdf-lab/README.md, "The gate").
+# Two importers on the very same PDFs: the commit before (base) and this one (head). The fuzz PDFs are
+# drawn here, once, with this runner's Chromium and fonts, so the comparison does not depend on the
+# environment baseline.json was written in. With no commit before (a new branch, the first push),
+# head is compared with baseline.json: its corpus part always, its fuzz part only if the env matches.
+name: pdf-lab
+
+on:
+  push:
+    paths: ['lib/PdfImporter.js', 'lib/pdfimport/**', 'lib/MarkdownImporter.js', 'vendor/pdfjs/**', 'tests/pdf-lab/**', 'tools/pdf-lab.html', '.github/workflows/pdf-lab.yml']
+  pull_request:
+    paths: ['lib/PdfImporter.js', 'lib/pdfimport/**', 'lib/MarkdownImporter.js', 'vendor/pdfjs/**', 'tests/pdf-lab/**', 'tools/pdf-lab.html', '.github/workflows/pdf-lab.yml']
+
+jobs:
+  lab:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: { lfs: false }
+
+      - name: Base commit
+        id: base
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then sha="${{ github.event.pull_request.base.sha }}"; else sha="${{ github.event.before }}"; fi
+          if [ -z "$sha" ] || [ "$sha" = "0000000000000000000000000000000000000000" ]; then sha=""; fi
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        if: steps.base.outputs.sha != ''
+        with: { ref: '${{ steps.base.outputs.sha }}', path: base }
+
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+
+      - name: Tools (Playwright's Chromium, wkhtmltopdf, the fonts of the fuzz styles)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends wkhtmltopdf fonts-dejavu fonts-liberation fonts-crosextra-carlito fonts-crosextra-caladea fonts-inter poppler-utils qpdf
+          npm install --no-save --no-package-lock playwright@1.56.1 pdf-lib@1.17.1
+          npx playwright install --with-deps chromium
+
+      - name: Fuzz and metamorphic PDFs (head's generators, made once for both importers)
+        run: |
+          node tests/pdf-lab/scripts/make-fuzz.js dev
+          node tests/pdf-lab/scripts/make-fuzz.js heldout
+          node tests/pdf-lab/scripts/make-meta.js
+
+      - name: Base importer
+        if: steps.base.outputs.sha != ''
+        env: { KELK: '${{ github.workspace }}/base', LAB_OUT: '${{ runner.temp }}/base' }
+        run: |
+          node tests/pdf-lab/scripts/run-import.js > /dev/null || true
+          node tests/pdf-lab/scripts/run-fuzz.js dev > /dev/null || true
+          node tests/pdf-lab/scripts/run-fuzz.js heldout > /dev/null || true
+          node tests/pdf-lab/scripts/run-meta.js > /dev/null || true
+
+      - name: Head importer
+        env: { LAB_OUT: '${{ runner.temp }}/head' }
+        run: |
+          node tests/pdf-lab/scripts/run-import.js > /dev/null || true
+          node tests/pdf-lab/scripts/run-fuzz.js dev > /dev/null || true
+          node tests/pdf-lab/scripts/run-fuzz.js heldout > /dev/null || true
+          node tests/pdf-lab/scripts/run-meta.js > /dev/null || true
+
+      - name: Stress (a long file, injected faults, an abort)
+        run: |
+          qpdf --empty --pages $(ls tests/pdf-lab/pdf/*/*.pdf | grep -v ocr-) -- "${{ runner.temp }}/big.pdf"
+          node tests/pdf-lab/scripts/run-stress.js "${{ runner.temp }}/big.pdf" tests/pdf-lab/pdf/en/chrome-github-bg--report.pdf
+
+      - name: Provenance profile
+        run: node tests/pdf-lab/scripts/profile.js
+
+      - name: Gate
+        env: { LAB_OUT: '${{ runner.temp }}/head' }
+        run: |
+          if [ -n "${{ steps.base.outputs.sha }}" ] && [ -f "${{ runner.temp }}/base/_scores.json" ]; then
+            node tests/pdf-lab/scripts/gate.js --against "${{ runner.temp }}/base"
+          else
+            node tests/pdf-lab/scripts/gate.js
+          fi
+
+      # (held-out results stay out of the artifact: its files are read only as means — the gate's log has them)
+      - name: Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdf-lab-results
+          path: |
+            ${{ runner.temp }}/head/_scores.json
+            ${{ runner.temp }}/head/fuzz-dev/_scores.json
+            ${{ runner.temp }}/head/meta/_scores.json
+            ${{ runner.temp }}/base/_scores.json
+          if-no-files-found: ignore

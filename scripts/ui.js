@@ -11,6 +11,7 @@
     K.$$ = function (sel, root) { return Array.from((root || document).querySelectorAll(sel)); };
 
     const scripts = new Map();      // src → Promise
+    const batches = [];             // K.ui.batch: toasts held back, one queue per batch
 
     /**
      * Kelk.libs — the large libraries (docx 0.4 MB, jsPDF 0.4 MB, mammoth
@@ -18,13 +19,15 @@
      *   await K.libs.need('docx')     .docx export
      *   await K.libs.need('jspdf')    .pdf export
      *   await K.libs.need('mammoth')  .docx import
+     *   await K.libs.need('pdfjs')    .pdf import (library + its worker, in order)
      */
     K.libs = {
         need: function (name) {
             const lib = K.config.libs[name];
             if (!lib) return Promise.reject(new Error('unknown library ' + name));
             if (window[lib.global]) return Promise.resolve(window[lib.global]);
-            return K.ui.loadScript(lib.src).then(function () {
+            const srcs = [].concat(lib.src);
+            return srcs.reduce(function (p, src) { return p.then(function () { return K.ui.loadScript(src); }); }, Promise.resolve()).then(function () {
                 if (!window[lib.global]) throw new Error(name + ' did not load');
                 return window[lib.global];
             });
@@ -32,14 +35,31 @@
     };
 
     K.ui = {
-        /** type: 'info' | 'warn' | 'error'; action: { label, run } — a button in the toast (e.g. Undo) */
+        /**
+         * type: 'info' | 'warn' | 'error'; action: { label, run } — a button in the toast (e.g. Undo).
+         * The same message twice is one toast with a count (×3), its time restarted — never a stack of copies.
+         * Inside K.ui.batch(…) the toasts wait, and come out once at its end: one per message, the most
+         * serious first (an import that stored forty pictures says "no room" once).
+         */
         toast: function (message, type, ms, action) {
+            if (batches.length) { batches[batches.length - 1].push({ message: message, type: type || 'info', ms: ms, action: action }); return; }
             const box = $('#toasts');
             if (!box) return;
+            const same = Array.from(box.children).filter(function (t) { return t._msg === message && t._type === (type || 'info') && !action; })[0];
+            if (same) {
+                same._count++;
+                same.querySelector('.toast-count').textContent = '×' + same._count;
+                clearTimeout(same._timer);
+                same._timer = setTimeout(function () { same.remove(); }, same._ms);
+                return;
+            }
             const el = document.createElement('div');
             el.className = 'toast' + (type && type !== 'info' ? ' ' + type : '');
             el.setAttribute('role', type === 'error' ? 'alert' : 'status');
             el.appendChild(document.createElement('span')).textContent = message;
+            const count = el.appendChild(document.createElement('span'));
+            count.className = 'toast-count';
+            el._msg = message; el._type = type || 'info'; el._count = 1;
             if (action) {
                 const b = document.createElement('button');
                 b.type = 'button';
@@ -49,7 +69,46 @@
                 el.appendChild(b);
             }
             box.appendChild(el);
-            setTimeout(function () { el.remove(); }, ms || (type === 'error' || type === 'warn' ? 6000 : 2800));
+            el._ms = ms || (type === 'error' || type === 'warn' ? 6000 : 2800);
+            el._timer = setTimeout(function () { el.remove(); }, el._ms);
+        },
+
+        /**
+         * Run fn with the toasts held back, then show them once each (with a count when repeated), errors
+         * first, then warnings, then the rest — at most `max` (default 4), the others summed up in the last.
+         */
+        batch: async function (fn, max) {
+            const queue = []; batches.push(queue);
+            try { return await fn(); }
+            finally {
+                batches.splice(batches.indexOf(queue), 1);
+                const order = { error: 0, warn: 1, info: 2 }, seen = new Map();
+                queue.forEach(function (t) {
+                    const k = t.type + '\u0000' + t.message;
+                    if (seen.has(k)) seen.get(k).n++; else seen.set(k, Object.assign({ n: 1 }, t));
+                });
+                const list = Array.from(seen.values()).sort(function (a, b) { return order[a.type] - order[b.type]; });
+                const lim = max || 4;
+                list.slice(0, lim).forEach(function (t) {
+                    K.ui.toast(t.message + (t.n > 1 ? ' (×' + t.n + ')' : ''), t.type, t.ms || (list.length > 1 && t.type !== 'info' ? 9000 : t.ms), t.action);
+                });
+                if (list.length > lim) {
+                    list.slice(lim).forEach(function (t) { console.info('Kelk:', t.message + (t.n > 1 ? ' (×' + t.n + ')' : '')); });
+                    K.ui.toast(K.i18n.t('moreMessages', list.length - lim), 'info');
+                }
+            }
+        },
+
+        /** page numbers as a short list: "1–3, 7, 9 …" (ranges joined, at most `max` parts) */
+        pageList: function (pages, max) {
+            const ps = Array.from(new Set(pages || [])).sort(function (a, b) { return a - b; }), parts = [];
+            for (let i = 0; i < ps.length; i++) {
+                let j = i; while (j + 1 < ps.length && ps[j + 1] === ps[j] + 1) j++;
+                parts.push(j > i + 1 ? ps[i] + '–' + ps[j] : j === i + 1 ? ps[i] + (/^(fa|ar)/.test(K.i18n.lang) ? '، ' : ', ') + ps[j] : String(ps[i]));
+                i = j;
+            }
+            const lim = max || 6, sep = /^(fa|ar)/.test(K.i18n.lang) ? '، ' : ', ';
+            return parts.slice(0, lim).join(sep) + (parts.length > lim ? ' …' : '');
         },
 
         icons: function (root) {
@@ -210,6 +269,53 @@
             else if (!dlg.open) dlg.showModal();
         },
 
-        help: function (open) { this.dialog('#help', open); }
+        help: function (open) { this.dialog('#help', open); },
+
+        /**
+         * A long task (an import, an export): a modal dialog — the page cannot be used meanwhile — with
+         * a label, a detail line, a progress bar and Cancel. fn gets { signal, progress(done, total,
+         * detail), label(text) }; the dialog shows after `delay` ms (default 200: a quick task never
+         * flashes it). Cancel (or Esc) aborts the signal and rejects at once with err.code 'aborted';
+         * a task that cannot stop half way (a builder) runs out and its result is dropped. One task at
+         * a time: another one waits for it.
+         */
+        task: function (label, fn, o) {
+            o = o || {};
+            const self = this, dlg = $('#task'), bar = $('#task-bar'), lab = $('#task-label'), det = $('#task-detail'), btn = $('#task-cancel');
+            const run = function () {
+                const ctl = new AbortController();
+                let shown = false, cancel;
+                const aborted = new Promise(function (resolve, reject) {
+                    cancel = function () { if (ctl.signal.aborted) return; ctl.abort(); const e = new Error(K.i18n.t('cancelled')); e.code = 'aborted'; reject(e); };
+                });
+                aborted.catch(function () {});
+                const api = {
+                    signal: ctl.signal,
+                    label: function (t) { if (lab) lab.textContent = t; },
+                    progress: function (done, total, detail) {
+                        if (!bar) return;
+                        if (total > 0) { bar.max = total; bar.value = Math.min(done, total); } else bar.removeAttribute('value');
+                        if (det) det.textContent = detail || '';
+                    }
+                };
+                if (dlg) {
+                    lab.textContent = label || ''; det.textContent = ''; bar.removeAttribute('value');
+                    btn.onclick = cancel;
+                    dlg.oncancel = function (e) { e.preventDefault(); cancel(); };       // Esc
+                }
+                const timer = dlg ? setTimeout(function () { if (!dlg.open) { dlg.showModal(); shown = true; } }, o.delay == null ? 200 : o.delay) : 0;
+                const done = function () { clearTimeout(timer); if (dlg && dlg.open) dlg.close(); };
+                return Promise.race([Promise.resolve().then(function () { return fn(api); }), aborted])
+                    .then(function (v) { done(); return v; }, function (e) { done(); throw e; });
+            };
+            const p = (self._tasks || Promise.resolve()).then(run, run);
+            self._tasks = p.catch(function () {});
+            return p;
+        },
+
+        /** Let the page paint (the task dialog) before a long synchronous step. */
+        paint: function () {
+            return new Promise(function (r) { requestAnimationFrame(function () { setTimeout(r, 0); }); });
+        }
     };
 })(window.Kelk = window.Kelk || {});

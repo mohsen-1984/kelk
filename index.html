@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Kelk — Markdown to Word, PDF and HTML, right-to-left first</title>
-    <meta name="description" content="Kelk: convert Markdown (GFM) to Word DOCX, Word DOC (MHTML), PDF and standalone HTML — and Word/HTML back to Markdown — entirely client-side in your browser. Right-to-left first (Persian, Arabic, Hebrew, Urdu) and every left-to-right language; LaTeX formulas; offline, no upload, open source.">
+    <title>Kelk — Markdown to Word, PDF and HTML and back, right-to-left first</title>
+    <meta name="description" content="Kelk: convert Markdown (GFM) to Word DOCX, Word DOC (MHTML), PDF and standalone HTML — and Word, HTML and PDF back to Markdown — entirely client-side in your browser. Right-to-left first (Persian, Arabic, Hebrew, Urdu) and every left-to-right language; LaTeX formulas; offline, no upload, open source.">
     <meta name="keywords" content="markdown to docx, markdown to pdf, markdown to word, markdown to html, docx to markdown, LaTeX, MathJax, Word equations, GFM, RTL, bidi, Persian, Farsi, Arabic, Hebrew, Urdu, client-side, offline">
     <meta name="author" content="mhn.com@gmail.com">
     <meta name="contributor" content="Anthropic Claude Opus 5.5">
@@ -14,7 +14,7 @@
     <!-- link previews: Open Graph (Telegram, WhatsApp, LinkedIn, Facebook …) and X / Twitter -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Kelk">
-    <meta property="og:title" content="Kelk — Markdown to Word, PDF and HTML, right-to-left first">
+    <meta property="og:title" content="Kelk — Markdown to Word, PDF and HTML and back, right-to-left first">
     <meta property="og:description" content="Markdown to DOCX, DOC, PDF and HTML — and back — in your browser. Right-to-left first, LaTeX formulas as Word equations, offline, open source.">
     <meta property="og:url" content="https://mohsen-1984.github.io/kelk/">
     <meta property="og:image" content="https://mohsen-1984.github.io/kelk/assets/og-image.png">
@@ -25,7 +25,7 @@
     <meta property="og:locale:alternate" content="en_US">
     <meta property="og:locale:alternate" content="ar_AR">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Kelk — Markdown to Word, PDF and HTML, right-to-left first">
+    <meta name="twitter:title" content="Kelk — Markdown to Word, PDF and HTML and back, right-to-left first">
     <meta name="twitter:description" content="Markdown to DOCX, DOC, PDF and HTML — and back — in your browser. Right-to-left first, LaTeX formulas, offline, open source.">
     <meta name="twitter:image" content="https://mohsen-1984.github.io/kelk/assets/og-image.png">
     <meta name="twitter:image:alt" content="Kelk — کِلک: Markdown to Word, PDF and HTML">
@@ -90,7 +90,6 @@
                     <button class="btn cap" id="btn-import" type="button" data-i18n-attr="title:import;aria-label:import"><i data-lucide="file-up"></i><span data-i18n="import"></span></button>
                     <button class="btn cap" id="btn-paste" type="button" data-i18n-attr="title:paste;aria-label:paste"><i data-lucide="clipboard-paste"></i><span data-i18n="paste"></span></button>
                     <button class="btn ghost icon" id="btn-replace" type="button" data-i18n-attr="title:replacePaste;aria-label:replacePaste"><i data-lucide="replace-all"></i></button>
-                    <button class="btn ghost icon" id="btn-copy-editor" type="button" data-i18n-attr="title:copyMd;aria-label:copyMd"><i data-lucide="copy"></i></button>
                     <span class="btn-pair">
                         <button class="btn ghost icon flip-rtl-btn" id="btn-undo" type="button" disabled data-i18n-attr="title:undo;aria-label:undo"><i data-lucide="undo-2"></i></button>
                         <button class="btn ghost icon flip-rtl-btn" id="btn-redo" type="button" disabled data-i18n-attr="title:redo;aria-label:redo"><i data-lucide="redo-2"></i></button>
@@ -116,10 +115,11 @@
                         <span id="st-file" hidden><span data-i18n="file"></span>: <b id="st-file-name" dir="auto"></b></span>
                     </div>
                     <span class="sep" aria-hidden="true"></span>
+                    <button class="btn icon" id="btn-copy-editor" type="button" data-i18n-attr="title:copyMd;aria-label:copyMd"><i data-lucide="copy"></i></button>
                     <button class="btn soft" id="btn-md" type="button" data-export="md" data-i18n-attr="title:mdHint"><i data-lucide="file-down"></i>MD</button>
                 </div>
             </div>
-            <input type="file" id="file-import" hidden accept=".md,.markdown,.txt,.html,.htm,.docx,text/markdown,text/plain,text/html">
+            <input type="file" id="file-import" hidden multiple accept=".md,.markdown,.txt,.html,.htm,.docx,.pdf,.zip,text/markdown,text/plain,text/html,application/pdf,application/zip">
         </section>
 
         <!-- preview -->
@@ -217,11 +217,13 @@
                             <label class="field"><span data-i18n="lineSpacing"></span>
                                 <select data-setting="text.lineHeight">
                                     <option value="" data-i18n="lineAuto"></option>
-                                    <option value="100%">1.0</option><option value="110%">1.1</option><option value="115%">1.15</option>
+                                    <option value="80%">0.8</option><option value="90%">0.9</option><option value="100%">1.0</option><option value="110%">1.1</option><option value="115%">1.15</option>
                                     <option value="125%">1.25</option><option value="150%">1.5</option><option value="175%">1.75</option><option value="200%">2.0</option>
                                 </select></label>
                         </div>
                         <div class="field"><span class="hint" data-i18n="textLayoutHint"></span></div>
+                        <label class="check"><input type="checkbox" data-setting="text.breaks"><span data-i18n="lineBreaks"></span></label>
+                        <div class="field"><span class="hint" data-i18n="lineBreaksHint"></span></div>
                         <div class="field"><span class="hint"><span data-i18n="textFontsHint"></span>
                             <button type="button" class="link-btn" data-open-group="gWord" data-i18n="gWord"></button></span></div>
                     </div>
@@ -428,6 +430,16 @@
             <label class="field"><span data-i18n="images"></span>
                 <select data-ui="importer.images"><option value="markdown" data-i18n="imagesMd"></option><option value="html" data-i18n="imagesHtml"></option><option value="drop" data-i18n="imagesDrop"></option></select></label>
         </div>
+        <label class="check"><input type="checkbox" data-ui="importer.asciiNumbers"><span data-i18n="asciiNumbers"></span></label>
+        <label class="check"><input type="checkbox" data-ui="importer.persianLetters"><span data-i18n="persianLetters"></span></label>
+        <div class="row2">
+            <label class="field"><span data-i18n="maxUpload"></span>
+                <select data-ui="importer.maxMB"><option value="10">10 MB</option><option value="20">20 MB</option><option value="40">40 MB</option><option value="60">60 MB</option></select></label>
+            <label class="field"><span data-i18n="fileSeparator"></span>
+                <select data-ui="importer.separator"><option value="name" data-i18n="sepName"></option><option value="rule" data-i18n="sepRule"></option><option value="none" data-i18n="sepNone"></option></select></label>
+        </div>
+        <div class="field"><span class="hint" data-i18n="fileSeparatorHint"></span></div>
+        <div class="field"><span class="hint" data-i18n="pdfTextHint"></span></div>
 
         <div class="sub-head" data-i18n="gBackup"></div>
         <div class="btn-row">
@@ -485,6 +497,16 @@
     </div>
 </dialog>
 
+<!-- a long task (import, export): the page waits, Cancel stops it (Kelk.ui.task) -->
+<dialog id="task" class="task" aria-labelledby="task-label">
+    <div class="dlg-body">
+        <div class="task-label" id="task-label" dir="auto"></div>
+        <div class="task-detail" id="task-detail" dir="auto"></div>
+        <progress id="task-bar"></progress>
+        <div class="task-actions"><button class="btn" id="task-cancel" type="button"><i data-lucide="x"></i><span data-i18n="taskCancel"></span></button></div>
+    </div>
+</dialog>
+
 <dialog id="help" aria-labelledby="help-title">
     <div class="dlg-head">
         <h2 id="help-title" data-i18n="shortcuts"></h2>
@@ -521,6 +543,11 @@
        https://cdn.jsdelivr.net/npm/mammoth@1.12.3/mammoth.browser.min.js   (loaded on first use)
        https://cdn.jsdelivr.net/npm/docx@9.7.1/dist/index.iife.min.js       (loaded on first use)
        https://cdn.jsdelivr.net/npm/jspdf@4.2.1/dist/jspdf.umd.min.js       (loaded on first use)
+       https://github.com/mozilla/pdf.js/releases/download/v6.4.299/pdfjs-6.4.299-dist.zip
+                                                                            (build/pdf.mjs, build/pdf.worker.mjs, web/wasm/
+                                                                             → vendor/pdfjs/ as classic scripts,
+                                                                             tools/build-pdfjs.js; loaded on first PDF import)
+       https://cdn.jsdelivr.net/npm/jszip@3.10.2/dist/jszip.min.js          (loaded on the first .zip import)
        https://registry.npmjs.org/mathjax/-/mathjax-4.1.3.tgz               (→ vendor/mathjax_4.1.3: startup, core,
        https://registry.npmjs.org/@mathjax/mathjax-newcm-font/-/mathjax-newcm-font-4.1.3.tgz        input/tex + extensions,
        https://registry.npmjs.org/@mathjax/mathjax-mhchem-font-extension/-/mathjax-mhchem-font-extension-4.1.3.tgz
@@ -546,6 +573,12 @@
 <script src="lib/HtmlBuilder.js"></script>
 <script src="lib/PreviewBuilder.js"></script>
 <script src="lib/MarkdownImporter.js"></script>
+<script src="lib/PdfImporter.js"></script>
+<script src="lib/pdfimport/extract.js"></script>
+<script src="lib/pdfimport/lines.js"></script>
+<script src="lib/pdfimport/regions.js"></script>
+<script src="lib/pdfimport/order.js"></script>
+<script src="lib/pdfimport/blocks.js"></script>
 
 <!-- page -->
 <script src="scripts/config.js"></script>
