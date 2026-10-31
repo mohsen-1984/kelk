@@ -77,29 +77,45 @@
         K.editor.insert(pre + out.join('\n\n') + post);
     }
 
-    /** Proportional scroll sync editor ↔ preview (side layout, both visible). */
+    /**
+     * Proportional scroll sync editor ↔ preview (side layout, both visible). The pane the reader is moving —
+     * the last one touched by the wheel, a pointer (its scrollbar's thumb too), a finger or the keyboard —
+     * leads, and only its scrolling moves the other; the other's own scroll events (the echo of being moved)
+     * are ignored. Moved once a frame, not on every event: dragging the preview's scrollbar fast had the two
+     * panes answering each other — the thumb shook and the drag lagged behind.
+     */
     function scrollSync(preview) {
-        let from = null;
+        let lead = null, raf = 0;
         function active() {
             const ws = K.$('#workspace');
             return K.store.getUi('scrollSync') && !ws.classList.contains('stack') && !ws.classList.contains('editor-closed');
         }
-        function follow(src, dst) {
-            if (!active() || from === dst) return;
-            const max = src.scrollHeight - src.clientHeight;
-            if (max <= 0) return;
-            from = src;
-            dst.scrollTop = (src.scrollTop / max) * (dst.scrollHeight - dst.clientHeight);
-            requestAnimationFrame(function () { requestAnimationFrame(function () { from = null; }); });
+        function apply() {
+            raf = 0;
+            if (!lead || !active()) return;
+            const src = lead, dst = src === area ? preview : area;
+            const max = src.scrollHeight - src.clientHeight, dmax = dst.scrollHeight - dst.clientHeight;
+            if (max <= 0 || dmax <= 0) return;
+            const top = Math.round((src.scrollTop / max) * dmax);
+            if (Math.abs(dst.scrollTop - top) >= 1) dst.scrollTop = top;
         }
-        area.addEventListener('scroll', function () { follow(area, preview); }, { passive: true });
-        preview.addEventListener('scroll', function () { follow(preview, area); }, { passive: true });
+        [area, preview].forEach(function (el) {
+            ['wheel', 'pointerdown', 'touchstart', 'keydown', 'focusin'].forEach(function (ev) {
+                el.addEventListener(ev, function () { lead = el; }, { passive: true });
+            });
+            el.addEventListener('scroll', function () {
+                if (lead === null) lead = el;                   // a scroll nobody started here (a find, an anchor): this pane leads
+                if (lead !== el) return;                        // the echo of being moved by the other
+                if (!raf) raf = requestAnimationFrame(apply);
+            }, { passive: true });
+        });
     }
 
     K.editor = {
         init: function () {
             area = K.$('#editor');
             area.value = K.store.content();
+            fileName = (area.value && K.store.getUi('sourceName')) || '';      // the imported file's name, after a reload
             const save = debounce(function () { persist(area.value); }, K.config.autosaveMs);
             const render = debounce(function () { K.preview.render(); }, K.config.renderMs);
             area.addEventListener('input', function (e) {
@@ -169,9 +185,10 @@
                 const files = Array.from((e.dataTransfer && e.dataTransfer.files) || []);
                 if (!files.length) return;
                 e.preventDefault();
-                const imgs = files.filter(K.images.isImage);
-                if (imgs.length) insertImages(imgs);
-                else K.importer.fromFile(files[0]);
+                // images go into the text at the cursor; the other files (several, a zip) are imported as one document
+                const imgs = files.filter(K.images.isImage), docs = files.filter(function (f) { return !K.images.isImage(f); });
+                if (docs.length) K.importer.fromFiles(docs);
+                else if (imgs.length) insertImages(imgs);
             });
 
             scrollSync(K.$('.preview-scroll'));

@@ -8,10 +8,10 @@
     'use strict';
 
     K.config = {
-        version: '1.5',
+        version: '2.0-rc1',             // release candidate; '2.0' at the release
         repoUrl: 'https://github.com/mohsen-1984/kelk',   // the footer link (hidden when empty)
         storagePrefix: 'kelk.',
-        maxFileMB: 10,
+        maxFileMB: 20,                  // the default of Settings → App → Largest file to import (ui.importer.maxMB)
         maxImageMB: 5,
         maxLogoPx: 256,                 // uploaded logos are scaled down to this height
         autosaveMs: 600,
@@ -27,7 +27,9 @@
             previewWordFont: false,     // preview with the Word fonts when installed
             sampleSeen: false,
             sampleLang: null,           // the about/sample document on screen (its language), if any
-            importer: { richPaste: true, nestedTables: 'extract', images: 'markdown' }
+            sourceName: null,           // the imported (or sample) file's name: the exports' default name, kept across reloads
+            importer: { richPaste: true, nestedTables: 'extract', images: 'markdown', asciiNumbers: true, persianLetters: true,
+                        maxMB: '20', separator: 'name' }   // largest file to import (MB); between files: name | rule | none
         },
 
         /** Export profile (Kelk.store.settings). */
@@ -50,7 +52,7 @@
             },
             // paragraphs' alignment (template textAlign) and the line spacing of everything:
             // '' → automatic, each its own (paragraphs 1.1, lists / tables / code / quote boxes 1.0)
-            text: { align: 'justify', lineHeight: '' },
+            text: { align: 'justify', lineHeight: '', breaks: true },   // breaks: a single new line is a line break (chat style); false: GFM's soft break
             page: { size: 'A4', orientation: 'portrait', margin: '20mm 15mm', tableWidth: 'auto', tableMinWidth: '50%', tableAlign: 'center' },
             // table style (BuilderBase.setTableStyle): lines × fill, a total row, three colors (text on a dark fill turns white)
             tableStyle: { lines: 'grid', fill: 'header-stripes', headerCenter: true, headerBold: true, total: false,
@@ -128,7 +130,9 @@
         libs: {
             docx: { src: 'vendor/docx.index.iife.min_9.7.1.js', global: 'docx' },
             jspdf: { src: 'vendor/jspdf.umd.min_4.2.1.js', global: 'jspdf' },
-            mammoth: { src: 'vendor/mammoth.browser.min_1.12.3.js', global: 'mammoth' }
+            mammoth: { src: 'vendor/mammoth.browser.min_1.12.3.js', global: 'mammoth' },
+            pdfjs: { src: ['vendor/pdfjs/pdf_6.4.299.js', 'vendor/pdfjs/pdf.worker_6.4.299.js'], global: 'pdfjsLib' },
+            jszip: { src: 'vendor/jszip.min_3.10.2.js', global: 'JSZip' }
         },
 
         /** Custom header/footer until the user writes their own (↺ brings them back), by interface language. */
@@ -156,7 +160,9 @@
         extensions: {
             markdown: ['.md', '.markdown', '.txt'],
             html: ['.html', '.htm'],
-            docx: ['.docx']
+            docx: ['.docx'],
+            pdf: ['.pdf'],
+            zip: ['.zip']
         }
     };
 })(window.Kelk = window.Kelk || {});

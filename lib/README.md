@@ -1,6 +1,6 @@
 # Kelk library (`lib/`)
 
-Markdown-rendered HTML to **.docx, .doc, .pdf and .html**, and Word/HTML back to Markdown —
+Markdown-rendered HTML to **.docx, .doc, .pdf and .html**, and Word, HTML and PDF back to Markdown —
 entirely in the browser, with correct direction for right-to-left languages (Persian, Arabic,
 Hebrew, Urdu, Kurdish …), for their mix with left-to-right text, and for purely left-to-right
 documents. No server, no build step; plain scripts that also load from `file://`.
@@ -11,7 +11,7 @@ nothing here depends on it.
 ## Files and load order
 
 ```text
-vendor      docx (for .docx) · jsPDF (for .pdf) · mammoth + turndown (+ gfm) (for import)
+vendor      docx (for .docx) · jsPDF (for .pdf) · mammoth + turndown (+ gfm) (for import) · pdf.js (for .pdf import)
 fonts       pdf-base64-ttf-fonts/pdf-font-*.js        PDF fonts (window.PdfFonts)
 lib         ImageCore.js        images: registered names, data URIs, URLs, SVG → PNG
             MathCore.js         LaTeX formulas: marked extension, MathJax 4 (local) → SVG / MathML, OMML ↔ TeX (see LATEX.md)
@@ -25,6 +25,8 @@ lib         ImageCore.js        images: registered names, data URIs, URLs, SVG �
             HtmlBuilder.js      .html (standalone page, fonts and images embedded)
             PreviewBuilder.js   a live preview on HtmlBuilder's logic and stylesheet (after HtmlBuilder)
             MarkdownImporter.js .docx / HTML / pasted rich text → Markdown
+            PdfImporter.js      .pdf → Markdown (needs vendor/pdfjs/, after MarkdownImporter; see PDFIMPORT.md)
+            pdfimport/*.js      its parts, after it: extract, lines, regions, order, blocks (PdfImporter.PARTS)
 ```
 
 Load them in that order with plain `<script>` tags. In Node the files `require` each other
@@ -103,6 +105,10 @@ column widths from the content (`BidiCore.tableColumnShares`), one body alignmen
 language (justify; a paragraph holding a long URL or path starts instead), and the table of
 contents layout (after the opening H1: `<hr>`, contents, `<hr>`, an empty line).
 
+File properties: `configure({ meta: { title, author, subject, keywords, creator } })` (or `setMeta`) — PDF Info,
+the .docx core properties, HTML `<meta name="author">`; the creator is "Kelk " + `BuilderBase.version` (2.0-rc1 now) unless set, the title the
+header's or the first H1 when left out.
+
 ## The builders
 
 - **`DocxBuilder`** — `toBlob()`, `build()` (the docx.js `Document`). Real Word styles (Heading,
@@ -157,7 +163,9 @@ comments, with the picture for other readers, as Word's "Save as Web Page" write
 drawn in Cambria Math); with `setMath({ word: 'image' })`, and always for mhchem (`\ce`), it
 stores the SVG itself (sharp at any zoom in Word 2016+) with a PNG fallback; `.pdf` draws the
 SVG's paths with jsPDF's own path operators (vector, sharp at any zoom — `svgToPdf` in
-PdfBuilder); `.doc` uses the PNG ImageCore rasterizes (about 576 dpi). A formula with right-to-left `\text` carries
+PdfBuilder) and keeps each formula's TeX in the file — an `/ActualText` span and an XMP map
+(`kelk:math`) that `PdfImporter` reads back as `$…$` / `$$…$$`, exactly (`setMath({ source: false })`
+writes neither; `PDFIMPORT.md` §3); `.doc` uses the PNG ImageCore rasterizes (about 576 dpi). A formula with right-to-left `\text` carries
 its font inside the image (`window.KelkWebFonts`, or `MathCore.configure({ fonts })`) and stays
 PNG in `.docx` and `.pdf`. Inline, TeX sets nested fractions in script sizes (`\frac{\frac{a}{b}}{…}`
 is small by design); `\dfrac` or `\displaystyle` gives full-size parts. Word lowers an inline picture twice as far as its run position says:
@@ -233,6 +241,86 @@ const r = await imp.fromDocx(arrayBuffer);               // r.markdown, r.messag
 const md = imp.fromDataTransfer(event.clipboardData);    // null when there is no HTML
 ```
 
+A `.docx` read here and built again with `DocxBuilder` is a simple **clean-up of a Word document**: mammoth keeps
+the meaning (headings by style, lists, tables, bold, italic, links, images; `fromDocx` turns Word's equations into
+LaTeX first) and drops direct formatting, and the builder decides every block's direction and alignment itself and
+writes one set of real Word styles. What Markdown does not hold — page layout, text boxes, the file's own header and
+footer, comments, tracked changes, complex merged cells — does not come back.
+
+## Import: `PdfImporter`
+
+Any PDF with a text layer (Word, LibreOffice, browsers, LaTeX, Kelk …) → semantic HTML →
+`MarkdownImporter`. Fully client-side and from `file://`: PDF.js comes as classic scripts
+(`vendor/pdfjs/`, made by `tools/build-pdfjs.js`) and runs on the main thread, giving the thread back every 30 ms (the interface stays responsive); its image decoders
+(JPEG 2000, JBIG2) are local scripts too, loaded when an image needs one.
+
+The importer is a core and five parts, each a plain script that adds its stage's methods to the class —
+load them in this order (no build step; `PdfImporter.missingParts()` names any that did not load):
+
+```html
+<script src="lib/PdfImporter.js"></script>
+<script src="lib/pdfimport/extract.js"></script>   <!-- 1. glyphs, repairs, 2. fonts -->
+<script src="lib/pdfimport/lines.js"></script>     <!-- 3. lines, 3.5 page furniture -->
+<script src="lib/pdfimport/regions.js"></script>   <!-- 4. regions: tables, code boxes, figures -->
+<script src="lib/pdfimport/order.js"></script>     <!-- 4. reading order (XY-cut) -->
+<script src="lib/pdfimport/blocks.js"></script>    <!-- 5. blocks, 6. HTML -->
+```
+
+```js
+const r = await PdfImporter.create({ images: 'markdown' }).fromArrayBuffer(buffer);
+r.markdown; r.notes;            // notes: 'noText' (a scan?), 'pageLimit', 'figureFailed', 'printNoLinks', 'ocrLayer', 'pageFailed',
+                                //   'lostGlyphs', 'suspectSpaces', 'textInPictures' (pages in r.quality.flags)
+r.failedPages;                  // pages that could not be read or laid out (the others were)
+// options.signal: an AbortSignal — the import stops at the next page with err.code 'aborted'
+// options.asciiNumbers (true): ۰–۹ / ٠–٩ → 0–9, and inside a number ٬ ، → ',' · ٫ → '.' · ٪ → '%' (code untouched)
+// options.persianLetters (true): in a Persian document, ي ك ى → ی ک ی (an Arabic document keeps its letters)
+r.profile;                      // who made it: { engine, app, version, os: { value, confidence, evidence }, path,
+                                //   postprocessors, tagged, outline, pageLabels, text: { invisible, type3 } } (PDFIMPORT.md §2a)
+PdfImporter.provenance({ producer, creator, xmp, fonts });   // the same, as a pure function
+r.profile.tagged;               // { marked, structTree, cover, sem, trust, roles, headings } — the structure tree, measured
+r.structure;                    // its named elements: [{ role, level, page, list, row, col, text }] (null: untagged)
+r.quality;                      // self-diagnosis per page: { pages: [{ page, lost, glued, covered, flags }], flags: { lostGlyphs | suspectSpaces | textInPictures: [pages] } }
+r.features;                     // how it is drawn: { text, fonts, graphics, structure, pages, cells: ['spaces=gaps', …] } (PDFIMPORT.md §2c)
+// a PDF that cannot be opened rejects with err.code 'password' (pass { password }), 'invalid' or 'open'
+```
+
+It reads glyph positions (not PDF.js's text content), rebuilds lines in visual order and turns
+them into logical order with its own bidi pass (bracket pairs, numbers, code spans as LTR isolates);
+shaped Arabic letters go back to plain letters, lost ZWNJs come back where the shapes, the glyph order or the
+outlines show them; a ToUnicode is checked against the font's own cmap glyph by glyph.
+Then: running headers/footers dropped, headings by size, paragraphs by spacing, lists by markers
+(bullets drawn or typed, numbers — also set off by a tab — task boxes; line breaks kept where a line ends short), tables from ruled grids and from borderless rows
+(common gutters; header rules and zebra shading count as the table's), code from monospace frames,
+quotes from shaded boxes, links from annotations, footnotes, forms and letter heads, formulas and drawings
+cropped as images (`onImage` can register them) — but a formula PdfBuilder drew comes back as its LaTeX
+(`$…$` / `$$…$$`) from the map it writes (`PDFIMPORT.md` §3). Columns are read by recursive XY-cut, including a short last column
+and a paragraph that runs on into the next column. Glyphs with no Unicode (OpenType ligatures,
+small capitals, Adobe PUA codes, Zapf Dingbats / Wingdings symbols) are repaired from their widths and the document's own letter
+pairs; glyphs a producer covers with `/ActualText` (Chrome: list numbers, minus and dash signs of
+variable fonts) take that text, read from the page's own content stream. Type3 fonts (Chrome writes
+variable fonts such as Inter or Segoe UI Variable this way) are measured by their own FontMatrix, and their bold
+read from each instance's wider letters.
+Browser output in particular: bullets drawn as discs, checkboxes as rounded squares, quotes as a bare
+side bar or a both-sides indent, `<hr>` as a band, strikethrough as a rule through the letters, a
+`<thead>` repeated on each page, bare tables whose cells are only a few points apart (a gap with no
+drawn space is a cell boundary), cell borders drawn cell by cell (they give the column boundaries).
+Tables go on over pages (down: same columns or the header row repeated; over: the remaining columns
+of a wide sheet, same rows), column alignment comes back as `|---:|`, and a hyphen at a line end is
+kept or dropped by the document's own words, then by the producer (browsers and office suites do not
+hyphenate by themselves). Producers that draw things their own way are handled by what they draw, not by
+name: wkhtmltopdf's checkboxes (white squares with a stroked tick), LibreOffice's quote borders and shading
+paragraph by paragraph, table rows set far apart and cells centred in their row, pandoc's header rules and
+headings told by font family, Calc's touching cells, Quartz's spaces set back into a comma, jsPDF's accents
+drawn after the next letter. A table cut by a page break comes back whole even when one part is too small
+to show its columns (it is cut at the other part's gutters).
+
+> The whole story — every stage, what each producer does, what a PDF itself has lost, and how to test a
+> change — is in **[`PDFIMPORT.md`](PDFIMPORT.md)**. Tests: `tests/pdf-lab/` (144 PDFs of 62
+> documents from 49 producer variants, scored against their source, headless in seconds; style fuzzing, a
+> metamorphic net and a gate — [`tests/pdf-lab/README.md`](../tests/pdf-lab/README.md)), `tests/builder-suite.html`
+> (every Kelk test case: PDF from `PdfBuilder`, read back) and `tests/pdf-import-suite.html` (PDFs you pick,
+> scored in the browser, offline).
+
 ## Known limitations
 
 - **Table of contents in Word** (.doc, .docx): Word computes the page numbers — right-click the
@@ -244,6 +332,9 @@ const md = imp.fromDataTransfer(event.clipboardData);    // null when there is n
 - **.doc** (MHTML) opens in Microsoft Word only.
 - **PDF:** no kerning (GPOS) and no marks on ligatures (MarkLigPos); internal `#anchor` links
   and `rowspan` are not drawn yet; images inside a line of text are left out.
+- **PDF import:** a scan needs an OCR layer; turned text, borderless two-column tables and formulas from other
+  programs are not read well yet; Persian PDFs whose fonts carry broken ToUnicode maps (wkhtmltopdf) lose letters
+  (`PDFIMPORT.md` §9, `TODO.md`).
 - A DOM is required to build documents (browser, or a DOM implementation in Node).
 
 ## License
