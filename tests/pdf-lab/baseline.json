@@ -1,0 +1,208 @@
+{
+ "written": "2026-10-30T07:00:14.611Z",
+ "note": "scripts/gate.js --update; the fuzz means hold only for their env",
+ "corpus": {
+  "kelk--fa-math": {
+   "error": null,
+   "markup": 0,
+   "pic": 0,
+   "mix": 0,
+   "recall": 1,
+   "order": 1,
+   "headings": 1,
+   "lists": 1,
+   "code": 1,
+   "total": 1,
+   "rtl": 1,
+   "zwnj": 1,
+   "yehKaf": 1,
+   "digits": 1
+  },
+  "kelk--math": {
+   "error": null,
+   "markup": 0,
+   "pic": 0,
+   "mix": 0,
+   "recall": 1,
+   "order": 1,
+   "headings": 1,
+   "lists": 1,
+   "tables": 1,
+   "code": 1,
+   "total": 1
+  }
+ },
+ "fuzz": {
+  "dev": {
+   "n": 100,
+   "errors": 0,
+   "env": {
+    "generator": 3,
+    "chromium": "153.0.8010.12",
+    "wkhtmltopdf": "wkhtmltopdf 0.12.6",
+    "fonts": {
+     "liberation-serif": "LiberationSerif-Regular.ttf",
+     "liberation-sans": "LiberationSans-Regular.ttf",
+     "dejavu-serif": "DejaVuSerif.ttf",
+     "dejavu-sans": "DejaVuSans.ttf",
+     "inter": "Inter-Regular.otf",
+     "charter": "c0648bt_.pfb",
+     "carlito": "Carlito-Regular.ttf",
+     "caladea": "Caladea-Regular.ttf",
+     "dejavu-mono": "DejaVuSansMono.ttf",
+     "liberation-mono": "LiberationMono-Regular.ttf",
+     "courier": "c0419bt_.pfb"
+    }
+   },
+   "mean": {
+    "recall": 0.9928,
+    "order": 0.9811,
+    "headings": 0.9882,
+    "lists": 0.9702,
+    "tables": 0.8883,
+    "code": 0.9568,
+    "quotes": 0.8968,
+    "total": 0.9595
+   },
+   "markup": 0
+  },
+  "heldout": {
+   "n": 100,
+   "errors": 0,
+   "env": {
+    "generator": 3,
+    "chromium": "153.0.8010.12",
+    "wkhtmltopdf": "wkhtmltopdf 0.12.6",
+    "fonts": {
+     "liberation-serif": "LiberationSerif-Regular.ttf",
+     "liberation-sans": "LiberationSans-Regular.ttf",
+     "dejavu-serif": "DejaVuSerif.ttf",
+     "dejavu-sans": "DejaVuSans.ttf",
+     "inter": "Inter-Regular.otf",
+     "charter": "c0648bt_.pfb",
+     "carlito": "Carlito-Regular.ttf",
+     "caladea": "Caladea-Regular.ttf",
+     "dejavu-mono": "DejaVuSansMono.ttf",
+     "liberation-mono": "LiberationMono-Regular.ttf",
+     "courier": "c0419bt_.pfb"
+    }
+   },
+   "mean": {
+    "recall": 0.9922,
+    "order": 0.9667,
+    "headings": 0.9704,
+    "lists": 0.9327,
+    "tables": 0.8684,
+    "code": 0.9679,
+    "quotes": 0.8605,
+    "total": 0.9463
+   },
+   "markup": 0
+  }
+ },
+ "meta": {
+  "generator": 2,
+  "env": {
+   "qpdf": "qpdf version 11.9.0",
+   "pdfLib": "1.17.1"
+  },
+  "transforms": {
+   "scale80": {
+    "kind": "same",
+    "n": 18,
+    "same": 15,
+    "errors": 0,
+    "total": 0.9959,
+    "delta": -0.0028
+   },
+   "scale125": {
+    "kind": "same",
+    "n": 18,
+    "same": 17,
+    "errors": 0,
+    "total": 0.9959,
+    "delta": -0.0028
+   },
+   "rotate90": {
+    "kind": "same",
+    "n": 18,
+    "same": 18,
+    "errors": 0,
+    "total": 0.9987,
+    "delta": 0
+   },
+   "objstm": {
+    "kind": "same",
+    "n": 18,
+    "same": 16,
+    "errors": 0,
+    "total": 0.9889,
+    "delta": -0.0098
+   },
+   "untag": {
+    "kind": "same",
+    "n": 7,
+    "same": 6,
+    "errors": 0,
+    "total": 0.9966,
+    "delta": 0
+   },
+   "color": {
+    "kind": "near",
+    "n": 18,
+    "same": 18,
+    "errors": 0,
+    "total": 0.9987,
+    "delta": 0
+   },
+   "pagebg": {
+    "kind": "near",
+    "n": 18,
+    "same": 12,
+    "errors": 0,
+    "total": 0.9707,
+    "delta": -0.028
+   },
+   "band": {
+    "kind": "near",
+    "n": 18,
+    "same": 16,
+    "errors": 0,
+    "total": 0.977,
+    "delta": -0.0216
+   },
+   "tz85": {
+    "kind": "near",
+    "n": 18,
+    "same": 5,
+    "errors": 0,
+    "total": 0.8845,
+    "delta": -0.1142
+   },
+   "trackTight": {
+    "kind": "near",
+    "n": 18,
+    "same": 10,
+    "errors": 0,
+    "total": 0.9511,
+    "delta": -0.0475
+   },
+   "trackLoose": {
+    "kind": "near",
+    "n": 18,
+    "same": 7,
+    "errors": 0,
+    "total": 0.836,
+    "delta": -0.1627
+   },
+   "noToUnicode": {
+    "kind": "hard",
+    "n": 18,
+    "same": 0,
+    "errors": 0,
+    "total": 0.1491,
+    "delta": -0.8496
+   }
+  }
+ }
+}

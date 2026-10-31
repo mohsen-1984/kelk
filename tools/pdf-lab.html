@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kelk PDF Lab</title>
+<style>
+  @font-face { font-family: Vazirmatn; src: local('Vazirmatn'); }
+  :root { --bg: #f7f7f5; --fg: #1d1d1b; --muted: #6b6b66; --line: #d9d8d2; --card: #fff; --accent: #2e6b4f; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #171716; --fg: #ecebe6; --muted: #a3a29b; --line: #34332f; --card: #201f1d; --accent: #7cc4a0; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.6 Vazirmatn, system-ui, sans-serif; background: var(--bg); color: var(--fg); }
+  header { padding: 14px 16px; border-bottom: 1px solid var(--line); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  header h1 { font-size: 16px; margin: 0 8px 0 0; }
+  .muted { color: var(--muted); font-size: 12px; }
+  main { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px 16px; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 8px; min-width: 0; display: flex; flex-direction: column; }
+  section h2 { font-size: 13px; margin: 0; padding: 8px 12px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; }
+  textarea { width: 100%; min-height: 70vh; border: 0; padding: 12px; font: 13px/1.55 'Vazir Code Hack', ui-monospace, monospace; background: transparent; color: inherit; resize: vertical; unicode-bidi: plaintext; }
+  #preview { padding: 12px 16px; overflow: auto; max-height: 75vh; }
+  #preview p, #preview li, #preview h1, #preview h2, #preview h3, #preview h4, #preview td, #preview th { unicode-bidi: plaintext; text-align: start; }
+  #preview table { border-collapse: collapse; } #preview td, #preview th { border: 1px solid var(--line); padding: 3px 6px; }
+  #preview blockquote { margin: 8px 0; padding: 4px 12px; border-inline-start: 3px solid var(--accent); }
+  #preview pre { background: var(--bg); padding: 8px; overflow: auto; direction: ltr; }
+  #msgs { padding: 0 16px 16px; white-space: pre-wrap; }
+  button, input[type=file] { font: inherit; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Kelk PDF Lab</h1>
+  <input type="file" id="file" accept=".pdf,application/pdf">
+  <span class="muted" id="status">pdf.js <span id="ver"></span> — classic scripts, main-thread worker, works from file://</span>
+</header>
+<main>
+  <section><h2><span>Markdown</span><span class="muted" id="stats"></span></h2><textarea id="md" spellcheck="false"></textarea></section>
+  <section><h2><span>HTML (before MarkdownImporter)</span></h2><div id="preview"></div></section>
+</main>
+<div id="msgs" class="muted"></div>
+
+<script src="../vendor/pdfjs/pdf_6.4.299.js"></script>
+<script src="../vendor/pdfjs/pdf.worker_6.4.299.js"></script>
+<script src="../vendor/purify.min_3.4.16.js"></script>
+<script src="../vendor/turndown/turndown_7.2.4.js"></script>
+<script src="../vendor/turndown/turndown-plugin-gfm_1.0.2.js"></script>
+<script src="../lib/MathCore.js"></script>
+<script src="../lib/pdf-base64-ttf-fonts/pdf-font-noto-emoji.js"></script>
+<script src="../lib/MarkdownImporter.js"></script>
+<script src="../lib/PdfImporter.js"></script>
+<script src="../lib/pdfimport/extract.js"></script>
+<script src="../lib/pdfimport/lines.js"></script>
+<script src="../lib/pdfimport/regions.js"></script>
+<script src="../lib/pdfimport/order.js"></script>
+<script src="../lib/pdfimport/blocks.js"></script>
+<script>
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  $('ver').textContent = window.pdfjsLib ? pdfjsLib.version : 'NOT LOADED';
+  async function run(buf, name) {
+    const t0 = performance.now();
+    $('status').textContent = 'Reading ' + name + ' …';
+    try {
+      const r = await PdfImporter.create().fromArrayBuffer(buf, { onProgress: (i, n) => { $('status').textContent = name + ': page ' + i + ' / ' + n; } });
+      $('md').value = r.markdown;
+      $('preview').innerHTML = r.html;
+      $('msgs').textContent = (r.messages || []).join('\n');
+      $('stats').textContent = r.source + ' · ' + Math.round(performance.now() - t0) + ' ms';
+      $('status').textContent = name + ' — done';
+      window.__labResult = r;
+    } catch (e) {
+      $('status').textContent = 'Error: ' + e.message;
+      window.__labResult = { error: e.stack || String(e) };
+    }
+  }
+  $('file').addEventListener('change', async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    run(await f.arrayBuffer(), f.name);
+  });
+  window.__labRun = run;   // for automated tests
+})();
+</script>
+</body>
+</html>

@@ -8,6 +8,7 @@
     'use strict';
 
     let map = {};
+    let held = 0, dirty = false;      // hold() … flush(): images stored once for a batch
 
     function slug(fileName) {
         return String(fileName || '').replace(/\.[^.]+$/, '').normalize('NFC')
@@ -40,8 +41,58 @@
             const base = name;
             while (name === 'logo' || (map[name] && map[name] !== uri)) name = base + '-' + n++;
             map[name] = uri;
-            if (!K.store.saveImages(map)) K.ui.toast(K.i18n.t('imagesSession'), 'warn');
+            if (held) dirty = true;                 // an import adding many pictures: stored once, at flush()
+            else if (!K.store.saveImages(map)) K.ui.toast(K.i18n.t('imagesSession'), 'warn');
             return name;
+        },
+
+        /**
+         * Register an image under a name the text already uses (a zip's «images/a.png»): that name, or the
+         * same with -2, -3 … when another picture holds it. Resolves to the name.
+         */
+        addAs: async function (name, file) {
+            if (file.size > K.config.maxImageMB * 1024 * 1024) throw new Error(K.i18n.t('tooLarge', K.config.maxImageMB) + ': ' + name);
+            return this.addUri(name, await readUri(file), true);
+        },
+
+        /** Register a data URI (an MD file's own image) under its label made a name; resolves to the name. */
+        addUri: async function (label, uri, exact) {
+            let name = exact ? String(label) : slug(label), n = 2;
+            const base = name;
+            while (name === 'logo' || (map[name] && map[name] !== uri)) name = base + '-' + n++;
+            map[name] = uri;
+            if (held) dirty = true;
+            else if (!K.store.saveImages(map)) K.ui.toast(K.i18n.t('imagesSession'), 'warn');
+            return name;
+        },
+
+        /**
+         * The Markdown with its images inside, for the MD file: every image the text names by a registered
+         * name becomes a reference — ![alt][name] — and the end of the file defines it as a data URI
+         * («[name]: data:image/png;base64,…»), so the file shows its pictures anywhere and comes back whole
+         * when it is imported (Kelk.importer turns the definitions back into stored images).
+         */
+        embed: function (md) {
+            const self = this, defs = {};
+            const out = String(md || '').replace(/!\[([^\]]*)\]\(\s*<?([^)\s>]+)>?(\s+"[^"]*")?\s*\)/g, function (all, alt, src, title) {
+                if (/^(data:|https?:|blob:)/i.test(src)) return all;
+                let key = src; try { key = decodeURIComponent(src); } catch (e) { /* keep */ }
+                const uri = self.get(key);
+                if (!uri || /[\[\]]/.test(key)) return all;
+                defs[key.toLowerCase()] = '[' + key + ']: ' + uri + (title || '');
+                return '![' + alt + '][' + key + ']';
+            });
+            const list = Object.keys(defs).map(function (k) { return defs[k]; });
+            return list.length ? out.replace(/\s*$/, '\n\n') + list.join('\n') + '\n' : out;
+        },
+
+        /** Hold the storing of added images until flush() (a PDF with forty figures: one write, one message). */
+        hold: function () { held++; },
+        flush: function () {
+            held = Math.max(0, held - 1);
+            if (held || !dirty) return;
+            dirty = false;
+            if (!K.store.saveImages(map)) K.ui.toast(K.i18n.t('imagesSession'), 'warn');
         },
 
         /** Forget images the text no longer uses. */

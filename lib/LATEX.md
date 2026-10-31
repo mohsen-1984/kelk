@@ -303,6 +303,12 @@ Inline images (formulas, but also any inline image) are **atoms of the line**: t
 hold them while the text keeps its baseline (`line.baseOff`), and a formula stands on the baseline
 lowered by its depth. Display formulas are centered.
 
+**The TeX goes into the file** (2.0): each formula is drawn inside a marked-content span whose
+`/ActualText` is its TeX between `$` or `$$` (what a reader that honours it copies), and the document's
+XMP holds a map of them — `kelk:math`, base64 of UTF-8 JSON `{ v: 1, math: [{ p, x0, x1, y0, y1, b, d,
+t }] }`: page, box and baseline in PDF space, display, TeX. `PdfImporter` puts each formula back from it
+(`lib/PDFIMPORT.md` §3): exactly, not rebuilt from vectors. `{ math: { source: false } }` writes neither.
+
 ---
 
 ## 11. The way back: `MarkdownImporter`
@@ -315,7 +321,7 @@ touches them) and written back as `$…$` / `$$…$$` at the end. Sources:
 | KaTeX (ChatGPT, Claude … pasted as rich text) | `<annotation encoding="application/x-tex">` |
 | MathML (Wikipedia) | the TeX annotation, or `alttext` (`{\displaystyle …}` unwrapped) |
 | MathJax 4 pages | `data-latex` |
-| Kelk's HTML | `.kelk-math[data-tex]` |
+| Kelk's HTML | `.kelk-math[data-tex]` (also what `PdfImporter` writes for a formula from Kelk's PDF map) |
 | a Kelk formula picture | its `alt` (the TeX) |
 | **Word equations in a `.docx`** | OMML, read from the zip before mammoth (below) |
 
@@ -343,7 +349,8 @@ brace with an open end as `cases`, `right left` column pairs as `aligned`, a tra
 |---|---|
 | `tests/math-file.html` | MathJax from `file://` with no network; MathCore render checks; OMML well-formedness; OMML → TeX round trip; importer sources |
 | `tests/math-modes.html` | 38 constructs, SVG and MathML side by side, with the reasons for every SVG fallback |
-| `tests/index.html` | all builders × the corpus, including `latex-formulas` in both HTML modes |
+| `tests/builder-suite.html` | all builders × the corpus, including `latex-formulas` in both HTML modes |
+| `tests/pdf-lab/scripts/math-roundtrip.js` | every case of `math-cases.js` in English and Persian text through `PdfBuilder` and `PdfImporter`: the TeX back exactly (76 checks with the setting's) |
 
 ---
 
