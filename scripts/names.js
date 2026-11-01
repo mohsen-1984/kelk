@@ -126,6 +126,7 @@
          */
         newDocument: function (fileName, sampleLang) {
             source = String(fileName || '').replace(/\.[^.]+$/, '');
+            K.store.setUi('sourceName', fileName ? String(fileName) : null);        // the exports keep the imported file's name after a reload
             user = null;
             if (K.store.get('document.title') != null) K.store.set('document.title', null);
             K.store.setUi('sampleLang', sampleLang || null);
@@ -148,6 +149,16 @@
         init: function () {
             const self = this;
             const stem = K.$('#nb-stem');
+            source = String(K.store.getUi('sourceName') || '').replace(/\.[^.]+$/, '');
+            // a click on a name copies it (the first click: the box takes the focus; the next ones place the caret)
+            const copy = function (text) {
+                if (!text || !navigator.clipboard || !navigator.clipboard.writeText) return;
+                navigator.clipboard.writeText(text).then(function () { K.ui.toast(K.i18n.t('nameCopied', text)); }, function () {});
+            };
+            stem.addEventListener('mousedown', function () { stem._wasFocused = document.activeElement === stem; });
+            stem.addEventListener('click', function () { if (!stem._wasFocused) copy((stem.value || stem.placeholder) + (K.$('#nb-ext') ? K.$('#nb-ext').textContent : '')); });
+            const fname = K.$('#st-file-name');
+            if (fname) { fname.style.cursor = 'copy'; fname.addEventListener('click', function () { copy(fname.textContent); }); }
             stem.addEventListener('input', function () { user = stem.value.trim() ? stem.value : null; });
             stem.addEventListener('blur', function () { if (user == null) self.refresh(); });
             stem.addEventListener('keydown', function (e) {

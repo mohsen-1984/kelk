@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kelk — PDF import tests</title>
+<style>
+  body { font: 14px/1.5 system-ui, 'Segoe UI', sans-serif; margin: 24px; color: #1c1b1a; background: #f7f6f3; }
+  h1 { font-size: 20px; margin: 0 0 4px; } p.sub { margin: 0 0 14px; color: #666; }
+  .bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+  button { font: inherit; padding: 6px 14px; border: 1px solid #c9c4ba; border-radius: 6px; background: #fff; cursor: pointer; }
+  button.primary { background: #1f6f5c; color: #fff; border-color: #1f6f5c; }
+  input[type=file] { font: inherit; }
+  table { border-collapse: collapse; background: #fff; width: 100%; }
+  th, td { border: 1px solid #e0dcd4; padding: 4px 8px; text-align: left; vertical-align: top; }
+  th { background: #efece6; } td.ok { color: #1f6f5c; } td.err { color: #b00020; } td.skip { color: #999; }
+  td a { color: inherit; } .sum { font-weight: 600; } code { background: #efece6; padding: 0 4px; border-radius: 3px; }
+  .meta { font-size: 12px; color: #888; }
+</style>
+</head>
+<body>
+<h1>Kelk — PDF import tests</h1>
+<p class="sub">PDF → Markdown only (<code>PdfImporter</code>); the other importers — .docx, .html, pasted rich text —
+  are <code>MarkdownImporter</code>'s, tested by <code>builder-suite.html</code> and <code>math-file.html</code>.
+  Select PDF files (for instance from <code>tests/pdf-lab/pdf/</code>). Files whose name ends with
+  <code>--&lt;doc&gt;.pdf</code> are scored against that corpus document (<code>tests/pdf-lab/corpus/&lt;doc&gt;.md</code>,
+  read from <code>pdf-lab/corpus.js</code> — offline, from <code>file://</code>), with the floors of
+  <code>pdf-import-corpus.js</code>. The table shows recall (words found), order (longest common run), and structure
+  scores (headings, lists, tables, code, quotes). Green meets the floor; red does not. The full lab, with its own
+  scorer and gate, is <code>tests/pdf-lab/</code> (Node).</p>
+<div class="bar">
+  <input type="file" id="files" multiple accept=".pdf">
+  <button class="primary" id="run" type="button" disabled>Run import</button>
+  <span class="sum" id="sum"></span>
+</div>
+<table id="out"><thead><tr><th>file</th><th>producer</th><th>tagged</th><th>lang</th><th>recall</th><th>order</th><th>headings</th><th>lists</th><th>tables</th><th>code</th><th>quotes</th><th>time</th><th>md</th></tr></thead><tbody></tbody></table>
+
+<!-- vendor -->
+<script src="../vendor/pdfjs/pdf_6.4.299.js"></script>
+<script src="../vendor/pdfjs/pdf.worker_6.4.299.js"></script>
+<script src="../vendor/turndown/turndown_7.2.4.js"></script>
+<script src="../vendor/turndown/turndown-plugin-gfm_1.0.2.js"></script>
+<script src="../vendor/purify.min_3.4.16.js"></script>
+<!-- library -->
+<script src="../lib/ImageCore.js"></script>
+<script src="../lib/MathCore.js"></script>
+<script src="../lib/BidiCore.js"></script>
+<script src="../lib/MarkdownImporter.js"></script>
+<script src="../lib/PdfImporter.js"></script>
+<script src="../lib/pdfimport/extract.js"></script>
+<script src="../lib/pdfimport/lines.js"></script>
+<script src="../lib/pdfimport/regions.js"></script>
+<script src="../lib/pdfimport/order.js"></script>
+<script src="../lib/pdfimport/blocks.js"></script>
+<!-- corpus: floors per producer, and the documents themselves (generated, offline) -->
+<script src="pdf-import-corpus.js"></script>
+<script src="pdf-lab/corpus.js"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (s) { return document.querySelector(s); };
+  var fileInput = $('#files'), runBtn = $('#run');
+  var pending = [];
+
+  // --- corpus: tests/pdf-lab/corpus.js (generated: pdf-lab/scripts/build-corpus-js.js), so the page scores from
+  // file://, where fetch is blocked; over http the .md files themselves are the fallback
+  var corpusCache = {};
+  async function loadCorpus(docName) {
+    if (corpusCache[docName] !== undefined) return corpusCache[docName];
+    if (window.KELK_PDF_CORPUS && typeof KELK_PDF_CORPUS[docName] === 'string') return (corpusCache[docName] = KELK_PDF_CORPUS[docName]);
+    // tests/pdf-lab/corpus/<doc>.md (works from http, not file://)
+    try {
+      var r = await fetch('pdf-lab/corpus/' + docName + '.md');
+      if (r.ok) { corpusCache[docName] = await r.text(); return corpusCache[docName]; }
+    } catch (e) { /* ignore */ }
+    corpusCache[docName] = null;
+    return null;
+  }
+
+  // --- word comparison (same as builder-suite.html) -------------------------------
+  function words(t) {
+    return t.normalize('NFC').replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+      .replace(/[*_`#>|\\\[\]()~:\-–—.,;!?«»“”،؛؟]+/g, ' ')
+      .split(/\s+/).filter(Boolean);
+  }
+  function compareWords(src, got) {
+    var bag = new Map(); got.forEach(function (w) { bag.set(w, (bag.get(w) || 0) + 1); });
+    var hit = 0; src.forEach(function (w) { var n = bag.get(w) || 0; if (n) { hit++; bag.set(w, n - 1); } });
+    var n = src.length, m = got.length, band = Math.max(200, Math.abs(n - m) + 200);
+    var prev = new Map(), lcs = 0;
+    for (var i = 1; i <= n; i++) {
+      var cur = new Map(), c = Math.round(i * m / Math.max(n, 1));
+      for (var j = Math.max(1, c - band); j <= Math.min(m, c + band); j++) {
+        var v = src[i - 1] === got[j - 1] ? (prev.get(j - 1) || 0) + 1 : Math.max(prev.get(j) || 0, cur.get(j - 1) || 0);
+        cur.set(j, v); if (v > lcs) lcs = v;
+      }
+      prev = cur;
+    }
+    return { recall: n ? hit / n : 1, order: n ? lcs / n : 1, n: n, m: m };
+  }
+
+  // --- structure scoring (simplified: count markdown patterns) --------------------
+  function structureScore(refMd, gotMd) {
+    var count = function (md, re) { var m = md.match(re); return m ? m.length : 0; };
+    var res = {};
+    var rh = count(refMd, /^#{1,6}\s/gm), gh = count(gotMd, /^#{1,6}\s/gm);
+    if (rh) res.headings = Math.min(gh / rh, 1);
+    var rl = count(refMd, /^[\s]*[-*+]\s/gm) + count(refMd, /^[\s]*\d+\.\s/gm);
+    var gl = count(gotMd, /^[\s]*[-*+]\s/gm) + count(gotMd, /^[\s]*\d+\.\s/gm);
+    if (rl) res.lists = Math.min(gl / rl, 1);
+    var rt = count(refMd, /^\|/gm), gt = count(gotMd, /^\|/gm);
+    if (rt) res.tables = Math.min(gt / rt, 1);
+    var rc = count(refMd, /^```/gm), gc = count(gotMd, /^```/gm);
+    if (rc) res.code = Math.min(gc / rc, 1);
+    var rq = count(refMd, /^>\s/gm), gq = count(gotMd, /^>\s/gm);
+    if (rq) res.quotes = Math.min(gq / rq, 1);
+    return res;
+  }
+
+  // --- file handling -------------------------------------------------------------
+  fileInput.addEventListener('change', function () {
+    pending = Array.from(fileInput.files);
+    runBtn.disabled = !pending.length;
+  });
+
+  // --- run -----------------------------------------------------------------------
+  runBtn.addEventListener('click', async function () {
+    var body = $('#out tbody'); body.innerHTML = '';
+    var ok = 0, bad = 0, skip = 0;
+    $('#sum').textContent = 'running…';
+    for (var fi = 0; fi < pending.length; fi++) {
+      var file = pending[fi];
+      var tr = document.createElement('tr');
+      body.appendChild(tr);
+      var td = function (text, cls) { var d = document.createElement('td'); d.textContent = text || ''; if (cls) d.className = cls; tr.appendChild(d); return d; };
+
+      var t0 = performance.now();
+      try {
+        var buf = await file.arrayBuffer();
+        var r = await PdfImporter.create({ images: 'drop', asciiNumbers: false, persianLetters: false }).fromArrayBuffer(buf);
+        var ms = Math.round(performance.now() - t0);
+        var name = file.name.replace(/\.pdf$/i, '');
+
+        // metadata
+        td(name);
+        td(r.producer || '', 'meta');
+        td(r.tagged ? 'yes' : 'no', 'meta');
+        td(r.lang || '', 'meta');
+
+        // score against corpus
+        var docName = IMPORT_CORPUS.corpusDocOf(file.name);
+        var refMd = docName ? await loadCorpus(docName) : null;
+        if (refMd) {
+          var producerId = IMPORT_CORPUS.detectProducer(r.producer || '', r.lang || '');
+          var thresh = IMPORT_CORPUS.thresholdsFor(name, producerId);
+          var cmp = compareWords(words(refMd), words(r.markdown));
+          var st = structureScore(refMd, r.markdown);
+          var pct = function (v) { return v !== undefined ? (100 * v).toFixed(1) + '%' : ''; };
+          var cls = function (v, key) {
+            if (v === undefined) return 'skip';
+            return v >= (thresh[key] || 0) ? 'ok' : 'err';
+          };
+          td(pct(cmp.recall), cls(cmp.recall, 'recall'));
+          td(pct(cmp.order), cls(cmp.order, 'order'));
+          td(pct(st.headings), cls(st.headings, 'headings'));
+          td(pct(st.lists), cls(st.lists, 'lists'));
+          td(pct(st.tables), cls(st.tables, 'tables'));
+          td(pct(st.code), cls(st.code, 'code'));
+          td(pct(st.quotes), cls(st.quotes, 'quotes'));
+          var fail = (cmp.recall < (thresh.recall || 0)) || (cmp.order < (thresh.order || 0));
+          if (fail) bad++; else ok++;
+        } else {
+          for (var s = 0; s < 7; s++) td('-', 'skip');
+          skip++;
+        }
+        td(ms + ' ms', 'meta');
+        // download link for the recovered markdown
+        var mdBlob = new Blob([r.markdown], { type: 'text/markdown' });
+        var a = document.createElement('a'); a.href = URL.createObjectURL(mdBlob); a.download = name + '.md'; a.textContent = 'md';
+        var mdTd = document.createElement('td'); mdTd.appendChild(a); tr.appendChild(mdTd);
+      } catch (e) {
+        td(file.name); for (var x = 0; x < 11; x++) td('');
+        tr.lastChild.textContent = e.message; tr.lastChild.className = 'err';
+        bad++;
+      }
+      $('#sum').textContent = ok + ' passed, ' + bad + ' failed' + (skip ? ', ' + skip + ' unscored' : '');
+    }
+  });
+})();
+</script>
+</body>
+</html>

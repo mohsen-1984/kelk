@@ -67,7 +67,7 @@
         'logoHeight': 'HFW', 'headerFooter.mode': 'HFW', 'headerFooter.header': 'HFW', 'headerFooter.footer': 'HFW', 'headerFooter.direction': 'HFW',
         'fonts.bidi': 'PHF', 'fonts.latin': 'PHF', 'fonts.bidiSize': 'PHFW', 'fonts.latinSize': 'PHFW', 'fonts.wordBidi': 'W', 'fonts.wordLatin': 'W',
         'toc.enabled': 'PHFW', 'toc.levels': 'PHFW', 'page.size': 'HFW', 'page.orientation': 'HFW', 'page.margin': 'HFW',
-        'text.align': 'PHFW', 'text.lineHeight': 'PHFW',
+        'text.align': 'PHFW', 'text.lineHeight': 'PHFW', 'text.breaks': 'PHFW',
         'page.tableWidth': 'PHFW', 'page.tableMinWidth': 'PHFW', 'page.tableAlign': 'PHFW',
         'tableStyle.lines': 'PHFW', 'tableStyle.fill': 'PHFW', 'tableStyle.total': 'PHFW', 'tableStyle.headerCenter': 'PHFW', 'tableStyle.headerBold': 'PHFW', 'tableStyle.headerColor': 'PHFW', 'tableStyle.stripeColor': 'PHFW', 'tableStyle.borderColor': 'PHFW',
         'code.showLanguage': 'PHFW', 'code.rtlFont': 'PHFW', 'code.font': 'PHF', 'code.wordFont': 'W', 'code.size': 'PHFW',
