@@ -1,7 +1,4 @@
 # Kelk — Contribute Log (کِلک)
-| 1405-08-10 | 2.0-rc1 | Zarrabi | 11 | Portability: rule that everything the work depends on is committed to the repository, the checklist rule moved into `CLAUDE.md`, commit attribution turned off in `.claude/settings.json`, `Claude-Session` lines stripped by the commit hook, the contributor recognised from the GitHub noreply address, machine prerequisites listed in Getting Started. |
-| 1405-08-10 | 2.0-rc1 | Zarrabi | 3 | Research of the current documentation on cloud and Desktop sessions: which parts of the repository setup (`CLAUDE.md`, hooks, skills, settings) apply there and what differs. |
-| 1405-08-10 | 2.0-rc1 | Zarrabi | 5 | Reviewing the portability changes and the findings on cloud sessions. |
 
 ![JavaScript](https://img.shields.io/badge/JavaScript-plain%20scripts%2C%20no%20build-F7DF1E?logo=javascript&logoColor=black)
 ![Runs from file://](https://img.shields.io/badge/Runs%20from-file%3A%2F%2F%20%2F%20GitHub%20Pages-1F6F5C)
@@ -546,9 +543,12 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-10 | 2.0-rc1 | Zarrabi | 20 | Reading the P0.1 findings and writing the next instructions. |
 | 1405-08-10 | 2.0-rc1 | Zarrabi | 50 | Restructuring: plan moved to `.claude/plans/Kelk-Redesign.md` with "overhaul" → "redesign" throughout, its links repointed, P0.0 marked approved; the report-generation sections and other projects’ references removed from the docs and the `.claude/` configuration; the imported `.claude/` folder reviewed and configured (local settings with a foreign credential deleted, broken hook entries and build leftovers removed); `CLAUDE.md` with the permanent project rules; commit hooks for the contributor prefix without co-author lines; history rewritten without the co-author line (`d5409f1` → `8229e6d`, merge → `0a2b161`, force-pushed) and the fork branch deleted; GitHub CLI installed. Work on this log itself is not counted (rule 1). The rename of the repository and folder to Kelk is pending. |
 | 1405-08-10 | 2.0-rc1 | Zarrabi | 33 | Reviewing each restructuring result, writing the next requests and answering the decisions. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 11 | Portability: rule that everything the work depends on is committed to the repository, the checklist rule moved into `CLAUDE.md`, commit attribution turned off in `.claude/settings.json`, `Claude-Session` lines stripped by the commit hook, the contributor recognised from the GitHub noreply address, machine prerequisites listed in Getting Started. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 3 | Research of the current documentation on cloud and Desktop sessions: which parts of the repository setup (`CLAUDE.md`, hooks, skills, settings) apply there and what differs. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 5 | Reviewing the portability changes and the findings on cloud sessions. |
 
 <!-- generated:totals -->
-**Entries: 21 · Total: 328 min (5.47 hours) — Zarrabi 328 min (14 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 24 · Total: 347 min (5.78 hours) — Zarrabi 347 min (17 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
