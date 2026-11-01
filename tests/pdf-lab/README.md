@@ -322,7 +322,7 @@ change made the importer worse:
 
 | What | Fails when |
 |---|---|
-| corpus | a file crashes, or its total drops more than 0.5 point |
+| corpus | a file crashes, or its total drops more than 0.5 point, or its right-to-left details (`rtl`) drop more than 0.5 point, or it is no longer scored (its `corpus/<doc>.md` missing or renamed) |
 | fuzz `dev`, `heldout` | a PDF crashes, or the split's **mean** total drops more than 1 point |
 | inline markup (`mkup`) | bold, italic, strike or inline code the importer wrote in HTML that a CommonMark parser no longer finds in its Markdown (`markup.js`: «بود**.**» stays literal asterisks) — any rise, on a corpus file or summed over a fuzz split; it should stay 0 |
 
@@ -334,7 +334,19 @@ groups per style value are too small (fewer than 15 files in most) to tell a cha
 node scripts/run-import.js && node scripts/run-fuzz.js dev && node scripts/run-fuzz.js heldout && node scripts/run-meta.js
 node scripts/gate.js                       # against baseline.json
 node scripts/gate.js --update              # this run becomes the baseline (refused if the gate fails)
+node scripts/gate.js --update --partial    # a filtered run: its files merged into the baseline, the others kept
+node scripts/gate.js --baseline cand.json  # read (and with --update write) cand.json instead of baseline.json
 ```
+
+**What `--update` refuses.** A run that lacks lab PDFs (every PDF under `pdf/`, compared by name): a
+filtered `run-import.js math` written as the whole baseline would leave every other file ungated. The
+gate prints how many files the run holds against the lab and the first missing names; run
+`run-import.js` without a filter, or add `--partial` to merge only this run's files into an existing baseline
+(`--partial` with no baseline to merge into is refused). `--update` with
+`--against` is refused too (the comparison would be with another run, not with the baseline being
+written). A fuzz split or the meta part this run lacks (no wkhtmltopdf or qpdf on the machine) is kept
+from the old baseline, and the gate says which. A corpus file scored in the baseline that is no longer
+scored (no crash) fails: its source Markdown is gone, so nothing gates it any more.
 
 **Two ways to compare.** Against `baseline.json` (local work): the corpus PDFs are files, so their
 scores hold anywhere; the fuzz PDFs are drawn by the local Chromium and fonts, so their stored means are
