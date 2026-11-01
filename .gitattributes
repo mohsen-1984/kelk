@@ -1,0 +1,4 @@
+# Scripts run by git and Claude Code hooks must keep LF line endings on every platform.
+.githooks/* text eol=lf
+*.sh text eol=lf
+*.mjs text eol=lf
