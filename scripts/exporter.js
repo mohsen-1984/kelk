@@ -136,6 +136,7 @@
             codeBlock: { showLanguage: !!s.code.showLanguage, rtlFont: s.code.rtlFont },
             math: { mode: (s.math && s.math.html) || 'svg', word: (s.math && s.math.word) || 'native', textFont: s.fonts.bidi },   // HTML: svg | mathml; Word/PDF: images (RTL \text in the web font)
             headerFooterDirection: s.headerFooter.direction,
+            meta: { title: K.names.title(), author: s.document.author || '' },   // the file's properties (creator: Kelk)
             fonts: fontsFor(kind, s),
             fontSizes: { bidi: +s.fonts.bidiSize || 12, latin: +s.fonts.latinSize || 11.5, code: +s.code.size || 10 },
             header: hf.header,
@@ -150,34 +151,48 @@
     }
 
     K.exporter = {
+        /**
+         * One export. The page waits in Kelk.ui.task's dialog while the file is made (fonts and the libraries
+         * load, formulas are drawn, the builder runs); Cancel drops the file. MD: the text with its images
+         * inside (Kelk.images.embed), so the file is whole on its own.
+         */
         run: async function (kind, btn) {
             const md = K.editor.value();
             if (!md.trim()) { K.ui.toast(K.i18n.t('emptyDoc'), 'warn'); return; }
+            if (kind === 'md') {
+                const blob = new Blob([K.images.embed(md)], { type: 'text/markdown;charset=utf-8' });
+                K.ui.download(blob, blob.type, K.ui.fileName(kind));
+                K.editor.markConverted(false);
+                K.ui.toast(K.i18n.t('exported', 'MD'));
+                return;
+            }
             K.ui.busy(btn, true);
             try {
-                const html = K.preview.html();
-                // Word / PDF: a formula with right-to-left \text embeds the web font in its image
-                if (kind !== 'html' && /data-tex="[^"]*[\u0590-\u08FF]/.test(html)) await K.fonts.forHtml(md);
-                let blob;
-                if (kind === 'docx') {
-                    await K.libs.need('docx');
-                    blob = await configure(DocxBuilder.create(), 'docx').addFromHtml(html).toBlob();
-                } else if (kind === 'doc') {
-                    blob = await configure(WordHtmlBuilder.create(), 'doc').addFromHtml(html).toBlob();
-                } else if (kind === 'pdf') {
-                    if (!window.PdfFonts || !window.jspdf) K.ui.toast(K.i18n.t('loadingFonts'));
-                    await Promise.all([K.libs.need('jspdf'), K.fonts.forPdf(md)]);
-                    blob = await configure(PdfBuilder.create(), 'pdf').addFromHtml(html).toBlob();
-                } else if (kind === 'html') {
-                    await K.fonts.forHtml(md);
-                    blob = await configure(HtmlBuilder.create(), 'html').addFromHtml(html).toBlob();
-                } else if (kind === 'md') {
-                    blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
-                }
+                const blob = await K.ui.task(K.i18n.t('taskExport', kind.toUpperCase()), async function () {
+                    await K.ui.paint();                        // the dialog is up before the builder holds the page
+                    const html = K.preview.html();
+                    // Word / PDF: a formula with right-to-left \text embeds the web font in its image
+                    if (kind !== 'html' && /data-tex="[^"]*[֐-ࣿ]/.test(html)) await K.fonts.forHtml(md);
+                    if (kind === 'docx') {
+                        await K.libs.need('docx');
+                        return configure(DocxBuilder.create(), 'docx').addFromHtml(html).toBlob();
+                    }
+                    if (kind === 'doc') return configure(WordHtmlBuilder.create(), 'doc').addFromHtml(html).toBlob();
+                    if (kind === 'pdf') {
+                        await Promise.all([K.libs.need('jspdf'), K.fonts.forPdf(md)]);
+                        await K.ui.paint();
+                        return configure(PdfBuilder.create(), 'pdf').addFromHtml(html).toBlob();
+                    }
+                    if (kind === 'html') {
+                        await K.fonts.forHtml(md);
+                        return configure(HtmlBuilder.create(), 'html').addFromHtml(html).toBlob();
+                    }
+                    throw new Error('unknown output ' + kind);
+                }, { delay: 120 });
                 K.ui.download(blob, blob.type, K.ui.fileName(kind));
-                if (kind === 'md') K.editor.markConverted(false);
                 K.ui.toast(K.i18n.t('exported', kind.toUpperCase()));
             } catch (e) {
+                if (e && e.code === 'aborted') { K.ui.toast(K.i18n.t('cancelled')); return; }
                 console.error(e);
                 K.ui.toast(K.i18n.t('failed', e.message), 'error');
             } finally {

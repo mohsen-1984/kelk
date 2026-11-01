@@ -33,7 +33,7 @@
             const all = window.KelkSamples || {};
             const lang = all[K.i18n.lang] ? K.i18n.lang : (all.en ? 'en' : 'fa');
             const doc = all[lang];
-            K.names.newDocument('', lang);          // remembered: this text IS the sample of `lang`
+            K.names.newDocument(doc.name, lang);    // remembered: this text IS the sample of `lang`; its file name names the exports
             K.editor.set(doc.markdown, doc.name);
             K.editor.markConverted(false);
             K.$('.preview-scroll').scrollTop = 0;
@@ -193,7 +193,7 @@
         // editor actions
         on('#btn-sample', 'click', function () { loadSample(); });
         on('#btn-import', 'click', function () { K.$('#file-import').click(); });
-        on('#file-import', 'change', function () { const f = this.files[0]; this.value = ''; K.importer.fromFile(f); });
+        on('#file-import', 'change', function () { const fs = Array.from(this.files || []); this.value = ''; K.importer.fromFiles(fs); });
         on('#btn-paste', 'click', function () { K.importer.fromClipboardButton(); });
         // no confirms on this page: every change of the text is one Undo away (Kelk.editor's history)
         on('#btn-replace', 'click', function () { K.importer.fromClipboardButton({ replace: true }); });   // clear, then paste

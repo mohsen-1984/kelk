@@ -147,8 +147,15 @@
         render: function () {
             if (!box) return;
             const md = K.editor.value();
-            if (!md.trim()) { box.innerHTML = ''; clean = ''; K.names.refresh(); return; }
-            let html = marked.parse(md);
+            if (!md.trim()) {
+                // the empty pane's hint is in the interface's language: its direction, not the last document's
+                box.innerHTML = ''; clean = '';
+                box.setAttribute('dir', K.i18n.lang === 'en' ? 'ltr' : 'rtl');
+                K.names.refresh(); return;
+            }
+            // Settings → Text → line breaks: a single new line is a line break (as chat apps show a model's
+            // answer) — on by default; off: GFM's soft break, the lines of a paragraph run together
+            let html = marked.parse(md, { breaks: K.store.get('text.breaks') !== false });
             if (typeof DOMPurify !== 'undefined') html = DOMPurify.sanitize(html, PURIFY);
             box.innerHTML = html;
             K.images.resolve(box);                       // ![x](name) → registered image

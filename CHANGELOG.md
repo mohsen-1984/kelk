@@ -2,6 +2,90 @@
 
 All notable changes to Kelk. Dates are those of the release tags.
 
+## [Unreleased]
+
+## [2.0-rc1] — release candidate (the date of 2.0 at its release)
+
+The third release, and the first that reads **PDF**: a PDF becomes Markdown again, in the browser, offline. Built
+for documents as people make them in Persian, Arabic and English. Formulas in Kelk's own PDFs come back as their
+LaTeX. The libraries in `lib/` are 2.0; the new `PdfImporter` is 1.0.
+
+Where it stands: a lab of 144 PDFs from 49 producer variants reads at 95.7 on average (114 files at 99 or more),
+style-fuzzed PDFs at 96.0 (94.6 on a held-out set). Weaker: Persian PDFs from wkhtmltopdf and from LibreOffice's
+HTML import (51–71), borderless two-column tables, turned text, formulas from other programs; a scan needs an OCR
+layer. How it works and its limits: `lib/PDFIMPORT.md`.
+
+### Added — PDF import
+
+- **Import a .pdf** like a .docx or .html: drop it on the Markdown panel or pick it with Import.
+- **Text and direction:** words, spaces and lines rebuilt from where each glyph is drawn; the direction of every
+  paragraph, cell and list item from its own letters; numbers in the order the page shows them.
+- **Persian and Arabic:** wrong character maps (ToUnicode) repaired against the font itself; ZWNJs the file never
+  drew put back; Arabic ي ك and digits written as Persian and ASCII (two settings, on by default).
+- **Structure:** headings, lists, quotes, code, tables (ruled, borderless, merged cells, across pages), links,
+  footnotes and endnotes, tables of contents, forms, letter heads.
+- **Pages:** running heads and footers, page numbers, borders and banners left out; columns and sidebars read in
+  order; pictures kept as pictures and text over them kept as text.
+- **Producers:** Word, Microsoft Print to PDF, Excel, PowerPoint, LibreOffice, Chrome, Edge, Firefox, Opera,
+  Prince, iText, Acrobat, InDesign, wkhtmltopdf, pandoc, LaTeX, ReportLab, OCR layers.
+- **It says what may be wrong:** pages with unreadable characters, words run together or text under a picture;
+  scans, password-protected and damaged files — in the interface's three languages.
+
+### Added — formulas through PDF
+
+- PdfBuilder writes each formula's LaTeX into the PDF (an `/ActualText` span and an XMP map); PdfImporter gives it
+  back exactly as `$…$` / `$$…$$`. `setMath({ source: false })` turns it off.
+
+### Added — import and export in the app
+
+- **Several files at once, and .zip:** picked or dropped together, they become one document in name order (numbers
+  in numeric order), each after a separator chosen in Settings (its name and a rule, a rule, or a blank line). A
+  zip's md, txt, html, docx and pdf files are imported, and its images found by the paths the text gives them
+  (JSZip, loaded on the first zip).
+- **A progress dialog** while a file is imported or made: the page waits, a PDF shows its pages going by, and
+  Cancel stops it.
+- **The MD file keeps its images:** pictures the text names (dropped, pasted, or from a PDF) go into the file as
+  data URIs at its end, and come back as pictures when it is imported again.
+- **Each new line is a new line** (Settings → Text, on by default): the lines of a paragraph keep their breaks in
+  the preview and every output, as chat apps show a model's answer; off is GFM's standard soft break.
+- Settings: the largest file to import (10, 20 — the new default —, 40 or 60 MB); line spacing 0.8 and 0.9.
+- PDF, .docx and HTML carry their properties: title, author, and Kelk as the creator.
+
+### Changed
+
+- The exports are named after the imported file (or the about document's file), also after a reload; a click on
+  a file name copies it.
+- The copy button of the Markdown sits by the MD button.
+- The app's title and texts say the way back too: Markdown to Word, PDF and HTML — and back; the editor's hint and
+  the drop area name .pdf.
+- About and samples (fa, en, ar): PDF import, and **cleaning up a Word document** — a .docx imported and exported
+  again comes back with its direction, alignment, styles and tables made uniform.
+- Messages of an import come once, grouped by kind with a count.
+
+### Fixed
+
+- PDF: the space between text and a formula or image at a block's edge was lost.
+- PDF: shapes that are emoji by default (⚪ ⚫ ⬛ ⬜ ◽ ◾) are drawn as text unless FE0F asks for the emoji.
+- Markdown import: a line break is written as a backslash, so it survives (a letter's address lines had run
+  into one).
+- `tools/bidi-lab.html` is in step with `lib/` again.
+- Scroll sync: dragging the preview's scrollbar fast no longer makes the two panes answer each other (the thumb
+  shook and lagged).
+- The empty preview's hint takes the interface's direction, not the last document's.
+- .doc export no longer has the page try to load its picture parts (`document_files/…` errors in the console).
+
+### Documentation and tests
+
+- `lib/PDFIMPORT.md`: how the importer works, a field guide to the producers, what a PDF itself loses.
+- `tests/pdf-lab/`: the import lab (Node + Playwright) — corpus, generators, scorer, style fuzzing, a metamorphic
+  net, a gate against regressions (also in CI), the formula round trip.
+- `tests/pdf-import-suite.html` (was `import-suite.html`): PDFs you pick, scored in the browser, offline.
+
+### Third-party
+
+- Added: PDF.js 6.4.299 (Apache-2.0) with its OpenJPEG and JBIG2 decoders (BSD), wrapped as classic scripts by
+  `tools/build-pdfjs.js` so it runs from `file://`; JSZip 3.10.2 (MIT, for .zip import).
+
 ## [1.5] — 2026-10-03
 
 The second release. Highlights: **LaTeX formulas** in the preview and all four outputs — as real,
@@ -45,7 +129,7 @@ preview and the HTML export share one logic and one stylesheet.
   with formulas in paragraphs, lists, quotes and table cells.
 - `lib/LATEX.md` (new, English): how formulas travel to every format and back, and the findings
   behind each decision (MathJax 4 from `file://`, MathML Core, Word's HTML form of equations …).
-- Tests: `tests/index.html` also checks that the preview and the HTML export give every block the
+- Tests: `tests/builder-suite.html` also checks that the preview and the HTML export give every block the
   same direction and every table cell the same style, and that the `table-dir-*` cases put every cell
   in its stated direction; `table-style-*`, `colors-code-quote` and edge cases (only a table, a
   one-row table, a single line, inline code with RTL text, code in a list item) in the corpus;

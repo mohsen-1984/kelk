@@ -1,0 +1,54 @@
+// Paths and modules for the PDF lab scripts. Kelk's root is three folders up (tests/pdf-lab/scripts);
+// set KELK=… to test another copy, KELK_ORIG=… for run-real.js's "before" column, and NODE_TOOLS=… for a
+// node_modules folder that holds playwright / docx when they are not installed next to the scripts.
+const path = require('path');
+const KELK = path.resolve(process.env.KELK || path.join(__dirname, '..', '..', '..'));
+const LAB = path.resolve(__dirname, '..');
+function req(name) {
+  try { return require(name); } catch (e) {
+    return require(path.join(process.env.NODE_TOOLS || '/opt/npm-tools/node_modules', name));
+  }
+}
+// LAB_OUT=… puts the results elsewhere (the gate compares two output folders: two versions of the importer on
+// the same PDFs); LAB_FUZZ=… reads the fuzzed PDFs from another folder
+const OUT = path.resolve(process.env.LAB_OUT || path.join(LAB, 'out'));
+const FUZZ = path.resolve(process.env.LAB_FUZZ || path.join(LAB, 'fuzz'));
+require('fs').mkdirSync(OUT, { recursive: true });
+// The script files of one version of the importer, in load order: a Kelk folder, its lib/ folder, or its
+// lib/PdfImporter.js — the core, then the parts in lib/pdfimport/ (an older single-file version has none).
+function importerFiles(where) {
+  const fs = require('fs');
+  let core = path.resolve(where);
+  if (fs.statSync(core).isDirectory()) core = fs.existsSync(path.join(core, 'lib', 'PdfImporter.js')) ? path.join(core, 'lib', 'PdfImporter.js') : path.join(core, 'PdfImporter.js');
+  const dir = path.join(path.dirname(core), 'pdfimport');
+  const parts = ['extract', 'lines', 'regions', 'order', 'blocks'].map((p) => path.join(dir, p + '.js')).filter((f) => fs.existsSync(f));
+  return [core].concat(parts);
+}
+
+// pdf/ is grouped by what a file tests (README, «The producers»); a file's group follows from its name, so a
+// generator writes through pdfPath(name) and a runner lists them all with labPdfs() — names stay unique across groups
+//   en/         the English corpus through every producer we can run (browsers, wkhtmltopdf, LibreOffice, pandoc, Kelk, OCR)
+//   rtl/        the right-to-left corpus through the same producers
+//   office/     the office files (sheets, a deck, Word documents) through LibreOffice
+//   pages/      single documents made for one layout problem (web layouts, layers, forms, templates, pictures, cards)
+//   producers/  producers we cannot run here, imitated glyph by glyph (Word, PowerPoint, Prince, iText, Acrobat, Adobe PDF Library)
+const PDF_GROUPS = [
+  ['producers', /^(word\d*-|pptx-|prince-|itext-|acrobat-|pdflib-)/],
+  ['office', /^(calc--|impress--|lowriter--word-)/],
+  ['pages', /^(chrome-(layout|layers|template|web-rtl|headtable|positioned|float-tagged|pictures|card|fa-links|form|letterhead)--|wk-pictures--|lowriter--merged)/],
+  ['rtl', /^(chrome-rtl-|wk-rtl--|lohtml-rtl--)|--(fa|ar)-/],
+  ['en', /./]
+];
+function pdfGroup(name) { return PDF_GROUPS.find(([, re]) => re.test(path.basename(name)))[0]; }
+function pdfPath(name) {
+  const dir = path.join(LAB, 'pdf', pdfGroup(name));
+  require('fs').mkdirSync(dir, { recursive: true });
+  return path.join(dir, path.basename(name));
+}
+// every PDF under a folder (default: the lab's pdf/), sorted by file name: [{ name: 'x--doc.pdf', file: full path }]
+function labPdfs(root) {
+  const fs = require('fs');
+  const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? walk(path.join(d, e.name)) : /\.pdf$/i.test(e.name) ? [path.join(d, e.name)] : []);
+  return walk(root || path.join(LAB, 'pdf')).map((f) => ({ name: path.basename(f), file: f })).sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+}
+module.exports = { pdfPath, pdfGroup, labPdfs, importerFiles, KELK, LAB, OUT, FUZZ, ORIG: process.env.KELK_ORIG || null, req, lab: 'file://' + KELK + '/tools/pdf-lab.html' };
