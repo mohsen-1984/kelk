@@ -396,6 +396,10 @@ of a page (`pdftoppm -f N -l N -r 200 -x … -y … -W … -H … -png`) settles
 
 ## Regenerating the PDFs
 
+The PDFs are ordinary git files marked `binary` (no LFS; decision of 1405-08-10, `docs/reports/P0.1-git-hygiene.md`).
+Every regeneration writes a whole new binary (creation dates and IDs are not pinned), and the old one stays in history
+for good — so commit a regenerated PDF only when its content changed, and pin timestamps where a producer allows it.
+
 ```sh
 python3 scripts/make-xlsx.py && python3 scripts/make-more.py && python3 scripts/make-layouts.py
 node scripts/make-docx.js && python3 scripts/add-diagram.py
