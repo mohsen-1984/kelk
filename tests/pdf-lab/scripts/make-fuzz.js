@@ -141,9 +141,10 @@ const HF = `<div style="font-size:7px;width:100%;display:flex;justify-content:sp
     try { env.fonts[k] = path.basename(cp.execFileSync('fc-match', ['-f', '%{file}', fam]).toString()); } catch (e) { env.fonts[k] = null; }
   });
   const manifest = { split, generated: new Date().toISOString(), env, samples: [] };
+  let noWk = 0;      // drawn for wkhtmltopdf, made with Chromium (not installed)
   for (let i = 0; i < count; i++) {
     const seed = SPLITS[split].base + i, s = drawStyle(seed);
-    if (s.producer === 'wkhtmltopdf' && !env.wkhtmltopdf) s.producer = 'chromium';
+    if (s.producer === 'wkhtmltopdf' && !env.wkhtmltopdf) { s.producer = 'chromium'; noWk++; }
     if (forceTagged && s.producer === 'chromium') s.tagged = forceTagged === 'all' ? 'yes' : 'no';
     const md = fs.readFileSync(path.join(LAB, 'corpus', s.doc + '.md'), 'utf8');
     const title = (md.match(/^# (.+)$/m) || [, s.doc])[1];
@@ -166,6 +167,7 @@ const HF = `<div style="font-size:7px;width:100%;display:flex;justify-content:sp
   await browser.close();
   fs.rmSync(tmp, { recursive: true, force: true });
   fs.writeFileSync(path.join(dir, 'manifest.json'), JSON.stringify(manifest, null, 1));
-  console.log('\n' + count + ' PDFs in ' + path.relative(process.cwd(), dir) + '/ (manifest.json has each style)');
+  if (noWk) console.log('\nwkhtmltopdf not found: ' + noWk + ' files drawn with Chromium instead');
+  console.log((noWk ? '' : '\n') + count + ' PDFs in ' + path.relative(process.cwd(), dir) + '/ (manifest.json has each style)');
 })();
 

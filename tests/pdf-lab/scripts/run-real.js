@@ -3,6 +3,7 @@
 //   node scripts/run-real.js [filter]
 const fs = require('fs'), path = require('path'), cp = require('child_process');
 const { chromium } = require('./env.js').req('playwright');
+const { fileUrl } = require('./env.js');
 const { words } = require('./score.js');
 const LAB = path.join(__dirname, '..');
 const VERSIONS = { orig: require('./env.js').ORIG || require('./env.js').KELK, new: require('./env.js').KELK };   // KELK_ORIG=… for a "before" column
@@ -17,7 +18,7 @@ const { lcs, norm } = require('./realwords.js');   // pdftotext's words, Arabic 
   const res = {};
   for (const [v, root] of Object.entries(VERSIONS)) {
     const page = await browser.newPage();
-    await page.goto('file://' + root + '/tools/pdf-lab.html');
+    await page.goto(fileUrl(root + '/tools/pdf-lab.html'));
     fs.mkdirSync(path.join(LAB, 'out', 'real', v), { recursive: true });
     for (const f of files) {
       const b64 = fs.readFileSync(path.join(dir, f)).toString('base64');

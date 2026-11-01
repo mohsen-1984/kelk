@@ -2,7 +2,7 @@
 // labels printed in the letterhead's paper (here: left out), the values in the page header on every page, as an office's
 // letter template does. A Latin letter's bare values had stayed bare (labels were given to right-to-left letters only);
 // a date that names its month («12 October 2026») was no date. corpus/letter-ltr.md → pdf/pages/chrome-letterhead--letter-ltr.pdf
-const { pdfPath } = require('./env.js');
+const { pdfPath, fileUrl } = require('./env.js');
 const fs = require('fs'), path = require('path'), os = require('os');
 const { req } = require('./env.js');
 const { chromium } = req('playwright');
@@ -22,7 +22,7 @@ const P = [
     body{font:12px/1.6 "Liberation Serif"} p{margin:0 0 10px} .sig{margin-top:28px}
     </style></head><body><p>Dear Ms Rahimi,</p>${body}<p>With best regards,</p><p class="sig"><b>Helen Morrow</b><br>Head of Records</p></body></html>`;
   const f = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'kelk-lt-')), 'p.html'); fs.writeFileSync(f, html);
-  await page.goto('file://' + f);
+  await page.goto(fileUrl(f));
   // the head: the office's name at the left; at the right three bare values, one under the other (their labels are
   // the paper's, not the text's)
   const head = `<div style="width:100%;margin:0 0.75in;display:flex;justify-content:space-between;font-family:'Liberation Serif'">

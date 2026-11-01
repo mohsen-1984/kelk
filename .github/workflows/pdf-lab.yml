@@ -1,8 +1,23 @@
 # The PDF import lab on every push and pull request (tests/pdf-lab/README.md, "The gate").
 # Two importers on the very same PDFs: the commit before (base) and this one (head). The fuzz PDFs are
 # drawn here, once, with this runner's Chromium and fonts, so the comparison does not depend on the
-# environment baseline.json was written in. With no commit before (a new branch, the first push),
-# head is compared with baseline.json: its corpus part always, its fuzz part only if the env matches.
+# environment baseline.json was written in. With no commit before (a new branch, the first push, a manual
+# run), or when the base importer leaves no corpus results, head is compared with baseline.json: its corpus
+# part always, its fuzz and meta parts only if the env matches — the run's summary says which comparison it made.
+#
+# Failures are never hidden. Every step runs under bash -euo pipefail and tees its output to
+# $RUNNER_TEMP/logs/<step>.log, uploaded with the results. The base importer's steps may fail (an old
+# importer that crashes says nothing about this one): each is continue-on-error, and the parts it leaves no
+# results for are named in the summary and left uncompared. Head's steps fail the job; the later steps still
+# run (!cancelled()) so the gate and the logs are there to read.
+# Held-out stays a mean: its per-file results never go into the artifact — only the console output of
+# run-fuzz.js heldout (means and per-style aggregates; file names only with --show, never used here).
+#
+# Manual run with "baseline" ticked: after head, gate.js --update writes a candidate baseline from this run,
+# starting from a copy of the committed baseline.json (parts this run lacks are kept), uploaded as the
+# artifact baseline-candidate — the fuzz and meta means of this runner's env, to be committed by hand.
+# Actions are pinned to commit SHAs (the tag in the comment); npm's cache and Playwright's Chromium are cached
+# on the pinned versions below (no lockfile yet), the apt packages are installed each run.
 name: pdf-lab
 
 on:
@@ -10,80 +25,250 @@ on:
     paths: ['lib/PdfImporter.js', 'lib/pdfimport/**', 'lib/MarkdownImporter.js', 'vendor/pdfjs/**', 'tests/pdf-lab/**', 'tools/pdf-lab.html', '.github/workflows/pdf-lab.yml']
   pull_request:
     paths: ['lib/PdfImporter.js', 'lib/pdfimport/**', 'lib/MarkdownImporter.js', 'vendor/pdfjs/**', 'tests/pdf-lab/**', 'tools/pdf-lab.html', '.github/workflows/pdf-lab.yml']
+  workflow_dispatch:
+    inputs:
+      baseline:
+        description: 'Write a candidate baseline.json from this run (artifact baseline-candidate)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pdf-lab-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash --noprofile --norc -euo pipefail {0}
 
 jobs:
   lab:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 60
+    env:
+      # the versions npm installs and the cache key (P0.4 moves them to package.json)
+      PLAYWRIGHT_VERSION: '1.56.1'
+      PDF_LIB_VERSION: '1.17.1'
     steps:
-      - uses: actions/checkout@v4
-        with: { lfs: false }
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with: { lfs: false, persist-credentials: false }
 
       - name: Base commit
         id: base
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          BEFORE: ${{ github.event.before }}
         run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then sha="${{ github.event.pull_request.base.sha }}"; else sha="${{ github.event.before }}"; fi
+          mkdir -p "$RUNNER_TEMP/logs"
+          case "$EVENT" in
+            pull_request) sha="$PR_BASE" ;;
+            push) sha="$BEFORE" ;;
+            *) sha="" ;;                     # a manual run: compared with baseline.json
+          esac
           if [ -z "$sha" ] || [ "$sha" = "0000000000000000000000000000000000000000" ]; then sha=""; fi
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/checkout@v4
+      # a force-pushed-away commit may be gone: then head is compared with baseline.json
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        id: base_checkout
         if: steps.base.outputs.sha != ''
-        with: { ref: '${{ steps.base.outputs.sha }}', path: base }
+        continue-on-error: true
+        with: { ref: '${{ steps.base.outputs.sha }}', path: base, lfs: false, persist-credentials: false }
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with: { node-version: 22 }
 
+      - name: Cache (npm's downloads, Playwright's Chromium)
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            ~/.npm
+            ~/.cache/ms-playwright
+          key: pdf-lab-ubuntu-24.04-playwright-${{ env.PLAYWRIGHT_VERSION }}-pdf-lib-${{ env.PDF_LIB_VERSION }}
+
       - name: Tools (Playwright's Chromium, wkhtmltopdf, the fonts of the fuzz styles)
+        id: tools
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends wkhtmltopdf fonts-dejavu fonts-liberation fonts-crosextra-carlito fonts-crosextra-caladea fonts-inter poppler-utils qpdf
-          npm install --no-save --no-package-lock playwright@1.56.1 pdf-lib@1.17.1
-          npx playwright install --with-deps chromium
+          {
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends wkhtmltopdf fonts-dejavu fonts-liberation fonts-crosextra-carlito fonts-crosextra-caladea fonts-inter poppler-utils qpdf
+            npm install --no-save --no-package-lock "playwright@$PLAYWRIGHT_VERSION" "pdf-lib@$PDF_LIB_VERSION"
+            npx playwright install --with-deps chromium     # the browser from the cache when it hit; its apt deps every run
+          } 2>&1 | tee "$RUNNER_TEMP/logs/tools.log"
 
-      - name: Fuzz and metamorphic PDFs (head's generators, made once for both importers)
-        run: |
-          node tests/pdf-lab/scripts/make-fuzz.js dev
-          node tests/pdf-lab/scripts/make-fuzz.js heldout
-          node tests/pdf-lab/scripts/make-meta.js
+      # ── the PDFs: head's generators, made once for both importers ──────────
+      - name: Fuzz PDFs, dev
+        id: make_dev
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
+        run: node tests/pdf-lab/scripts/make-fuzz.js dev 2>&1 | tee "$RUNNER_TEMP/logs/make-fuzz-dev.log"
 
-      - name: Base importer
-        if: steps.base.outputs.sha != ''
+      - name: Fuzz PDFs, held-out
+        id: make_heldout
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
+        run: node tests/pdf-lab/scripts/make-fuzz.js heldout 2>&1 | tee "$RUNNER_TEMP/logs/make-fuzz-heldout.log"
+
+      - name: Metamorphic PDFs
+        id: make_meta
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
+        run: node tests/pdf-lab/scripts/make-meta.js 2>&1 | tee "$RUNNER_TEMP/logs/make-meta.log"
+
+      # ── base importer: may fail, never hides head (the gate step names what it lacks) ──
+      - name: Base importer, corpus
+        id: base_corpus
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' && steps.base_checkout.outcome == 'success' }}
+        continue-on-error: true
         env: { KELK: '${{ github.workspace }}/base', LAB_OUT: '${{ runner.temp }}/base' }
-        run: |
-          node tests/pdf-lab/scripts/run-import.js > /dev/null || true
-          node tests/pdf-lab/scripts/run-fuzz.js dev > /dev/null || true
-          node tests/pdf-lab/scripts/run-fuzz.js heldout > /dev/null || true
-          node tests/pdf-lab/scripts/run-meta.js > /dev/null || true
+        run: node tests/pdf-lab/scripts/run-import.js 2>&1 | tee "$RUNNER_TEMP/logs/base-import.log"
 
-      - name: Head importer
+      - name: Base importer, fuzz dev
+        id: base_dev
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' && steps.base_checkout.outcome == 'success' && steps.make_dev.outcome == 'success' }}
+        continue-on-error: true
+        env: { KELK: '${{ github.workspace }}/base', LAB_OUT: '${{ runner.temp }}/base' }
+        run: node tests/pdf-lab/scripts/run-fuzz.js dev 2>&1 | tee "$RUNNER_TEMP/logs/base-fuzz-dev.log"
+
+      - name: Base importer, fuzz held-out (means only)
+        id: base_heldout
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' && steps.base_checkout.outcome == 'success' && steps.make_heldout.outcome == 'success' }}
+        continue-on-error: true
+        env: { KELK: '${{ github.workspace }}/base', LAB_OUT: '${{ runner.temp }}/base' }
+        run: node tests/pdf-lab/scripts/run-fuzz.js heldout 2>&1 | tee "$RUNNER_TEMP/logs/base-fuzz-heldout.log"
+
+      - name: Base importer, metamorphic
+        id: base_meta
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' && steps.base_checkout.outcome == 'success' && steps.make_meta.outcome == 'success' }}
+        continue-on-error: true
+        env: { KELK: '${{ github.workspace }}/base', LAB_OUT: '${{ runner.temp }}/base' }
+        run: node tests/pdf-lab/scripts/run-meta.js 2>&1 | tee "$RUNNER_TEMP/logs/base-meta.log"
+
+      # ── head importer: a failure fails the job ─────────────────────────────
+      - name: Head importer, corpus
+        id: head_corpus
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
         env: { LAB_OUT: '${{ runner.temp }}/head' }
-        run: |
-          node tests/pdf-lab/scripts/run-import.js > /dev/null || true
-          node tests/pdf-lab/scripts/run-fuzz.js dev > /dev/null || true
-          node tests/pdf-lab/scripts/run-fuzz.js heldout > /dev/null || true
-          node tests/pdf-lab/scripts/run-meta.js > /dev/null || true
+        run: node tests/pdf-lab/scripts/run-import.js 2>&1 | tee "$RUNNER_TEMP/logs/head-import.log"
+
+      - name: Head importer, fuzz dev
+        if: ${{ !cancelled() && steps.make_dev.outcome == 'success' }}
+        env: { LAB_OUT: '${{ runner.temp }}/head' }
+        run: node tests/pdf-lab/scripts/run-fuzz.js dev 2>&1 | tee "$RUNNER_TEMP/logs/head-fuzz-dev.log"
+
+      - name: Head importer, fuzz held-out (means only)
+        if: ${{ !cancelled() && steps.make_heldout.outcome == 'success' }}
+        env: { LAB_OUT: '${{ runner.temp }}/head' }
+        run: node tests/pdf-lab/scripts/run-fuzz.js heldout 2>&1 | tee "$RUNNER_TEMP/logs/head-fuzz-heldout.log"
+
+      - name: Head importer, metamorphic
+        if: ${{ !cancelled() && steps.make_meta.outcome == 'success' }}
+        env: { LAB_OUT: '${{ runner.temp }}/head' }
+        run: node tests/pdf-lab/scripts/run-meta.js 2>&1 | tee "$RUNNER_TEMP/logs/head-meta.log"
 
       - name: Stress (a long file, injected faults, an abort)
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
         run: |
-          qpdf --empty --pages $(ls tests/pdf-lab/pdf/*/*.pdf | grep -v ocr-) -- "${{ runner.temp }}/big.pdf"
-          node tests/pdf-lab/scripts/run-stress.js "${{ runner.temp }}/big.pdf" tests/pdf-lab/pdf/en/chrome-github-bg--report.pdf
+          {
+            qpdf --empty --pages $(ls tests/pdf-lab/pdf/*/*.pdf | grep -v ocr-) -- "$RUNNER_TEMP/big.pdf"
+            node tests/pdf-lab/scripts/run-stress.js "$RUNNER_TEMP/big.pdf" tests/pdf-lab/pdf/en/chrome-github-bg--report.pdf
+          } 2>&1 | tee "$RUNNER_TEMP/logs/stress.log"
 
       - name: Provenance profile
-        run: node tests/pdf-lab/scripts/profile.js
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
+        run: node tests/pdf-lab/scripts/profile.js 2>&1 | tee "$RUNNER_TEMP/logs/profile.log"
 
+      # Kelk's own round trip: tests/builder-suite.html, md → PdfBuilder → PdfImporter (it waits up to 10 min)
+      - name: Round trip (builder → importer)
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
+        timeout-minutes: 15
+        run: node tests/pdf-lab/scripts/roundtrip.js 2>&1 | tee "$RUNNER_TEMP/logs/roundtrip.log"
+
+      - name: Math round trip (TeX → PdfBuilder → PdfImporter → TeX)
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
+        timeout-minutes: 10
+        run: node tests/pdf-lab/scripts/math-roundtrip.js 2>&1 | tee "$RUNNER_TEMP/logs/math-roundtrip.log"
+
+      # every lab PDF (pdf/ and its subfolders) and the dev fuzz split — never held-out: run-crash.js prints the
+      # names of slow or failing files
+      - name: Crash sweep (errors, timeouts, slow files)
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
+        timeout-minutes: 20
+        env: { LAB_OUT: '${{ runner.temp }}/logs' }
+        run: |
+          rc=0   # both sweeps run even when the first finds a crash
+          node tests/pdf-lab/scripts/run-crash.js tests/pdf-lab/pdf "$GITHUB_WORKSPACE" 30000 2>&1 | tee "$RUNNER_TEMP/logs/crash.log" || rc=$?
+          if [ -d tests/pdf-lab/fuzz/dev ]; then node tests/pdf-lab/scripts/run-crash.js tests/pdf-lab/fuzz/dev "$GITHUB_WORKSPACE" 30000 2>&1 | tee -a "$RUNNER_TEMP/logs/crash.log" || rc=$?; fi
+          exit "$rc"
+
+      # ── the gate: head against base, or against baseline.json when base left no corpus results ──
       - name: Gate
+        id: gate
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
+        env:
+          LAB_OUT: '${{ runner.temp }}/head'
+          BASE_SHA: ${{ steps.base.outputs.sha }}
+          BASE_CHECKOUT: ${{ steps.base_checkout.outcome }}
+          BASE_CORPUS: ${{ steps.base_corpus.outcome }}
+          BASE_DEV: ${{ steps.base_dev.outcome }}
+          BASE_HELDOUT: ${{ steps.base_heldout.outcome }}
+          BASE_META: ${{ steps.base_meta.outcome }}
+        run: |
+          base="$RUNNER_TEMP/base" log="$RUNNER_TEMP/logs/gate.log" sum="$GITHUB_STEP_SUMMARY"
+          has() { [ -f "$base/$1" ] && echo 'results' || echo 'no results'; }
+          rc=0
+          echo '## pdf-lab gate' >> "$sum"
+          if [ -n "$BASE_SHA" ] && [ -f "$base/_scores.json" ]; then
+            {
+              echo "Head against the base importer (\`$BASE_SHA\`) on the same PDFs."
+              echo
+              echo '| base part | step | |'
+              echo '|---|---|---|'
+              echo "| corpus | ${BASE_CORPUS:-skipped} | $(has _scores.json) |"
+              echo "| fuzz/dev | ${BASE_DEV:-skipped} | $(has fuzz-dev/_scores.json) |"
+              echo "| fuzz/heldout | ${BASE_HELDOUT:-skipped} | $(has fuzz-heldout/_scores.json) |"
+              echo "| meta | ${BASE_META:-skipped} | $(has meta/_scores.json) |"
+              echo
+              echo 'A part with no base results is printed for head but not compared.'
+            } >> "$sum"
+            node tests/pdf-lab/scripts/gate.js --against "$base" 2>&1 | tee "$log" || rc=$?
+          else
+            if [ -z "$BASE_SHA" ]; then why='no commit before (a new branch, a first push or a manual run)'
+            elif [ "$BASE_CHECKOUT" != 'success' ]; then why="the base commit \`$BASE_SHA\` could not be checked out"
+            else why="the base importer (\`$BASE_SHA\`) left no corpus results (its run-import.js step: ${BASE_CORPUS:-skipped})"; fi
+            {
+              echo "**Fallback: head against baseline.json** — $why."
+              echo 'Corpus compared file by file; fuzz and meta only where the baseline env matches this runner (else noted, not compared).'
+            } >> "$sum"
+            echo "::warning title=pdf-lab gate::compared with baseline.json, not the base importer — $why"
+            node tests/pdf-lab/scripts/gate.js 2>&1 | tee "$log" || rc=$?
+          fi
+          { echo; echo '```'; cat "$log"; echo '```'; } >> "$sum"
+          exit "$rc"
+
+      # ── manual run with "baseline": a candidate baseline.json from this run ──
+      # from a copy of the committed one: the parts this run lacks are kept; --update refuses when the gate
+      # (this run against the committed baseline) fails or the run lacks lab PDFs — nothing is uploaded then
+      - name: Baseline candidate
+        id: baseline
+        if: ${{ !cancelled() && github.event_name == 'workflow_dispatch' && inputs.baseline && steps.head_corpus.outcome == 'success' }}
         env: { LAB_OUT: '${{ runner.temp }}/head' }
         run: |
-          if [ -n "${{ steps.base.outputs.sha }}" ] && [ -f "${{ runner.temp }}/base/_scores.json" ]; then
-            node tests/pdf-lab/scripts/gate.js --against "${{ runner.temp }}/base"
-          else
-            node tests/pdf-lab/scripts/gate.js
-          fi
+          cp tests/pdf-lab/baseline.json "$RUNNER_TEMP/baseline-candidate.json"
+          node tests/pdf-lab/scripts/gate.js --update --baseline "$RUNNER_TEMP/baseline-candidate.json" 2>&1 | tee "$RUNNER_TEMP/logs/baseline-candidate.log"
+
+      - name: Upload the baseline candidate
+        if: ${{ !cancelled() && steps.baseline.outcome == 'success' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: baseline-candidate
+          path: ${{ runner.temp }}/baseline-candidate.json
+          if-no-files-found: error
 
       # (held-out results stay out of the artifact: its files are read only as means — the gate's log has them)
       - name: Results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: pdf-lab-results
           path: |
@@ -91,4 +276,5 @@ jobs:
             ${{ runner.temp }}/head/fuzz-dev/_scores.json
             ${{ runner.temp }}/head/meta/_scores.json
             ${{ runner.temp }}/base/_scores.json
+            ${{ runner.temp }}/logs/
           if-no-files-found: ignore

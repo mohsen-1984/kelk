@@ -261,7 +261,7 @@ Kelk has no server, no account and no upload: documents never leave the browser.
 | PDF lab — gate | `gate.js` | Since P0.2 (1405-08-10): `baseline.json` holds **all 144 corpus files** (55 with `rtl`), the clean run passes and a deliberate ZWNJ break fails 21 files; fuzz and meta in the baseline are still the review machine's (Chromium 153) until P0.3. Before: 2 of 144 files, "passed" while checking nothing. |
 | CI | `.github/workflows/pdf-lab.yml` | Two runs, both **green and both meaningless**: the fork run (1405-08-09) had no base and fell back to the blind `baseline.json`; the `main` run (1405-08-10) compared against `4beee81` (1.5, no importer) and passed because every base / head step ends in `> /dev/null \|\| true`. |
 | Builder suite | `tests/builder-suite.html` | 383 cases through the four builders, preview parity and a PDF round trip; DOCX / DOC "pass" whenever a blob is produced (no XML validation, no goldens). **Not in CI.** |
-| Formulas | `tests/math-file.html`, `math-modes.html` | Browser pages, checked by eye; `math-roundtrip.js` never sets an exit code. |
+| Formulas | `tests/math-file.html`, `math-modes.html`, `math-roundtrip.js` | Browser pages, checked by eye; since P0.3 `math-roundtrip.js` exits 1 on a failed case (76 / 76 pass, 1405-08-10) and `roundtrip.js` on a red builder-suite cell outside its two-entry allow-list (404 pass). |
 | Lint / unit tests | — | **None**: no `package.json`, ESLint or unit tests yet (P0.4, P1.1). |
 
 ### Protocol for every change
@@ -310,7 +310,6 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 | 🟠 High | README links `kelk_2.0.zip` under `releases/latest` → 404 (latest is v1.5; a prerelease is skipped by `latest`). | `README.md` | Link the tagged release (P8.1). |
 | 🟡 Medium | Version strings in ≈ 8 places disagree (`2.0-rc1` / `2.0` / `1.0`). | `scripts/config.js:11` and ≈ 7 other places | P0.4: one `VERSION`, `tools/check-version.js` in CI. |
 | 🟡 Medium | No `package.json`, lockfile, ESLint or Prettier. | root | P0.4 (tooling). |
-| 🟡 Medium | The lab harness is Linux-only: `'/opt/npm-tools/node_modules'`, `'file://' + path` ×30, `fc-match`, `/usr/share/fonts`, `/` splits in `features.js`. On Windows (checked 1405-08-10): `make-meta.js` crashes at once without `qpdf` (`spawnSync qpdf ENOENT`, before making any file) — 7 of 12 transforms need it; `make-fuzz.js` silently draws the wkhtmltopdf share with Chromium when wkhtmltopdf is missing; without `fc-match` every font in the fuzz `env` is `null`. | `tests/pdf-lab/scripts/env.js`, `features.js`, `make-meta.js`, `make-fuzz.js` | P0.3: `url.pathToFileURL`, `require.resolve`, `path.sep`; `make-meta.js` skips the qpdf transforms with a note; `make-fuzz.js` prints the substitution. |
 | 🟡 Medium | Pages is a Jekyll branch deploy of the whole repo: no `.nojekyll`, no cache-busting on `lib/`, `scripts/`, `styles/`. | — | P8.1: Pages through Actions with the release set and hashed URLs. |
 | 🟡 Medium | Not in CI: the builder suite, `math-roundtrip.js`, struct / features / crash runs, lint, link check, a11y, bundle size, generated-files freshness. | `.github/workflows/` | P0.3, P2.3, P2.4. |
 | ⚪ Low | Docs out of step: the lab described in four places, stale numbers ("106 PDFs", "27 producers"), metamorphic net stated as 15 seeds / 171 PDFs (actual 18 / 205), Noto Emoji version "—", hljs theme 11.11.1 vs JS 11.12.0; `PDFIMPORT.md` (155 KB) has no TOC. | `lib/PDFIMPORT.md`, `tests/pdf-lab/README.md`, `THIRD-PARTY-NOTICES.md` | P8.2: split the doc, generated TOC, `tools/check-docs.js`. |
@@ -376,7 +375,7 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 No open issues.
 
 <details>
-<summary><strong>✅ Resolved</strong> (9) — click to expand</summary>
+<summary><strong>✅ Resolved</strong> (10) — click to expand</summary>
 
 | Priority | Issue | Location | Suggestion |
 |---|---|---|---|
@@ -389,6 +388,7 @@ No open issues.
 | ✅ Resolved 1405-08-10 | `tests/pdf-lab/real/` (the owner's private PDFs when present) was not git-ignored. | `.gitignore` | P0.1: `tests/pdf-lab/real/`, `private/` and `node_modules/` ignored. |
 | ✅ Resolved 1405-08-10 | 144 binary PDFs (15.6 MB) entered `main`'s history as ordinary files with PR #1; storage was undecided (LFS, release asset or plain files). | `tests/pdf-lab/pdf/` | P0.1 decision: kept as ordinary files marked `binary`; history is not rewritten; revisit past 50 MB, > 10 MB of packed churn a year, or a single fixture > 10 MB. |
 | ✅ Resolved 1405-08-10 | **The local gate was blind**: `baseline.json` held 2 of 144 corpus files (a filtered run written with `--update`), so 142 files were never gated — how the Persian regressions slipped through. | `tests/pdf-lab/baseline.json`, `tests/pdf-lab/scripts/gate.js` | P0.2: `--update` refuses a run lacking any lab PDF (`--partial` merges, `--baseline` tries a candidate); baseline rewritten with all 144 files (55 with `rtl`); switching off the ZWNJ rules now fails 21 files. |
+| ✅ Resolved 1405-08-10 | The lab harness was Linux-only (`'/opt/npm-tools/node_modules'`, `'file://' + path` ×30, `/usr/share/fonts`, `/` splits in `features.js`); on Windows `make-meta.js` crashed without `qpdf` and `make-fuzz.js` silently drew the wkhtmltopdf share with Chromium. | `tests/pdf-lab/scripts/` | P0.3: `env.fileUrl()` on `url.pathToFileURL`, `req()` with a clear install message, `features.js` labels built with `/`, a `dejavu()` font lookup in the Python generators; `make-meta.js` skips the qpdf transforms with a note, `make-fuzz.js` prints the substitution. Corpus, fuzz and meta outputs byte-identical. The generators still need their producers (LibreOffice, wkhtmltopdf, pandoc …) on `PATH`. |
 
 </details>
 
@@ -568,9 +568,14 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-10 | 2.0-rc1 | Zarrabi | 3 | Deliberate-break test: both ZWNJ rules switched off on a throwaway worktree — 21 files fail on right-to-left details, gate exit 1; the narrow-space rule found to hurt wkhtmltopdf Persian. |
 | 1405-08-10 | 2.0-rc1 | Zarrabi | 2 | Review of the `gate.js` change: name matching, merge semantics, CI paths byte-identical; two defects found. |
 | 1405-08-10 | 2.0-rc1 | Zarrabi | 9 | Reviewing the P0.2 report and approving the baseline choice. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 21 | P0.3 CI first green run, first part: checklist; scope of the harness, script and workflow changes; integration and local checks of the three changes (corpus, fuzz and meta outputs byte-identical, round-trip 404 pass with the two-cell allow-list, math 76 / 76, crash smoke 144 files); fixes from the review; Known Issues (Linux-only harness resolved) and Testing figures; GitHub CLI sign-in checked; first commit and push for the CI run. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 6 | Platform-neutral lab harness: `env.fileUrl()` on `url.pathToFileURL` replacing `'file://' + path`, `req()` with an install message, `features.js` labels, `dejavu()` font lookup in the Python generators; `make-meta.js` skips the qpdf transforms with a note, `make-fuzz.js` prints the wkhtmltopdf substitution. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 5 | Exit codes for the CI smoke scripts: `roundtrip.js` with an allow-list of known red cells, `math-roundtrip.js` failing on a failed case, `run-crash.js` searching subfolders and writing to `LAB_OUT`. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 5 | CI workflow `pdf-lab.yml` rewritten: no `\|\| true`, `bash -euo pipefail`, logs into the artifact, `contents: read`, concurrency, SHA-pinned actions, npm and Playwright cache, round-trip, math and crash steps, gate fallback with a step summary, `baseline` dispatch input producing a baseline candidate; actionlint clean. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 5 | Review of the P0.3 diff before the push: harness, smoke scripts and workflow. |
 
 <!-- generated:totals -->
-**Entries: 36 · Total: 442 min (7.37 hours) — Zarrabi 442 min (29 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 41 · Total: 484 min (8.07 hours) — Zarrabi 484 min (34 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---

@@ -39,7 +39,7 @@ const lo = (src, outName) => {
   }
   // Kelk's builders, in the test page (all libraries loaded)
   const b = await chromium.launch(); const page = await b.newPage();
-  await page.goto('file://' + require('./env.js').KELK + '/tests/builder-suite.html');
+  await page.goto(require('./env.js').fileUrl(require('./env.js').KELK + '/tests/builder-suite.html'));
   for (const f of docs) {
     const name = f.replace(/\.md$/, ''), md = fs.readFileSync(path.join(LAB, 'corpus', f), 'utf8');
     const out = await page.evaluate(async (md) => {

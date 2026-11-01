@@ -3,14 +3,14 @@
 // importer must give the formulas back as `$…$` / `$$…$$`, exactly — PdfBuilder writes each formula's TeX into the
 // file (lib/PDFIMPORT.md §3). The corpus files are their own expected Markdown.
 //   node scripts/make-math.js      → pdf/en/kelk--math.pdf, pdf/rtl/kelk--fa-math.pdf
-const { pdfPath, KELK } = require('./env.js');
+const { pdfPath, KELK, fileUrl } = require('./env.js');
 const fs = require('fs'), path = require('path');
 const { chromium } = require('./env.js').req('playwright');
 const LAB = path.join(__dirname, '..');
 (async () => {
   const b = await chromium.launch(); const page = await b.newPage();
   page.on('pageerror', (e) => console.log('pageerror', String(e).slice(0, 300)));
-  await page.goto('file://' + KELK + '/tests/builder-suite.html');
+  await page.goto(fileUrl(KELK + '/tests/builder-suite.html'));
   for (const name of ['math', 'fa-math']) {
     const md = fs.readFileSync(path.join(LAB, 'corpus', name + '.md'), 'utf8');
     const pdf = await page.evaluate(async (md) => {
