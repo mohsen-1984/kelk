@@ -17,7 +17,8 @@ from fontTools.ttLib import TTFont
 from fontTools import subset
 
 LAB = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
-REG = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
+from rtl_pdf import dejavu
+REG = dejavu('DejaVuSans.ttf')
 W, H = 960.0, 540.0
 
 FORMS = {

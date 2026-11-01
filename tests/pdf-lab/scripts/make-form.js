@@ -12,13 +12,13 @@
 // The pairs must come back one per item, row by row in reading order; the bands as headings, the table as a table.
 // The r9 importer read values as headings and the pairs column by column, every line in ** **.
 //   node scripts/make-form.js     → pdf/chrome-form--form-fa.pdf, pdf/chrome-form--form.pdf
-const { pdfPath } = require('./env.js');
+const { pdfPath, fileUrl } = require('./env.js');
 const fs = require('fs'), path = require('path'), os = require('os');
 const { KELK, req } = require('./env.js');
 const { chromium } = req('playwright');
 const LAB = path.join(__dirname, '..');
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'kelk-form-'));
-const WEB = 'file://' + KELK + '/assets/fonts/rastikerdar/webfonts/';
+const WEB = fileUrl(KELK + '/assets/fonts/rastikerdar/webfonts') + '/';
 const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 // «☐» as a picture: a canvas drawn in the page, then an <img> of itself (a raster in the PDF)
 const BOX = `document.querySelectorAll('canvas.box').forEach(function(c){var g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);
@@ -68,7 +68,7 @@ function build(md, rtl) {
   for (const [doc, rtl] of [['form-fa', true], ['form', false]]) {
     const f = path.join(TMP, doc + '.html');
     fs.writeFileSync(f, build(fs.readFileSync(path.join(LAB, 'corpus', doc + '.md'), 'utf8'), rtl));
-    await page.goto('file://' + f); await page.evaluate(() => document.fonts.ready); await page.waitForTimeout(200);
+    await page.goto(fileUrl(f)); await page.evaluate(() => document.fonts.ready); await page.waitForTimeout(200);
     await page.pdf({ path: pdfPath('chrome-form--' + doc + '.pdf'), preferCSSPageSize: true, printBackground: true });
     console.log('pdf/chrome-form--' + doc + '.pdf');
   }

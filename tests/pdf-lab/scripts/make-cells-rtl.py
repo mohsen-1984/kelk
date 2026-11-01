@@ -13,7 +13,7 @@ import rtl_pdf
 rtl_pdf.CODES |= {ord('o')}
 from rtl_pdf import Font, Doc, LAB, REG, BOLD, visual
 
-MONO = '/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf'
+MONO = rtl_pdf.dejavu('DejaVuSansMono.ttf')
 C = Doc({'F1': Font(REG, 'AAAAAA+DemoMitra'), 'F2': Font(BOLD, 'AAAAAB+DemoMitra-Bold'), 'F3': Font(MONO, 'AAAAAC+CourierNewPSMT')}, w=612, h=792)
 R, L0 = 550, 62
 for p in (1, 2):

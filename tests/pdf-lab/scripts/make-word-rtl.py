@@ -36,7 +36,8 @@ from fontTools.ttLib import TTFont
 from fontTools import subset
 
 LAB = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
-FONT = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
+from rtl_pdf import dejavu
+FONT = dejavu('DejaVuSans.ttf')
 
 # ── joining and presentation forms ─────────────────────────────────────
 FORMS = {  # base → isolated, final, initial, medial
