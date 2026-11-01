@@ -47,7 +47,10 @@ const NAMES = MEMBERS.map(m => m.name);
 function contributor() {
   const email = (git(['config', 'user.email']) || '').toLowerCase();
   const uname = git(['config', 'user.name']) || '';
+  // GitHub's private noreply address (<id>+<login>@users.noreply.github.com) is used by web merges and cloud sessions.
+  const noreply = (email.match(/^(?:\d+\+)?([^@]+)@users\.noreply\.github\.com$/) || [])[1];
   let m = MEMBERS.find(c => c.emails.some(e => e.toLowerCase() === email))
+       || MEMBERS.find(c => noreply && c.github.toLowerCase() === noreply)
        || MEMBERS.find(c => c.names.includes(uname) || c.name === uname);
   if (!m) {
     const out = git(['credential', 'fill'], {
@@ -177,6 +180,8 @@ function validateHistory(rows) {
     if (!NAMES.includes(who)) problems.push(`Change History row ${n}: contributor "${who}" is not one of ${NAMES.join(' / ')}.`);
     if (!/^(\d+|—)$/.test(wl)) problems.push(`Change History row ${n}: workload "${wl}" must be whole minutes or —.`);
     if (!change) problems.push(`Change History row ${n}: empty description.`);
+    const actor = change.match(/\b(the person|person['’]s|lead session|agents?|by the author|the author|the owner|owner['’]s)\b/i);
+    if (actor) problems.push(`Change History row ${n}: describe only the action, not who did it ("${actor[0]}"); the Contributor column carries the name.`);
     if (date.slice(0, 10) < prev) problems.push(`Change History row ${n}: out of chronological order (${date} after ${prev}).`);
     prev = date.slice(0, 10);
   });
@@ -278,13 +283,20 @@ function preCommit() {
   if (problems.length) fail(`\n- ${problems.join('\n- ')}`);
   if (git(['diff', '--quiet', '--', LOG]) === null) fail(`${LOG} has unstaged changes — stage it (git add ${LOG}).`);
   if (fs.existsSync(abs('.git/MERGE_HEAD'))) return;
+  // Work on the log itself is not recorded (workload rule 1): a commit touching only these files needs no row.
+  const LEDGER = new Set([LOG, '.claude/scripts/contributelog.mjs', '.claude/scripts/workload.mjs', '.claude/contributors.json']);
+  const files = (git(['diff', '--cached', '--name-only']) || '').split('\n').filter(Boolean);
+  if (files.every(f => LEDGER.has(f))) return;
   const staged = historyRows(fromGit(git(['show', `:${LOG}`])) || '') || [];
   const before = historyRows(fromGit(git(['show', `HEAD:${LOG}`])) || '') || [];
   const who = contributor();
   if (!who) fail('the current contributor is unknown — add your git email to .claude/contributors.json.');
-  const added = staged.slice(before.length);
-  if (staged.length <= before.length || !added.some(c => c[2] === who))
-    fail(`every commit adds its Change History row(s) to ${LOG}, at least one with Contributor "${who}". `
+  // A new row is one not in HEAD and dated on or after HEAD's newest row (reworded old rows don't count).
+  const old = new Set(before.map(c => c.join('|')));
+  const newest = before.reduce((m, c) => (c[0].slice(0, 10) > m ? c[0].slice(0, 10) : m), '');
+  const added = staged.filter(c => !old.has(c.join('|')) && c[0].slice(0, 10) >= newest);
+  if (!added.some(c => c[2] === who))
+    fail(`a commit that changes the project adds its Change History row(s) to ${LOG}, at least one with Contributor "${who}". `
        + 'Measure the change with: node .claude/scripts/workload.mjs');
 }
 
@@ -292,7 +304,8 @@ function commitMsg(file) {
   const who = contributor();
   const lines = fs.readFileSync(file, 'utf8').split('\n')
     .filter(l => !(/^\s*co-authored-by:/i.test(l) && /claude|anthropic/i.test(l)))
-    .filter(l => !/generated with \[?claude code/i.test(l));
+    .filter(l => !/generated with \[?claude code/i.test(l))
+    .filter(l => !/^\s*claude-session:/i.test(l));
   while (lines.length && !lines.at(-1).trim()) lines.pop();
   const i = lines.findIndex(l => l.trim() && !l.startsWith('#'));
   if (i < 0) return fs.writeFileSync(file, lines.join('\n') + '\n');

@@ -1,4 +1,7 @@
 # Kelk — Contribute Log (کِلک)
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 11 | Portability: rule that everything the work depends on is committed to the repository, the checklist rule moved into `CLAUDE.md`, commit attribution turned off in `.claude/settings.json`, `Claude-Session` lines stripped by the commit hook, the contributor recognised from the GitHub noreply address, machine prerequisites listed in Getting Started. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 3 | Research of the current documentation on cloud and Desktop sessions: which parts of the repository setup (`CLAUDE.md`, hooks, skills, settings) apply there and what differs. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 5 | Reviewing the portability changes and the findings on cloud sessions. |
 
 ![JavaScript](https://img.shields.io/badge/JavaScript-plain%20scripts%2C%20no%20build-F7DF1E?logo=javascript&logoColor=black)
 ![Runs from file://](https://img.shields.io/badge/Runs%20from-file%3A%2F%2F%20%2F%20GitHub%20Pages-1F6F5C)
@@ -60,7 +63,9 @@ documentation is [`lib/README.md`](../lib/README.md), with [`lib/LATEX.md`](../l
 | Node.js | 18+ (CI uses 22) | Only for the PDF lab and `tools/*.js`. There is **no `package.json`** yet (plan P0.4). |
 | Playwright | 1.56.1 (the CI pin) + `pdf-lib` 1.17.1 | Installed **outside** the repository; `NODE_TOOLS` points at its `node_modules`. |
 | Lab generators | LibreOffice (`soffice`), wkhtmltopdf, pandoc, Python 3 with openpyxl, python-pptx, fontTools, DejaVu fonts, qpdf, poppler-utils | Only to **remake** lab PDFs; importing and scoring need Node + Playwright only. |
-| Python 3 | optional | `tools/build_pdf_fonts.py` (PDF fonts) and the Claude Code `ui-visual-check` skill. |
+| Python 3 | 3.10+, optional | `tools/build_pdf_fonts.py` (PDF fonts) and the Claude Code `ui-visual-check` skill (with Chrome or Edge). |
+| Claude Code tooling | Git with `bash` (Git for Windows on Windows), Node.js ≥ 20 | The hooks in `.claude/settings.json` and `.githooks/`. Git is pointed at `.githooks` at the start of every Claude Code session; outside Claude Code run `git config core.hooksPath .githooks` once per clone. |
+| GitHub CLI (`gh`) | optional | Reading CI runs and opening pull requests; `gh auth login` once per machine. |
 
 > ⚠️ **Never run `gate.js --update` after a filtered run** (e.g. `run-import.js math`). The committed
 > `baseline.json` holds 2 of the 144 corpus files because of exactly that, and the gate has been passing without
@@ -432,7 +437,8 @@ Every completed task, **sorted chronologically (oldest first)** — new rows are
 - **Version** is the Kelk version the change shipped in: **1.0** (tag `v1.0`, CHANGELOG 1405-07-07) · **1.5** (tag
   `v1.5`, 1405-07-11) · **2.0-rc1** (CHANGELOG; untagged, `scripts/config.js` carries it).
 - **Rows**: a change takes several consecutive rows with the same date — the lead session's own work, one row per
-  agent (or inseparable agent group) and one for the person's effort; each description says who did what.
+  agent (or inseparable agent group) and one for the person's effort. **Each description states only the work done** — never who did it (no
+  “the person”, “lead session”, “agent”, names); the Contributor column carries the name.
 - **Contributor** is one of the project's two members: **Zarrabi** (GitHub `AliZarrabi`) or **Hasan Nejad** (GitHub
   `mohsen-1984`), taken from the GitHub account the work was done under. Session and agent rows belong to the member
   who ran the session.
@@ -456,14 +462,16 @@ Every completed task, **sorted chronologically (oldest first)** — new rows are
 1. **Workload** is all the time spent working on the project, in minutes: studying and investigating a problem,
    weighing options, reviewing and testing work, and implementing changes — not implementation alone. It has an
    **AI part** (Claude Code sessions and their agents) and a **human part** (the person, or anyone else working on the
-   project); both are project work and both count in the totals.
+   project); both are project work and both count in the totals. **Work on this log itself is not recorded** — measuring
+   workload, writing or restructuring `docs/ContributeLog.md`, and its tooling (`contributelog.mjs`, `workload.mjs`); a
+   commit that changes only those files needs no row.
 2. **One row per contributor.** A change is recorded as several rows: one for the lead session's own work, one for
    each agent with an independent scope (one QA agent per design concept, one fix agent per area, …) and one for the
    person's effort.
 3. Several agents share a row **only** when their work cannot be told apart from a business point of view — forks
    splitting one task, or a group of verifiers checking one list.
-4. The **Contributor** column names the project member the row's work belongs to; the description says who did
-   what within it (the lead session, an agent and its scope, or the person).
+4. The **Contributor** column names the project member the row's work belongs to; the description states only the
+   work itself, without naming the person, the session or an agent.
 5. **Totals** — number of rows, overall minutes and hours, and the minutes and rows per contributor — sit at the end of the
    table (generated).
 
@@ -517,33 +525,30 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 
 | Date | Version | Contributor | Workload (min) | Change |
 |---|---|---|--:|---|
-| 1405-07-06 | 1.0 | Hasan Nejad | — | First upload of Kelk to GitHub through the web uploader (`a2a7075`, 87 files: the page, `lib/` builders, fonts, vendor libraries, `LICENSE`, `README.md`, `TODO.md`, `THIRD-PARTY-NOTICES.md`), then the README rewritten with an Arabic screenshot and the about documents extended (`05a4b08`, tag `v1.0`). Work of the author, mohsen-1984; no logs. |
-| 1405-07-06 | 1.0 | Hasan Nejad | — | 1.0 follow-ups by the author: import naming and settings in the page (`349d49d`: `importer.js`, `main.js`, `names.js`), MarkdownImporter extended and a PdfBuilder fix (`668d18c`, 1405-07-07, the CHANGELOG's 1.0 date); no logs. |
-| 1405-07-11 | 1.5 | Hasan Nejad | — | Release 1.5 by the author in four uploads (`184b4f7`, `8d9c534`, `0fdc3f6`, `94f0c31` = tag `v1.5`): LaTeX formulas with a local MathJax 4.1.3 (Word equations in .docx / .doc, vectors in PDF), table styles, code and quote colours, the regrouped Settings pane, `PreviewBuilder`, `CHANGELOG.md` started, samples §6.5, og-image, math screenshots and test pages; no logs. |
-| 1405-07-14 | 1.5 | Hasan Nejad | — | Untagged follow-up by the author (`e340112`): MarkdownImporter (+161 lines), DocxBuilder and WordHtmlBuilder changes, a new action in `main.js` with its strings and style, about documents touched; no logs. |
-| 1405-07-18 | 1.5 | Hasan Nejad | — | README, icons, og-image and every screenshot refreshed by the author (`adec97d`); no logs. |
-| 1405-07-24 | 1.5 | Hasan Nejad | — | Downloadable Vazirmatn + Sahel TTF zip for Word, WordHtmlBuilder (+234) and DocxBuilder (+263) changes, settings, storage, exporter and i18n additions — 25 files (`4beee81`, the author); no logs. |
+| 1405-07-06 | 1.0 | Hasan Nejad | — | First upload of Kelk to GitHub through the web uploader (`a2a7075`, 87 files: the page, `lib/` builders, fonts, vendor libraries, `LICENSE`, `README.md`, `TODO.md`, `THIRD-PARTY-NOTICES.md`), then the README rewritten with an Arabic screenshot and the about documents extended (`05a4b08`, tag `v1.0`). No logs. |
+| 1405-07-06 | 1.0 | Hasan Nejad | — | 1.0 follow-ups: import naming and settings in the page (`349d49d`: `importer.js`, `main.js`, `names.js`), MarkdownImporter extended and a PdfBuilder fix (`668d18c`, 1405-07-07, the CHANGELOG's 1.0 date); no logs. |
+| 1405-07-11 | 1.5 | Hasan Nejad | — | Release 1.5 in four uploads (`184b4f7`, `8d9c534`, `0fdc3f6`, `94f0c31` = tag `v1.5`): LaTeX formulas with a local MathJax 4.1.3 (Word equations in .docx / .doc, vectors in PDF), table styles, code and quote colours, the regrouped Settings pane, `PreviewBuilder`, `CHANGELOG.md` started, samples §6.5, og-image, math screenshots and test pages; no logs. |
+| 1405-07-14 | 1.5 | Hasan Nejad | — | Untagged follow-up (`e340112`): MarkdownImporter (+161 lines), DocxBuilder and WordHtmlBuilder changes, a new action in `main.js` with its strings and style, about documents touched; no logs. |
+| 1405-07-18 | 1.5 | Hasan Nejad | — | README, icons, og-image and every screenshot refreshed (`adec97d`); no logs. |
+| 1405-07-24 | 1.5 | Hasan Nejad | — | Downloadable Vazirmatn + Sahel TTF zip for Word, WordHtmlBuilder (+234) and DocxBuilder (+263) changes, settings, storage, exporter and i18n additions — 25 files (`4beee81`); no logs. |
 | 1405-07-24 → 1405-08-09 | 2.0-rc1 | Hasan Nejad | — | Development of 2.0-rc1 outside git: the PDF importer (`lib/PdfImporter.js`, `lib/pdfimport/`, `lib/PDFIMPORT.md`), the PDF lab (`tests/pdf-lab/`: 144 PDFs from 49 producer variants, fuzz splits, metamorphic net, gate, CI workflow), formulas through PDF, multi-file and zip import, the progress dialog; committed in `d5409f1` below. No logs here. |
-| 1405-08-09 | 1.5 | Zarrabi | 17 | Review of the 1.5 follow-up `4beee81` (lead session): read the Word-output changes, reported the findings and estimated PDF import at 1.5–2 weeks. |
-| 1405-08-09 | 1.5 | Zarrabi | 25 | The person's time on that review: reading the findings and the estimate, then replacing the working tree with the 2.0-rc1 code (confirmed by the person, 1405-08-10). |
-| 1405-08-09 | 2.0-rc1 | Zarrabi | 79 | Review & redesign plan (lead session): read the PDF importer and its lab against the three concepts the owner named (self-calibration, metamorphic testing, graceful degradation), the held-out question and the Persian regressions; ran the 144-PDF corpus on Windows (Playwright build workaround) — mean 95.7, RTL 90.1 — and found the blind gate (2 of 144 in `baseline.json`), the English-only held-out set and `fa-features` quote 0 on all four producers; briefed the four agents below and merged their reports; researched the PDF → Markdown landscape; settled the owner's decisions (optional ML, OCR late, dev tooling only, one plan file, execution deferred); wrote the plan (now `.claude/plans/Kelk-Redesign.md`) and `docs/reports/corpus-run-1405-08-09.json`; committed the 2.0 tree with the workflow and the 144 lab PDFs as `d5409f1` "Kelk 2.0-rc1: PDF import, test lab, overhaul plan" (356 files) on the local branch that became the fork branch `AliZarrabi/overhaul/2.0`. |
-| 1405-08-09 | 2.0-rc1 | Zarrabi | 11 | Review agent, application layer: `index.html`, `scripts/*.js`, `styles/*.css` and the about documents — architecture and module coupling, the settings-migration bug, preview performance, main-thread blocking, sanitising, i18n and accessibility, with file:line evidence. |
-| 1405-08-09 | 2.0-rc1 | Zarrabi | 20 | Review agent, builder libraries: `lib/` without the PDF importer (BuilderBase, the four builders, PreviewBuilder, BidiCore / BidiView, MathCore, ImageCore, MarkdownImporter, `lib/README.md`, `LATEX.md`) and the builder test pages — duplication across builders, PdfBuilder shaping and bugs (B1–B8), test gaps. |
-| 1405-08-09 | 2.0-rc1 | Zarrabi | 20 | Review agent, infrastructure, tooling, release and docs: the CI workflow, `tools/`, the lab harness mechanics (`env.js`, runners, `gate.js`, `baseline.json`, fuzz and meta generators), README / CHANGELOG / TODO / notices, assets, sizes, release and Pages, supply chain. |
-| 1405-08-09 | 2.0-rc1 | Zarrabi | 5 | Planning agent: designed the phased redesign plan (phases, sub-phases, acceptance criteria, efforts, dependencies) from the collected findings and the owner's fixed decisions. |
-| 1405-08-09 | 2.0-rc1 | Zarrabi | 1 | The person’s time in the review: answering the planning questions, reviewing and accepting the plan — most of the waits overlapped the agents or a background corpus job and are subtracted under rule 13 (confirmed by the person, 1405-08-10). |
-| 1405-08-09 → 1405-08-10 | 2.0-rc1 | Zarrabi | 14 | PR #1 preparation (lead session): wrote the PR description, saved it as `docs/reports/PR-overhaul-2.0.md` (never committed), and wrote the continuation prompt for a fresh session. |
-| 1405-08-09 → 1405-08-10 | 2.0-rc1 | Zarrabi | 23 | The person's time on PR #1: reviewing the push, the PR text and its file, taking the prompt; the person pushed, opened PR #1 and merged it into `main` on 1405-08-10 (`db323e1`) (confirmed by the person, 1405-08-10). |
-| 1405-08-10 | 2.0-rc1 | Zarrabi | 10 | P0.1 preparation (lead session): read the plan, checked the repository state and inspected both CI runs (green, but one compared against the blind baseline and the other against 1.5 behind `\|\| true`); found that `overhaul/2.0` had already been merged into `main` through PR #1 and that the 144 lab PDFs are already in history as ordinary files (one CRLF file found); wrote the P0.1 checklist and the PDF-storage options, and asked the owner about the branch, P0.0 and the CI artifact. |
-| 1405-08-10 | 2.0-rc1 | Zarrabi | 20 | The person's time on the P0.1 preparation: starting the session, reading the findings and writing the next instructions (confirmed by the person, 1405-08-10). |
-| 1405-08-10 | 2.0-rc1 | Zarrabi | 74 | Restructuring and project automation at the owner’s request (lead session): plan moved to `.claude/plans/Kelk-Redesign.md` with "overhaul" → "redesign" throughout, its links repointed, P0.0 marked approved, Creator/Created and Summary lines added; the report-generation and other projects’ sections removed from the docs and `.claude/` configuration; the imported `.claude/` folder reviewed and configured (local settings with a foreign credential deleted, broken hook entries and build leftovers removed); `Sample.md` used and deleted; Plans section limited to plan files and made collapsible; Contributor column; `CLAUDE.md` with the permanent rules; automation: `contributelog.mjs` (generated Plans list, totals and counts, checks as a Stop hook), git hooks (`pre-commit`: a Change History row per commit; `commit-msg`: contributor prefix, no co-author lines), `.gitattributes` for LF scripts, tested on scratch clones; history rewritten without the co-author line (`d5409f1` → `8229e6d`, merge → `0a2b161`, force-pushed) and the fork branch deleted; GitHub CLI installed. The rename of the repository and folder to Kelk is pending. |
-| 1405-08-10 | 2.0-rc1 | Zarrabi | 5 | Workload-measurement agent: measured every session and agent log of the review and of this session under the rules above, for the figures of this table. |
-| 1405-08-10 | 2.0-rc1 | Zarrabi | 8 | ContributeLog agent: wrote `docs/ContributeLog.md` in the structure of a sample project handbook, every detail gathered from the repository, the git history, the plan, the corpus report and the CI findings. |
-| 1405-08-10 | 2.0-rc1 | Zarrabi | 5 | Workload-script agent: wrote `.claude/scripts/workload.mjs`, which measures the change being committed from the session logs under the rules above, and checked it against the figures recorded earlier. |
-| 1405-08-10 | 2.0-rc1 | Zarrabi | 59 | The person’s time on the restructuring and the automation: reading each result, writing the next requests and answering the decisions (measured by the workload script; confirmed by the person, 1405-08-10). |
+| 1405-08-09 | 1.5 | Zarrabi | 17 | Review of the 1.5 follow-up `4beee81`: read the Word-output changes, reported the findings and estimated PDF import at 1.5–2 weeks. |
+| 1405-08-09 | 1.5 | Zarrabi | 25 | Reading the review's findings and estimate, then replacing the working tree with the 2.0-rc1 code. |
+| 1405-08-09 | 2.0-rc1 | Zarrabi | 79 | Review & redesign plan: read the PDF importer and its lab against the three concepts set for the review (self-calibration, metamorphic testing, graceful degradation), the held-out question and the Persian regressions; ran the 144-PDF corpus on Windows (Playwright build workaround) — mean 95.7, RTL 90.1 — and found the blind gate (2 of 144 in `baseline.json`), the English-only held-out set and `fa-features` quote 0 on all four producers; merged the four reviews below; researched the PDF → Markdown landscape; settled the decisions (optional ML, OCR late, dev tooling only, one plan file, execution deferred); wrote the plan (now `.claude/plans/Kelk-Redesign.md`) and `docs/reports/corpus-run-1405-08-09.json`; committed the 2.0 tree with the workflow and the 144 lab PDFs as `d5409f1` "Kelk 2.0-rc1: PDF import, test lab, overhaul plan" (356 files) on the local branch that became the fork branch `AliZarrabi/overhaul/2.0`. |
+| 1405-08-09 | 2.0-rc1 | Zarrabi | 11 | Review of the application layer: `index.html`, `scripts/*.js`, `styles/*.css` and the about documents — architecture and module coupling, the settings-migration bug, preview performance, main-thread blocking, sanitising, i18n and accessibility, with file:line evidence. |
+| 1405-08-09 | 2.0-rc1 | Zarrabi | 20 | Review of the builder libraries: `lib/` without the PDF importer (BuilderBase, the four builders, PreviewBuilder, BidiCore / BidiView, MathCore, ImageCore, MarkdownImporter, `lib/README.md`, `LATEX.md`) and the builder test pages — duplication across builders, PdfBuilder shaping and bugs (B1–B8), test gaps. |
+| 1405-08-09 | 2.0-rc1 | Zarrabi | 20 | Review of infrastructure, tooling, release and docs: the CI workflow, `tools/`, the lab harness mechanics (`env.js`, runners, `gate.js`, `baseline.json`, fuzz and meta generators), README / CHANGELOG / TODO / notices, assets, sizes, release and Pages, supply chain. |
+| 1405-08-09 | 2.0-rc1 | Zarrabi | 5 | Designed the phased redesign plan (phases, sub-phases, acceptance criteria, efforts, dependencies) from the collected findings and the fixed decisions. |
+| 1405-08-09 | 2.0-rc1 | Zarrabi | 1 | Answering the planning questions, reviewing and accepting the plan (waiting that overlapped other running work is not counted, rule 13). |
+| 1405-08-09 → 1405-08-10 | 2.0-rc1 | Zarrabi | 14 | PR #1 preparation: wrote the PR description, saved it as `docs/reports/PR-overhaul-2.0.md` (never committed), and wrote the continuation prompt for a fresh session. |
+| 1405-08-09 → 1405-08-10 | 2.0-rc1 | Zarrabi | 23 | Reviewing the push, the PR text and its file; pushing, opening PR #1 and merging it into `main` on 1405-08-10 (`db323e1`). |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 10 | P0.1 preparation: read the plan, checked the repository state and inspected both CI runs (green, but one compared against the blind baseline and the other against 1.5 behind `\|\| true`); found that `overhaul/2.0` had already been merged into `main` through PR #1 and that the 144 lab PDFs are already in history as ordinary files (one CRLF file found); wrote the P0.1 checklist and the PDF-storage options, and asked about the branch, P0.0 and the CI artifact. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 20 | Reading the P0.1 findings and writing the next instructions. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 50 | Restructuring: plan moved to `.claude/plans/Kelk-Redesign.md` with "overhaul" → "redesign" throughout, its links repointed, P0.0 marked approved; the report-generation sections and other projects’ references removed from the docs and the `.claude/` configuration; the imported `.claude/` folder reviewed and configured (local settings with a foreign credential deleted, broken hook entries and build leftovers removed); `CLAUDE.md` with the permanent project rules; commit hooks for the contributor prefix without co-author lines; history rewritten without the co-author line (`d5409f1` → `8229e6d`, merge → `0a2b161`, force-pushed) and the fork branch deleted; GitHub CLI installed. Work on this log itself is not counted (rule 1). The rename of the repository and folder to Kelk is pending. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 33 | Reviewing each restructuring result, writing the next requests and answering the decisions. |
 
 <!-- generated:totals -->
-**Entries: 24 · Total: 396 min (6.60 hours) — Zarrabi 396 min (17 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 21 · Total: 328 min (5.47 hours) — Zarrabi 328 min (14 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
