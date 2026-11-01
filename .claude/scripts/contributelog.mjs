@@ -208,6 +208,14 @@ function buildLog(src) {
     const t = replaceBlock(text, name, body);
     if (t === null) problems.push(`${LOG}: the <!-- generated:${name} --> markers are missing.`); else text = t;
   }
+  // Change History rows (Date | Version | Contributor | Workload | Change) anywhere outside their section.
+  const hs = text.indexOf('## 📜 Change History'), he = text.indexOf('\n## ', hs + 5);
+  text.split('\n').reduce((pos, l, i) => {
+    const c = cells(l);
+    if (/^\| \d{4}-\d{2}-\d{2}/.test(l) && c.length === 5 && NAMES.includes(c[2]) && (pos < hs || (he > 0 && pos > he)))
+      problems.push(`${LOG}: line ${i + 1} is a Change History row outside the Change History table.`);
+    return pos + l.length + 1;
+  }, 0);
   const rows = historyRows(text);
   if (!rows) problems.push(`${LOG}: no "## 📜 Change History" section.`);
   else {
@@ -292,9 +300,16 @@ function preCommit() {
   const who = contributor();
   if (!who) fail('the current contributor is unknown — add your git email to .claude/contributors.json.');
   // A new row is one not in HEAD and dated on or after HEAD's newest row (reworded old rows don't count).
-  const old = new Set(before.map(c => c.join('|')));
+  // Keyed on date, version, contributor and minutes, so a reworded row is not new; counted as a multiset.
+  const key = c => c.slice(0, 4).join('|');
+  const old = new Map();
+  for (const c of before) old.set(key(c), (old.get(key(c)) || 0) + 1);
   const newest = before.reduce((m, c) => (c[0].slice(0, 10) > m ? c[0].slice(0, 10) : m), '');
-  const added = staged.filter(c => !old.has(c.join('|')) && c[0].slice(0, 10) >= newest);
+  const added = staged.filter(c => {
+    const n = old.get(key(c)) || 0;
+    if (n) { old.set(key(c), n - 1); return false; }
+    return c[0].slice(0, 10) >= newest;
+  });
   if (!added.some(c => c[2] === who))
     fail(`a commit that changes the project adds its Change History row(s) to ${LOG}, at least one with Contributor "${who}". `
        + 'Measure the change with: node .claude/scripts/workload.mjs');
