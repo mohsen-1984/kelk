@@ -1,6 +1,11 @@
 {
   "plansDirectory": ".claude/plans",
   "autoMemoryEnabled": false,
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
+  },
   "hooks": {
     "Stop": [
       {

@@ -3,6 +3,20 @@
 Kelk is a client-side Markdown ⇄ DOCX/DOC/PDF/HTML converter (no build step, runs from `file://`), Persian/Arabic-first.
 Project handbook: [`docs/ContributeLog.md`](docs/ContributeLog.md). Plans: `.claude/plans/` (listed in the handbook → Plans).
 
+## Portability
+
+Two contributors work on separate computers, so **everything the work depends on is committed to this repository**:
+rules (this file), plans (`.claude/plans/`), hooks, skills, scripts, settings (`.claude/settings.json`), git hooks
+(`.githooks/`), reports (`docs/reports/`). Never rely on anything that stays on one machine — personal or global
+`CLAUDE.md` files, Claude Code memory, `.claude/settings.local.json`, files in a temp or scratchpad folder — for
+anything the other contributor or a later session needs; put it in the repo, or it does not exist.
+Machine prerequisites are listed in `docs/ContributeLog.md` → Getting Started → Prerequisites.
+
+## Working method
+
+- Every multi-step task starts with a TodoWrite checklist, one item per action, each marked done as soon as it is
+  done. If TodoWrite is not available, say so in the first message and keep the checklist in the reply instead.
+
 ## Contributors and commits
 
 - Two contributors: **Zarrabi** (GitHub `AliZarrabi`) and **Hasan Nejad** (GitHub `mohsen-1984`), listed in
@@ -37,10 +51,15 @@ Project handbook: [`docs/ContributeLog.md`](docs/ContributeLog.md). Plans: `.cla
 - Dates everywhere are Solar Hijri `YYYY-MM-DD`.
 - **Generated parts** (between `<!-- generated:NAME -->` markers: the Plans list, the Change History totals) and the
   counts in collapsible headers are rewritten by `node .claude/scripts/contributelog.mjs fix` — never edit them by hand.
-- **Change History**: every commit adds its rows (pre-commit refuses otherwise) — one row per contributor of the change:
+- **Change History records project work only.** Work on the log itself — measuring workload, writing or restructuring
+  `docs/ContributeLog.md`, its tooling (`contributelog.mjs`, `workload.mjs`, `contributors.json`) — gets no row and its
+  time is left out of the rows (split the session at the requests that were about the log).
+- Every commit that changes the project adds its rows (pre-commit refuses otherwise) — one row per contributor of the change:
   the lead session, each agent with its own scope, the person. Columns: Date | Version | Contributor | Workload (min) |
   Change. Measure with `node .claude/scripts/workload.mjs` (rules in the collapsible "How Workload is calculated"
   section); the person's time is **proposed** and recorded only after the owner confirms it.
+- **Descriptions state only the action** (“Review of the builder libraries: …”, “Answering the planning questions …”)
+  — never who did it: no “the person’s time”, “lead session”, “agent”, “by the author” or names. The checks refuse them.
 - Keep the hand-written sections current in the same change that makes them stale: Known Issues (new findings,
   resolved rows into the collapsed *Resolved* table), Testing figures, Overview / architecture facts.
 - Never: a client report or its generator, references to other projects, a Persian copy of a plan.
