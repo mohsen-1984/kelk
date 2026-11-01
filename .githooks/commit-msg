@@ -1,0 +1,3 @@
+#!/bin/sh
+# "<Contributor>: " prefix; Claude co-author and generated-by lines removed (CLAUDE.md -> Automation).
+exec node .claude/scripts/contributelog.mjs commit-msg "$1"

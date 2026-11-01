@@ -1,0 +1,3 @@
+# Claude Code: personal permissions and machine-local state
+.claude/settings.local.json
+__pycache__/

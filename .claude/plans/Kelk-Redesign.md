@@ -1,10 +1,13 @@
-# Kelk 2.0 → 2.x Overhaul Plan
+# Kelk 2.0 → 2.x Redesign Plan
 
-*Master plan (English). Persian summary: [`OVERHAUL-PLAN.fa.md`](OVERHAUL-PLAN.fa.md). Dates are Solar Hijri `YYYY-MM-DD`.
+**Creator:** Zarrabi · **Created:** 1405-08-09
+**Summary:** Structural changes, not a rewrite: the rule-based PDF importer and its lab are the asset, and the weaknesses found in the review are fixable in place, each step gated by the lab. 8 phases / 31 sub-phases, ≈ 76 working days plus the owner's review — **P0** stabilise and commit · **P1** verified bugs · **P2** test-net completeness · **P3** importer structure, calibration, degradation · **P4** generalisation with real producers and golden-50 · **P5** app and libraries · **P6** optional ML second opinion · **P7** OCR for scans · **P8** release and docs. Next: **P0.1 Git hygiene**. Progress tracker: §5.
+
+*Master plan, `.claude/plans/Kelk-Redesign.md`. Dates are Solar Hijri `YYYY-MM-DD`.
 Written 1405-08-09 (2026-10-31) from a full review of the 2.0-rc1 tree; raw corpus scores of that day:
-[`reports/corpus-run-1405-08-09.json`](reports/corpus-run-1405-08-09.json).*
+[`docs/reports/corpus-run-1405-08-09.json`](../../docs/reports/corpus-run-1405-08-09.json).*
 
-**Status: accepted by the project owner on 1405-08-09; execution not started.** Work continues on another machine —
+**Status: accepted by the project owner on 1405-08-09; execution started — P0.0 approved 1405-08-10.** Work continues on another machine —
 everything needed to resume is in this file. Nothing in the repository has been changed by the review.
 
 ---
@@ -19,7 +22,7 @@ bidi and a fa/en/ar interface. 2.0-rc1 adds **PDF import**: ≈10,400 lines in `
 
 The owner asked for (a) a review of the PDF import against three concepts — self-calibration, metamorphic testing,
 graceful degradation — plus the generalisation gap / held-out question and the observed Persian regressions; (b) a
-whole-project overhaul plan in phases and sub-phases, **each sub-phase ending with a report and the owner's explicit
+whole-project redesign plan in phases and sub-phases, **each sub-phase ending with a report and the owner's explicit
 approval**; (c) a progress tracker; (d) researched feature proposals; (e) the plan saved in the project.
 
 Decisions taken by the owner during planning:
@@ -29,7 +32,7 @@ Decisions taken by the owner during planning:
 | In-browser ML layout model | **Yes, optional download** — rules stay the default; model fetched/cached only when enabled |
 | OCR for scanned PDFs | **Yes, as a late phase** (P7) |
 | Tooling | **Dev tooling only** (package.json, ESLint/Prettier, unit tests, CI); the shipped site stays plain scripts loadable from `file://` |
-| Plan files | **Both**: this English master + Persian summary |
+| Plan file | **One English file**: `.claude/plans/Kelk-Redesign.md` |
 | Start | Plan accepted; **execution deferred** until the owner says go |
 
 ---
@@ -51,7 +54,7 @@ Decisions taken by the owner during planning:
    - Weakest producers: `lohtml-rtl` 59.0, `wk-rtl` 61.2, `chrome-rtl-plain-hf` 81.4, `kelkdocx-lo` 88.7 (its fa/ar files 55–96).
    - RTL failure modes: `brackets` **0** in every LibreOffice-path RTL file (mirrored brackets — TODO already suspects Vazirmatn's RTL bracket glyphs outside the cmap), lists 0–28 and tables 0–42 there; wkhtmltopdf `zwnj` 0 and `yehKaf` 53–68 (broken ToUnicode in the PDF itself); Chrome browser-default style loses `quote` (0) and `code` in fa/ar while the text is perfect (`chrome-rtl-plain-hf--ar-article` 69.6 with `rtl` 100 — a layout loss, not a text loss).
    - **Regression-shaped pattern:** `fa-features` scores **quote 0 on all four producers** (Kelk, Chrome plain, Chrome GitHub-style, Chrome tagged), each at 85 ± 1. Same document, same metric, every producer → the quote rule drops Persian nested quotes regardless of producer. TODO.md lists "Kelk's own: fa-features 85 (its quotes)" as Kelk-only; the data says it is not. **First thing to bisect in P1.**
-   - Full per-file table: Appendix A; raw JSON: `reports/corpus-run-1405-08-09.json`.
+   - Full per-file table: Appendix A; raw JSON: `docs/reports/corpus-run-1405-08-09.json`.
 
 ### 2.2 Application layer (`scripts/`, `index.html`, `styles/`)
 
@@ -101,9 +104,10 @@ The asset is ≈10k lines of producer knowledge encoded as traceable geometric r
 
 ## 4. Process rules (every sub-phase)
 
-- Branch `overhaul/P<n>.<m>`. Report in `docs/reports/P<n>.<m>-<slug>.md`: what changed; lab before/after (corpus mean, dev, held-out, meta per transform, `rtl`); open issues. **Stop until the owner approves in writing.** Merge to `main` on approval; update the tracker in both plan files.
+- Before a sub-phase starts: a TodoWrite checklist, one item per action, each marked done as it finishes.
+- Branch `redesign/P<n>.<m>`; `main` is touched only by the merge after approval. Report in `docs/reports/P<n>.<m>-<slug>.md`: what changed; lab before/after (corpus mean, dev, held-out, meta per transform, `rtl`); open issues. **Stop until the owner approves in writing.** Merge to `main` on approval; update the tracker (§5).
 - Every importer change runs `run-import.js`, `run-fuzz.js dev|heldout`, `run-meta.js`, then `gate.js`; held-out is read as means only (`--show` never used); `gate.js --update` only in the approval step.
-- A Change History row + regenerated client report at each approval (project workload rules).
+- A Change History row in [`docs/ContributeLog.md`](../../docs/ContributeLog.md) at each approval (project workload rules).
 
 ---
 
@@ -114,7 +118,7 @@ Status: `todo` → `doing` → `report` (report written, waiting) → `approved`
 | Phase | Sub-phase | Status | Started | Finished | Lab after (corpus / dev / held-out / rtl) | Approval |
 |---|---|---|---|---|---|---|
 | — | Review & plan | approved | 1405-08-09 | 1405-08-09 | 95.7 / 96.0 / 94.6 / 92.9 (baseline) | ☑ owner, 1405-08-09 |
-| P0 | P0.0 Plan files into project | doing | 1405-08-09 | | | ☐ |
+| P0 | P0.0 Plan files into project | approved | 1405-08-09 | 1405-08-10 | — (no code change) | ☑ owner, 1405-08-10 |
 | P0 | P0.1 Git hygiene | todo | | | | ☐ |
 | P0 | P0.2 Baseline rebuilt, gate guarded | todo | | | | ☐ |
 | P0 | P0.3 CI first green run | todo | | | | ☐ |
@@ -157,9 +161,9 @@ Effort figures are working days and include the report; the owner's review time 
 
 ### P0 — Stabilise and commit (≈ 4 d)
 
-**P0.0 Plan files into the project** — write this file and `OVERHAUL-PLAN.fa.md`; README pointer; Change History row. *Accept:* files exist; tracker row approved. ½ d. → report & approval.
+**P0.0 Plan file into the project** — write this file; README pointer; Change History row. *Accept:* files exist; tracker row approved. ½ d. → report & approval.
 
-**P0.1 Git hygiene** — `.gitattributes` (`* text=auto eol=lf`; `*.pdf *.zip *.woff* *.png *.docx *.xlsx *.pptx binary`), `.gitignore` (+ `tests/pdf-lab/real/`, `private/`, `node_modules/`), `.editorconfig`; lab PDFs (15.6 MB) to **Git LFS** (`lfs: true` in the workflow) or a release asset + `scripts/fetch-pdfs.js` (decide in the report; LFS recommended, fetch script as fallback for the 1 GB/month quota); commit the 2.0 tree on branch `overhaul/2.0`. *Accept:* clean `git status`; `git ls-files | grep real/` empty; a fresh clone runs `run-import.js`. 1 d. → report & approval.
+**P0.1 Git hygiene** — `.gitattributes` (`* text=auto eol=lf`; `*.pdf *.zip *.woff* *.png *.docx *.xlsx *.pptx binary`), `.gitignore` (+ `tests/pdf-lab/real/`, `private/`, `node_modules/`), `.editorconfig`; lab PDFs (15.6 MB) to **Git LFS** (`lfs: true` in the workflow) or a release asset + `scripts/fetch-pdfs.js` (decide in the report; LFS recommended, fetch script as fallback for the 1 GB/month quota); commit the 2.0 tree on branch `redesign/2.0` (already done: the 2.0 tree reached `main` through PR #1, merged 1405-08-10). *Accept:* clean `git status`; `git ls-files | grep real/` empty; a fresh clone runs `run-import.js`. 1 d. → report & approval.
 
 **P0.2 Baseline rebuilt, gate guarded** — `gate.js --update` refuses when the corpus count < `labPdfs().length` unless `--partial`; full run → `baseline.json` with all 144 files + `rtl` per file; gate `rtl` per file (TOL 0.5) like total. *Accept:* `Object.keys(base.corpus).length === 144`; disabling the ZWNJ rule locally fails the gate. ½ d. → report & approval.
 

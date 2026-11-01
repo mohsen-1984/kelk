@@ -1,0 +1,7 @@
+{
+  "_comment": "The project's members. The contributor of a session or commit is found from git config user.email, then user.name, then the signed-in GitHub account. Used by .claude/scripts/contributelog.mjs.",
+  "contributors": [
+    { "name": "Zarrabi", "github": "AliZarrabi", "emails": ["ali.zarabi@gmail.com"], "names": ["Ali Zarrabi"] },
+    { "name": "Hasan Nejad", "github": "mohsen-1984", "emails": ["mhn.com@gmail.com"], "names": ["mohsen-1984"] }
+  ]
+}
