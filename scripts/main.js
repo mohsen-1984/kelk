@@ -235,6 +235,35 @@
             else if (e.key === 'F1') { e.preventDefault(); K.ui.help(false); K.ui.dialog('#guide', true); }
         });
 
+        // another tab of Kelk saved (the storage event reaches every OTHER tab of the same origin): this tab
+        // follows it — text, images, profile, logo, page settings — so it never writes back what it showed before
+        window.addEventListener('storage', function (e) {
+            const pre = K.config.storagePrefix;
+            if (e.key === null) {
+                // the storage was cleared (another tab's site data, DevTools): this tab's text and images are
+                // written back, not taken as empty; the profile and page settings fall back to the defaults
+                K.store.saveContent(K.editor.value());
+                K.store.saveImages(K.images.all());
+                K.settings.load();
+                return;
+            }
+            if (e.key.indexOf(pre) !== 0) return;
+            const key = e.key.slice(pre.length);
+            if (key === 'images') { K.images.reload(); K.preview.render(); }
+            if (key === 'content' && K.editor.external(K.store.content())) {
+                K.names.followStored(true);
+                K.ui.toast(K.i18n.t('tabSynced'));
+            }
+            if (key === 'ui') {
+                const u = K.store.ui();
+                if (u.lang && u.lang !== K.i18n.lang) switchLang(u.lang);
+                K.ui.theme(u.theme || '');                  // the preview's colors follow in settings.load() below
+                K.ui.layout(u.layout);
+                K.names.followStored(false);
+            }
+            if (key === 'settings' || key === 'ui' || key === 'logo') K.settings.load();
+        });
+
         K.ui.icons();
         K.ui.watchBars();
 

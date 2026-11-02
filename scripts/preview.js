@@ -12,7 +12,7 @@
 (function (K) {
     'use strict';
 
-    let box, clean = '', mathRun = 0;
+    let box, clean = '', mathRun = 0, soon = 0;
 
     // DOMPurify's own URI rules: http(s), mailto, tel, relative names; data: for images
     const PURIFY = { ADD_ATTR: ['target', 'dir', 'align'] };
@@ -144,7 +144,20 @@
         /** Document direction the preview decided ('rtl' | 'ltr'). */
         dir: function () { return (box && box.getAttribute('dir')) || 'rtl'; },
 
+        /** Draw after a pause (typing: `ms`, default config.renderMs); a newer call or a render() replaces it. */
+        renderSoon: function (ms) {
+            clearTimeout(soon);
+            soon = setTimeout(function () { K.preview.render(); }, ms == null ? K.config.renderMs : ms);
+        },
+
+        /**
+         * A drawing still waiting (renderSoon) is made now: whoever reads html() or the page's
+         * title right after a keystroke (the exports, Copy) gets the text as typed.
+         */
+        flush: function () { if (soon) this.render(); },
+
         render: function () {
+            clearTimeout(soon); soon = 0;
             if (!box) return;
             const md = K.editor.value();
             if (!md.trim()) {
@@ -251,6 +264,7 @@
 
         /** Rich copy of the whole preview (HTML + plain text) for pasting into Word/mail. */
         copyAll: async function () {
+            this.flush();
             try {
                 if (navigator.clipboard && typeof ClipboardItem !== 'undefined') {
                     const clone = box.cloneNode(true);
