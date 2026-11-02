@@ -14,8 +14,78 @@
 
     let box, clean = '', mathRun = 0, soon = 0;
 
-    // DOMPurify's own URI rules: http(s), mailto, tel, relative names; data: for images
-    const PURIFY = { ADD_ATTR: ['target', 'dir', 'align'] };
+    // DOMPurify's own URI rules: http(s), mailto, tel, relative names; data: for images.
+    // The document shares the page with the app: its id / name values get DOMPurify's
+    // "user-content-" prefix (a <div id="toasts"> cannot take over the app's elements), and no
+    // <style> (it would restyle the app) or form control (a fake dialog) reaches the pane.
+    const PURIFY = {
+        ADD_ATTR: ['target', 'dir', 'align'],
+        SANITIZE_NAMED_PROPS: true,
+        FORBID_TAGS: ['form', 'input', 'button', 'textarea', 'select', 'style']
+    };
+    const NAMED_PREFIX = 'user-content-';
+
+    const TASK = 'data-kelk-task';
+
+    /**
+     * A task-list checkbox (GFM "- [ ]", marked's <input type="checkbox" disabled>) is the one
+     * input a document has: the sanitiser leaves a mark in its place (the <input> itself is
+     * forbidden), and taskBoxes() puts a disabled checkbox made by the app back.
+     */
+    function markTask(node, data) {
+        if (data.tagName !== 'input' || !node.parentNode) return;
+        if (String(node.getAttribute('type') || '').toLowerCase() !== 'checkbox') return;
+        const mark = node.ownerDocument.createElement('span');
+        mark.setAttribute(TASK, node.hasAttribute('checked') ? 'done' : 'open');
+        node.parentNode.insertBefore(mark, node);
+    }
+    function taskBoxes(root) {
+        K.$$('span[' + TASK + ']', root).forEach(function (mark) {
+            const box = document.createElement('input');
+            if (mark.getAttribute(TASK) === 'done') box.setAttribute('checked', '');
+            box.setAttribute('disabled', '');
+            box.setAttribute('type', 'checkbox');
+            mark.replaceWith(box);
+        });
+    }
+
+    /** HTML of the user through DOMPurify with the preview's rules; without DOMPurify only its text is kept. */
+    function sanitize(html) {
+        if (typeof DOMPurify !== 'undefined') {
+            DOMPurify.addHook('uponSanitizeElement', markTask);
+            try { return DOMPurify.sanitize(String(html || ''), PURIFY); }
+            finally { DOMPurify.removeHook('uponSanitizeElement', markTask); }
+        }
+        const t = document.createElement('template');
+        t.innerHTML = String(html || '');
+        return String(t.content.textContent || '').replace(/[&<>"]/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+        });
+    }
+
+    /**
+     * After the prefix, a link of the document to one of its own ids ([x](#part) → <a id="part">)
+     * points to the prefixed id; web links open a new tab, and every link that does gets
+     * rel="noopener noreferrer".
+     */
+    function fixLinks(root) {
+        // the prefixed names: ids, and the name of an <a name> anchor or an image <map>
+        const named = {};
+        K.$$('[id], a[name], map[name]', root).forEach(function (el) {
+            if (el.id) named[el.id] = true;
+            if (el.getAttribute('name')) named[el.getAttribute('name')] = true;
+        });
+        function follow(el, attr) {
+            let id = el.getAttribute(attr).slice(1);
+            try { id = decodeURIComponent(id); } catch (e) { /* as written */ }
+            if (!id || id.indexOf(NAMED_PREFIX) === 0) return;
+            if (named[NAMED_PREFIX + id]) el.setAttribute(attr, '#' + NAMED_PREFIX + id);
+        }
+        K.$$('a[href^="#"], area[href^="#"]', root).forEach(function (a) { follow(a, 'href'); });
+        K.$$('img[usemap^="#"]', root).forEach(function (img) { follow(img, 'usemap'); });
+        K.$$('a[href^="http"]', root).forEach(function (a) { a.target = '_blank'; });
+        K.$$('a[target], area[target]', root).forEach(function (a) { a.rel = 'noopener noreferrer'; });
+    }
 
     // ── the app's dark theme: the document's own colors, translated for the preview only ──────
     // The exports keep the chosen colors; in the dark preview a light fill becomes a dark fill of
@@ -140,6 +210,8 @@
          * directions and frame code on exactly the Markdown's HTML.
          */
         html: function () { return box ? clean : ''; },
+        /** HTML of the user (the document, the custom header / footer) through the preview's sanitiser. */
+        sanitize: sanitize,
 
         /** Document direction the preview decided ('rtl' | 'ltr'). */
         dir: function () { return (box && box.getAttribute('dir')) || 'rtl'; },
@@ -169,11 +241,10 @@
             // Settings → Text → line breaks: a single new line is a line break (as chat apps show a model's
             // answer) — on by default; off: GFM's soft break, the lines of a paragraph run together
             let html = marked.parse(md, { breaks: K.store.get('text.breaks') !== false });
-            if (typeof DOMPurify !== 'undefined') html = DOMPurify.sanitize(html, PURIFY);
-            box.innerHTML = html;
+            box.innerHTML = sanitize(html);
+            taskBoxes(box);                              // task-list checkboxes, disabled
             K.images.resolve(box);                       // ![x](name) → registered image
-
-            K.$$('a[href^="http"]', box).forEach(function (a) { a.target = '_blank'; a.rel = 'noopener'; });
+            fixLinks(box);
 
             // highlight.js: fenced blocks with a language (and plain ones, auto)
             if (typeof hljs !== 'undefined') {
