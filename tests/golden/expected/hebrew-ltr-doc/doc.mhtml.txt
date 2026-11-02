@@ -1,0 +1,19 @@
+# MHTML, 2 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/416e8e1fd5ad.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="ltr">
+        <p style="direction:ltr;text-align:justify" class="MsoNormal">An English document with a Hebrew word <span dir="rtl">שלום</span> inside.</p>
+<p style="direction:rtl;text-align:justify" class="MsoNormal">שלום עולם — <span dir="ltr">a Hebrew-led line in an English document</span>.</p>
+
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="filelist.xml"/>
+</xml>

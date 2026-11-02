@@ -14,6 +14,9 @@ assets/fonts/embed/
 assets/icons.js
 docs/about-kelk-and-samples.js
 tests/pdf-lab/corpus.js
+# the golden snapshots (written by tests/golden/run.js --update) and the official OOXML schemas (kept unchanged)
+tests/golden/expected/
+tests/ooxml-xsd/
 package-lock.json
 
 # The PDF lab: its PDFs, its outputs (made when run), the baseline gate.js --update writes, and run reports

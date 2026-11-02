@@ -13,7 +13,11 @@
     "test": "node --test \"tests/unit/*.test.js\"",
     "format:check": "prettier --check .",
     "check:version": "node tools/check-version.js",
-    "check:i18n": "node tools/check-i18n.js"
+    "check:i18n": "node tools/check-i18n.js",
+    "test:golden": "node tests/golden/run.js",
+    "test:golden:update": "node tests/golden/run.js --update",
+    "test:docx": "node tests/docx-validate.js",
+    "test:builders": "node tests/pdf-lab/scripts/roundtrip.js"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

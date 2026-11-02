@@ -1,0 +1,673 @@
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:w="urn:schemas-microsoft-com:office:word"
+  xmlns:m="http://schemas.microsoft.com/office/2004/12/omml"
+  xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<link rel=File-List href="document_files/filelist.xml">
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name=ProgId content=Word.Document>
+  <meta name=Generator content="Microsoft Word 15">
+  <meta name=Originator content="Microsoft Word 15">
+<!--[if gte mso 9]><xml>
+ <o:DocumentProperties>
+  <o:Author></o:Author>
+  <o:LastAuthor></o:LastAuthor>
+  <o:Revision>1</o:Revision>
+  <o:TotalTime>1</o:TotalTime>
+  <o:Version>16.00</o:Version>
+ </o:DocumentProperties>
+ <o:OfficeDocumentSettings>
+  <o:AllowPNG/>
+ </o:OfficeDocumentSettings>
+</xml><![endif]-->
+<!--[if gte mso 9]><xml>
+ <w:WordDocument>
+  <w:SpellingState>Clean</w:SpellingState>
+  <w:GrammarState>Clean</w:GrammarState>
+  <w:TrackMoves>false</w:TrackMoves>
+  <w:TrackFormatting/>
+  <w:PunctuationKerning/>
+  <w:ValidateAgainstSchemas/>
+  <w:SaveIfXMLInvalid>false</w:SaveIfXMLInvalid>
+  <w:IgnoreMixedContent>false</w:IgnoreMixedContent>
+  <w:AlwaysShowPlaceholderText>false</w:AlwaysShowPlaceholderText>
+  <w:DoNotPromoteQF/>
+  <w:LidThemeOther>EN-US</w:LidThemeOther>
+  <w:LidThemeAsian>X-NONE</w:LidThemeAsian>
+  <w:LidThemeComplexScript>AR-SA</w:LidThemeComplexScript>
+  <w:Compatibility>
+   <w:BreakWrappedTables/>
+   <w:SnapToGridInCell/>
+   <w:WrapTextWithPunct/>
+   <w:UseAsianBreakRules/>
+   <w:DontGrowAutofit/>
+   <w:SplitPgBreakAndParaMark/>
+   <w:EnableOpenTypeKerning/>
+   <w:DontFlipMirrorIndents/>
+   <w:OverrideTableStyleHps/>
+  </w:Compatibility>
+  <m:mathPr>
+   <m:mathFont m:val="Cambria Math"/>
+   <m:brkBin m:val="before"/>
+   <m:brkBinSub m:val="&#45;-"/>
+   <m:smallFrac m:val="off"/>
+   <m:dispDef/>
+   <m:lMargin m:val="0"/>
+   <m:rMargin m:val="0"/>
+   <m:defJc m:val="centerGroup"/>
+   <m:wrapIndent m:val="1440"/>
+   <m:intLim m:val="subSup"/>
+   <m:naryLim m:val="undOvr"/>
+  </m:mathPr></w:WordDocument>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <w:LatentStyles DefLockedState="false" DefUnhideWhenUsed="false"
+  DefSemiHidden="false" DefQFormat="false" DefPriority="99"
+  LatentStyleCount="376">
+      <w:LsdException Locked="false" Priority="0" QFormat="true" Name="Normal"/>
+      <w:LsdException Locked="false" Priority="9" QFormat="true" Name="heading 1"/>
+      <w:LsdException Locked="false" Priority="9" QFormat="true" Name="heading 2"/>
+      <w:LsdException Locked="false" Priority="9" QFormat="true" Name="heading 3"/>
+      <w:LsdException Locked="false" Priority="9" QFormat="true" Name="heading 4"/>
+      <w:LsdException Locked="false" Priority="9" QFormat="true" Name="heading 5"/>
+      <w:LsdException Locked="false" Priority="9" QFormat="true" Name="heading 6"/>
+      <w:LsdException Locked="false" Priority="22" QFormat="true" Name="Strong"/>
+      <w:LsdException Locked="false" Priority="20" QFormat="true" Name="Emphasis"/>
+      <w:LsdException Locked="false" Priority="20" QFormat="true" Name="Title"/>
+      <w:LsdException Locked="false" Priority="20" QFormat="true" Name="SubTitle"/>
+      <w:LsdException Locked="false" Priority="20" QFormat="true" Name="Quote"/>
+      <!-- <w:LsdException Locked="false" Priority="59" QFormat="true" Name="Normal (Web)"/> -->
+ </w:LatentStyles>
+</xml>
+<![endif]-->
+  <style>
+/* Font Definitions */
+@font-face {
+	font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;
+}
+@font-face {
+	font-family:"Sahel";
+}
+@font-face {
+	font-family:"Vazir Code Hack";
+}
+
+/* Word-specific styling */
+
+.MsoChpDefault {
+  mso-style-type:export-only;
+  mso-default-props:yes;
+}
+
+.MsoPapDefault {
+  mso-style-type:export-only;
+  direction:rtl;
+  text-align:justify;
+  margin-bottom:6pt;
+}
+
+/* Page Setup */
+@page WordSection1 {
+  size: 21.0cm 29.7cm;
+  margin:1.5cm;
+  mso-page-orientation: portrait;
+  mso-gutter: 0cm;
+  mso-header-margin:0.7cm;
+  mso-footer-margin:0.7cm;
+  mso-paper-source:0;
+  mso-header: h1;
+  mso-footer: f1;
+}
+
+div.WordSection1 {page:WordSection1;}
+
+table.MsoNormalTable, table.headerFooterTable {
+  mso-style-name:"Table Normal";
+  border-collapse: collapse;
+  margin-top:0pt;
+  margin-right:0cm;
+  margin-bottom:0pt;
+  margin-left:0cm;
+  mso-tstyle-rowband-size:0;
+  mso-tstyle-colband-size:0;
+  mso-style-noshow:yes;
+  mso-style-priority:99;
+  mso-style-parent:"";
+  mso-padding-alt:0cm 5.4pt 0cm 5.4pt;
+  mso-para-margin-top:0cm;
+  mso-para-margin-right:0cm;
+  mso-para-margin-bottom:8.0pt;
+  mso-para-margin-left:0cm;
+  mso-pagination:widow-orphan;
+  mso-bidi-language:FA;
+  unicode-bidi:embed;
+  font-family:"Sahel",sans-serif;
+  mso-ascii-font-family:"Sahel";
+  mso-hansi-font-family:"Sahel";
+  mso-bidi-font-family:"Sahel";
+  font-size:11.5pt;
+  mso-bidi-font-size:12.0pt;
+  line-height:100%;
+  mso-line-height-rule:auto;
+}
+
+/* only the header/footer table spans the text: a content table's width is its own
+   (inline, from WordHtmlBuilder — a class width here overrides it in list items) */
+table.headerFooterTable {
+  width: 98%;
+}
+
+th, td {
+  border: solid windowtext 1.0pt;
+  padding: 1pt;
+  direction: rtl;
+}
+
+/* a content table's lines, fills and weight are inline on each cell (BuilderBase table style) */
+th {
+  font-weight: bold;
+}
+
+/* hidden table for header/footer */
+table#hrdftrtbl {
+  margin:0in 0in 0in 900in;
+  width:1px;
+  height:1px;
+  overflow:hidden;
+}
+
+p.MsoNormal, div.MsoNormal {
+  mso-style-unhide:no;
+  mso-style-qformat:yes;
+  mso-style-parent:"";
+  margin-top:4pt;
+  margin-right:0cm;
+  margin-bottom:6pt;
+  margin-left:0cm;
+  direction:rtl;
+  text-align:justify;
+  mso-pagination:widow-orphan;
+  mso-bidi-language:FA;
+  unicode-bidi:embed;
+  font-family:"Sahel",sans-serif;
+  mso-ascii-font-family:"Sahel";
+  mso-hansi-font-family:"Sahel";
+  mso-bidi-font-family:"Sahel";
+  font-size:11.5pt;
+  mso-bidi-font-size:12.0pt;
+  line-height:110%;
+  mso-line-height-rule:auto;
+}
+
+/* Same as p.MsoNormal above, except margins are 0 for tighter list spacing */
+li.MsoNormal {
+  mso-style-unhide:no;
+  mso-style-qformat:yes;
+  mso-style-parent:"";
+  margin-top:0pt;
+  margin-right:0cm;
+  margin-bottom:0pt;
+  margin-left:0cm;
+  direction: rtl;
+  mso-pagination:widow-orphan;
+  mso-bidi-language:FA;
+  unicode-bidi:embed;
+  font-family:"Sahel",sans-serif;
+  mso-ascii-font-family:"Sahel";
+  mso-hansi-font-family:"Sahel";
+  mso-bidi-font-family:"Sahel";
+  font-size:11.5pt;
+  mso-bidi-font-size:12.0pt;
+  line-height:100%;
+  mso-line-height-rule:auto;
+}
+li.MsoNormal { margin-bottom: 3pt; mso-margin-bottom-alt: 3pt; }
+
+a:link, span.MsoHyperlink {
+  mso-style-priority:99;
+  color:#0563C1;
+  mso-themecolor:hyperlink;
+  text-decoration:underline;
+  text-underline:single;
+  mso-bidi-language:FA;
+  unicode-bidi:embed;
+  font-family:"Sahel",sans-serif;
+  mso-ascii-font-family:"Sahel";
+  mso-hansi-font-family:"Sahel";
+  mso-bidi-font-family:"Sahel";
+  font-size:11.5pt;
+  mso-bidi-font-size:12.0pt;
+  line-height:110%;
+  mso-line-height-rule:auto;
+}
+a:visited, span.MsoHyperlinkFollowed {
+  mso-style-noshow:yes;
+  mso-style-priority:99;
+  color:#954F72;
+  mso-themecolor:followedhyperlink;
+  text-decoration:underline;
+  text-underline:single;
+  mso-bidi-language:FA;
+  unicode-bidi:embed;
+  font-family:"Sahel",sans-serif;
+  mso-ascii-font-family:"Sahel";
+  mso-hansi-font-family:"Sahel";
+  mso-bidi-font-family:"Sahel";
+  font-size:11.5pt;
+  mso-bidi-font-size:12.0pt;
+  line-height:110%;
+  mso-line-height-rule:auto;
+}
+
+/* Keep each Word style in its OWN rule, with the Mso class selector first:
+ * Word maps a CSS rule to a Style-gallery style by its selectors, and
+ * grouping two styles (or leading with a bare HTML element) can leave the
+ * gallery style without these properties. */
+span.MsoStrong, strong {
+  mso-bidi-language:FA;
+  unicode-bidi:embed;
+  font-family:"Sahel",sans-serif;
+  mso-ascii-font-family:"Sahel";
+  mso-hansi-font-family:"Sahel";
+  mso-bidi-font-family:"Sahel";
+  font-size:11.5pt;
+  mso-bidi-font-size:12.0pt;
+  line-height:110%;
+  mso-line-height-rule:auto;
+}
+
+span.MsoEmphasis, em {
+  mso-bidi-language:FA;
+  unicode-bidi:embed;
+  font-family:"Sahel",sans-serif;
+  mso-ascii-font-family:"Sahel";
+  mso-hansi-font-family:"Sahel";
+  mso-bidi-font-family:"Sahel";
+  font-size:11.5pt;
+  mso-bidi-font-size:12.0pt;
+  line-height:110%;
+  mso-line-height-rule:auto;
+}
+
+p.MsoTOCHeading {
+  text-align: right;
+  color: #2F5496;
+  font-size: 14.0pt;
+  mso-bidi-font-size: 14.0pt;   /* the same size for Persian text (as .docx / .pdf) */
+  font-weight: bold;
+  mso-bidi-language:FA;
+  unicode-bidi:embed;
+  font-family:"Sahel",sans-serif;
+  mso-ascii-font-family:"Sahel";
+  mso-hansi-font-family:"Sahel";
+  mso-bidi-font-family:"Sahel";
+  line-height:110%;
+  mso-line-height-rule:auto;
+}
+
+/* text in a content table's cells (WordHtmlBuilder wraps it): no space before, a little after —
+   the same "Table Text" style as the .docx; direction and alignment are the cell's (inline) */
+p.MsoTableText {
+  mso-style-name: "Table Text";
+  mso-style-parent: "";
+  margin-top: 0pt;
+  margin-right: 0cm;
+  margin-bottom: 1pt;
+  margin-left: 0cm;
+  mso-margin-top-alt: 0pt;
+  mso-margin-bottom-alt: 1pt;
+  direction: rtl;
+  text-align: right;
+  mso-pagination: widow-orphan;
+  mso-bidi-language:FA;
+  unicode-bidi:embed;
+  font-family:"Sahel",sans-serif;
+  mso-ascii-font-family:"Sahel";
+  mso-hansi-font-family:"Sahel";
+  mso-bidi-font-family:"Sahel";
+  font-size:11.5pt;
+  mso-bidi-font-size:12.0pt;
+  line-height:100%;
+  mso-line-height-rule:auto;
+}
+
+/* table of contents entries: Word's built-in "toc 1…3" (WordHtmlBuilder setToc) */
+p.MsoToc1, li.MsoToc1, div.MsoToc1,
+p.MsoToc2, li.MsoToc2, div.MsoToc2,
+p.MsoToc3, li.MsoToc3, div.MsoToc3 {
+  mso-style-update: auto;
+  mso-style-priority: 39;
+  mso-style-next: Normal;
+  margin-top: 0pt;
+  margin-bottom: 5pt;
+  margin-right: 0pt;
+  text-align: right;
+  direction:rtl;
+  text-align:justify;
+  mso-pagination: widow-orphan;
+  mso-bidi-language:FA;
+  unicode-bidi:embed;
+  font-family:"Sahel",sans-serif;
+  mso-ascii-font-family:"Sahel";
+  mso-hansi-font-family:"Sahel";
+  mso-bidi-font-family:"Sahel";
+  line-height:110%;
+  mso-line-height-rule:auto;
+}
+p.MsoToc2, li.MsoToc2, div.MsoToc2 { margin-right: 11pt; }
+p.MsoToc3, li.MsoToc3, div.MsoToc3 { margin-right: 22pt; }
+
+p.MsoTitle {
+  margin-top: 6pt;
+  margin-bottom: 6pt;
+  font-size: 15.0pt;
+  font-weight: bold;
+  direction:rtl;
+  text-align:justify;
+  mso-bidi-language:FA;
+  unicode-bidi:embed;
+  font-family:"Sahel",sans-serif;
+  mso-ascii-font-family:"Sahel";
+  mso-hansi-font-family:"Sahel";
+  mso-bidi-font-family:"Sahel";
+  line-height:110%;
+  mso-line-height-rule:auto;
+}
+
+p.MsoSubtitle {
+  margin-top: 6pt;
+  margin-bottom: 6pt;
+  font-size: 13.0pt;
+  font-style: italic;
+  direction:rtl;
+  text-align:justify;
+  mso-bidi-language:FA;
+  unicode-bidi:embed;
+  font-family:"Sahel",sans-serif;
+  mso-ascii-font-family:"Sahel";
+  mso-hansi-font-family:"Sahel";
+  mso-bidi-font-family:"Sahel";
+  line-height:110%;
+  mso-line-height-rule:auto;
+}
+
+/* Heading styles */
+h1, p.MsoHeading1 {
+  font-size: 15.0pt;
+  mso-bidi-font-size:15.0pt;
+  color:#44546A;
+  margin-top: 18pt;
+  margin-bottom: 6.0pt;
+  page-break-after: avoid;
+  font-weight: bold;
+  direction:rtl;
+  text-align:justify;
+  mso-bidi-language:FA;
+  unicode-bidi:embed;
+  font-family:"Sahel",sans-serif;
+  mso-ascii-font-family:"Sahel";
+  mso-hansi-font-family:"Sahel";
+  mso-bidi-font-family:"Sahel";
+  line-height:110%;
+  mso-line-height-rule:auto;
+}
+h2, p.MsoHeading2 {
+  font-size: 14.0pt;
+  mso-bidi-font-size:14.0pt;
+  color:#293E1A;
+  margin-top: 16pt;
+  margin-bottom: 6.0pt;
+  page-break-after: avoid;
+  font-weight: bold;
+  direction:rtl;
+  text-align:justify;
+  mso-bidi-language:FA;
+  unicode-bidi:embed;
+  font-family:"Sahel",sans-serif;
+  mso-ascii-font-family:"Sahel";
+  mso-hansi-font-family:"Sahel";
+  mso-bidi-font-family:"Sahel";
+  line-height:110%;
+  mso-line-height-rule:auto;
+}
+h3, p.MsoHeading3 {
+  font-size: 13.0pt;
+  mso-bidi-font-size:13.0pt;
+  color:#666666;
+  margin-top: 14pt;
+  margin-bottom: 6.0pt;
+  page-break-after: avoid;
+  font-weight: bold;
+  direction:rtl;
+  text-align:justify;
+  mso-bidi-language:FA;
+  unicode-bidi:embed;
+  font-family:"Sahel",sans-serif;
+  mso-ascii-font-family:"Sahel";
+  mso-hansi-font-family:"Sahel";
+  mso-bidi-font-family:"Sahel";
+  line-height:110%;
+  mso-line-height-rule:auto;
+}
+h4, p.MsoHeading4 {
+  font-size: 12.0pt;
+  mso-bidi-font-size:12.0pt;
+  color:#204F7A;
+  margin-top: 12pt;
+  margin-bottom: 6.0pt;
+  page-break-after: avoid;
+  font-weight: bold;
+  direction:rtl;
+  text-align:justify;
+  mso-bidi-language:FA;
+  unicode-bidi:embed;
+  font-family:"Sahel",sans-serif;
+  mso-ascii-font-family:"Sahel";
+  mso-hansi-font-family:"Sahel";
+  mso-bidi-font-family:"Sahel";
+  line-height:110%;
+  mso-line-height-rule:auto;
+}
+h5, p.MsoHeading5 {
+  font-size: 12.0pt;
+  mso-bidi-font-size:12.0pt;
+  color:#6C5200;
+  margin-top: 10pt;
+  margin-bottom: 6.0pt;
+  page-break-after: avoid;
+  font-weight: bold;
+  direction:rtl;
+  text-align:justify;
+  mso-bidi-language:FA;
+  unicode-bidi:embed;
+  font-family:"Sahel",sans-serif;
+  mso-ascii-font-family:"Sahel";
+  mso-hansi-font-family:"Sahel";
+  mso-bidi-font-family:"Sahel";
+  line-height:110%;
+  mso-line-height-rule:auto;
+}
+h6, p.MsoHeading6 {
+  font-size: 12.0pt;
+  mso-bidi-font-size:12.0pt;
+  color:#000000;
+  font-style: italic;
+  margin-top: 8pt;
+  margin-bottom: 6.0pt;
+  page-break-after: avoid;
+  font-weight: bold;
+  direction:rtl;
+  text-align:justify;
+  mso-bidi-language:FA;
+  unicode-bidi:embed;
+  font-family:"Sahel",sans-serif;
+  mso-ascii-font-family:"Sahel";
+  mso-hansi-font-family:"Sahel";
+  mso-bidi-font-family:"Sahel";
+  line-height:110%;
+  mso-line-height-rule:auto;
+}
+
+/* Quote — two forms, chosen per quote by WordHtmlBuilder:
+ *
+ * SIMPLE (text-only quotes, the common case): plain <p class="MsoQuote">
+ *   paragraphs. Border, indent and padding belong to this style — i.e. to
+ *   Word's built-in "Quote" in the Style gallery — so the user can restyle
+ *   or remove it in Word; consecutive paragraphs join into one border line.
+ *
+ * TABLE (quotes containing lists, nested quotes, code, tables): a single-cell
+ *   table.MsoQuoteTable whose cell draws the border (inline), because a
+ *   paragraph border breaks at every list/nested indent. Paragraphs inside
+ *   the cell cancel this rule's border/indent inline.
+ *
+ * The bare blockquote selector is the non-browser fallback (no conversion). */
+/* A filled quote has a hairline in its fill color on the end side, with padding EQUAL to the
+ * bar's: Word positions a paragraph's shading using the border spacing of the OPPOSITE side, so
+ * unequal spacings shift the fill (a white gap at the bar, or past it). Keep padding-left and
+ * padding-right equal (change them together); the hairline's color must equal the fill color.
+ * ONE rule per Word style class: Word keys a style by its CLASS (MsoQuote →
+ * "Quote"), not by the element. A later rule for the same class — even
+ * li.MsoQuote — redefines the style, so a separate borderless li.MsoQuote
+ * rule stripped the border from the gallery "Quote" style. List items in a
+ * table-form quote cancel the border inline instead (WordHtmlBuilder). */
+p.MsoQuote, li.MsoQuote, div.MsoQuote {
+  mso-style-priority:29;
+  mso-style-unhide:no;
+  mso-style-qformat:yes;
+  mso-style-next:Normal;
+  margin-top: 4pt;
+  margin-bottom: 6pt;
+  margin-right: 14.15pt;
+  margin-left: 0cm;
+  border: none;
+  border-right: solid #1F6F5C 3.5pt;
+  border-left: solid #F6F9F8 .25pt;
+  padding-top: 2pt;
+  padding-bottom: 2pt;
+  padding-right: 12pt;
+  padding-left: 12pt;
+  background: #F6F9F8;
+  color: #4A4A4A;
+  font-style: italic;
+  direction:rtl;
+  text-align:justify;
+  mso-bidi-language:FA;
+  unicode-bidi:embed;
+  font-family:"Sahel",sans-serif;
+  mso-ascii-font-family:"Sahel";
+  mso-hansi-font-family:"Sahel";
+  mso-bidi-font-family:"Sahel";
+  font-size:11.5pt;
+  mso-bidi-font-size:12.0pt;
+  line-height:110%;
+  mso-line-height-rule:auto;
+}
+
+/* Non-browser fallback only (no blockquote → MsoQuote conversion ran).
+ * Deliberately a SEPARATE rule from p.MsoQuote above — see note at Strong. */
+blockquote {
+  margin-top: 4pt;
+  margin-bottom: 6pt;
+  margin-right: 14.15pt;
+  margin-left: 0cm;
+  border: none;
+  border-right: solid #1F6F5C 3.5pt;
+  border-left: solid #F6F9F8 .25pt;
+  padding-top: 2pt;
+  padding-bottom: 2pt;
+  padding-right: 12pt;
+  padding-left: 12pt;
+  background: #F6F9F8;
+  color: #4A4A4A;
+  font-style: italic;
+  direction:rtl;
+  text-align:justify;
+  mso-bidi-language:FA;
+  unicode-bidi:embed;
+  font-family:"Sahel",sans-serif;
+  mso-ascii-font-family:"Sahel";
+  mso-hansi-font-family:"Sahel";
+  mso-bidi-font-family:"Sahel";
+  font-size:11.5pt;
+  mso-bidi-font-size:12.0pt;
+  line-height:110%;
+  mso-line-height-rule:auto;
+}
+
+table.MsoQuoteTable {
+  border-collapse: collapse;
+  border: none;
+  width: 98%;
+  margin-top: 4pt;
+  margin-bottom: 6pt;
+}
+
+pre, code {
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: embed;
+  mso-bidi-language:FA;
+  font-family:"Vazir Code Hack", monospace;
+  mso-ascii-font-family:"Vazir Code Hack";
+  mso-hansi-font-family:"Vazir Code Hack";
+  mso-bidi-font-family:"Vazir Code Hack";
+  font-size:10.0pt;
+  mso-bidi-font-size:10.0pt;
+  margin-top:0pt;
+  margin-right:0cm;
+  margin-bottom:0pt;
+  margin-left:0cm;
+  line-height:100%;
+  mso-line-height-rule:auto;
+}
+
+pre {
+  border: 0.75pt solid #D4D0C8;
+  padding: 6px;
+  background-color: #FCFCFC;
+  width: 98%;
+  margin-top: 6pt;
+  margin-bottom: 6pt;
+}
+
+/* Highlight.js Syntax Highlighting */
+.hljs-keyword { color: #0000ff; }
+.hljs-built_in { color: #0000ff; }
+.hljs-type { color: #267f99; }
+.hljs-literal { color: #0000ff; }
+.hljs-symbol { color: #0000ff; }
+.hljs-meta { color: #0000ff; }
+.hljs-title { color: #795e26; }
+.hljs-function { color: #795e26; }
+.hljs-class { color: #267f99; }
+.hljs-variable { color: #001080; }
+.hljs-params { color: #001080; }
+.hljs-property { color: #001080; }
+.hljs-attr { color: #e50000; }
+.hljs-string { color: #a31515; font-style: normal; }
+.hljs-regexp { color: #811f3f; }
+.hljs-char { color: #a31515; }
+.hljs-comment { color: #008000; font-style: normal; }
+.hljs-doctag { color: #008000; font-style: normal; }
+.hljs-number { color: #098658; }
+.hljs-tag { color: #800000; }
+.hljs-name { color: #800000; }
+.hljs-selector-class { color: #800000; }
+.hljs-selector-id { color: #800000; }
+.hljs-operator { color: #000000; }
+.hljs-punctuation { color: #000000; }
+.hljs-section { color: #0000ff; font-weight: bold; }
+.hljs-link { color: #0366d6; }
+.hljs-link-url { color: #032f62; text-decoration: underline; }
+.hljs-strong { color: #000000; font-weight: bold; }
+.hljs-emphasis { color: #000000; font-style: normal; }
+.hljs-bullet { color: #0000ff; }
+.hljs-quote { color: #6a737d; }
+.hljs-blockquote { color: #6a737d; font-style: normal; }
+.hljs-deletion { color: #a31515; background-color: #fdd; }
+.hljs-addition { color: #008000; background-color: #dfd; }
+
+  </style>
+</head>

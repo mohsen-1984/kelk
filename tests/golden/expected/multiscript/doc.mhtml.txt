@@ -1,0 +1,24 @@
+# MHTML, 2 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/b1656fe21d17.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="rtl">
+        <p class="MsoNormal">سند فارسی با زبان‌های دیگر:</p>
+<p style="direction:ltr;text-align:justify" class="MsoNormal">Привет, мир! Это русский текст.</p>
+<p style="direction:ltr;text-align:justify" class="MsoNormal">Γειά σου Κόσμε, ελληνικό κείμενο.</p>
+<p style="direction:ltr;text-align:justify" class="MsoNormal">Tiếng Việt có dấu: Xin chào thế giới.</p>
+<p style="direction:ltr;text-align:justify" class="MsoNormal">Բարեւ աշխարհ — հայերեն.</p>
+<p style="direction:ltr;text-align:justify" class="MsoNormal">გამარჯობა მსოფლიო — ქართული.</p>
+<p style="direction:ltr;text-align:justify" class="MsoNormal">Zażółć gęślą jaźń — Polish, and 2×3 = 6.</p>
+
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="filelist.xml"/>
+</xml>

@@ -1,0 +1,27 @@
+# MHTML, 2 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/0d2b22b1f2f4.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="rtl">
+        <p style="margin-bottom:6pt;mso-margin-bottom-alt:6pt" class="MsoNormal">متن پیش از کد:</p>
+<div align="center" class="MsoNormal"><table class="MsoCodeTable" dir="ltr" border="0" cellspacing="0" cellpadding="0" width="98%" style="width:98%;border-collapse:collapse;border:none;mso-border-alt:none;mso-yfti-tbllook:1184;mso-padding-alt:0cm 0cm 0cm 0cm;margin-top:6pt;margin-bottom:6pt"><tbody><tr><td valign="top" style="border:none;border-left:1px solid #2F3B52;border-right:1px solid #2F3B52;border-bottom:1px solid #2F3B52;border-top:1px solid #2F3B52;mso-border-left-alt:1px solid #2F3B52;mso-border-right-alt:1px solid #2F3B52;mso-border-bottom-alt:1px solid #2F3B52;mso-border-top-alt:1px solid #2F3B52;background:#2F3B52;padding:1pt 6px 1pt 6px"><p class="MsoNormal" dir="ltr" style="direction:ltr;text-align:left;margin:0cm;line-height:normal;font-family:&quot;Vazir Code Hack&quot;,monospace;mso-ascii-font-family:&quot;Vazir Code Hack&quot;;mso-hansi-font-family:&quot;Vazir Code Hack&quot;;mso-bidi-font-family:&quot;Vazir Code Hack&quot;;font-size:8.0pt;mso-bidi-font-size:8.0pt;color:#E8E8E8">python</p></td></tr><tr><td valign="top" style="border:none;border-left:1px solid #2F3B52;border-right:1px solid #2F3B52;border-bottom:1px solid #2F3B52;mso-border-left-alt:1px solid #2F3B52;mso-border-right-alt:1px solid #2F3B52;mso-border-bottom-alt:1px solid #2F3B52;background:#F7F9FC;padding:4pt 6px 4pt 6px"><pre style="border:none;mso-border-alt:none;padding:0cm;margin:0cm;background:transparent;width:auto"><code class="language-python">def total(rows):
+    return sum(r["value"] for r in rows)   # جمع مقادیر
+</code></pre></td></tr></tbody></table></div>
+<p class="MsoNormal" style="direction:rtl;text-align:right;margin:0;mso-margin-top-alt:0;mso-margin-bottom-alt:0;line-height:8pt;mso-line-height-rule:exactly;font-size:4.0pt;mso-bidi-font-size:4.0pt">&nbsp;</p><table class="MsoQuoteTable" border="0" cellspacing="0" cellpadding="0" dir="rtl" width="95.2%" style="width:95.2%;border-collapse:collapse;border:none;mso-border-alt:none;mso-yfti-tbllook:1184;mso-padding-alt:0cm 0cm 0cm 0cm;margin-right:14.15pt;margin-left:0cm"><tr><td valign="top" style="border-top:none;border-bottom:none;border-left:none;border-right:solid #2F5496 5pt;mso-border-top-alt:none;mso-border-bottom-alt:none;mso-border-left-alt:none;mso-border-right-alt:solid #2F5496 5pt;padding:2pt 0cm 2pt 0cm;padding-right:12pt;padding-left:6pt;background:#F6F9F8;direction:rtl;text-align:right"><p class="MsoQuote" style="border-top:none;border-right:none;border-bottom:none;border-left:none;mso-border-alt:none;padding:0cm;margin-right:0cm;margin-left:0cm">نقل‌قول با نوار ضخیم و رنگ دیگر.</p><ul>
+<li class="MsoQuote" style="border-top:none;border-right:none;border-bottom:none;border-left:none;mso-border-alt:none;padding:0cm;margin-right:0cm;margin-left:0cm;margin-top:0pt;margin-bottom:3pt;mso-margin-bottom-alt:3pt;line-height:100%">با یک فهرست</li>
+<li class="MsoQuote" style="border-top:none;border-right:none;border-bottom:none;border-left:none;mso-border-alt:none;padding:0cm;margin-right:0cm;margin-left:0cm;margin-top:0pt;margin-bottom:3pt;mso-margin-bottom-alt:3pt;line-height:100%">و مورد دوم</li>
+</ul></td></tr></table>
+<p class="MsoNormal" style="direction:rtl;text-align:right;margin:0;mso-margin-top-alt:0;mso-margin-bottom-alt:0;line-height:8pt;mso-line-height-rule:exactly;font-size:4.0pt;mso-bidi-font-size:4.0pt">&nbsp;</p><p class="MsoQuote" style="border-top:none;border-bottom:none;border-right:solid #F6F9F8 .25pt;border-left:solid #2F5496 5pt;padding-left:12pt;padding-right:12pt;background:#F6F9F8;margin-left:14.15pt;margin-right:0cm;direction:ltr;text-align:justify" dir="ltr">A left-to-right quote in the same style.</p>
+
+        <p class=MsoNormal style='direction:rtl;text-align:right'>&nbsp;</p>
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="filelist.xml"/>
+</xml>

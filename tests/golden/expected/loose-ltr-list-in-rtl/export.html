@@ -1,0 +1,23 @@
+<!-- ===== head ===== -->
+<!-- shared: _shared/9f312759af51.txt -->
+<!-- ===== body ===== -->
+<body>
+<div class="page">
+
+<article class="doc bd-root bd-doc-rtl"><p>یک پاراگراف فارسی در سند.</p>
+<h3 class="bd-ltr">1.2 Current shipped solution ("Mode 1" below)</h3>
+<p class="bd-ltr">Implemented and working today in <code dir="ltr" class="bd-iso-ltr">App.converter</code>:</p>
+<ul class="bd-ltr">
+<li class="bd-ltr"><p class="bd-ltr"><strong><code dir="ltr" class="bd-iso-ltr">protectProblematicTables(root)</code></strong> — runs on the parsed DOM <em>before</em><br><code dir="ltr" class="bd-iso-ltr">cleanTableCells</code>, and flags a table when<br><code dir="ltr" class="bd-iso-ltr">table.rows.length === 0</code>. Each flagged table is replaced <strong>in the DOM</strong></p>
+<p class="bd-ltr"><strong>Why a plain text token:</strong> the sanitized DOM is later serialized to a string<br>unchanged, every time.</p>
+<div class="code"><div class="code-lang">code</div><pre><code class="hljs sql" dir="ltr"><span class="hljs-operator">&gt;</span> ⚠️ This table could not be converted
+</code></pre></div></li>
+<li class="bd-ltr"><strong><code dir="ltr" class="bd-iso-ltr">convertBlockByBlock(html, turndownService)</code></strong> — last-resort safety net.<br>If the single call throws.
+</li>
+</ul>
+<p class="bd-ltr">This document specifies a <strong>new, opt-in alternative</strong> to the raw-HTML<br>fallback.</p>
+</article>
+
+</div>
+</body>
+</html>

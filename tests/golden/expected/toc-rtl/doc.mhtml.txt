@@ -1,0 +1,29 @@
+# MHTML, 2 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/b1656fe21d17.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="rtl">
+        <h1 id="_Toc1"><a name="_Toc1"></a>سندی با فهرست مطالب</h1><hr><w:Sdt SdtDocPart="t" DocPartType="Table of Contents" DocPartUnique="t" ID="-1694142144"><p class="MsoTocHeading">فهرست مطالب<w:sdtPr></w:sdtPr></p><p class="MsoToc1" style="tab-stops:left dotted 509pt"><!--[if supportFields]><span style='mso-element:field-begin'></span> TOC \o &quot;1-2&quot; \h \z \u <span style='mso-element:field-separator'></span><![endif]--><span class="MsoHyperlink"><a href="#_Toc1">سندی با فهرست مطالب<span style="mso-tab-count:1 dotted">. </span><!--[if supportFields]><span style='mso-element:field-begin'></span> PAGEREF _Toc1 \h <span style='mso-element:field-separator'></span><![endif]--><!--[if supportFields]><span style='mso-element:field-end'></span><![endif]--></a></span></p><p class="MsoToc2" style="tab-stops:left dotted 509pt"><span class="MsoHyperlink"><a href="#_Toc2">فصل 1<span style="mso-tab-count:1 dotted">. </span><!--[if supportFields]><span style='mso-element:field-begin'></span> PAGEREF _Toc2 \h <span style='mso-element:field-separator'></span><![endif]--><!--[if supportFields]><span style='mso-element:field-end'></span><![endif]--></a></span></p><p class="MsoToc2" style="tab-stops:left dotted 509pt"><span class="MsoHyperlink"><a href="#_Toc3">فصل 2<span style="mso-tab-count:1 dotted">. </span><!--[if supportFields]><span style='mso-element:field-begin'></span> PAGEREF _Toc3 \h <span style='mso-element:field-separator'></span><![endif]--><!--[if supportFields]><span style='mso-element:field-end'></span><![endif]--></a></span><!--[if supportFields]><span style='mso-element:field-end'></span><![endif]--></p></w:Sdt><hr><p class="MsoNormal">&nbsp;</p>
+<p class="MsoNormal">یک پاراگراف متن.</p>
+<h2 id="_Toc2"><a name="_Toc2"></a>فصل 1</h2>
+<p class="MsoNormal">یک پاراگراف متن.</p>
+<h3>بخش 1.1</h3>
+<p class="MsoNormal">یک پاراگراف متن.</p>
+<h2 id="_Toc3"><a name="_Toc3"></a>فصل 2</h2>
+<p class="MsoNormal">یک پاراگراف متن.</p>
+<h3>بخش 2.1</h3>
+<p class="MsoNormal">یک پاراگراف متن.</p>
+<h3>بخش 2.2</h3>
+<p class="MsoNormal">یک پاراگراف متن.</p>
+
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="filelist.xml"/>
+</xml>

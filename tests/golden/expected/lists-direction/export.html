@@ -1,0 +1,65 @@
+<!-- ===== head ===== -->
+<!-- shared: _shared/29bd0df37315.txt -->
+<!-- ===== body ===== -->
+<body>
+<div class="page">
+
+<article class="doc bd-root bd-doc-rtl"><h1>آزمون قواعد جهت فهرست</h1>
+<p>این سند عمداً فارسی است تا جهت سند <span class="bd-iso-ltr">RTL</span> تشخیص داده شود.</p>
+<h2>مورد 1: متن زیرفهرست در تصمیم آیتم والد حساب می‌شود</h2>
+<p>فهرست الف — آیتم انگلیسی با زیرآیتم فارسی (رفتار فعلی: آیتم دوم <span class="bd-iso-ltr">RTL</span> می‌ماند):</p>
+<ul>
+<li>مورد اول فارسی</li>
+<li class="bd-ltr">Second item in English<ul>
+<li class="bd-rtl bd-s1">زیرمورد فارسی</li>
+<li class="bd-rtl bd-s1">زیرمورد دوم</li>
+</ul>
+</li>
+<li>مورد سوم فارسی</li>
+</ul>
+<p>فهرست ب — همان ساختار، ولی زیرآیتم‌ها انگلیسی (کنترل: آیتم دوم <span class="bd-iso-ltr">LTR</span> می‌شود):</p>
+<ul>
+<li>مورد اول فارسی</li>
+<li class="bd-ltr">Second item in English<ul>
+<li class="bd-ltr bd-b0 bd-s1">English sub item</li>
+<li class="bd-ltr bd-b0 bd-s1">Another sub item</li>
+</ul>
+</li>
+<li>مورد سوم فارسی</li>
+</ul>
+<p>فهرست ج — فهرست شماره‌دار با آیتم انگلیسی که زیرفهرست مختلط دارد:</p>
+<ol>
+<li>گام نخست</li>
+<li class="bd-ltr">Configure the server<ol>
+<li class="bd-rtl bd-s1">نصب بسته‌ها</li>
+<li class="bd-ltr bd-b0 bd-s1">Restart the service</li>
+</ol>
+</li>
+<li>گام پایانی</li>
+</ol>
+<h2>مورد 2: یک ویرگول فارسی کل فهرست را <span class="bd-iso-ltr">RTL</span> حساب می‌کند</h2>
+<p>فهرست د — تمام انگلیسی (کنترل: کل درخت <span class="bd-iso-ltr">LTR</span>، علامت‌ها سمت چپ):</p>
+<ul class="bd-ltr">
+<li class="bd-ltr">Budget</li>
+<li class="bd-ltr">1,250,000</li>
+<li class="bd-ltr">2024 - 2025</li>
+<li class="bd-ltr">Total</li>
+</ul>
+<p>فهرست هـ — همان فهرست، فقط یک ویرگول فارسی در آیتم اول (رفتار فعلی: آیتم‌های عددی <span class="bd-iso-ltr">RTL</span> می‌شوند):</p>
+<ul class="bd-ltr">
+<li class="bd-ltr">Budget، approved</li>
+<li class="bd-ltr">1,250,000</li>
+<li class="bd-ltr">2024 - 2025</li>
+<li class="bd-ltr">Total</li>
+</ul>
+<p>فهرست و — به‌جای ویرگول، نقطه‌ویرگول و علامت سؤال فارسی:</p>
+<ul class="bd-ltr">
+<li class="bd-ltr">Is it ready؟</li>
+<li class="bd-ltr">42</li>
+<li class="bd-ltr">Done؛ closed</li>
+</ul>
+</article>
+
+</div>
+</body>
+</html>
