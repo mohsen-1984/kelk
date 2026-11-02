@@ -37,7 +37,7 @@ and recorded.
 |---|---|
 | **What it is** | A static web page (`index.html` + `scripts/` + `styles/`) on top of a standalone JavaScript library (`lib/`): four builders with one API — `DocxBuilder`, `PdfBuilder`, `WordHtmlBuilder` (.doc / MHTML), `HtmlBuilder` — plus `PreviewBuilder`, `BidiCore`, `MathCore`, `MarkdownImporter` (.docx / HTML / rich paste → Markdown) and `PdfImporter` (.pdf → Markdown, on PDF.js). |
 | **Backend** | None. Every conversion runs client-side; the page works from `file://`, from the release zip, or from any static host. |
-| **Repository** | GitHub `mohsen-1984/Kelk` (being renamed from `mohsen-1984/kelk`; links in the root README and the Pages URL still read `kelk` until they are updated). Branch `main`; tags `v1.0`, `v1.5`. The 2.0-rc1 tree came in through [PR #1](https://github.com/mohsen-1984/Kelk/pull/1) from the fork branch `AliZarrabi/overhaul/2.0`, merged into `main` on 1405-08-10 (`db323e1`). Redesign work runs on branches `redesign/P<n>.<m>`. |
+| **Repository** | GitHub `mohsen-1984/Kelk` (being renamed from `mohsen-1984/kelk`; links in the root README and the Pages URL still read `kelk` until they are updated). Branch `main`; tags `v1.0`, `v1.5`. The 2.0-rc1 tree came in through [PR #1](https://github.com/mohsen-1984/Kelk/pull/1) from the fork branch `AliZarrabi/overhaul/2.0`, merged into `main` on 1405-08-10 (`db323e1`). Redesign work runs on branches `redesign/P<n>.<m>`, each merged into `main` through a pull request with a merge commit after its approval (P0.1–P0.4: PRs #3–#6, 1405-08-11). |
 | **Published** | GitHub Pages `https://mohsen-1984.github.io/kelk/` (branch deploy of the whole repository) and a release zip `kelk_<version>.zip` made by hand. |
 | **Users** | Anyone writing Markdown — notably for AI-model output — who needs Word or PDF, above all in Persian and Arabic; the import side gives AI models clean Markdown from Word, PDF and HTML. |
 | **Size** | `lib/` ≈ 22.6k lines of JavaScript in 18 files (the PDF importer, `lib/PdfImporter.js` + `lib/pdfimport/`, ≈ 8.6k of them), `scripts/` ≈ 3.6k lines in 13 files; tree ≈ 50.6 MB (runtime ≈ 31.8, dev-only ≈ 18.8 — measured 1405-08-09); `vendor/` 16.75 MB (MathJax 11.17); the PDF lab's 144 PDFs 15.6 MB. |
@@ -57,7 +57,7 @@ documentation is [`lib/README.md`](../lib/README.md), with [`lib/LATEX.md`](../l
 |---|---|---|
 | **A current browser** | Chrome, Edge or Firefox | All the app needs. MathJax and PDF.js are wrapped to load from `file://`. |
 | **Git** | any | `mohsen-1984/Kelk`, branch `main`. Text files are LF everywhere (`.gitattributes`); a working tree cloned before P0.1 needs one refresh on a clean tree: `git rm -r --cached -q . && git reset -q --hard`. |
-| Node.js | 20.19+ / 22.13+ / 24+ for lint (ESLint 10); 18+ for the lab alone (CI uses 22) | Only for the dev tooling, the PDF lab and `tools/*.js`. Since P0.4 `package.json` pins the dev tools (Playwright, pdf-lib, ESLint, Prettier, JSZip); `npm ci` at the root installs them. |
+| Node.js | 20.19+ / 22.13+ / 24+ for lint (ESLint 10); 22.22.2+ / 24.15+ / 26+ for the unit tests (jsdom 30); 18+ for the lab alone (CI uses 22) | Only for the dev tooling, the unit tests, the PDF lab and `tools/*.js`. Since P0.4 `package.json` pins the dev tools (Playwright, pdf-lib, ESLint, Prettier, JSZip; jsdom since P1.1); `npm ci` at the root installs them. |
 | Playwright | 1.56.1 (the CI pin) + `pdf-lib` 1.17.1 | Installed **outside** the repository; `NODE_TOOLS` points at its `node_modules`. |
 | Lab generators | LibreOffice (`soffice`), wkhtmltopdf, pandoc, Python 3 with openpyxl, python-pptx, fontTools, DejaVu fonts, qpdf, poppler-utils | Only to **remake** lab PDFs; importing and scoring need Node + Playwright only. |
 | Python 3 | 3.10+, optional | `tools/build_pdf_fonts.py` (PDF fonts) and the Claude Code `ui-visual-check` skill (with Chrome or Edge). |
@@ -75,6 +75,11 @@ documentation is [`lib/README.md`](../lib/README.md), with [`lib/LATEX.md`](../l
 ```bash
 # the app — nothing to install or build
 start index.html                      # Windows; or open it in any browser, or serve the folder statically
+
+# dev checks (after `npm ci` at the root; the same three run in CI, tooling.yml)
+npm run lint                          # ESLint, 0 errors expected
+npm run check:version                 # every version string against K.config.version
+npm test                              # tests/unit: storage, exports, two tabs (Node + jsdom)
 
 # the browser test pages (open from file://)
 start tests/index.html                # links to the suites below
@@ -203,7 +208,7 @@ kelk/                     root: index.html  README.md  CHANGELOG.md  TODO.md  TH
 |---|---|---|
 | Page shell | `index.html`, `scripts/main.js`, `ui.js`, `styles/` | Layout, top bar, panels, maximise, toasts, themes, startup. |
 | Editor & preview | `scripts/editor.js`, `preview.js` | Markdown editing, debounced (250 ms) preview through `PreviewBuilder`, scroll sync. |
-| Settings & storage | `scripts/settings.js`, `storage.js`, `config.js` | Settings pane (grouped by subject), defaults, one-shot migrations, `localStorage`. |
+| Settings & storage | `scripts/settings.js`, `storage.js`, `config.js` | Settings pane (grouped by subject), defaults, `localStorage` holding only the differences from the defaults; the profile carries `schemaVersion` and one `K.store.migrate()` brings an older one up to it; other tabs followed through the `storage` event (`main.js`). |
 | Import / export | `scripts/importer.js`, `exporter.js`, `names.js`, `images.js` | File pickers, drop, multi-file and zip, progress dialog with Cancel, file naming, images in the text. |
 | i18n | `scripts/i18n.js` | English, Persian, Arabic strings; direction of the interface. |
 | Direction engine | `lib/BidiCore.js`, `BidiView.js` | Every direction decision — paragraphs, list items, cells, numbers and brackets in RTL text — for all outputs and the preview. |
@@ -268,7 +273,7 @@ Kelk has no server, no account and no upload: documents never leave the browser.
 | Formulas | `tests/math-file.html`, `math-modes.html`, `math-roundtrip.js` | Browser pages, checked by eye; since P0.3 `math-roundtrip.js` exits 1 on a failed case (76 / 76 pass, 1405-08-10) and `roundtrip.js` on a red builder-suite cell outside its two-entry allow-list (404 pass). |
 | Lint | `npm run lint` (`eslint.config.js`) | Since P0.4 (1405-08-11): **0 errors, 109 warnings** (`no-useless-escape` 42, `no-unused-vars` 32, `no-useless-assignment` 18, `no-misleading-character-class` 7, `no-control-regex` 6, `no-sparse-arrays` 4); CI workflow `tooling.yml` on every push and PR. Prettier is configured (`.prettierrc`) but the tree is not formatted, so `npm run format:check` is not in CI. |
 | Version | `npm run check:version` (`tools/check-version.js`) | 24 places checked against `K.config.version` (`scripts/config.js`): `package.json` (semver form), CHANGELOG heading, `BuilderBase.version`, the `lib/` headers and README download (release form `2.0`), `PdfImporter` its own `1.0`; in `tooling.yml`. |
-| Unit tests | — | **None** yet (P1.1). |
+| Unit tests | `npm test` (`tests/unit/`, Node's test runner + jsdom) | Since P1.1 (1405-08-11): **23 tests**, all pass — `storage.test.js` (14: a fresh profile keeps its choices across reloads, only differences stored, legacy profiles with and without markers, the ui/profile split, settings files, a newer schema read and written by an older tab, page settings) and `app.test.js` (9: `index.html` with all its scripts in jsdom — an HTML / MD export right after a keystroke contains it, the title follows a new first heading, the last keystrokes saved on `pagehide`, a second tab follows text, settings, images, logo, the file name, theme and layout, unsaved typing kept, a cleared storage written back, a settings file and Reset / Undo through the Settings pane). On the code before P1.1, 16 of the first 19 fail. In `tooling.yml`. |
 
 ### Protocol for every change
 
@@ -294,7 +299,7 @@ From the plan (§4, §9); every sub-phase ends with a report and the owner's wri
   generator, RTL fonts, digits and tracking dimensions; ≥ 40 % RTL.
 - **Metamorphic net** (P2.2): ≥ 20 transforms, "same" transforms asserted byte-identical.
 - **Builders in CI** (P2.3): DOCX validated (OOXML XSD + LibreOffice conversion), golden snapshots in `tests/golden/`,
-  MarkdownImporter unit tests. App unit tests in `tests/unit/` (Node + jsdom, P1.1).
+  MarkdownImporter unit tests. App unit tests: `tests/unit/` exists since P1.1 (Node + jsdom; `appWindow()` in `helpers.js` loads the whole page) — new app fixes add their case there.
 - **Real producers and goldens** (P4): ≈ 40 PDFs from Word, Print to PDF, Excel, PowerPoint, Edge on the owner's
   machine; 50 hand-written golden Markdown files.
 
@@ -347,16 +352,15 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 
 | Priority | Issue | Location | Suggestion |
 |---|---|---|---|
-| 🟠 High | **Settings migrations run against fresh profiles**: the one-shot markers (`_auto`, `_vch`, `_vz`, `_auto2`, `_hfauto`, `_lh`) are not in the defaults, so a user's own choices get "migrated" on the next reload; the stored profile freezes old defaults; `settings.js` duplicates part of it. | `scripts/storage.js:54-114`, `config.js:36-66`, `settings.js:188-193` | P1.1: `schemaVersion`, store diffs only, one `migrate()`. |
-| 🟠 High | **Exports can read stale preview HTML**: the preview renders 250 ms after typing, the exporter reads it at once. | `scripts/exporter.js:173`, `editor.js:120` | P1.1: `K.preview.flush()` before export. |
 | 🟠 High | ≈ 1.93 MB of JS / CSS parsed at startup, 1.44 MB of it unminified `lib/` that only import / export needs. | `index.html:564-581` | P5.1: lazy-load builders and importer (≤ 0.6 MB). |
 | 🟡 Medium | PDF.js on a fake worker (main thread); builders synchronous, so Cancel cannot interrupt an export. | `scripts/config.js:134`, `exporter.js:172-189` | P5.1 real Worker on http(s); later async builders. |
-| 🟡 Medium | Images as base64 in `localStorage` (≈ 5 MB quota); no `storage` event, so two tabs overwrite each other; Clear cannot be undone. | `scripts/images.js:38-46`, `main.js:200-206` | P5.3 IndexedDB + recovery snapshots; P1.1 `storage` listener. |
+| 🟡 Medium | Images as base64 in `localStorage` (≈ 5 MB quota); Clear survives only in the page's Undo history, not a reload. | `scripts/images.js`, `main.js:200-206` | P5.3 IndexedDB + recovery snapshots. |
 | 🟡 Medium | Every render redoes marked + DOMPurify + hljs + MathJax; startup renders 3–4 times. | `scripts/preview.js:147-195` | Cache per block; render once at startup. |
 | 🟡 Medium | `<html lang="fa" dir="rtl">` hard-coded → a wrong-language flash; Tab trap in the editor (WCAG 2.1.2); stats `aria-live` chatter. | `index.html:2,111`, `scripts/editor.js:142-146` | P1.4 boot script; P5.4 a11y. |
 | 🟡 Medium | The Arabic UI gets the Persian word «جدول» and Persian dates. | `scripts/importer.js:20,146`, `exporter.js:114` | P1.4: through `K.i18n`, date locale by language. |
 | ⚪ Low | ≈ 10 hard-coded English strings; 9 unused i18n keys; `vendor/lucide.min_1.48.0.js` (444 KB) and a duplicate hljs CSS shipped unused. | `scripts/`, `vendor/` | P1.4 `tools/check-i18n.js`; P5.1 drop the unused files. |
 | ⚪ Low | Missing: PWA, print CSS, find / replace, snapshots, export presets, reorder before a multi-file join, outline navigation, auto theme. | — | P5.3–P5.4. |
+| ⚪ Low | Two tabs (since P1.1, 1405-08-11): two tabs typing within the same 600 ms autosave pause — the later save wins, and the other tab takes it once idle; a tab of an older Kelk version keeps a newer profile's other values but cannot read the ones it does not know. | `scripts/main.js` (storage listener), `editor.js` (`external`), `storage.js` (`set`) | P5.3 with IndexedDB and snapshots, if it matters in use. |
 
 ### 📚 Builder libraries (`lib/`)
 
@@ -377,7 +381,7 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 No open issues.
 
 <details>
-<summary><strong>✅ Resolved</strong> (14) — click to expand</summary>
+<summary><strong>✅ Resolved</strong> (17) — click to expand</summary>
 
 | Priority | Issue | Location | Suggestion |
 |---|---|---|---|
@@ -395,6 +399,9 @@ No open issues.
 | ✅ Resolved 1405-08-11 | `baseline.json` was made with Chromium 153 and Bitstream Type 1 fonts; CI has Playwright 1.56.1 (Chromium 141) and no such fonts, so the fuzz comparison on the no-base path is always skipped. | `tests/pdf-lab/baseline.json` | P0.3 approval step: fuzz and meta rebuilt on the CI runner (manual run 41391608314 with `baseline` ticked) and its `baseline-candidate` committed — fuzz env Chromium 141.0.7390.37 + wkhtmltopdf 0.12.6 (the runner does resolve the Bitstream `.pfb` fonts), meta qpdf 11.9.0, corpus identical (144 files). The fallback path now compares fuzz. |
 | ✅ Resolved 1405-08-11 | Version strings in ≈ 8 places disagree (`2.0-rc1` / `2.0` / `1.0`). | `scripts/config.js:11` and ≈ 7 other places | P0.4: `K.config.version` is the one source; the "disagreement" is three fixed forms (full `2.0-rc1`, npm `2.0.0-rc1`, release `2.0` in the `lib/` headers and the download name) plus PdfImporter's own `1.0`. `tools/check-version.js` checks all 24 places (CI `tooling.yml`); the app sets `BuilderBase.version` from the config at load. |
 | ✅ Resolved 1405-08-11 | No `package.json`, lockfile, ESLint or Prettier. | root | P0.4: `package.json` + `package-lock.json` (exact pins: Playwright 1.56.1, pdf-lib 1.17.1, ESLint 10.13.0, Prettier 3.9.10, JSZip 3.10.2), `eslint.config.js` (0 errors), `.prettierrc` / `.prettierignore` matching `.editorconfig` (the tree is not reformatted); CI installs with `npm ci`. |
+| ✅ Resolved 1405-08-11 | **Settings migrations ran against fresh profiles**: the one-shot markers (`_auto`, `_vch`, `_vz`, `_auto2`, `_hfauto`, `_lh`) were not in the defaults, so a fresh profile's own choices (DejaVu Sans Mono, Sahel, 98 %, `rtl`, 110 %, Calibri, an emptied title or edition) were "migrated" on the next reload; the stored profile was the whole merge of the defaults (old defaults frozen); `settings.js` repeated part of it for settings files. | `scripts/storage.js`, `config.js`, `settings.js` | P1.1: `schemaVersion: 1` in `K.config.defaults`; profile and page settings stored as their differences from the defaults; one `K.store.migrate()` for the stored profile at load, a settings file and Undo of Reset — its steps run only below schemaVersion 1, the markers are dropped. `tests/unit/storage.test.js`. |
+| ✅ Resolved 1405-08-11 | **Exports could read stale preview HTML**: the preview renders 250 ms after typing, the exporter read it at once (the last keystroke, a changed first heading in the file name, were missing). | `scripts/exporter.js`, `editor.js`, `preview.js` | P1.1: one preview timer (`K.preview.renderSoon`), `K.preview.flush()` before every export and Copy. `tests/unit/app.test.js`. |
+| ✅ Resolved 1405-08-11 | No `storage` event: a second tab wrote back the text it showed before, and its next image save dropped the other tab's images; the last keystrokes of the 600 ms autosave pause were lost when the tab closed. | `scripts/main.js`, `editor.js`, `images.js` | P1.1: a `storage` listener — text taken as one Undo step unless this tab holds unsaved typing, images merged, profile, logo and page settings (language, theme, layout, the imported file's name) followed, a cleared storage written back from this tab; autosave written on `pagehide` and when the tab hides. `tests/unit/app.test.js`. |
 
 </details>
 
@@ -419,7 +426,7 @@ the plan, not this list.
 
 | Date | Plan | Creator | Why & What |
 |---|---|---|---|
-| 1405-08-09 | [Kelk 2.0 → 2.x Redesign Plan](../.claude/plans/Kelk-Redesign.md) | Zarrabi | **Status:** accepted by the project owner on 1405-08-09; execution started — P0.0, P0.1, P0.2 and P0.3 approved 1405-08-10, P0.4 approved 1405-08-11. Structural changes, not a rewrite: the rule-based PDF importer and its lab are the asset, and the weaknesses found in the review are fixable in place, each step gated by the lab. 8 phases / 31 sub-phases, ≈ 76 working days plus the owner's review — **P0** stabilise and commit · **P1** verified bugs · **P2** test-net completeness · **P3** importer structure, calibration, degradation · **P4** generalisation with real producers and golden-50 · **P5** app and libraries · **P6** optional ML second opinion · **P7** OCR for scans · **P8** release and docs. P0.1 Git hygiene approved 1405-08-10 (LF everywhere, lab PDFs kept as ordinary `binary` files). P0.2 approved 1405-08-10 (gate guarded, 144-file corpus baseline; fuzz and meta kept until P0.3 rebuilds them in CI). P0.3 approved 1405-08-10 (CI green and a deliberate ZWNJ break turns it red); its last step done 1405-08-11: the fuzz and meta parts of `baseline.json` rebuilt on the CI runner (manual run 41391608314 with `baseline` ticked; Chromium 141, wkhtmltopdf 0.12.6, qpdf 11.9.0; corpus unchanged), so CI's fallback path compares fuzz too. P0.4 approved 1405-08-11 (`package.json` + lockfile with exact pins, ESLint 0 errors, Prettier configured without reformatting, `tools/check-version.js` — one source `K.config.version` — and lint in CI `tooling.yml`, green runs 41421784781 / 41421784696). Next: **P1.1 Storage & export correctness**. Progress tracker: §5. |
+| 1405-08-09 | [Kelk 2.0 → 2.x Redesign Plan](../.claude/plans/Kelk-Redesign.md) | Zarrabi | **Status:** accepted by the project owner on 1405-08-09; execution started — P0.0, P0.1, P0.2 and P0.3 approved 1405-08-10, P0.4 approved 1405-08-11. Structural changes, not a rewrite: the rule-based PDF importer and its lab are the asset, and the weaknesses found in the review are fixable in place, each step gated by the lab. 8 phases / 31 sub-phases, ≈ 76 working days plus the owner's review — **P0** stabilise and commit · **P1** verified bugs · **P2** test-net completeness · **P3** importer structure, calibration, degradation · **P4** generalisation with real producers and golden-50 · **P5** app and libraries · **P6** optional ML second opinion · **P7** OCR for scans · **P8** release and docs. P0.1 Git hygiene approved 1405-08-10 (LF everywhere, lab PDFs kept as ordinary `binary` files). P0.2 approved 1405-08-10 (gate guarded, 144-file corpus baseline; fuzz and meta kept until P0.3 rebuilds them in CI). P0.3 approved 1405-08-10 (CI green and a deliberate ZWNJ break turns it red); its last step done 1405-08-11: the fuzz and meta parts of `baseline.json` rebuilt on the CI runner (manual run 41391608314 with `baseline` ticked; Chromium 141, wkhtmltopdf 0.12.6, qpdf 11.9.0; corpus unchanged), so CI's fallback path compares fuzz too. P0.4 approved 1405-08-11 (`package.json` + lockfile with exact pins, ESLint 0 errors, Prettier configured without reformatting, `tools/check-version.js` — one source `K.config.version` — and lint in CI `tooling.yml`, green runs 41421784781 / 41421784696). P0.1–P0.4 merged into `main` 1405-08-11 (PRs #3–#6, merge commits; `main` at `cbacc0a`). **P1.1 Storage & export correctness** reported 1405-08-11 (branch `redesign/P1.1`: profile stored as differences with `schemaVersion` and one `migrate()`, `K.preview.flush()` before every export, a `storage` listener for two tabs, first unit tests in `tests/unit/`), waiting for approval. Progress tracker: §5. |
 
 </details>
 
@@ -593,9 +600,15 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 5 | Review of the P0.4 diff: `npm ci` on Linux with npm 10 and 11, base-run module lookup, 15 mutations of the version check, load order of the version sync, the `hasMix` removal, lint coverage. |
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 9 | P0.4 first CI runs checked and recorded: `tooling` 41421784781 and `pdf-lab` 41421784696 green on `npm ci` (lint 0 errors, 24 version checks, Chromium 141.0.7390.37 from the lockfile, fuzz compared +0.0); the `minimatch` advisory in ESLint's dependencies assessed; a hand-over prompt for the next session. |
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 1 | P0.4 approval in the plan and the report: tracker row, Summary, Status, done note, report status and approval step; the lab-install rule in `CLAUDE.md` relaxed to `npm ci` at the root. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 30 | Instructions for merging the P0 branches and starting P1.1; choosing one pull request per sub-phase and approving the deletion of the merged branches. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 14 | P0 branches merged into `main`: `main` checked unchanged since the P0.1 base; PRs #3–#6 opened through the GitHub API (the CLI token lacked pull-request rights), each merged with a merge commit after its green checks (pdf-lab 41452472229, 41453184728, 41453948942, 41454969643; tooling 41454969155); `main`'s run 41455922949 green against the base (corpus 95.7 → 95.7, fuzz +0.0, meta equal); local `main` refreshed (`npm ci`, lint 0 errors, 24 version checks); the five merged branches deleted; merge note in the plan. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 31 | P1.1 Storage & export correctness: `schemaVersion` in the defaults, profile and page settings stored as differences, one `K.store.migrate()` for load, settings files and Undo; `K.preview.renderSoon` / `flush()` before every export and Copy; autosave on `pagehide`; a `storage` listener (text as one Undo step, images, profile, logo, language, theme, layout, the export name, cleared storage written back); `tests/unit/` with jsdom 30.1.3 (deps resolved ≥ 14 days old), 23 tests (16 of the first 19 fail on the old code), `npm test` in `tooling.yml`; review findings applied; report `docs/reports/P1.1-storage-export.md`, Known Issues, Testing and the plan updated. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 3 | Review of the P1.1 diff: storage diff/merge and migration paths, timers, the storage listener, callers in `scripts/`, i18n wording; three faults confirmed with a jsdom probe (stale export name in a second tab, cleared storage emptying the text, an older tab dropping a newer profile's values). |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 2 | P1.1 first CI push: `tooling` run 41471258802 red at the unit-test step — Node 22's test runner does not take a folder; `npm test` changed to the glob `tests/unit/*.test.js`. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 3 | P1.1 CI on PR #7 checked and recorded in the report: `tooling` 41471461805 / 41471453294 (lint 0 errors, 24 version checks, 23 / 23 unit tests on Node 22) and `pdf-lab` 41471461751 / 41471453284 (head against `main`: corpus 95.7 → 95.7, fuzz +0.0, meta equal, gate passed). |
 
 <!-- generated:totals -->
-**Entries: 55 · Total: 630 min (10.50 hours) — Zarrabi 630 min (48 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 61 · Total: 713 min (11.88 hours) — Zarrabi 713 min (54 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---

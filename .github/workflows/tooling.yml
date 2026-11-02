@@ -1,5 +1,6 @@
-# Dev tooling on every push and pull request: ESLint (npm run lint, eslint.config.js) and the single version
-# string (npm run check:version, tools/check-version.js). A workflow of its own, not a job in pdf-lab.yml: that
+# Dev tooling on every push and pull request: ESLint (npm run lint, eslint.config.js), the single version
+# string (npm run check:version, tools/check-version.js) and the app's unit tests (npm test: tests/unit, Node's
+# test runner + jsdom; since P1.1). A workflow of its own, not a job in pdf-lab.yml: that
 # one runs only when the lab's paths change, this one on any change, and a lint failure never hides the lab's
 # results. Prettier's format check is not here — .prettierrc encodes the style of the tree, but the tree is not
 # formatted yet (plan P0.4).
@@ -7,7 +8,7 @@
 # Same conventions as pdf-lab.yml: actions pinned to commit SHAs (the tag in the comment), read-only token,
 # every step under bash -euo pipefail with its output teed to $RUNNER_TEMP/logs/<step>.log and uploaded.
 # npm's download cache is keyed on package-lock.json; `npm ci` installs exactly the locked versions.
-# Both checks run even when the other fails (!cancelled()), and each fails the job.
+# All checks run even when another fails (!cancelled()), and each fails the job.
 name: tooling
 
 on:
@@ -50,6 +51,10 @@ jobs:
       - name: Version (npm run check:version)
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npm run check:version 2>&1 | tee "$RUNNER_TEMP/logs/check-version.log"
+
+      - name: Unit tests (npm test — tests/unit, Node's runner + jsdom)
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: npm test 2>&1 | tee "$RUNNER_TEMP/logs/unit-tests.log"
 
       - name: Logs
         if: always()

@@ -133,6 +133,16 @@
             this.refresh();
         },
 
+        /**
+         * Another tab saved (Kelk's storage listener): the imported file's name as it stored it; a text
+         * replaced from there also drops a stem typed here for the old one.
+         */
+        followStored: function (replaced) {
+            source = String(K.store.getUi('sourceName') || '').replace(/\.[^.]+$/, '');
+            if (replaced) user = null;
+            this.refresh();
+        },
+
         /** Kept for callers: an imported file. */
         setSource: function (fileName) { this.newDocument(fileName, null); },
 

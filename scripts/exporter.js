@@ -157,6 +157,7 @@
          * inside (Kelk.images.embed), so the file is whole on its own.
          */
         run: async function (kind, btn) {
+            K.preview.flush();                             // a keystroke of the last 250 ms is in the preview, title and name
             const md = K.editor.value();
             if (!md.trim()) { K.ui.toast(K.i18n.t('emptyDoc'), 'warn'); return; }
             if (kind === 'md') {
@@ -170,6 +171,7 @@
             try {
                 const blob = await K.ui.task(K.i18n.t('taskExport', kind.toUpperCase()), async function () {
                     await K.ui.paint();                        // the dialog is up before the builder holds the page
+                    K.preview.flush();                         // typed while the dialog came up (nothing waiting: no-op)
                     const html = K.preview.html();
                     // Word / PDF: a formula with right-to-left \text embeds the web font in its image
                     if (kind !== 'html' && /data-tex="[^"]*[֐-ࣿ]/.test(html)) await K.fonts.forHtml(md);
@@ -203,6 +205,7 @@
         // exposed for tests
         _configure: configure,
         _htmlPage: async function () {
+            K.preview.flush();
             await K.fonts.forHtml(K.editor.value());
             return configure(HtmlBuilder.create(), 'html').addFromHtml(K.preview.html()).toHtml();
         },
