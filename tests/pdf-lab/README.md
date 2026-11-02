@@ -30,8 +30,19 @@ baseline.json  the scores the gate compares with (scripts/gate.js --update write
 
 ## Requirements
 
-Node 18+, the `playwright` package (Chromium) and, for `make-docx.js`, `docx`. Installed next to the
-scripts, or in the folder `NODE_TOOLS=…` names. The generators also need what they drive: LibreOffice
+Node 18+ (20.19+ for `npm run lint`), the `playwright` package (Chromium), `pdf-lib` and, for `make-docx.js`, `docx`. The repository's
+`package.json` pins `playwright` and `pdf-lib` (the versions CI uses, locked in `package-lock.json`); from the
+repository root:
+
+```
+npm ci                              # or npm install: node_modules/ at the root, which the scripts find
+npx playwright install chromium
+```
+
+`docx` is not in `package.json` (only `make-docx.js` needs it): `npm install --no-save docx` at the root.
+A tools folder outside the repository still works — `npm install playwright@<the pinned version> pdf-lib@…`
+there and set `NODE_TOOLS=…` to its `node_modules`; the scripts look next to themselves (that is, up to the
+root `node_modules`) first, then in `NODE_TOOLS`. The generators also need what they drive: LibreOffice
 (`soffice`), wkhtmltopdf, pandoc, Python 3 with openpyxl and python-pptx, fontTools and the DejaVu fonts
 (`make-word-rtl.py`). The importer
 runs and the tools need none of those — only Node and Playwright.

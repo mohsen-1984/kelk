@@ -16,15 +16,22 @@
 # Manual run with "baseline" ticked: after head, gate.js --update writes a candidate baseline from this run,
 # starting from a copy of the committed baseline.json (parts this run lacks are kept), uploaded as the
 # artifact baseline-candidate — the fuzz and meta means of this runner's env, to be committed by hand.
-# Actions are pinned to commit SHAs (the tag in the comment); npm's cache and Playwright's Chromium are cached
-# on the pinned versions below (no lockfile yet), the apt packages are installed each run.
+# Node modules: `npm ci` from the repository root installs package.json's devDependencies at the versions
+# package-lock.json pins (playwright, pdf-lib, …); the lab scripts find them by Node's own lookup (env.js req():
+# tests/pdf-lab/scripts → up to the root node_modules). The base steps run head's lab scripts with KELK
+# pointing at the base checkout — only the base importer's files come from there, loaded into the browser by its
+# tools/pdf-lab.html — so they use head's node_modules too, and an old base commit needs no package.json.
+# Actions are pinned to commit SHAs (the tag in the comment); npm's download cache is keyed on
+# package-lock.json, Playwright's Chromium on the playwright version in the lockfile; the apt packages are
+# installed each run. Lint and the version check are another workflow (tooling.yml): they run on every change,
+# not only the lab's paths, and their failures never hide the lab's results.
 name: pdf-lab
 
 on:
   push:
-    paths: ['lib/PdfImporter.js', 'lib/pdfimport/**', 'lib/MarkdownImporter.js', 'vendor/pdfjs/**', 'tests/pdf-lab/**', 'tools/pdf-lab.html', '.github/workflows/pdf-lab.yml']
+    paths: ['lib/PdfImporter.js', 'lib/pdfimport/**', 'lib/MarkdownImporter.js', 'vendor/pdfjs/**', 'tests/pdf-lab/**', 'tools/pdf-lab.html', 'package.json', 'package-lock.json', '.github/workflows/pdf-lab.yml']
   pull_request:
-    paths: ['lib/PdfImporter.js', 'lib/pdfimport/**', 'lib/MarkdownImporter.js', 'vendor/pdfjs/**', 'tests/pdf-lab/**', 'tools/pdf-lab.html', '.github/workflows/pdf-lab.yml']
+    paths: ['lib/PdfImporter.js', 'lib/pdfimport/**', 'lib/MarkdownImporter.js', 'vendor/pdfjs/**', 'tests/pdf-lab/**', 'tools/pdf-lab.html', 'package.json', 'package-lock.json', '.github/workflows/pdf-lab.yml']
   workflow_dispatch:
     inputs:
       baseline:
@@ -47,10 +54,6 @@ jobs:
   lab:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
-    env:
-      # the versions npm installs and the cache key (P0.4 moves them to package.json)
-      PLAYWRIGHT_VERSION: '1.56.1'
-      PDF_LIB_VERSION: '1.17.1'
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with: { lfs: false, persist-credentials: false }
@@ -78,24 +81,29 @@ jobs:
         continue-on-error: true
         with: { ref: '${{ steps.base.outputs.sha }}', path: base, lfs: false, persist-credentials: false }
 
+      # npm's download cache (~/.npm), keyed on package-lock.json
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with: { node-version: 22 }
+        with: { node-version: 22, cache: npm, cache-dependency-path: package-lock.json }
 
-      - name: Cache (npm's downloads, Playwright's Chromium)
+      - name: Playwright version (from the lockfile)
+        id: versions
+        run: |
+          v=$(node -p "require('./package-lock.json').packages['node_modules/playwright'].version")
+          echo "playwright=$v" | tee -a "$GITHUB_OUTPUT"
+
+      - name: Cache (Playwright's Chromium)
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
-          path: |
-            ~/.npm
-            ~/.cache/ms-playwright
-          key: pdf-lab-ubuntu-24.04-playwright-${{ env.PLAYWRIGHT_VERSION }}-pdf-lib-${{ env.PDF_LIB_VERSION }}
+          path: ~/.cache/ms-playwright
+          key: pdf-lab-ubuntu-24.04-playwright-${{ steps.versions.outputs.playwright }}
 
-      - name: Tools (Playwright's Chromium, wkhtmltopdf, the fonts of the fuzz styles)
+      - name: Tools (node_modules, Playwright's Chromium, wkhtmltopdf, the fonts of the fuzz styles)
         id: tools
         run: |
           {
             sudo apt-get update
             sudo apt-get install -y --no-install-recommends wkhtmltopdf fonts-dejavu fonts-liberation fonts-crosextra-carlito fonts-crosextra-caladea fonts-inter poppler-utils qpdf
-            npm install --no-save --no-package-lock "playwright@$PLAYWRIGHT_VERSION" "pdf-lib@$PDF_LIB_VERSION"
+            npm ci                                          # package-lock.json's versions into ./node_modules
             npx playwright install --with-deps chromium     # the browser from the cache when it hit; its apt deps every run
           } 2>&1 | tee "$RUNNER_TEMP/logs/tools.log"
 

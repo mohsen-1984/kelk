@@ -57,7 +57,7 @@ documentation is [`lib/README.md`](../lib/README.md), with [`lib/LATEX.md`](../l
 |---|---|---|
 | **A current browser** | Chrome, Edge or Firefox | All the app needs. MathJax and PDF.js are wrapped to load from `file://`. |
 | **Git** | any | `mohsen-1984/Kelk`, branch `main`. Text files are LF everywhere (`.gitattributes`); a working tree cloned before P0.1 needs one refresh on a clean tree: `git rm -r --cached -q . && git reset -q --hard`. |
-| Node.js | 18+ (CI uses 22) | Only for the PDF lab and `tools/*.js`. There is **no `package.json`** yet (plan P0.4). |
+| Node.js | 20.19+ / 22.13+ / 24+ for lint (ESLint 10); 18+ for the lab alone (CI uses 22) | Only for the dev tooling, the PDF lab and `tools/*.js`. Since P0.4 `package.json` pins the dev tools (Playwright, pdf-lib, ESLint, Prettier, JSZip); `npm ci` at the root installs them. |
 | Playwright | 1.56.1 (the CI pin) + `pdf-lib` 1.17.1 | Installed **outside** the repository; `NODE_TOOLS` points at its `node_modules`. |
 | Lab generators | LibreOffice (`soffice`), wkhtmltopdf, pandoc, Python 3 with openpyxl, python-pptx, fontTools, DejaVu fonts, qpdf, poppler-utils | Only to **remake** lab PDFs; importing and scoring need Node + Playwright only. |
 | Python 3 | 3.10+, optional | `tools/build_pdf_fonts.py` (PDF fonts) and the Claude Code `ui-visual-check` skill (with Chrome or Edge). |
@@ -95,7 +95,9 @@ The lab (`tests/pdf-lab/`) imports every lab PDF with `lib/PdfImporter.js` in he
 [`tests/pdf-lab/README.md`](../tests/pdf-lab/README.md).
 
 ```bash
-# once, in a folder outside the repository
+# once, at the repository root (package.json pins the versions; node_modules/ is git-ignored)
+npm ci && npx playwright install chromium
+# or, as before, in a folder outside the repository, then NODE_TOOLS as below
 npm install playwright@1.56.1 pdf-lib@1.17.1 && npx playwright install chromium
 export NODE_TOOLS=/path/to/that/folder/node_modules
 export LAB_OUT=/path/outside/the/repo/lab-out     # results stay out of the working tree
@@ -118,8 +120,9 @@ stop it, delete `%LOCALAPPDATA%/ms-playwright/__dirlock`, unzip the downloaded
 `playwright-download-chromium-headless-shell-win64-<build>.zip` (in `%TEMP%`) into
 `ms-playwright/chromium_headless_shell-<build>` with Windows `tar -xf`, and create the empty marker files
 `INSTALLATION_COMPLETE` and `DEPENDENCIES_VALIDATED` there. The headless shell is all the lab needs.
-P0.3 made the harness itself platform-neutral (1405-08-10); the install workaround stays until P0.4 pins Playwright in
-`package.json`.
+P0.3 made the harness itself platform-neutral (1405-08-10); since P0.4 (1405-08-11) `package.json` pins Playwright
+1.56.1 and the scripts find the root `node_modules` without `NODE_TOOLS`. The browser download itself is unchanged, so
+the workaround above still applies when `npx playwright install` stalls.
 
 ---
 
@@ -263,7 +266,9 @@ Kelk has no server, no account and no upload: documents never leave the browser.
 | CI | `.github/workflows/pdf-lab.yml` | Since P0.3 (1405-08-10) failures fail the job (no `\|\| true`, `bash -euo pipefail`, logs in the artifact); without a base commit the gate falls back to `baseline.json` and says so in the step summary. Green run 41333786984 (`f6ea8e9`): corpus 95.7, fuzz dev 96.0, held-out 94.6 (means only), all 12 metamorphic transforms equal to the baseline, round trip ok (2 known cells), math 76 / 76, crash sweep 144 files / 0 errors, gate passed. The deliberate break (both ZWNJ rules off, run 41333855809) is **red** at the gate only: 40 failures (21 `rtl`, 19 total). Before: two green runs that proved nothing (`> /dev/null \|\| true`). |
 | Builder suite | `tests/builder-suite.html` | 383 cases through the four builders, preview parity and a PDF round trip; DOCX / DOC "pass" whenever a blob is produced (no XML validation, no goldens). **Not in CI.** |
 | Formulas | `tests/math-file.html`, `math-modes.html`, `math-roundtrip.js` | Browser pages, checked by eye; since P0.3 `math-roundtrip.js` exits 1 on a failed case (76 / 76 pass, 1405-08-10) and `roundtrip.js` on a red builder-suite cell outside its two-entry allow-list (404 pass). |
-| Lint / unit tests | — | **None**: no `package.json`, ESLint or unit tests yet (P0.4, P1.1). |
+| Lint | `npm run lint` (`eslint.config.js`) | Since P0.4 (1405-08-11): **0 errors, 109 warnings** (`no-useless-escape` 42, `no-unused-vars` 32, `no-useless-assignment` 18, `no-misleading-character-class` 7, `no-control-regex` 6, `no-sparse-arrays` 4); CI workflow `tooling.yml` on every push and PR. Prettier is configured (`.prettierrc`) but the tree is not formatted, so `npm run format:check` is not in CI. |
+| Version | `npm run check:version` (`tools/check-version.js`) | 24 places checked against `K.config.version` (`scripts/config.js`): `package.json` (semver form), CHANGELOG heading, `BuilderBase.version`, the `lib/` headers and README download (release form `2.0`), `PdfImporter` its own `1.0`; in `tooling.yml`. |
+| Unit tests | — | **None** yet (P1.1). |
 
 ### Protocol for every change
 
@@ -307,10 +312,8 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 |---|---|---|---|
 | 🟠 High | **Release zip made by hand**, no include list: a 2.0 zip would carry `tests/pdf-lab` (16 MB) and `.github/`. | — | P8.1: `tools/build-release.js` with an include list. |
 | 🟠 High | README links `kelk_2.0.zip` under `releases/latest` → 404 (latest is v1.5; a prerelease is skipped by `latest`). | `README.md` | Link the tagged release (P8.1). |
-| 🟡 Medium | Version strings in ≈ 8 places disagree (`2.0-rc1` / `2.0` / `1.0`). | `scripts/config.js:11` and ≈ 7 other places | P0.4: one `VERSION`, `tools/check-version.js` in CI. |
-| 🟡 Medium | No `package.json`, lockfile, ESLint or Prettier. | root | P0.4 (tooling). |
 | 🟡 Medium | Pages is a Jekyll branch deploy of the whole repo: no `.nojekyll`, no cache-busting on `lib/`, `scripts/`, `styles/`. | — | P8.1: Pages through Actions with the release set and hashed URLs. |
-| 🟡 Medium | Not in CI: the builder suite (beyond its PDF round-trip cells), struct / features runs, lint, link check, a11y, bundle size, generated-files freshness. | `.github/workflows/` | P2.3, P2.4. (P0.3 added the round trip, `math-roundtrip.js` and the crash sweep, 1405-08-10.) |
+| 🟡 Medium | Not in CI: the builder suite (beyond its PDF round-trip cells), struct / features runs, link check, a11y, bundle size, generated-files freshness. | `.github/workflows/` | P2.3, P2.4. (P0.3 added the round trip, `math-roundtrip.js` and the crash sweep, 1405-08-10; P0.4 lint and the version check, 1405-08-11.) |
 | ⚪ Low | Docs out of step: the lab described in four places, stale numbers ("106 PDFs", "27 producers"), metamorphic net stated as 15 seeds / 171 PDFs (actual 18 / 205), Noto Emoji version "—", hljs theme 11.11.1 vs JS 11.12.0; `PDFIMPORT.md` (155 KB) has no TOC. | `lib/PDFIMPORT.md`, `tests/pdf-lab/README.md`, `THIRD-PARTY-NOTICES.md` | P8.2: split the doc, generated TOC, `tools/check-docs.js`. |
 | ⚪ Low | `run-real.js` ignores `LAB_OUT`. | `tests/pdf-lab/scripts/run-real.js` | Honour `LAB_OUT` like the other runners. |
 
@@ -366,7 +369,7 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 | 🟡 Medium | **No shared intermediate model**: four builders each re-parse the HTML (≈ 8,050 LOC of renderers vs 2,485 shared); ≈ 150 LOC of helpers copied verbatim, `cssSafe` ×4, `_pagingLabels` ×4, ≈ 1,400 LOC of parallel per-feature code. | `lib/PdfBuilder.js:415-463` ≈ `DocxBuilder.js:308-358`, `WordHtmlBuilder.js:2111` | P5.2: `lib/DomUtil.js`, `walkBlocks`, goldens prove no output change. |
 | 🟡 Medium | DocxBuilder relies on docx.js 9.7.1 internals inside silent try/catch; `markSectionRtl` runs only on detected RTL, not on `setDirection('rtl')`. | `lib/DocxBuilder.js:380,396,946` | Guard and test against the validator of P2.3. |
 | 🟡 Medium | DOCX / DOC tests "pass" whenever a blob is produced; MarkdownImporter essentially untested; ≈ 11 empty `catch` blocks. | `tests/builder-suite.html`, `lib/` | P2.3. |
-| ⚪ Low | **B6** two divergent `NAMED_COLORS` maps · **B7** blob URL revoked right after `click()` · **B8** dead data-URI regexp branch · `hasMix` declared twice. | `lib/BuilderBase.js`, `DocxBuilder.js`, `WordHtmlBuilder.js`, `MarkdownImporter.js:673`, `BidiCore.js:109,692` | P1.3. |
+| ⚪ Low | **B6** two divergent `NAMED_COLORS` maps · **B7** blob URL revoked right after `click()` · **B8** dead data-URI regexp branch. (`hasMix` declared twice: the identical second copy removed in P0.4, 1405-08-11.) | `lib/BuilderBase.js`, `DocxBuilder.js`, `WordHtmlBuilder.js`, `MarkdownImporter.js:673` | P1.3. |
 | ⚪ Low | `kelk:source` is never written, so the lossless Kelk → PDF → Kelk round trip waits (the importer already reads it). | `lib/PdfBuilder.js` | P5.5. |
 
 ### 🛠️ Claude Code tooling
@@ -374,7 +377,7 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 No open issues.
 
 <details>
-<summary><strong>✅ Resolved</strong> (12) — click to expand</summary>
+<summary><strong>✅ Resolved</strong> (14) — click to expand</summary>
 
 | Priority | Issue | Location | Suggestion |
 |---|---|---|---|
@@ -390,6 +393,8 @@ No open issues.
 | ✅ Resolved 1405-08-10 | The lab harness was Linux-only (`'/opt/npm-tools/node_modules'`, `'file://' + path` ×30, `/usr/share/fonts`, `/` splits in `features.js`); on Windows `make-meta.js` crashed without `qpdf` and `make-fuzz.js` silently drew the wkhtmltopdf share with Chromium. | `tests/pdf-lab/scripts/` | P0.3: `env.fileUrl()` on `url.pathToFileURL`, `req()` with a clear install message, `features.js` labels built with `/`, a `dejavu()` font lookup in the Python generators; `make-meta.js` skips the qpdf transforms with a note, `make-fuzz.js` prints the substitution. Corpus, fuzz and meta outputs byte-identical. The generators still need their producers (LibreOffice, wkhtmltopdf, pandoc …) on `PATH`. |
 | ✅ Resolved 1405-08-10 | **CI hid every failure**: base and head steps ended in `> /dev/null \|\| true`; both runs until then were green without proving anything. | `.github/workflows/pdf-lab.yml:53-64` | P0.3: workflow rewritten — no `\|\| true`, every step under `bash -euo pipefail` with its log teed into the artifact, head steps fail the job, round-trip / math / crash steps added. Green run 41333786984 (`f6ea8e9`); the same commit with both ZWNJ rules off (run 41333855809) failed at the gate with 40 failures (21 `rtl`, 19 total). |
 | ✅ Resolved 1405-08-11 | `baseline.json` was made with Chromium 153 and Bitstream Type 1 fonts; CI has Playwright 1.56.1 (Chromium 141) and no such fonts, so the fuzz comparison on the no-base path is always skipped. | `tests/pdf-lab/baseline.json` | P0.3 approval step: fuzz and meta rebuilt on the CI runner (manual run 41391608314 with `baseline` ticked) and its `baseline-candidate` committed — fuzz env Chromium 141.0.7390.37 + wkhtmltopdf 0.12.6 (the runner does resolve the Bitstream `.pfb` fonts), meta qpdf 11.9.0, corpus identical (144 files). The fallback path now compares fuzz. |
+| ✅ Resolved 1405-08-11 | Version strings in ≈ 8 places disagree (`2.0-rc1` / `2.0` / `1.0`). | `scripts/config.js:11` and ≈ 7 other places | P0.4: `K.config.version` is the one source; the "disagreement" is three fixed forms (full `2.0-rc1`, npm `2.0.0-rc1`, release `2.0` in the `lib/` headers and the download name) plus PdfImporter's own `1.0`. `tools/check-version.js` checks all 24 places (CI `tooling.yml`); the app sets `BuilderBase.version` from the config at load. |
+| ✅ Resolved 1405-08-11 | No `package.json`, lockfile, ESLint or Prettier. | root | P0.4: `package.json` + `package-lock.json` (exact pins: Playwright 1.56.1, pdf-lib 1.17.1, ESLint 10.13.0, Prettier 3.9.10, JSZip 3.10.2), `eslint.config.js` (0 errors), `.prettierrc` / `.prettierignore` matching `.editorconfig` (the tree is not reformatted); CI installs with `npm ci`. |
 
 </details>
 
@@ -414,7 +419,7 @@ the plan, not this list.
 
 | Date | Plan | Creator | Why & What |
 |---|---|---|---|
-| 1405-08-09 | [Kelk 2.0 → 2.x Redesign Plan](../.claude/plans/Kelk-Redesign.md) | Zarrabi | **Status:** accepted by the project owner on 1405-08-09; execution started — P0.0, P0.1, P0.2 and P0.3 approved 1405-08-10. Structural changes, not a rewrite: the rule-based PDF importer and its lab are the asset, and the weaknesses found in the review are fixable in place, each step gated by the lab. 8 phases / 31 sub-phases, ≈ 76 working days plus the owner's review — **P0** stabilise and commit · **P1** verified bugs · **P2** test-net completeness · **P3** importer structure, calibration, degradation · **P4** generalisation with real producers and golden-50 · **P5** app and libraries · **P6** optional ML second opinion · **P7** OCR for scans · **P8** release and docs. P0.1 Git hygiene approved 1405-08-10 (LF everywhere, lab PDFs kept as ordinary `binary` files). P0.2 approved 1405-08-10 (gate guarded, 144-file corpus baseline; fuzz and meta kept until P0.3 rebuilds them in CI). P0.3 approved 1405-08-10 (CI green and a deliberate ZWNJ break turns it red); its last step done 1405-08-11: the fuzz and meta parts of `baseline.json` rebuilt on the CI runner (manual run 41391608314 with `baseline` ticked; Chromium 141, wkhtmltopdf 0.12.6, qpdf 11.9.0; corpus unchanged), so CI's fallback path compares fuzz too. Next: **P0.4 Dev tooling, single version**. Progress tracker: §5. |
+| 1405-08-09 | [Kelk 2.0 → 2.x Redesign Plan](../.claude/plans/Kelk-Redesign.md) | Zarrabi | **Status:** accepted by the project owner on 1405-08-09; execution started — P0.0, P0.1, P0.2 and P0.3 approved 1405-08-10, P0.4 approved 1405-08-11. Structural changes, not a rewrite: the rule-based PDF importer and its lab are the asset, and the weaknesses found in the review are fixable in place, each step gated by the lab. 8 phases / 31 sub-phases, ≈ 76 working days plus the owner's review — **P0** stabilise and commit · **P1** verified bugs · **P2** test-net completeness · **P3** importer structure, calibration, degradation · **P4** generalisation with real producers and golden-50 · **P5** app and libraries · **P6** optional ML second opinion · **P7** OCR for scans · **P8** release and docs. P0.1 Git hygiene approved 1405-08-10 (LF everywhere, lab PDFs kept as ordinary `binary` files). P0.2 approved 1405-08-10 (gate guarded, 144-file corpus baseline; fuzz and meta kept until P0.3 rebuilds them in CI). P0.3 approved 1405-08-10 (CI green and a deliberate ZWNJ break turns it red); its last step done 1405-08-11: the fuzz and meta parts of `baseline.json` rebuilt on the CI runner (manual run 41391608314 with `baseline` ticked; Chromium 141, wkhtmltopdf 0.12.6, qpdf 11.9.0; corpus unchanged), so CI's fallback path compares fuzz too. P0.4 approved 1405-08-11 (`package.json` + lockfile with exact pins, ESLint 0 errors, Prettier configured without reformatting, `tools/check-version.js` — one source `K.config.version` — and lint in CI `tooling.yml`, green runs 41421784781 / 41421784696). Next: **P1.1 Storage & export correctness**. Progress tracker: §5. |
 
 </details>
 
@@ -579,9 +584,18 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-10 | 2.0-rc1 | Zarrabi | 2 | P0.3 approval in Known Issues and Testing: "CI hides every failure" resolved, the "Not in CI" and supply-chain rows trimmed, the gate, CI and security rows given the green and red run figures. |
 | 1405-08-10 | 2.0-rc1 | Zarrabi | 2 | P0.3 first part: questions and decisions before the CI rewrite (`f6ea8e9`). |
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 18 | P0.3 last step, baseline rebuilt on the CI runner: manual `pdf-lab.yml` run 41391608314 with `baseline` ticked started through the GitHub API and watched to green; `baseline-candidate` checked (corpus identical, 144 files, every per-file entry equal; fuzz env Chromium 141.0.7390.37 + wkhtmltopdf 0.12.6; meta env qpdf 11.9.0) and committed as `tests/pdf-lab/baseline.json`; Node.js LTS installed on the second machine; plan Summary, tracker and §6 note, the P0.3 report, Known Issues (Chromium-153 baseline resolved) and the Testing gate row updated. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 17 | P0.3 CI check after the baseline commit: push run 41393422460 compared with the base commit (fuzz +0.0); manual run 41394135108 on the fallback path compared fuzz dev and held-out against the new baseline (+0.0, gate passed); the two run ids added to the P0.3 report. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 15 | Reviewing the P0.3 result and approving it; asking for P0.4 with parallel work. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 19 | P0.4 Dev tooling, single version: checklist and split of the work; `package.json` with exact pins (each ≥ 2 weeks old) and `package-lock.json`; integration (lint 0 errors, 24 version checks); review findings applied (`engines` to ESLint 10's range, match counts in `check-version.js`, HTML exclusion stated); ContributeLog prerequisites, lab setup, Testing and Known Issues; plan tracker; report `docs/reports/P0.4-dev-tooling.md`. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 2 | Version inventory and single source: 24 places in three forms plus PdfImporter's own `1.0`; `tools/check-version.js`; `BuilderBase.version` set from `K.config.version` at load. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 5 | `eslint.config.js`: file groups, explicit readonly cross-file globals, rule options with reasons; 0 errors, 109 warnings; the duplicate `hasMix` in `lib/BidiCore.js` removed. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 12 | `.prettierrc` / `.prettierignore` measured against the existing style (no reformatting); `pdf-lab.yml` on `npm ci` with lockfile-keyed caches; new `tooling.yml` (lint and version check on every push and PR); lab README install section; actionlint clean. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 5 | Review of the P0.4 diff: `npm ci` on Linux with npm 10 and 11, base-run module lookup, 15 mutations of the version check, load order of the version sync, the `hasMix` removal, lint coverage. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 9 | P0.4 first CI runs checked and recorded: `tooling` 41421784781 and `pdf-lab` 41421784696 green on `npm ci` (lint 0 errors, 24 version checks, Chromium 141.0.7390.37 from the lockfile, fuzz compared +0.0); the `minimatch` advisory in ESLint's dependencies assessed; a hand-over prompt for the next session. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 1 | P0.4 approval in the plan and the report: tracker row, Summary, Status, done note, report status and approval step; the lab-install rule in `CLAUDE.md` relaxed to `npm ci` at the root. |
 
 <!-- generated:totals -->
-**Entries: 46 · Total: 545 min (9.08 hours) — Zarrabi 545 min (39 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 55 · Total: 630 min (10.50 hours) — Zarrabi 630 min (48 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
