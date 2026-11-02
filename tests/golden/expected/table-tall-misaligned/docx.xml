@@ -34,6 +34,24 @@
   <Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties" Target="docProps/custom.xml"/>
 </Relationships>
 
+<!-- ===== docProps/app.xml ===== -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"/>
+
+<!-- ===== docProps/core.xml ===== -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cp:coreProperties [5 xmlns declarations sha256 b63ed098059a]>
+  <dc:creator>Kelk 2.0-rc1</dc:creator>
+  <cp:lastModifiedBy>Kelk 2.0-rc1</cp:lastModifiedBy>
+  <cp:revision>1</cp:revision>
+  <dcterms:created xsi:type="dcterms:W3CDTF">[date]</dcterms:created>
+  <dcterms:modified xsi:type="dcterms:W3CDTF">[date]</dcterms:modified>
+</cp:coreProperties>
+
+<!-- ===== docProps/custom.xml ===== -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"/>
+
 <!-- ===== word/_rels/comments.xml.rels ===== -->
 <?xml version="1.0" encoding="UTF-8"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>
@@ -473,4 +491,6 @@
 </w:settings>
 
 <!-- ===== word/styles.xml ===== -->
-<!-- shared: _shared/42eabb6e82ce.txt -->
+<!-- shared: _shared/0631e55ba47b.txt -->
+<!-- ===== word/media/image1.png ===== -->
+[raster png 1×1 sha256 6b7fa434f92a = an input picture]
