@@ -1140,7 +1140,7 @@ is a heading of its own (minor, kept without a larger heading above it), its lin
 header's narrow column of pairs the XY-cut had read the band first). A document whose glyphs are six in ten bold
 has bold as its face (`_boldFace`): no `**` round every line. A **value's next lines** — a row of words under a
 value of the row above, a line pitch down — go on with that value (a remark wrapped over a cell merged across the
-row). A label's colon is not an address's («https://»). **The run must be drawn as a form**: rules or fills along it
+row). A label's colon is not an address's («`https://`»). **The run must be drawn as a form**: rules or fills along it
 or round it (a box, a ruled table, a band), or every label standing apart from its value («Date:» … its date) —
 two columns of prose whose lines start «Latin: …», «Arrows: …» on one baseline had been read as pairs.
 
@@ -1458,7 +1458,7 @@ start number. **Right to left**, a bullet set off by a tab stands at the right o
 list): it is joined to the text on its left, and Word's Courier «o» there marks the second level — the
 glyph itself is taken out (the «o» is Latin: a Latin start of the item, «o pip», read it into its own run,
 «pip o»). **A Latin item of a right-to-left list** (a Persian encyclopedia page's external links:
-«… (https://…) ▪») has its bullet at the right end of a line with no right-to-left letter, a gap before it,
+«… (`https://…`) ▪») has its bullet at the right end of a line with no right-to-left letter, a gap before it,
 on a right-to-left page or document (more Arabic-script letters than Latin ones, or its language): the item
 is right to left, its text read left to right — as the browser set it —, and its wrapped lines go with it. A
 list item's text never runs on left of its marker (right of it in right-to-left

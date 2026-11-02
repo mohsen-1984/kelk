@@ -7,7 +7,9 @@
 const fs = require('fs'), path = require('path');
 const dir = path.join(__dirname, '..', 'docs');
 const samples = {};
-fs.readdirSync(dir).forEach(function (f) {
+// sorted: readdir order is the file system's (alphabetical on NTFS, hash order on Linux ext4), and the key order
+// is written into the file, so an unsorted list made the output depend on the machine (CI's freshness check)
+fs.readdirSync(dir).sort().forEach(function (f) {
     const m = /^about-kelk-and-samples\.([a-z]{2,3})\.md$/.exec(f);
     if (m) samples[m[1]] = { name: f, markdown: fs.readFileSync(path.join(dir, f), 'utf8') };
 });
