@@ -148,7 +148,8 @@
             // const t = name || (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
             // Light by default, whatever the system's matchMedia says; the dark theme is a choice (the
             // preview then shows the document's colors in a dark version — scripts/preview.js darkPaper).
-            const t = name || 'light';
+            // Any other value (an old or edited store) is light — the same as scripts/boot.js before the first paint.
+            const t = name === 'dark' ? 'dark' : 'light';
             document.documentElement.setAttribute('data-theme', t);
             this.setIcon($('#btn-theme'), t === 'dark' ? 'sun' : 'moon');
             return t;

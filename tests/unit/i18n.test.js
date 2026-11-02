@@ -111,7 +111,7 @@ test('Arabic interface: the strings once hard-coded follow the language', async 
 // ---- scripts/boot.js ------------------------------------------------------------------------------------------
 
 /** boot.js alone, on a page that says lang="fa" dir="rtl" (as index.html does without scripts). */
-function boot(stored, languages, timeZone) {
+function boot(stored, languages, timeZone, throwing) {
   const dom = new JSDOM('<!doctype html><html lang="fa" dir="rtl"><head></head><body></body></html>', {
     url: ORIGIN,
     runScripts: 'outside-only'
@@ -120,6 +120,8 @@ function boot(stored, languages, timeZone) {
   Object.keys(stored || {}).forEach(function (k) {
     w.localStorage.setItem(k, stored[k]);
   });
+  // blocked site data: reading window.localStorage throws (a SecurityError in browsers)
+  if (throwing) Object.defineProperty(w, 'localStorage', { get: function () { throw new Error('SecurityError'); } });
   Object.defineProperty(w.navigator, 'languages', { value: languages || ['en-US'] });
   w.Intl = {
     DateTimeFormat: function () {
@@ -179,17 +181,35 @@ function checkI18n(root) {
   return spawnSync(process.execPath, args, { encoding: 'utf8' });
 }
 
-/** A copy of index.html and scripts/ with i18n.js changed by `edit`. */
+/**
+ * A copy of index.html and scripts/; `edit` changes scripts/i18n.js, or, as an object, any file:
+ * { 'scripts/ui.js': fn, 'index.html': fn }.
+ */
 function tree(edit) {
+  const edits = typeof edit === 'function' ? { 'scripts/i18n.js': edit } : edit || {};
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'kelk-i18n-'));
   fs.mkdirSync(path.join(dir, 'scripts'));
-  fs.copyFileSync(path.join(ROOT, 'index.html'), path.join(dir, 'index.html'));
-  fs.readdirSync(path.join(ROOT, 'scripts')).forEach(function (f) {
-    let src = fs.readFileSync(path.join(ROOT, 'scripts', f), 'utf8');
-    if (f === 'i18n.js' && edit) src = edit(src);
-    fs.writeFileSync(path.join(dir, 'scripts', f), src);
+  const files = ['index.html'].concat(
+    fs.readdirSync(path.join(ROOT, 'scripts')).map(function (f) {
+      return 'scripts/' + f;
+    })
+  );
+  files.forEach(function (f) {
+    let src = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    if (edits[f]) src = edits[f](src);
+    fs.writeFileSync(path.join(dir, f), src);
   });
   return dir;
+}
+
+/** check-i18n on a changed copy of the tree: { status, stdout }. */
+function checkEdited(edit) {
+  const dir = tree(edit);
+  try {
+    return checkI18n(dir);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 }
 
 test('check-i18n: exit 0 on the tree (0 missing, 0 unused)', function () {
@@ -221,10 +241,116 @@ test('check-i18n: exit 1 for a key the page uses that no language has; 2 when th
     fs.appendFileSync(path.join(dir, 'scripts', 'ui.js'), "\nKelk.i18n.t('zzNowhere');\n");
     const r = checkI18n(dir);
     assert.equal(r.status, 1, r.stdout);
-    assert.match(r.stdout, /MISSING +zzNowhere — used in scripts\/ui\.js, in no language/);
+    assert.match(r.stdout, /MISSING +zzNowhere — used in scripts\/ui\.js:\d+, in no language/);
     fs.writeFileSync(path.join(dir, 'scripts', 'i18n.js'), 'window.Kelk = {};');
     assert.equal(checkI18n(dir).status, 2);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
+});
+
+// ---- review findings (P1.4 review) ----------------------------------------------------------------------------
+
+test('boot.js: a storage that throws on access is a first visit, and the page still gets lang/dir/theme', function () {
+  const r = boot({ 'kelk.ui': ui({ lang: 'en' }) }, ['ar-EG'], null, true);
+  assert.deepEqual([r.lang, r.dir, r.theme], ['ar', 'rtl', 'light']);
+});
+
+test('boot.js: an inherited name is not a language, an unknown theme is light', function () {
+  const r = boot({ 'kelk.ui': ui({ lang: 'toString', theme: 'blue' }) });
+  assert.deepEqual([r.lang, r.dir, r.theme], ['fa', 'rtl', 'light']);
+  assert.equal(boot({ 'kelk.ui': ui({ lang: '__proto__' }) }).dir, 'rtl');
+});
+
+test('the app agrees with boot.js on a "toString" language and an unknown theme', async function () {
+  const { window: w, errors } = await appWindow({ 'kelk.ui': ui({ lang: 'toString', theme: 'blue' }) });
+  const r = w.document.documentElement;
+  assert.equal(w.Kelk.i18n.lang, 'fa');
+  assert.equal(r.getAttribute('data-theme'), 'light', 'Kelk.ui.theme: not the raw "blue"');
+  assert.equal(w.Kelk.boot.theme, 'light');
+  assert.deepEqual(errors, []);
+});
+
+test("boot.js: an old profile's kelk.settings.ui gives lang and theme, over kelk.ui as storage.js load() merges them", function () {
+  const old = JSON.stringify({ ui: { lang: 'ar', theme: 'dark' } });
+  assert.deepEqual(
+    (({ lang, dir, theme }) => ({ lang, dir, theme }))(boot({ 'kelk.settings': old }, ['en-US'])),
+    { lang: 'ar', dir: 'rtl', theme: 'dark' }
+  );
+  assert.equal(boot({ 'kelk.settings': old, 'kelk.ui': ui({ lang: 'en' }) }).lang, 'ar');
+  assert.equal(boot({ 'kelk.settings': JSON.stringify({ ui: { theme: 'dark' } }), 'kelk.ui': ui({ lang: 'en' }) }).lang, 'en');
+  assert.equal(boot({ 'kelk.settings': '{"ui":"x"}', 'kelk.ui': ui({ lang: 'en' }) }).lang, 'en', 'a broken ui entry is ignored');
+});
+
+test('the app starts where boot.js did for an old profile (kelk.settings.ui moved by load())', async function () {
+  const { window: w, errors } = await appWindow({ 'kelk.settings': JSON.stringify({ ui: { lang: 'ar', theme: 'dark' } }) });
+  const r = w.document.documentElement;
+  assert.equal(w.Kelk.boot.lang, 'ar');
+  assert.equal(w.Kelk.i18n.lang, 'ar');
+  assert.equal(r.getAttribute('data-theme'), 'dark');
+  assert.deepEqual(errors, []);
+});
+
+test('index.html: the CSP <meta> comes before boot.js (a policy applies only to what follows it)', function () {
+  const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  const csp = html.indexOf('http-equiv="Content-Security-Policy"');
+  assert.ok(csp > 0, 'the CSP meta is there');
+  assert.ok(csp < html.indexOf('<script src="scripts/boot.js"></script>'));
+  assert.ok(!/<script>/.test(html.slice(0, html.indexOf('</head>'))), 'no inline script in <head>');
+});
+
+test('check-i18n: a use inside a comment does not count (JS line and block comments, HTML)', function () {
+  let r = checkEdited({
+    'scripts/settings.js': (s) => s.replace("img.alt = K.i18n.t('logoAlt');", "img.alt = ''; // K.i18n.t('logoAlt')"),
+    'scripts/main.js': (s) =>
+      s.replace("box.setAttribute('aria-label', K.i18n.t('languageGroup'));", "/* K.i18n.t('languageGroup') */"),
+    'index.html': (s) =>
+      s.replace('<span data-i18n="footerOffline"></span>', '<!-- <span data-i18n="footerOffline"></span> -->')
+  });
+  assert.equal(r.status, 1, r.stdout);
+  assert.match(r.stdout, /UNUSED +logoAlt/);
+  assert.match(r.stdout, /UNUSED +languageGroup/);
+  assert.match(r.stdout, /UNUSED +footerOffline/);
+  // quotes and slashes inside strings and regular expressions start no comment
+  r = checkEdited({
+    'scripts/settings.js': (s) =>
+      s.replace("img.alt = K.i18n.t('logoAlt');", "const zz1 = '//', zz2 = /\\/*'/; img.alt = K.i18n.t('logoAlt');")
+  });
+  assert.equal(r.status, 0, r.stdout);
+});
+
+test('check-i18n: a template literal is a key; a variable or an expression is NONLITERAL', function () {
+  let r = checkEdited({ 'scripts/ui.js': (s) => s + '\nKelk.i18n.t(`zzTypo`);\n' });
+  assert.equal(r.status, 1, r.stdout);
+  assert.match(r.stdout, /MISSING +zzTypo — used in scripts\/ui\.js:\d+, in no language/);
+  r = checkEdited({ 'scripts/ui.js': (s) => s + '\nKelk.i18n.t(`listSep`);\n' });
+  assert.equal(r.status, 0, 'a known key as a template literal: ' + r.stdout);
+  r = checkEdited({
+    'scripts/ui.js': (s) => s + "\nconst kk = 'zzViaVar'; Kelk.i18n.t(kk); Kelk.i18n.t(`a${kk}`); Kelk.i18n.t('pdf_' + kk);\n"
+  });
+  assert.equal(r.status, 1, r.stdout);
+  assert.match(r.stdout, /NONLITERAL +scripts\/ui\.js:\d+ t\(kk\)/);
+  assert.match(r.stdout, /NONLITERAL +scripts\/ui\.js:\d+ t\(`a\$\{kk\}`\)/);
+  assert.match(r.stdout, /NONLITERAL +scripts\/ui\.js:\d+ t\('pdf_' \+ kk\)/, 'pdf_ is allowed in importer.js only');
+});
+
+test('check-i18n: a pdf_ key counts only where importer.js writes it in full', function () {
+  const r = checkEdited({
+    // the table entry gone, the suffix still written elsewhere in the file
+    'scripts/importer.js': (s) =>
+      s.replace("ocrLayer: { key: 'pdf_ocrLayer', type: 'info' },", '') + "\nconst zzSuffix = 'ocrLayer';\n"
+  });
+  assert.equal(r.status, 1, r.stdout);
+  assert.match(r.stdout, /UNUSED +pdf_ocrLayer/);
+  assert.doesNotMatch(r.stdout, /NONLITERAL/, 'importer.js may compute pdf_ keys');
+});
+
+test('check-i18n: PLACEHOLDER names each language with its own placeholders', function () {
+  const r = checkEdited(function (s) {
+    return s
+      .replace("tableLabel: 'Table',", "tableLabel: 'Table', zzPh: 'a {0}',")
+      .replace("libFailed: 'تعذّر تحميل «{0}»',", "libFailed: 'تعذّر تحميل «{0}»', zzPh: 'b',");
+  });
+  assert.match(r.stdout, /MISSING +zzPh — not in fa/);
+  assert.match(r.stdout, /PLACEHOLDER +zzPh — en \{0\}, ar -$/m);
 });
