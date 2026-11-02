@@ -102,7 +102,11 @@ jobs:
         run: |
           {
             sudo apt-get update
-            sudo apt-get install -y --no-install-recommends wkhtmltopdf fonts-dejavu fonts-liberation fonts-crosextra-carlito fonts-crosextra-caladea fonts-inter poppler-utils qpdf
+            # fonts-noto-core: Noto Naskh Arabic, a right-to-left body font of the fuzz styles (Vazirmatn and Sahel come from the repository).
+            # Not pinned: the noble version could not be fixed reliably (packages.ubuntu.com 20201225-2, Launchpad 20201225-2build1),
+            # and a wrong pin fails the install. make-fuzz.js records NotoNaskhArabic-Regular.ttf's hash in the env, so a
+            # package update shows as another env (fuzz not compared with the baseline, said so) rather than a silent change.
+            sudo apt-get install -y --no-install-recommends wkhtmltopdf fonts-dejavu fonts-liberation fonts-crosextra-carlito fonts-crosextra-caladea fonts-inter fonts-noto-core poppler-utils qpdf
             npm ci                                          # package-lock.json's versions into ./node_modules
             npx playwright install --with-deps chromium     # the browser from the cache when it hit; its apt deps every run
           } 2>&1 | tee "$RUNNER_TEMP/logs/tools.log"

@@ -21,7 +21,8 @@ pdf/       the PDFs made from them: <producer>--<doc>.pdf (144 files), in five f
            and a filter matches as before
 scripts/   generators, the importer runs, the scorer, inspection tools
 out/       (made when run) the imported Markdown / HTML and _scores.json
-fuzz/      (made when run) style-fuzzed PDFs: dev/ and heldout/, each with its manifest.json
+fuzz/      (made when run) style-fuzzed PDFs: dev/ and heldout/, each with its manifest.json (and the sources
+           whose digits a style rewrote, <name>.md)
            (their results go to out/fuzz-dev/, out/fuzz-heldout/)
 meta/      (made when run) the metamorphic net: meta/<transform>/<seed>.pdf and manifest.json
            (results in out/meta/)
@@ -44,7 +45,8 @@ A tools folder outside the repository still works — `npm install playwright@<t
 there and set `NODE_TOOLS=…` to its `node_modules`; the scripts look next to themselves (that is, up to the
 root `node_modules`) first, then in `NODE_TOOLS`. The generators also need what they drive: LibreOffice
 (`soffice`), wkhtmltopdf, pandoc, Python 3 with openpyxl and python-pptx, fontTools and the DejaVu fonts
-(`make-word-rtl.py`). The importer
+(`make-word-rtl.py`); the fuzz styles' fonts (Liberation, DejaVu, Carlito, Caladea, Inter, and Noto Naskh Arabic
+from `fonts-noto-core` — Vazirmatn and Sahel come from the repository). The importer
 runs and the tools need none of those — only Node and Playwright.
 
 `scripts/env.js` finds Kelk three folders up; `KELK=/path/to/kelk` tests another copy.
@@ -88,6 +90,7 @@ runs and the tools need none of those — only Node and Playwright.
 | `banner.md` | a news card and a cookie banner over it (`make-overlay.js`) |
 | `inline.md`, `inline-fa.md` | pictures in the lines of text (`make-pictures.js`): an icon before and after a heading, a badge in a sentence, a list with picture bullets, a float, a dot grid in the margin |
 | `fa-article.md`, `fa-features.md`, `fa-report.md`, `ar-article.md` | the right-to-left corpus (`make-rtl.js`): Persian prose with ZWNJ words, English terms, ASCII and Persian digits, brackets and «guillemets»; nested and numbered lists, a task list, nested quotes, code with a Persian comment, tables (one of 35 rows over pages); Arabic with ي ك ة, a few harakat and Arabic-Indic digits |
+| `fa-mixed.md` | a Persian infrastructure report full of English terms (Kubernetes, `maxSurge`, p95), version numbers, percentages, ASCII and Persian digits and short bracketed spans — the `rtl` column's targets; written for the lab (CC0). Fuzz only (`make-fuzz.js`): no corpus PDF is made of it |
 
 ## The producers
 
@@ -198,21 +201,40 @@ sets measure that gap.
 ```sh
 node scripts/make-fuzz.js dev        # 100 PDFs: fuzz/dev/      (seeds 1–100)
 node scripts/make-fuzz.js heldout    # 100 PDFs: fuzz/heldout/  (seeds 100001–100100)
-node scripts/run-fuzz.js dev         # mean, scores per style value, weakest files, what moved
-node scripts/run-fuzz.js heldout     # mean and scores per style value only
+node scripts/run-fuzz.js dev         # mean, per direction, scores per style value, weakest files, what moved
+node scripts/run-fuzz.js heldout     # mean, per direction and scores per style value only
 ```
 
-Each sample is one corpus document (round robin, so every document is equally present) printed in a
+Each sample is one corpus document (round robin, so every document is equally present: since generator 4
+`article`, `features`, `readme`, `report`, `symbols` and the right-to-left `fa-article`, `fa-report`, `ar-article`,
+`fa-mixed` — 44 of each split's 100 files right to left) printed in a
 style drawn from a seeded generator: producer (Chromium 3 : wkhtmltopdf 1), body font (8 families),
 size (9–13 pt), leading, paper (A4, Letter, A5), margins, left or justified, one or two columns,
 heading scale and family, spaced or indented paragraphs, five quote styles, five code-block styles,
 code font, inline-code chips, five table styles, list indent, Chrome's header / footer, headings in
-capitals or not, tagged or not (a structure tree, an outline and `/Lang`). In two columns, tables and code
+capitals or not, tagged or not (a structure tree, an outline and `/Lang`), and since generator 4:
+
+| Dimension | Values | What it does |
+|---|---|---|
+| `dir` | `ltr`, `rtl` | follows the document (fa / ar → `rtl`): `<html dir="rtl">` with `lang` `fa` or `ar`, the sheet mirrored (bars, indents, start alignment on the right — `align: left` means start-aligned there); code blocks are not mirrored (left to right, their bar and indent on the left); a table column's `align="left"` (Markdown `:---`) is kept as written, as browsers, GitHub and `make-rtl.js` print it |
+| `font` (right to left), `latinFont` | `vazirmatn`, `sahel`, `noto-naskh`; the 8 Latin families (`-` for left to right) | the body font of a right-to-left file serves the Arabic script only — its `@font-face` (families `Fuzz Vazirmatn`, `Fuzz Sahel`, `Fuzz Naskh`) carries a `unicode-range` of the Arabic blocks, ZWNJ / ZWJ and the direction marks — so Latin letters, ASCII digits, spaces and Latin punctuation are set in the drawn `latinFont` (Vazirmatn and Sahel have Latin glyphs of their own, which would otherwise take every Latin run). Vazirmatn and Sahel are the static TTFs of `assets/fonts/download/vazirmatn-sahel-ttf.zip` (wkhtmltopdf takes no woff2); Noto Naskh Arabic is the system's, through `local()`. Headings `sans` / `serif` are Vazirmatn / Noto Naskh Arabic there. wkhtmltopdf 0.12.6's support of `unicode-range` and `local()` is not verified (no wkhtmltopdf on the machine that wrote this): look at the fonts of a `-wk--fa-*` fuzz PDF on the runner |
+| `digits` | `ascii` 1, `native` 1, `asis` 1; `-` | a right-to-left file's numbers: `asis` as the document has them (fa-report and fa-mixed mix ASCII and Persian digits on purpose); `ascii` all ASCII; `native` the running text's numbers in Persian ۰–۹ (fa) or Arabic-Indic ٠–٩ (ar), with the decimal point ٫, the thousands separator ٬ and a following percent sign ٪ (as ar-article writes them) — except a number attached to a Latin word, directly or through one space or hyphen (SHA-256, p95, Alpine 3.19, 64 GB stay ASCII). Code, link targets, addresses and list markers keep theirs; table cells are text. A rewritten source is written beside the PDF (`<name>.md`, `source` in the manifest) and scored instead of `corpus/<doc>.md`; `-` for left-to-right files |
+| `tracking` | `none` 2, `tight` 1, `loose` 1 | `letter-spacing` 0 / −0.04 em / +0.08 em over the whole text: the producer lays the lines out with it — the real-producer counterpart of the metamorphic `trackTight` / `trackLoose` (Tc after the fact) |
+
+The new dimensions are drawn after the old ones for every seed, whatever its document, so the draws before them
+keep their values (the documents themselves moved: round robin over nine). In two columns, tables and code
 are set smaller and break only words that cannot fit, as a real two-column document's do. The style of every file is in
 `manifest.json`, with its `env`: the generator's version (`GENERATOR` in `make-fuzz.js` — raise it when
 a dimension or a style changes, since every seed then draws another PDF), the Chromium and wkhtmltopdf
-versions and the font files. A new dimension is drawn last, so the earlier ones keep their values per
+versions and the font files (Noto Naskh Arabic recorded `null` where the browser lacks it — those files are set in
+its fallback, `make-fuzz.js` says how many, and such a run never matches a baseline's env). A new dimension is drawn last, so the earlier ones keep their values per
 seed. The PDFs are not shipped — 20 seconds make them again.
+
+`run-fuzz.js` prints an `rtl` column beside the total (outside it, as in the corpus: ZWNJ, yeh / kaf, digits and
+brackets kept, `score.js`; its mean is over the right-to-left files only), the means per direction (`ltr`, `rtl`)
+under the split's mean, with the four `rtl` parts, and `dir`, `digits`, `tracking` in the per-value table;
+`_scores.json` holds them (`summary.byDir`), and the gate holds them too (below). "Change since last run" is printed
+only when the previous run read PDFs of the same generator and env.
 
 **The rule of the two splits.** `dev` is for work: open its files, read its Markdown, write rules from
 what you see. `heldout` is for judgement: only its means and its per-value table are read
@@ -241,7 +263,13 @@ shallow indents and nested quotes without a gap, italic quotes plain, justified 
 closer than a column's gap, wrapped rows with centred cells: dev 96.0 (lists 85.3 → 97.0, tables 84.3 → 88.8,
 quotes 82.9 → 89.7, code 85.1 → 95.7), held-out 94.6 (every column up or equal); the corpus unchanged, file by
 file. Still weak in both: two columns (held-out 78: tables 53, lists 69) and A5 paper — tables that cross a page
-or a column break inside a wrapped row.
+or a column break inside a wrapped row. That is generator 3 on the CI runner (dev 96.0, held-out 94.6).
+
+Generator 4 (1405-08-11: the right-to-left documents, `digits`, `tracking`) draws another set; its baseline is
+built on the CI runner (`docs/reports/P2.1-rtl-fuzz.md`). On a Windows machine without wkhtmltopdf or Noto Naskh
+Arabic — indicative only — dev 86.0 (ltr 92.4, rtl 78.0, `rtl` 91.0), held-out 86.8 (ltr 91.1, rtl 81.4, `rtl`
+93.0), where generator 3 there gave 95.8 / 93.9. Weak: right-to-left headings (dev 68) and quotes (67);
+`tracking: loose` (dev 75.4: ltr 80.7 against 96.2 untracked); Noto Naskh Arabic, and its fallback here.
 
 **A paired test.** `--tagged=all` / `--tagged=none` force one value of `tagged` on every Chromium file:
 the same styles with and without a structure tree, in folders of their own (such a set is no dev or
@@ -287,7 +315,7 @@ invariant; scale80 −1.0, scale125 −0.3; objstm −4.6 (`/ActualText` inside 
 Persian Word file −55); pagebg −3.4, band −2.6 (a deck −35); **tz85 −13.5, trackTight −5.7, trackLoose −16.2**
 (set where each run stands, these three open gaps no real producer leaves for the producers that place every
 run by its own position — LibreOffice, pandoc —; their losses are largely the transform's: kept as regression
-guards, to be replaced by a tracking dimension in the fuzz generator, TODO); noToUnicode 14.7. The gate holds each
+guards; the real-producer measure is the fuzz generator's `tracking` dimension, generator 4); noToUnicode 14.7. The gate holds each
 transform's mean (−1 point; −3 for `noToUnicode`); CI makes the PDFs once and runs both importers on them.
 
 ## Coverage: `features.js`
@@ -334,7 +362,7 @@ change made the importer worse:
 | What | Fails when |
 |---|---|
 | corpus | a file crashes, or its total drops more than 0.5 point, or its right-to-left details (`rtl`) drop more than 0.5 point, or it is no longer scored (its `corpus/<doc>.md` missing or renamed) |
-| fuzz `dev`, `heldout` | a PDF crashes, or the split's **mean** total drops more than 1 point |
+| fuzz `dev`, `heldout` | a PDF crashes, or the split's **mean** total drops more than 1 point, or so does a direction's (`ltr`, `rtl`) mean total or the `rtl` column's mean over the right-to-left files (a loss on the 44 right-to-left files alone barely moves the split's mean); an older baseline without them gives a note |
 | inline markup (`mkup`) | bold, italic, strike or inline code the importer wrote in HTML that a CommonMark parser no longer finds in its Markdown (`markup.js`: «بود**.**» stays literal asterisks) — any rise, on a corpus file or summed over a fuzz split; it should stay 0 |
 
 A metric that drops while the total holds (headings −3, tables +3) is printed as a note, not failed.
@@ -361,8 +389,9 @@ scored (no crash) fails: its source Markdown is gone, so nothing gates it any mo
 
 **Two ways to compare.** Against `baseline.json` (local work): the corpus PDFs are files, so their
 scores hold anywhere; the fuzz PDFs are drawn by the local Chromium and fonts, so their stored means are
-compared only when the manifest's `env` (Chromium, wkhtmltopdf, the font files) matches the
-baseline's — otherwise the gate says so and skips them. Against another run (`--against DIR`): two
+compared only when the manifest's `env` (the generator's version, Chromium, wkhtmltopdf, the font files) matches the
+baseline's — otherwise the gate says so and skips them; a new `GENERATOR` is named as such ("drawn by generator 4,
+the baseline's by generator 3"), and its fuzz part is rebuilt with a manual CI run with `baseline` ticked. Against another run (`--against DIR`): two
 importers on the very same PDFs, which needs no such care. `LAB_OUT=…` sends a run's results to
 another folder and `KELK=…` picks the importer, so
 
