@@ -110,9 +110,11 @@
             const sm = K.config.samples[K.i18n.lang] || K.config.samples.fa;
             const h = hf.header == null ? sm.header : hf.header;     // null → the sample of the interface language
             const f = hf.footer == null ? sm.footer : hf.footer;
+            // the custom HTML through the preview's sanitiser (no script, handler, style, form or javascript: link)
+            const custom = function (x) { return K.preview.sanitize(fillCustom(x, s, logo, K.names.hfDir())); };
             return {
-                header: h.trim() ? { html: fillCustom(h, s, logo, K.names.hfDir()), title: title || undefined } : null,
-                footer: f.trim() ? { html: fillCustom(f, s, logo, K.names.hfDir()), title: title || undefined } : null
+                header: h.trim() ? { html: custom(h), title: title || undefined } : null,
+                footer: f.trim() ? { html: custom(f), title: title || undefined } : null
             };
         }
         return {};

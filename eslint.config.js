@@ -99,6 +99,7 @@ module.exports = [
   {
     ignores: [
       'node_modules/**',
+      '.claude/worktrees/**', // other checkouts of this repository (agent worktrees), linted in their own place
       'vendor/**', // third-party libraries
       '**/*.min.js',
       '**/*.min_*.js',
