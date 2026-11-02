@@ -888,7 +888,7 @@
 
         /** Set the language and re-label the page. */
         apply: function (lang) {
-            this.lang = STRINGS[lang] ? lang : 'fa';
+            this.lang = typeof lang === 'string' && Object.prototype.hasOwnProperty.call(STRINGS, lang) ? lang : 'fa';   // not 'toString'
             const root = document.documentElement;
             root.lang = this.lang;
             root.dir = this.dir();
