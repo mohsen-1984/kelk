@@ -57,7 +57,7 @@
 <p style="direction:ltr;text-align:justify" class="MsoNormal">Case 34 (primes + spacing): <!--[if gte msEquation 12]><m:oMath><m:sSup><m:e><i style='mso-bidi-font-style:normal'><span dir=LTR style='font-family:"Cambria Math",serif'><m:r>f</m:r></span></i></m:e><m:sup><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>′</m:r></span></m:sup></m:sSup><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>(</m:r></span><i style='mso-bidi-font-style:normal'><span dir=LTR style='font-family:"Cambria Math",serif'><m:r>x</m:r></span></i><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>)</m:r></span><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>,</m:r></span><span dir=LTR><m:r><m:rPr><m:nor/></m:rPr> ​</m:r></span><m:sSup><m:e><i style='mso-bidi-font-style:normal'><span dir=LTR style='font-family:"Cambria Math",serif'><m:r>f</m:r></span></i></m:e><m:sup><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>″</m:r></span></m:sup></m:sSup><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>(</m:r></span><i style='mso-bidi-font-style:normal'><span dir=LTR style='font-family:"Cambria Math",serif'><m:r>x</m:r></span></i><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>)</m:r></span><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>,</m:r></span><span dir=LTR><m:r><m:rPr><m:nor/></m:rPr> ​</m:r></span><i style='mso-bidi-font-style:normal'><span dir=LTR style='font-family:"Cambria Math",serif'><m:r>a</m:r></span></i><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr> ​</m:r></span><i style='mso-bidi-font-style:normal'><span dir=LTR style='font-family:"Cambria Math",serif'><m:r>b</m:r></span></i><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr> ​</m:r></span><i style='mso-bidi-font-style:normal'><span dir=LTR style='font-family:"Cambria Math",serif'><m:r>c</m:r></span></i><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr> ​</m:r></span><i style='mso-bidi-font-style:normal'><span dir=LTR style='font-family:"Cambria Math",serif'><m:r>d</m:r></span></i><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr> ​</m:r></span><i style='mso-bidi-font-style:normal'><span dir=LTR style='font-family:"Cambria Math",serif'><m:r>e</m:r></span></i><i style='mso-bidi-font-style:normal'><span dir=LTR style='font-family:"Cambria Math",serif'><m:r>f</m:r></span></i></m:oMath><![endif]--><![if !msEquation]><span style="mso-text-raise:-2pt"><img src="document_files/image034.png" alt="f'(x),\ f''(x),\ a\,b\;c\quad d\qquad e\!f" width="241" height="19" class="kelk-math-img"></span><![endif]> <span dir="rtl">پایان.</span></p>
 <p class="MsoNormal">مورد 35 (<span dir="ltr">phantom + not</span>): <!--[if gte msEquation 12]><m:oMath><m:phant><m:phantPr><m:show m:val="0"/></m:phantPr><m:e><i style='mso-bidi-font-style:normal'><span dir=LTR style='font-family:"Cambria Math",serif'><m:r>x</m:r></span></i></m:e></m:phant><i style='mso-bidi-font-style:normal'><span dir=LTR style='font-family:"Cambria Math",serif'><m:r>y</m:r></span></i><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>,</m:r></span><span dir=LTR><m:r><m:rPr><m:nor/></m:rPr> ​</m:r></span><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>⊄</m:r></span><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>,</m:r></span><span dir=LTR><m:r><m:rPr><m:nor/></m:rPr> ​</m:r></span><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>≠</m:r></span></m:oMath><![endif]--><![if !msEquation]><span style="mso-text-raise:-1.5pt"><img src="document_files/image035.png" alt="\phantom{x}y,\ \not\subset,\ \not=" width="90" height="18" class="kelk-math-img"></span><![endif]> پایان.</p>
 <p style="direction:ltr;text-align:justify" class="MsoNormal">Case 36 (text Persian): </p>
-<p class="MsoNormal" style="text-align:center"><!--[if gte msEquation 12]><m:oMathPara><m:oMathParaPr><m:jc m:val="center"/></m:oMathParaPr><m:oMath><span dir=RTL><m:r><m:rPr><m:nor/></m:rPr>اگر </m:r></span><i style='mso-bidi-font-style:normal'><span dir=LTR style='font-family:"Cambria Math",serif'><m:r>x</m:r></span></i><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>&gt;</m:r></span><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>0</m:r></span><span dir=RTL><m:r><m:rPr><m:nor/></m:rPr> آنگاه </m:r></span><i style='mso-bidi-font-style:normal'><span dir=LTR style='font-family:"Cambria Math",serif'><m:r>y</m:r></span></i><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>=</m:r></span><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>1</m:r></span></m:oMath></m:oMathPara><![endif]--><![if !msEquation]><img src="document_files/image036.png" alt="\text{اگر } x &gt; 0 \text{ آنگاه } y = 1" width="153" height="18" class="kelk-math-img"><![endif]></p>
+<p class="MsoNormal" style="text-align:center"><!--[if gte msEquation 12]><m:oMathPara><m:oMathParaPr><m:jc m:val="center"/></m:oMathParaPr><m:oMath><span dir=RTL><m:r><m:rPr><m:nor/></m:rPr>اگر </m:r></span><i style='mso-bidi-font-style:normal'><span dir=LTR style='font-family:"Cambria Math",serif'><m:r>x</m:r></span></i><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>&gt;</m:r></span><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>0</m:r></span><span dir=RTL><m:r><m:rPr><m:nor/></m:rPr> آنگاه </m:r></span><i style='mso-bidi-font-style:normal'><span dir=LTR style='font-family:"Cambria Math",serif'><m:r>y</m:r></span></i><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>=</m:r></span><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>1</m:r></span></m:oMath></m:oMathPara><![endif]--><![if !msEquation]><img src="document_files/image036.png" alt="\text{اگر } x &gt; 0 \text{ آنگاه } y = 1" width="[measured]" height="18" class="kelk-math-img"><![endif]></p>
 <p class="MsoNormal">مورد 37 (<span dir="ltr">units (siunitx-like)</span>): <!--[if gte msEquation 12]><m:oMath><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>9.81</m:r></span><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr> ​</m:r></span><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>m</m:r></span><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>/</m:r></span><m:sSup><m:e><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>s</m:r></span></m:e><m:sup><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>2</m:r></span></m:sup></m:sSup><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>,</m:r></span><span dir=LTR><m:r><m:rPr><m:nor/></m:rPr> ​</m:r></span><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>25</m:r></span><m:sSup><m:e><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr> ​</m:r></span></m:e><m:sup><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>∘</m:r></span></m:sup></m:sSup><span dir=LTR style='font-family:"Cambria Math",serif'><m:r><m:rPr><m:sty m:val="p"/></m:rPr>C</m:r></span></m:oMath><![endif]--><![if !msEquation]><span style="mso-text-raise:-2pt"><img src="document_files/image037.png" alt="9.81\,\mathrm{m/s^2},\ 25\,^{\circ}\mathrm{C}" width="137" height="21" class="kelk-math-img"></span><![endif]> پایان.</p>
 
 </div>
@@ -65,115 +65,115 @@
 </html>
 
 <!-- ===== file:///C:/document_files/image001.png (image/png) ===== -->
-[raster]
+[raster png 2048×104]
 
 <!-- ===== file:///C:/document_files/image002.png (image/png) ===== -->
-[raster]
+[raster png 1252×62]
 
 <!-- ===== file:///C:/document_files/image003.png (image/png) ===== -->
-[raster]
+[raster png 913×228]
 
 <!-- ===== file:///C:/document_files/image004.png (image/png) ===== -->
-[raster]
+[raster png 1203×105]
 
 <!-- ===== file:///C:/document_files/image005.png (image/png) ===== -->
-[raster]
+[raster png 1004×106]
 
 <!-- ===== file:///C:/document_files/image006.png (image/png) ===== -->
-[raster]
+[raster png 1004×158]
 
 <!-- ===== file:///C:/document_files/image007.png (image/png) ===== -->
-[raster]
+[raster png 1731×133]
 
 <!-- ===== file:///C:/document_files/image008.png (image/png) ===== -->
-[raster]
+[raster png 707×127]
 
 <!-- ===== file:///C:/document_files/image009.png (image/png) ===== -->
-[raster]
+[raster png 1393×212]
 
 <!-- ===== file:///C:/document_files/image010.png (image/png) ===== -->
-[raster]
+[raster png 1035×334]
 
 <!-- ===== file:///C:/document_files/image011.png (image/png) ===== -->
-[raster]
+[raster png 1303×246]
 
 <!-- ===== file:///C:/document_files/image012.png (image/png) ===== -->
-[raster]
+[raster png 1320×403]
 
 <!-- ===== file:///C:/document_files/image013.png (image/png) ===== -->
-[raster]
+[raster png 879×148]
 
 <!-- ===== file:///C:/document_files/image014.png (image/png) ===== -->
-[raster]
+[raster png 431×465]
 
 <!-- ===== file:///C:/document_files/image015.png (image/png) ===== -->
-[raster]
+[raster png 1251×403]
 
 <!-- ===== file:///C:/document_files/image016.png (image/png) ===== -->
-[raster]
+[raster png 811×146]
 
 <!-- ===== file:///C:/document_files/image017.png (image/png) ===== -->
-[raster]
+[raster png 1548×212]
 
 <!-- ===== file:///C:/document_files/image018.png (image/png) ===== -->
-[raster]
+[raster png 731×343]
 
 <!-- ===== file:///C:/document_files/image019.png (image/png) ===== -->
-[raster]
+[raster png 972×287]
 
 <!-- ===== file:///C:/document_files/image020.png (image/png) ===== -->
-[raster]
+[raster png 677×344]
 
 <!-- ===== file:///C:/document_files/image021.png (image/png) ===== -->
-[raster]
+[raster png 891×436]
 
 <!-- ===== file:///C:/document_files/image022.png (image/png) ===== -->
-[raster]
+[raster png 217×142]
 
 <!-- ===== file:///C:/document_files/image023.png (image/png) ===== -->
-[raster]
+[raster png 948×295]
 
 <!-- ===== file:///C:/document_files/image024.png (image/png) ===== -->
-[raster]
+[raster png 4082×264]
 
 <!-- ===== file:///C:/document_files/image025.png (image/png) ===== -->
-[raster]
+[raster png 1012×262]
 
 <!-- ===== file:///C:/document_files/image026.png (image/png) ===== -->
-[raster]
+[raster png 634×142]
 
 <!-- ===== file:///C:/document_files/image027.png (image/png) ===== -->
-[raster]
+[raster png 803×164]
 
 <!-- ===== file:///C:/document_files/image028.png (image/png) ===== -->
-[raster]
+[raster png 1062×104]
 
 <!-- ===== file:///C:/document_files/image029.png (image/png) ===== -->
-[raster]
+[raster png 1669×107]
 
 <!-- ===== file:///C:/document_files/image030.png (image/png) ===== -->
-[raster]
+[raster png 1108×430]
 
 <!-- ===== file:///C:/document_files/image031.png (image/png) ===== -->
-[raster]
+[raster png 3633×115]
 
 <!-- ===== file:///C:/document_files/image032.png (image/png) ===== -->
-[raster]
+[raster png 2945×114]
 
 <!-- ===== file:///C:/document_files/image033.png (image/png) ===== -->
-[raster]
+[raster png 262×90]
 
 <!-- ===== file:///C:/document_files/image034.png (image/png) ===== -->
-[raster]
+[raster png 1444×115]
 
 <!-- ===== file:///C:/document_files/image035.png (image/png) ===== -->
-[raster]
+[raster png 542×110]
 
 <!-- ===== file:///C:/document_files/image036.png (image/png) ===== -->
-[raster]
+[raster png, size measured]
 
 <!-- ===== file:///C:/document_files/image037.png (image/png) ===== -->
-[raster]
+[raster png 820×124]
 
 <!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
 <xml xmlns:o="urn:schemas-microsoft-com:office:office">

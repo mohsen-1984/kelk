@@ -694,7 +694,9 @@ CORPUS.push({ name: 'code-in-list-item', md: '- مورد ششم:\n  ```javascrip
 // ── P2.3: builders in CI — the features the goldens (tests/golden/) and the DOCX validation
 // (tests/docx-validate.js) must cover that no earlier case had. Rowspan: the P1.3 table-rowspan-* cases above.
 //   links-internal       #links to headings with ids, and an external link
-//   images               a PNG data URI inline, alone in a paragraph, in a table cell and in list items
+//   images               a PNG data URI inline, alone in a paragraph, in a table cell and in list items, and a
+//                        second, different PNG (the goldens keep each picture's size and, when an output carries
+//                        the input's bytes unchanged, their hash)
 //   hf-custom-html-*     setHeader / setFooter({ html }) with the {page} {pages} {title} fields ({date} is left
 //                        out: it prints today's date, which a golden cannot hold)
 //   toc-*                setToc: three levels with the title given for both directions; a right-to-left document
@@ -704,6 +706,8 @@ CORPUS.push({ name: 'code-in-list-item', md: '- مورد ششم:\n  ```javascrip
 //                        .docx's rule comes back through MarkdownImporter's HR_TOKEN (plan §2.3: it leaked as text)
 (function () {
   const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAMCAIAAAD3UuoiAAAAF0lEQVR42mOQz4+hCmIYNWjUoFGD8CEAQKoHUDfC1K4AAAAASUVORK5CYII=';
+  // a second, different picture (10 × 20, another colour): each output must keep the two apart
+  const PNG2 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAUCAIAAAA7jDsBAAAAFUlEQVR42mM44KCABzGMSo9KU0saAAVr4QF/0jtWAAAAAElFTkSuQmCC';
 
   CORPUS.push({ name: 'links-internal', html: `<h1 id="top">Links inside the document</h1>
 <p>Jump to <a href="#part-two">part two</a>, to <a href="#part-three">the third part</a> or back to <a href="#top">the top</a>.
@@ -718,6 +722,8 @@ An external link: <a href="https://example.com/kelk">example.com</a>.</p>
 An inline picture ![green bar](${PNG}) inside a sentence.
 
 ![a picture alone in its paragraph](${PNG})
+
+![a second, different picture](${PNG2})
 
 | Picture | Caption |
 |---|---|

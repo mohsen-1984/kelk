@@ -34,6 +34,25 @@
   <Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties" Target="docProps/custom.xml"/>
 </Relationships>
 
+<!-- ===== docProps/app.xml ===== -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"/>
+
+<!-- ===== docProps/core.xml ===== -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cp:coreProperties [5 xmlns declarations sha256 b63ed098059a]>
+  <dc:title>فرمول‌ها — Formulas</dc:title>
+  <dc:creator>Kelk 2.0-rc1</dc:creator>
+  <cp:lastModifiedBy>Kelk 2.0-rc1</cp:lastModifiedBy>
+  <cp:revision>1</cp:revision>
+  <dcterms:created xsi:type="dcterms:W3CDTF">[date]</dcterms:created>
+  <dcterms:modified xsi:type="dcterms:W3CDTF">[date]</dcterms:modified>
+</cp:coreProperties>
+
+<!-- ===== docProps/custom.xml ===== -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"/>
+
 <!-- ===== word/_rels/comments.xml.rels ===== -->
 <?xml version="1.0" encoding="UTF-8"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>
@@ -1688,4 +1707,21 @@
 </w:settings>
 
 <!-- ===== word/styles.xml ===== -->
-<!-- shared: _shared/b935586775f8.txt -->
+<!-- shared: _shared/9c53780a45ed.txt -->
+<!-- ===== word/media/image1.svg ===== -->
+[6986 bytes sha256 69156bf46a43]
+
+<!-- ===== word/media/image2.png ===== -->
+[raster png 1004×106]
+
+<!-- ===== word/media/image3.svg ===== -->
+[10060 bytes sha256 7aa27400f6c3]
+
+<!-- ===== word/media/image4.png ===== -->
+[raster png 1004×158]
+
+<!-- ===== word/media/image5.svg ===== -->
+[15791 bytes sha256 87cd928a8c83]
+
+<!-- ===== word/media/image6.png ===== -->
+[raster png 1731×133]
