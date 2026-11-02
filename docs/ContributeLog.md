@@ -118,7 +118,8 @@ stop it, delete `%LOCALAPPDATA%/ms-playwright/__dirlock`, unzip the downloaded
 `playwright-download-chromium-headless-shell-win64-<build>.zip` (in `%TEMP%`) into
 `ms-playwright/chromium_headless_shell-<build>` with Windows `tar -xf`, and create the empty marker files
 `INSTALLATION_COMPLETE` and `DEPENDENCIES_VALIDATED` there. The headless shell is all the lab needs.
-P0.3 removes the need for this.
+P0.3 made the harness itself platform-neutral (1405-08-10); the install workaround stays until P0.4 pins Playwright in
+`package.json`.
 
 ---
 
@@ -242,7 +243,7 @@ Kelk has no server, no account and no upload: documents never leave the browser.
 | Browser storage | `localStorage`: settings, the document, images as base64 data URIs — no credentials. | `scripts/storage.js`, `scripts/images.js:38-46` |
 | PDF parsing | PDF.js 6.4.299 on a fake worker in the main thread; encrypted PDFs with a user password give a message only. | `scripts/config.js:134` |
 | Third-party code | Vendored and pinned by file name; no checksums, SBOM or Dependabot (plan P8.3). | `vendor/`, `THIRD-PARTY-NOTICES.md` |
-| CI | `pdf-lab.yml` has no `permissions:`, no `concurrency:`, actions not SHA-pinned (plan P0.3). | `.github/workflows/pdf-lab.yml` |
+| CI | `pdf-lab.yml` runs with `permissions: contents: read`, a `concurrency:` group and actions pinned to commit SHAs (P0.3, 1405-08-10). | `.github/workflows/pdf-lab.yml` |
 | Private test data | The owner's real PDFs are never committed (each pattern is rebuilt with our own text); no private data found in the lab PDFs (1405-08-09). `tests/pdf-lab/real/` and `private/` are git-ignored (P0.1). | `tests/pdf-lab/` |
 | Local tooling | `.claude/settings.local.json` (personal permissions) is git-ignored; none is kept in the repository. | `.gitignore` |
 
@@ -250,7 +251,7 @@ Kelk has no server, no account and no upload: documents never leave the browser.
 
 ## 🧪 Testing
 
-### Current state (measured 1405-08-09 on the review machine, Windows, Playwright Chromium; CI checked 1405-08-10)
+### Current state (measured 1405-08-09 on the review machine, Windows, Playwright Chromium; CI green run 41333786984 on 1405-08-10)
 
 | Check | Command | Result |
 |---|---|---|
@@ -258,8 +259,8 @@ Kelk has no server, no account and no upload: documents never leave the browser.
 | PDF lab — right-to-left | (same run) | **55 RTL files: mean total 90.1**, `rtl` column 92.9. Weakest producers `lohtml-rtl` 59.0, `wk-rtl` 61.2, `chrome-rtl-plain-hf` 81.4, `kelkdocx-lo` 88.7. |
 | PDF lab — style fuzz | `run-fuzz.js dev` / `heldout` | **dev 96.0, held-out 94.6** (CHANGELOG 2.0-rc1, taken as the plan's baseline). The held-out set is English Chromium / wkhtmltopdf output only. |
 | PDF lab — metamorphic net | `run-meta.js` | 12 transforms × 18 seeds (5 RTL). Losses it proves: `noToUnicode` −85, `trackLoose` −16.3, `tz85` −11.4, `trackTight` −4.8, `objstm` −1.0. |
-| PDF lab — gate | `gate.js` | Since P0.2 (1405-08-10): `baseline.json` holds **all 144 corpus files** (55 with `rtl`), the clean run passes and a deliberate ZWNJ break fails 21 files; fuzz and meta in the baseline are still the review machine's (Chromium 153) until P0.3. Before: 2 of 144 files, "passed" while checking nothing. |
-| CI | `.github/workflows/pdf-lab.yml` | Two runs, both **green and both meaningless**: the fork run (1405-08-09) had no base and fell back to the blind `baseline.json`; the `main` run (1405-08-10) compared against `4beee81` (1.5, no importer) and passed because every base / head step ends in `> /dev/null \|\| true`. |
+| PDF lab — gate | `gate.js` | Since P0.2 (1405-08-10): `baseline.json` holds **all 144 corpus files** (55 with `rtl`), the clean run passes and a deliberate ZWNJ break fails 21 files; fuzz and meta in the baseline are still the review machine's (Chromium 153), so CI's fallback path does not compare fuzz — rebuilt from a CI run in the P0.3 approval step, still to do. Before: 2 of 144 files, "passed" while checking nothing. |
+| CI | `.github/workflows/pdf-lab.yml` | Since P0.3 (1405-08-10) failures fail the job (no `\|\| true`, `bash -euo pipefail`, logs in the artifact); without a base commit the gate falls back to `baseline.json` and says so in the step summary. Green run 41333786984 (`f6ea8e9`): corpus 95.7, fuzz dev 96.0, held-out 94.6 (means only), all 12 metamorphic transforms equal to the baseline, round trip ok (2 known cells), math 76 / 76, crash sweep 144 files / 0 errors, gate passed. The deliberate break (both ZWNJ rules off, run 41333855809) is **red** at the gate only: 40 failures (21 `rtl`, 19 total). Before: two green runs that proved nothing (`> /dev/null \|\| true`). |
 | Builder suite | `tests/builder-suite.html` | 383 cases through the four builders, preview parity and a PDF round trip; DOCX / DOC "pass" whenever a blob is produced (no XML validation, no goldens). **Not in CI.** |
 | Formulas | `tests/math-file.html`, `math-modes.html`, `math-roundtrip.js` | Browser pages, checked by eye; since P0.3 `math-roundtrip.js` exits 1 on a failed case (76 / 76 pass, 1405-08-10) and `roundtrip.js` on a red builder-suite cell outside its two-entry allow-list (404 pass). |
 | Lint / unit tests | — | **None**: no `package.json`, ESLint or unit tests yet (P0.4, P1.1). |
@@ -282,8 +283,8 @@ From the plan (§4, §9); every sub-phase ends with a report and the owner's wri
 
 ### Where tests should go next
 
-- **Gate first** (P0.2): a full baseline of all 144 files with `rtl` per file, and `--update` refusing a partial run.
-- **CI that can fail** (P0.3): no `|| true`, `pipefail`, logs in the artifact, round trip and crash smoke added.
+- **Gate first** (P0.2, done 1405-08-10): a full baseline of all 144 files with `rtl` per file, and `--update` refusing a partial run.
+- **CI that can fail** (P0.3, done 1405-08-10): no `|| true`, `pipefail`, logs in the artifact, round trip and crash smoke added.
 - **Persian in the held-out net** (P2.1): `fa-article`, `fa-report`, `ar-article` and a new `fa-mixed` in the fuzz
   generator, RTL fonts, digits and tracking dimensions; ≥ 40 % RTL.
 - **Metamorphic net** (P2.2): ≥ 20 transforms, "same" transforms asserted byte-identical.
@@ -304,14 +305,13 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 
 | Priority | Issue | Location | Suggestion |
 |---|---|---|---|
-| 🟠 High | **CI hides every failure**: base and head steps end in `> /dev/null \|\| true`; both runs so far are green without proving anything. | `.github/workflows/pdf-lab.yml:53-64` | P0.3: remove, `set -o pipefail`, `tee` logs into the artifact. |
-| 🟠 High | `baseline.json` was made with Chromium 153 and Bitstream Type 1 fonts; CI has Playwright 1.56.1 (Chromium 141) and no such fonts, so the fuzz comparison on the no-base path is always skipped. | `tests/pdf-lab/baseline.json` | Rebuild the baseline in the CI environment (P0.2–P0.3). |
 | 🟠 High | **Release zip made by hand**, no include list: a 2.0 zip would carry `tests/pdf-lab` (16 MB) and `.github/`. | — | P8.1: `tools/build-release.js` with an include list. |
 | 🟠 High | README links `kelk_2.0.zip` under `releases/latest` → 404 (latest is v1.5; a prerelease is skipped by `latest`). | `README.md` | Link the tagged release (P8.1). |
+| 🟠 High | `baseline.json` was made with Chromium 153 and Bitstream Type 1 fonts; CI has Playwright 1.56.1 (Chromium 141) and no such fonts, so the fuzz comparison on the no-base path is always skipped. | `tests/pdf-lab/baseline.json` | P0.3 approval step, still to do: a manual CI run with `baseline` ticked, then commit its `baseline-candidate` artifact. |
 | 🟡 Medium | Version strings in ≈ 8 places disagree (`2.0-rc1` / `2.0` / `1.0`). | `scripts/config.js:11` and ≈ 7 other places | P0.4: one `VERSION`, `tools/check-version.js` in CI. |
 | 🟡 Medium | No `package.json`, lockfile, ESLint or Prettier. | root | P0.4 (tooling). |
 | 🟡 Medium | Pages is a Jekyll branch deploy of the whole repo: no `.nojekyll`, no cache-busting on `lib/`, `scripts/`, `styles/`. | — | P8.1: Pages through Actions with the release set and hashed URLs. |
-| 🟡 Medium | Not in CI: the builder suite, `math-roundtrip.js`, struct / features / crash runs, lint, link check, a11y, bundle size, generated-files freshness. | `.github/workflows/` | P0.3, P2.3, P2.4. |
+| 🟡 Medium | Not in CI: the builder suite (beyond its PDF round-trip cells), struct / features runs, lint, link check, a11y, bundle size, generated-files freshness. | `.github/workflows/` | P2.3, P2.4. (P0.3 added the round trip, `math-roundtrip.js` and the crash sweep, 1405-08-10.) |
 | ⚪ Low | Docs out of step: the lab described in four places, stale numbers ("106 PDFs", "27 producers"), metamorphic net stated as 15 seeds / 171 PDFs (actual 18 / 205), Noto Emoji version "—", hljs theme 11.11.1 vs JS 11.12.0; `PDFIMPORT.md` (155 KB) has no TOC. | `lib/PDFIMPORT.md`, `tests/pdf-lab/README.md`, `THIRD-PARTY-NOTICES.md` | P8.2: split the doc, generated TOC, `tools/check-docs.js`. |
 | ⚪ Low | `run-real.js` ignores `LAB_OUT`. | `tests/pdf-lab/scripts/run-real.js` | Honour `LAB_OUT` like the other runners. |
 
@@ -323,7 +323,7 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 | 🟠 High | Custom header / footer HTML is never sanitised. | `scripts/exporter.js:109-116` | P1.2: sanitise it like the preview. |
 | 🟠 High | **B4** — `HtmlBuilder.toHtml` parses into a live element; `on*` attributes pass through. | `lib/HtmlBuilder.js:478-493` | P1.2: `BidiCore.inertRoot`, strip `on*` / `javascript:`. |
 | 🟡 Medium | No Content Security Policy. | `index.html` | P1.2: a `<meta>` CSP, tested on `file://` and Pages with MathJax and PDF.js; `rel="noopener noreferrer"` on every `target=_blank`. |
-| 🟡 Medium | Supply chain: vendor files pinned by name only (`6.4.299` repeated ×8, the marked file name ×14), no checksums, SBOM or Dependabot; CI without `permissions:` and SHA-pinned actions. | `vendor/`, `.github/workflows/pdf-lab.yml` | P8.3 vendor manifest with hashes; P0.3 workflow hardening. |
+| 🟡 Medium | Supply chain: vendor files pinned by name only (`6.4.299` repeated ×8, the marked file name ×14), no checksums, SBOM or Dependabot. (The CI workflow got `permissions:` and SHA-pinned actions in P0.3, 1405-08-10.) | `vendor/` | P8.3 vendor manifest with hashes. |
 
 ### 📄 PDF import
 
@@ -375,7 +375,7 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 No open issues.
 
 <details>
-<summary><strong>✅ Resolved</strong> (10) — click to expand</summary>
+<summary><strong>✅ Resolved</strong> (11) — click to expand</summary>
 
 | Priority | Issue | Location | Suggestion |
 |---|---|---|---|
@@ -389,6 +389,7 @@ No open issues.
 | ✅ Resolved 1405-08-10 | 144 binary PDFs (15.6 MB) entered `main`'s history as ordinary files with PR #1; storage was undecided (LFS, release asset or plain files). | `tests/pdf-lab/pdf/` | P0.1 decision: kept as ordinary files marked `binary`; history is not rewritten; revisit past 50 MB, > 10 MB of packed churn a year, or a single fixture > 10 MB. |
 | ✅ Resolved 1405-08-10 | **The local gate was blind**: `baseline.json` held 2 of 144 corpus files (a filtered run written with `--update`), so 142 files were never gated — how the Persian regressions slipped through. | `tests/pdf-lab/baseline.json`, `tests/pdf-lab/scripts/gate.js` | P0.2: `--update` refuses a run lacking any lab PDF (`--partial` merges, `--baseline` tries a candidate); baseline rewritten with all 144 files (55 with `rtl`); switching off the ZWNJ rules now fails 21 files. |
 | ✅ Resolved 1405-08-10 | The lab harness was Linux-only (`'/opt/npm-tools/node_modules'`, `'file://' + path` ×30, `/usr/share/fonts`, `/` splits in `features.js`); on Windows `make-meta.js` crashed without `qpdf` and `make-fuzz.js` silently drew the wkhtmltopdf share with Chromium. | `tests/pdf-lab/scripts/` | P0.3: `env.fileUrl()` on `url.pathToFileURL`, `req()` with a clear install message, `features.js` labels built with `/`, a `dejavu()` font lookup in the Python generators; `make-meta.js` skips the qpdf transforms with a note, `make-fuzz.js` prints the substitution. Corpus, fuzz and meta outputs byte-identical. The generators still need their producers (LibreOffice, wkhtmltopdf, pandoc …) on `PATH`. |
+| ✅ Resolved 1405-08-10 | **CI hid every failure**: base and head steps ended in `> /dev/null \|\| true`; both runs until then were green without proving anything. | `.github/workflows/pdf-lab.yml:53-64` | P0.3: workflow rewritten — no `\|\| true`, every step under `bash -euo pipefail` with its log teed into the artifact, head steps fail the job, round-trip / math / crash steps added. Green run 41333786984 (`f6ea8e9`); the same commit with both ZWNJ rules off (run 41333855809) failed at the gate with 40 failures (21 `rtl`, 19 total). |
 
 </details>
 
@@ -413,7 +414,7 @@ the plan, not this list.
 
 | Date | Plan | Creator | Why & What |
 |---|---|---|---|
-| 1405-08-09 | [Kelk 2.0 → 2.x Redesign Plan](../.claude/plans/Kelk-Redesign.md) | Zarrabi | **Status:** accepted by the project owner on 1405-08-09; execution started — P0.0, P0.1 and P0.2 approved 1405-08-10. Structural changes, not a rewrite: the rule-based PDF importer and its lab are the asset, and the weaknesses found in the review are fixable in place, each step gated by the lab. 8 phases / 31 sub-phases, ≈ 76 working days plus the owner's review — **P0** stabilise and commit · **P1** verified bugs · **P2** test-net completeness · **P3** importer structure, calibration, degradation · **P4** generalisation with real producers and golden-50 · **P5** app and libraries · **P6** optional ML second opinion · **P7** OCR for scans · **P8** release and docs. P0.1 Git hygiene approved 1405-08-10 (LF everywhere, lab PDFs kept as ordinary `binary` files). P0.2 approved 1405-08-10 (gate guarded, 144-file corpus baseline; fuzz and meta kept until P0.3 rebuilds them in CI). Next: **P0.3 CI first green run**. Progress tracker: §5. |
+| 1405-08-09 | [Kelk 2.0 → 2.x Redesign Plan](../.claude/plans/Kelk-Redesign.md) | Zarrabi | **Status:** accepted by the project owner on 1405-08-09; execution started — P0.0, P0.1, P0.2 and P0.3 approved 1405-08-10. Structural changes, not a rewrite: the rule-based PDF importer and its lab are the asset, and the weaknesses found in the review are fixable in place, each step gated by the lab. 8 phases / 31 sub-phases, ≈ 76 working days plus the owner's review — **P0** stabilise and commit · **P1** verified bugs · **P2** test-net completeness · **P3** importer structure, calibration, degradation · **P4** generalisation with real producers and golden-50 · **P5** app and libraries · **P6** optional ML second opinion · **P7** OCR for scans · **P8** release and docs. P0.1 Git hygiene approved 1405-08-10 (LF everywhere, lab PDFs kept as ordinary `binary` files). P0.2 approved 1405-08-10 (gate guarded, 144-file corpus baseline; fuzz and meta kept until P0.3 rebuilds them in CI). P0.3 approved 1405-08-10 (CI green and a deliberate ZWNJ break turns it red; one step left: the fuzz and meta parts of `baseline.json` rebuilt from a manual CI run with `baseline` ticked, not yet run — the token could not start it). Next: that run, then **P0.4 Dev tooling, single version**. Progress tracker: §5. |
 
 </details>
 
@@ -573,9 +574,12 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-10 | 2.0-rc1 | Zarrabi | 5 | Exit codes for the CI smoke scripts: `roundtrip.js` with an allow-list of known red cells, `math-roundtrip.js` failing on a failed case, `run-crash.js` searching subfolders and writing to `LAB_OUT`. |
 | 1405-08-10 | 2.0-rc1 | Zarrabi | 5 | CI workflow `pdf-lab.yml` rewritten: no `\|\| true`, `bash -euo pipefail`, logs into the artifact, `contents: read`, concurrency, SHA-pinned actions, npm and Playwright cache, round-trip, math and crash steps, gate fallback with a step summary, `baseline` dispatch input producing a baseline candidate; actionlint clean. |
 | 1405-08-10 | 2.0-rc1 | Zarrabi | 5 | Review of the P0.3 diff before the push: harness, smoke scripts and workflow. |
+| 1405-08-10 → 1405-08-11 | 2.0-rc1 | Zarrabi | 38 | P0.3 CI first green run, second part: green run 41333786984 watched (artifact and logs read, round-trip allow-list unchanged on Linux); deliberate ZWNJ break pushed on a temporary branch, run 41333855809 red at the gate only (40 failures), branch deleted; the earlier `main` run read as a reproducibility check; report `docs/reports/P0.3-ci-green.md`; on approval the plan, tracker and Known Issues updated; the manual baseline run refused by the token (HTTP 403, `actions=write`), the cause traced and the docs set to show it as still to do. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 1 | P0.3 approval in the plan and the report: tracker row, Summary, Status, done note, report status and acceptance. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 2 | P0.3 approval in Known Issues and Testing: "CI hides every failure" resolved, the "Not in CI" and supply-chain rows trimmed, the gate, CI and security rows given the green and red run figures. |
 
 <!-- generated:totals -->
-**Entries: 41 · Total: 484 min (8.07 hours) — Zarrabi 484 min (34 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 44 · Total: 525 min (8.75 hours) — Zarrabi 525 min (37 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
