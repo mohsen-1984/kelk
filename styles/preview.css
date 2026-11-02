@@ -49,6 +49,18 @@
 [data-theme="dark"] .doc .code .hljs-comment, [data-theme="dark"] .doc .code .hljs-quote { color: #8b949e; }
 [data-theme="dark"] .doc .code .hljs-name, [data-theme="dark"] .doc .code .hljs-selector-tag, [data-theme="dark"] .doc .code .hljs-section { color: #7ee787; }
 [data-theme="dark"] .doc .code .hljs-subst, [data-theme="dark"] .doc .code .hljs-params { color: var(--ink); }
+/* the light theme's #24292e / #6a737d left on the dark box (1.03:1 / 3.1:1; WCAG AA needs 4.5:1 — tools/check-a11y.js) */
+[data-theme="dark"] .doc .code .hljs-strong, [data-theme="dark"] .doc .code .hljs-emphasis { color: var(--ink); }
+[data-theme="dark"] .doc .code .hljs-code, [data-theme="dark"] .doc .code .hljs-formula { color: #8b949e; }
+/* light: GitHub's #d73a49 keyword red is 4.45:1 on the code box (#fcfcfc), just under AA; its current red, in the pane
+   only (the exports keep HtmlBuilder's document colors) */
+:root:not([data-theme="dark"]) .doc .code .hljs-keyword,
+:root:not([data-theme="dark"]) .doc .code .hljs-doctag,
+:root:not([data-theme="dark"]) .doc .code .hljs-type,
+:root:not([data-theme="dark"]) .doc .code .hljs-meta .hljs-keyword,
+:root:not([data-theme="dark"]) .doc .code .hljs-template-tag,
+:root:not([data-theme="dark"]) .doc .code .hljs-template-variable,
+:root:not([data-theme="dark"]) .doc .code .hljs-variable.language_ { color: #cf222e; }
 
 /* highlight.js's page theme adds padding and a background to code.hljs: the frame has its own */
 .doc pre code.hljs { padding: 0; background: none; }
