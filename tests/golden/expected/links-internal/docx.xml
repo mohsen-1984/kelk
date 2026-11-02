@@ -34,6 +34,25 @@
   <Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties" Target="docProps/custom.xml"/>
 </Relationships>
 
+<!-- ===== docProps/app.xml ===== -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"/>
+
+<!-- ===== docProps/core.xml ===== -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cp:coreProperties [5 xmlns declarations sha256 b63ed098059a]>
+  <dc:title>Links inside the document</dc:title>
+  <dc:creator>Kelk 2.0-rc1</dc:creator>
+  <cp:lastModifiedBy>Kelk 2.0-rc1</cp:lastModifiedBy>
+  <cp:revision>1</cp:revision>
+  <dcterms:created xsi:type="dcterms:W3CDTF">[date]</dcterms:created>
+  <dcterms:modified xsi:type="dcterms:W3CDTF">[date]</dcterms:modified>
+</cp:coreProperties>
+
+<!-- ===== docProps/custom.xml ===== -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"/>
+
 <!-- ===== word/_rels/comments.xml.rels ===== -->
 <?xml version="1.0" encoding="UTF-8"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>

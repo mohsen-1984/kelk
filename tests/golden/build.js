@@ -81,7 +81,7 @@ async function buildCase(page, name, kinds) {
         for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000));
         return btoa(s);
       };
-      const out = {};
+      const out = { source: html }; // the case's input HTML (its pictures: normalize.js hashes those carried unchanged)
       const attempt = async (key, fn) => {
         try {
           out[key] = await fn();

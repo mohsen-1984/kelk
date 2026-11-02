@@ -14,10 +14,13 @@
  * shown on the expanded text. What is normalised away (and why): tests/golden/normalize.js.
  *
  *   node tests/golden/run.js             compare; a difference prints a unified diff and exits 1
- *   node tests/golden/run.js --update    rewrite the snapshots (then review `git diff tests/golden`)
+ *   node tests/golden/run.js --update    rewrite the snapshots (then review `git diff tests/golden`): every case is
+ *                                        built first and nothing is written unless all built; stray files in a
+ *                                        case's folder, unused shared sections and folders of removed cases go
  *   options: --cases a,b (only these; with --update only these are rewritten)
  *            --out DIR   also write every actual snapshot there (CI uploads it; default: none)
- * Exit 1 on a difference, a builder that throws, a case without a snapshot, or a snapshot without a case.
+ * Exit 1 on a difference, a builder that throws, a case without a snapshot, a snapshot without a case, a stray
+ * file in a snapshot folder, or a shared section whose content does not match its name.
  */
 'use strict';
 
@@ -55,13 +58,16 @@ const SHARED_DIR = path.join(EXPECTED, '_shared');
 const SHARED = /^<!-- ===== (?:.*head|word\/(?:styles|settings|fontTable|footnotes|endnotes|comments|webSettings|numbering)\.xml) ===== -->$/;
 const REF = /^<!-- shared: _shared\/([0-9a-f]{12})\.txt -->$/gm;
 
+/** a shared section's name: the first 12 hex digits of its SHA-256 (checked in compare mode) */
+const hash = (text) => crypto.createHash('sha256').update(text).digest('hex').slice(0, 12);
+
 /** text → { compact (sections replaced by references), blobs: Map hash → section text } */
 function share(text) {
   const parts = text.split(/^(<!-- ===== .+ ===== -->\n)/m), blobs = new Map();
   for (let i = 1; i < parts.length; i += 2) {
     const body = parts[i + 1] || '';
     if (!SHARED.test(parts[i].trim()) || body.length < 1000) continue;
-    const h = crypto.createHash('sha256').update(body).digest('hex').slice(0, 12);
+    const h = hash(body);
     blobs.set(h, body);
     parts[i + 1] = '<!-- shared: _shared/' + h + '.txt -->\n';
   }
@@ -118,6 +124,8 @@ function unifiedDiff(a, b, label) {
   return cut.join('\n');
 }
 
+const readText = (f) => fs.readFileSync(f, 'utf8').replace(/\r\n/g, '\n');
+
 (async () => {
   const o = args();
   const suite = await openSuite();
@@ -129,8 +137,12 @@ function unifiedDiff(a, b, label) {
   if (unknown.length) throw new Error('no such case: ' + unknown.join(', '));
   let fail = 0, same = 0, written = 0;
   const t0 = Date.now(), used = new Map(); // shared sections of this run: hash → text
+
+  // 1. build and normalise every case first: --update writes nothing unless all of them built
+  const built = [];
   for (const name of names) {
     const out = await buildCase(suite.page, name, KINDS);
+    const ctx = { inputs: norm.inputPictures(out.source) };
     const snap = {};
     for (const key of Object.keys(FILES)) {
       const v = out[key];
@@ -139,31 +151,93 @@ function unifiedDiff(a, b, label) {
         fail++;
         continue;
       }
-      snap[key] = key === 'html' ? norm.html(v)
-        : key === 'docx' ? await norm.docx(Buffer.from(v, 'base64'))
-        : key === 'doc' ? norm.mhtml(v)
-        : norm.markdown(v);
+      snap[key] = key === 'html' ? norm.html(v, ctx)
+        : key === 'docx' ? await norm.docx(Buffer.from(v, 'base64'), ctx)
+        : key === 'doc' ? norm.mhtml(v, ctx)
+        : norm.markdown(v, ctx);
     }
     const dir = dirOf(name);
     if (o.out) {
       fs.mkdirSync(path.join(o.out, path.basename(dir)), { recursive: true });
       Object.keys(snap).forEach((k) => fs.writeFileSync(path.join(o.out, path.basename(dir), FILES[k]), snap[k]));
     }
+    const files = {};
     for (const k of Object.keys(snap)) {
       const { compact, blobs } = share(snap[k]);
       blobs.forEach((v, h) => used.set(h, v));
-      const f = path.join(dir, FILES[k]);
-      if (o.update) {
-        fs.mkdirSync(dir, { recursive: true });
-        if (!fs.existsSync(f) || fs.readFileSync(f, 'utf8') !== compact) { fs.writeFileSync(f, compact); written++; }
-        continue;
+      files[k] = { compact, blobs };
+    }
+    built.push({ name, dir, files });
+  }
+  if (suite.errors.length) {
+    suite.errors.forEach((e) => console.log('FAIL  page error: ' + e));
+    fail += suite.errors.length;
+  }
+  await suite.close();
+  const known = new Set(Object.values(FILES));
+  const strays = (dir) => (fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => !known.has(f)) : []);
+
+  if (o.update) {
+    // 2a. all or nothing
+    if (fail) {
+      console.log('golden: ' + fail + ' FAILED — nothing written (--update writes only when every case builds)');
+      process.exitCode = 1;
+      return;
+    }
+    fs.mkdirSync(SHARED_DIR, { recursive: true });
+    used.forEach((v, h) => {
+      const f = path.join(SHARED_DIR, h + '.txt');
+      if (!fs.existsSync(f) || readText(f) !== v) { fs.writeFileSync(f, v); written++; } // new, or damaged
+    });
+    for (const { dir, files } of built) {
+      fs.mkdirSync(dir, { recursive: true });
+      for (const k of Object.keys(files)) {
+        const f = path.join(dir, FILES[k]);
+        if (!fs.existsSync(f) || readText(f) !== files[k].compact) { fs.writeFileSync(f, files[k].compact); written++; }
       }
+      strays(dir).forEach((f) => {
+        fs.rmSync(path.join(dir, f), { recursive: true, force: true });
+        written++;
+        console.log('removed tests/golden/expected/' + path.basename(dir) + '/' + f);
+      });
+    }
+    if (!o.cases) {
+      // shared sections no case refers to any more; folders of cases that no longer exist
+      fs.readdirSync(SHARED_DIR).filter((f) => !used.has(f.replace(/\.txt$/, ''))).forEach((f) => { fs.rmSync(path.join(SHARED_DIR, f)); written++; });
+      const want = new Set(names.map((n) => path.basename(dirOf(n))).concat('_shared'));
+      fs.readdirSync(EXPECTED).filter((d) => !want.has(d)).forEach((d) => {
+        fs.rmSync(path.join(EXPECTED, d), { recursive: true, force: true });
+        written++;
+        console.log('removed tests/golden/expected/' + d);
+      });
+    }
+    console.log('golden: ' + names.length + ' cases, ' + written + ' files written (' + ((Date.now() - t0) / 1000).toFixed(0) + ' s)');
+    console.log('golden: ok');
+    return;
+  }
+
+  // 2b. compare. Every shared file must hold what its name says (its SHA-256), so a reference cannot point at
+  // changed text; a stray or stale file anywhere under expected/ fails too.
+  if (fs.existsSync(SHARED_DIR)) {
+    fs.readdirSync(SHARED_DIR).forEach((f) => {
+      const m = /^([0-9a-f]{12})\.txt$/.exec(f);
+      const where = 'tests/golden/expected/_shared/' + f;
+      if (!m) { console.log('FAIL  ' + where + ': not a shared section (stray file)'); fail++; }
+      else if (hash(readText(path.join(SHARED_DIR, f))) !== m[1]) { console.log('FAIL  ' + where + ': its content does not match its name (damaged; --update rewrites it)'); fail++; }
+      else if (!o.cases && !used.has(m[1])) { console.log('FAIL  ' + where + ': no snapshot refers to it (stale; --update removes it)'); fail++; }
+    });
+  }
+  for (const { name, dir, files } of built) {
+    strays(dir).forEach((f) => { console.log('FAIL  ' + name + ': stray file ' + f + ' in its snapshot folder (--update removes it)'); fail++; });
+    for (const k of Object.keys(files)) {
+      const { compact, blobs } = files[k];
+      const f = path.join(dir, FILES[k]);
       if (!fs.existsSync(f)) {
         console.log('FAIL  ' + name + ' ' + FILES[k] + ': no snapshot (a new case? run with --update and review)');
         fail++;
         continue;
       }
-      const want = fs.readFileSync(f, 'utf8').replace(/\r\n/g, '\n');
+      const want = readText(f);
       const missing = [...want.matchAll(REF)].map((m) => m[1]).filter((h) => !fs.existsSync(path.join(SHARED_DIR, h + '.txt')));
       if (want === compact && !missing.length) { same++; continue; }
       console.log('FAIL  ' + name + ' ' + FILES[k] + ' differs from tests/golden/expected:' + (missing.length ? ' (missing _shared/' + missing.join(', ') + ')' : ''));
@@ -171,36 +245,15 @@ function unifiedDiff(a, b, label) {
       fail++;
     }
   }
-  if (o.update) {
-    fs.mkdirSync(SHARED_DIR, { recursive: true });
-    used.forEach((v, h) => {
-      const f = path.join(SHARED_DIR, h + '.txt');
-      if (!fs.existsSync(f)) { fs.writeFileSync(f, v); written++; }
-    });
-  }
-  if (suite.errors.length) {
-    suite.errors.forEach((e) => console.log('FAIL  page error: ' + e));
-    fail += suite.errors.length;
-  }
-  await suite.close();
-  // snapshots of cases that no longer exist (a full run only)
   if (!o.cases && fs.existsSync(EXPECTED)) {
     const want = new Set(names.map((n) => path.basename(dirOf(n))).concat('_shared'));
-    // shared sections no case refers to any more
-    if (o.update && fs.existsSync(SHARED_DIR)) {
-      fs.readdirSync(SHARED_DIR).filter((f) => !used.has(f.replace(/\.txt$/, ''))).forEach((f) => { fs.rmSync(path.join(SHARED_DIR, f)); written++; });
-    }
-    fs.readdirSync(EXPECTED).filter((d) => !want.has(d)).forEach((d) => {
-      if (o.update) { fs.rmSync(path.join(EXPECTED, d), { recursive: true, force: true }); written++; console.log('removed tests/golden/expected/' + d); }
-      else { console.log('FAIL  tests/golden/expected/' + d + ': no such case (removed? run with --update)'); fail++; }
-    });
+    fs.readdirSync(EXPECTED).filter((d) => !want.has(d)).forEach((d) => { console.log('FAIL  tests/golden/expected/' + d + ': no such case (removed? run with --update)'); fail++; });
   }
-  const secs = ((Date.now() - t0) / 1000).toFixed(0) + ' s';
-  if (o.update) console.log('golden: ' + names.length + ' cases, ' + written + ' files written (' + secs + ')' + (fail ? ', ' + fail + ' FAILED' : ''));
-  else console.log('golden: ' + names.length + ' cases, ' + same + ' snapshots equal, ' + fail + ' failed (' + secs + ')');
+  console.log('golden: ' + names.length + ' cases, ' + same + ' snapshots equal, ' + fail + ' failed (' + ((Date.now() - t0) / 1000).toFixed(0) + ' s)');
   console.log(fail ? 'golden: FAILED' : 'golden: ok');
   if (fail) process.exitCode = 1;
 })().catch((e) => {
   console.error(e);
   process.exitCode = 1;
 });
+

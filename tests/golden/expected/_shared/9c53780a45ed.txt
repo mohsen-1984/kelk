@@ -249,14 +249,3 @@
   </w:style>
 </w:styles>
 
-<!-- ===== word/media/image1.svg ===== 6986 bytes sha256 69156bf46a43 -->
-
-<!-- ===== word/media/image2.png ===== raster -->
-
-<!-- ===== word/media/image3.svg ===== 10060 bytes sha256 7aa27400f6c3 -->
-
-<!-- ===== word/media/image4.png ===== raster -->
-
-<!-- ===== word/media/image5.svg ===== 15791 bytes sha256 87cd928a8c83 -->
-
-<!-- ===== word/media/image6.png ===== raster -->

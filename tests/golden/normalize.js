@@ -3,14 +3,15 @@
  * and one machine to the next, as readable text.
  *
  *   html(text)        HtmlBuilder export: data URIs → a placeholder (see dataUri)
- *   docx(buffer)      DocxBuilder .docx: its XML parts (not docProps/: dates, application), media renamed in order,
+ *   docx(buffer)      DocxBuilder .docx: its XML parts (docProps/core.xml's dates → [date]), media renamed in order,
  *                     pretty-printed one element per line (property containers *Pr on one line), concatenated
  *   mhtml(text)       WordHtmlBuilder .doc: the MIME boundary (a timestamp) fixed, quoted-printable parts decoded,
  *                     base64 parts (pictures) replaced by a placeholder
  *   markdown(text)    PDF → MD and DOCX → MD: data URIs → a placeholder
  *
  * Pictures rendered on a canvas (a formula's PNG fallback) differ in their bytes between platforms (font
- * rasterising, anti-aliasing), so raster data is never kept, only its type; vector and font data (SVG, woff2, …)
+ * rasterising, anti-aliasing): of a raster picture the type and the size in its header are kept, its bytes (as a
+ * hash) only when they are an input picture's (see raster()); vector and font data (SVG, woff2, …)
  * come from Kelk's own files and MathJax's paths and are kept as a size and a hash, and so are long SVG path
  * outlines (d="…"). Each output is split into sections, one marker line each (<!-- ===== name ===== -->): the
  * parts of a .docx or .doc, and an HTML page's head and body — run.js stores large repeated sections once.
@@ -26,11 +27,64 @@ function sha(data) {
   return crypto.createHash('sha256').update(data).digest('hex').slice(0, 12);
 }
 
-/** data:<mime>;base64,<data> → data:<mime>;base64,[<bytes> bytes sha256 <hash>] (raster: [raster]) */
-function dataUri(text) {
-  return text.replace(/data:([\w.+-]+\/[\w.+-]+)((?:;[\w-]+=[^;,]*)*);base64,([A-Za-z0-9+/=\s]+)/g, function (m, mime, params, b64) {
-    if (RASTER.test(mime)) return 'data:' + mime + params + ';base64,[raster]';
+const DATA_URI = /data:([\w.+-]+\/[\w.+-]+)((?:;[\w-]+=[^;,]*)*);base64,([A-Za-z0-9+/=\s]+)/g;
+
+/** a raster picture's width × height from its header; null when the header is not one of its type */
+function rasterSize(b, type) {
+  try {
+    if (/png/i.test(type)) {
+      if (b.length < 33 || b.toString('hex', 0, 8) !== '89504e470d0a1a0a' || b.toString('latin1', 12, 16) !== 'IHDR') return null;
+      if (b.toString('latin1', b.length - 8, b.length - 4) !== 'IEND') return null; // cut short
+      return [b.readUInt32BE(16), b.readUInt32BE(20)];
+    }
+    if (/jpe?g/i.test(type)) {
+      if (b[0] !== 0xff || b[1] !== 0xd8 || b[b.length - 2] !== 0xff || b[b.length - 1] !== 0xd9) return null;
+      for (let i = 2; i + 9 < b.length;) {
+        if (b[i] !== 0xff) return null;
+        const marker = b[i + 1], len = b.readUInt16BE(i + 2);
+        if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) return [b.readUInt16BE(i + 7), b.readUInt16BE(i + 5)];
+        i += 2 + len;
+      }
+      return null;
+    }
+    if (/gif/i.test(type)) return /^GIF8[79]a$/.test(b.toString('latin1', 0, 6)) ? [b.readUInt16LE(6), b.readUInt16LE(8)] : null;
+    if (/bmp/i.test(type)) return b.toString('latin1', 0, 2) === 'BM' ? [b.readInt32LE(18), Math.abs(b.readInt32LE(22))] : null;
+  } catch (e) {
+    return null;
+  }
+  return null;
+}
+
+/**
+ * A raster picture's placeholder. Its bytes are kept (as a hash) only when they are the input's own — a picture
+ * of the case passed through unchanged; a picture the builder drew (a formula on a canvas) differs in its bytes
+ * between platforms, so of it only the type and the size in the header are kept, and for a formula whose width is
+ * measured in the page (ctx.measured, see rtlTextWidths) not even the size. A header that does not decode is said
+ * so: a damaged picture changes the snapshot.
+ */
+function raster(bytes, type, ctx, measured) {
+  const b = Buffer.from(bytes), t = type.replace(/^image\//, '');
+  const size = rasterSize(b, type);
+  if (!size || !size[0] || !size[1]) return '[raster ' + t + ' NOT DECODABLE, ' + b.length + ' bytes]';
+  if (ctx && ctx.inputs && ctx.inputs.has(sha(b))) return '[raster ' + t + ' ' + size.join('×') + ' sha256 ' + sha(b) + ' = an input picture]';
+  return measured ? '[raster ' + t + ', size measured]' : '[raster ' + t + ' ' + size.join('×') + ']';
+}
+
+/** the hashes of the raster pictures of a case's input (data URIs) */
+function inputPictures(source) {
+  const set = new Set();
+  String(source || '').replace(DATA_URI, (m, mime, params, b64) => {
+    if (RASTER.test(mime)) set.add(sha(Buffer.from(b64.replace(/\s+/g, ''), 'base64')));
+    return m;
+  });
+  return set;
+}
+
+/** data:<mime>;base64,<data> → data:<mime>;base64,[<bytes> bytes sha256 <hash>] (raster: see raster()) */
+function dataUri(text, ctx) {
+  return text.replace(DATA_URI, function (m, mime, params, b64) {
     const bytes = Buffer.from(b64.replace(/\s+/g, ''), 'base64');
+    if (RASTER.test(mime)) return 'data:' + mime + params + ';base64,' + raster(bytes, mime, ctx);
     return 'data:' + mime + params + ';base64,[' + bytes.length + ' bytes sha256 ' + sha(bytes) + ']';
   });
 }
@@ -53,12 +107,38 @@ function splitHead(text, label) {
   return '<!-- ===== ' + label + 'head ===== -->\n' + text.slice(0, j) + '\n<!-- ===== ' + label + 'body ===== -->\n' + text.slice(j).replace(/^\r?\n/, '');
 }
 
-function html(text) {
-  return eol(splitHead(vectors(dataUri(text)), ''));
+/**
+ * A formula with right-to-left \text: its width is not kept. MathJax measures such text in the page
+ * (mtextInheritFont, MathCore.renderNow): an SVG <text> getBBox at the page's small text size, where Chromium on
+ * Linux rounds each glyph's advance to whole pixels and Windows does not — with the same font file (Vazirmatn, a
+ * registered face) Case 36 of latex-formulas is 7.997 em wide on Windows and 7.934 em on Ubuntu (first CI run).
+ * So, only for a formula whose TeX holds a right-to-left letter: data-width, the SVG's width, its viewBox width and
+ * the x of every translate() (positions after the text) → [measured]; in the .doc, the picture's width. The TeX,
+ * the glyph outlines, heights and everything else stay.
+ */
+const RTL = /[֐-ࣿיִ-﷿ﹰ-﻿]/;
+const M = '[measured]';
+function rtlTextWidths(text) {
+  return text
+    .replace(/(<(span|div) class="kelk-math"[^>]*?data-tex="([^"]*)"[^>]*>)([\s\S]*?<\/(?:svg|math)>)/g, (m, open, tag, tex, body) => {
+      if (!RTL.test(tex)) return m;
+      return open.replace(/data-width="[^"]*"/, 'data-width="' + M + '"') + body
+        .replace(/(<svg\b[^>]*?\bwidth=")[\d.]+(ex")/, '$1' + M + '$2')
+        .replace(/(<svg\b[^>]*?\bviewBox="[-\d.]+ [-\d.]+ )[-\d.]+/, '$1' + M)
+        .replace(/translate\([-\d.]+([,)])/g, 'translate(' + M + '$1');
+    })
+    .replace(/<img\b[^>]*class="kelk-math-img"[^>]*>/g, (m) => {
+      const alt = (/\balt="([^"]*)"/.exec(m) || [])[1] || '';
+      return RTL.test(alt) ? m.replace(/\bwidth="[\d.]+"/, 'width="' + M + '"') : m;
+    });
 }
 
-function markdown(text) {
-  return eol(dataUri(text));
+function html(text, ctx) {
+  return eol(splitHead(rtlTextWidths(vectors(dataUri(text, ctx))), ''));
+}
+
+function markdown(text, ctx) {
+  return eol(dataUri(text, ctx));
 }
 
 /**
@@ -122,8 +202,16 @@ function prettyXml(xml) {
   return out.join('\n') + '\n';
 }
 
-/** the .docx's parts as one text: every XML part but docProps/*, media renamed media/imageN.ext in order */
-async function docx(buf) {
+/**
+ * docProps/core.xml's dates (written at every build) → [date]; the rest of the document properties is kept
+ * (title, creator — Kelk's version —, subject, keywords; app.xml, custom.xml).
+ */
+function propDates(xml) {
+  return xml.replace(/(<dcterms:(?:created|modified)\b[^>]*>)[^<]*(<\/dcterms:)/g, '$1[date]$2');
+}
+
+/** the .docx's parts as one text: every XML part (docProps' dates normalised), media renamed media/imageN.ext */
+async function docx(buf, ctx) {
   const zip = await JSZip.loadAsync(buf);
   const names = Object.keys(zip.files).filter((n) => !zip.files[n].dir).sort();
   const media = names.filter((n) => /^word\/media\//.test(n));
@@ -140,16 +228,16 @@ async function docx(buf) {
   const fix = (s) => s.replace(/media\/([0-9a-f]{20,}\.\w+)/g, (m, f) => 'media/' + (rename.get(f) || f));
   const out = ['# ' + names.length + ' parts: ' + names.map(fix).sort().join(', ')];
   for (const n of names) {
-    if (!/\.(xml|rels)$/.test(n) || /^docProps\//.test(n)) continue;
-    const text = await zip.file(n).async('string');
+    if (!/\.(xml|rels)$/.test(n)) continue;
+    const text = propDates(await zip.file(n).async('string'));
     out.push('', '<!-- ===== ' + n + ' ===== -->', fix(prettyXml(text)).replace(/\n$/, ''));
   }
   for (const f of order) {
     const n = 'word/media/' + f, type = f.split('.').pop();
     if (!zip.files[n]) continue;
     const bytes = await zip.file(n).async('nodebuffer');
-    out.push('', '<!-- ===== word/media/' + rename.get(f) + ' ===== ' +
-      (/^(png|jpe?g|gif|webp|bmp)$/i.test(type) ? 'raster' : bytes.length + ' bytes sha256 ' + sha(bytes)) + ' -->');
+    out.push('', '<!-- ===== word/media/' + rename.get(f) + ' ===== -->',
+      /^(png|jpe?g|gif|webp|bmp)$/i.test(type) ? raster(bytes, 'image/' + type.replace('jpg', 'jpeg'), ctx) : '[' + bytes.length + ' bytes sha256 ' + sha(bytes) + ']');
   }
   // docx.js gives a hyperlink's relationship a random id (rId + 21 characters): number them in order of appearance
   const ids = new Map();
@@ -173,9 +261,11 @@ function unQp(s) {
 }
 
 /** the .doc (MHTML): its parts, text decoded, pictures as placeholders */
-function mhtml(text) {
+function mhtml(text, ctx) {
   const m = /boundary="([^"]+)"/.exec(text);
-  if (!m) return eol('# not MHTML\n' + dataUri(text));
+  if (!m) return eol('# not MHTML\n' + dataUri(text, ctx));
+  // the pictures of formulas with right-to-left \text (their size is measured in the page: rtlTextWidths)
+  const measured = new Set();
   const parts = text.split('--' + m[1]);
   const out = ['# MHTML, ' + (parts.length - 2) + ' parts'];
   parts.slice(1).forEach((p) => {
@@ -189,13 +279,20 @@ function mhtml(text) {
     out.push('');
     if (enc === 'base64') {
       const bytes = Buffer.from(body.replace(/\s+/g, ''), 'base64');
-      out.push('<!-- ===== ' + label + '===== -->', RASTER.test(type) ? '[raster]' : '[' + bytes.length + ' bytes sha256 ' + sha(bytes) + ']');
+      const file = loc.trim().split('/').pop();
+      out.push('<!-- ===== ' + label + '===== -->', RASTER.test(type) ? raster(bytes, type, ctx, measured.has(file)) : '[' + bytes.length + ' bytes sha256 ' + sha(bytes) + ']');
       return;
     }
-    const t = vectors(dataUri(enc === 'quoted-printable' ? unQp(body) : body).replace(/\r\n?/g, '\n')).replace(/\s+$/, '');
+    const decoded = enc === 'quoted-printable' ? unQp(body) : body;
+    decoded.replace(/<img\b[^>]*class="kelk-math-img"[^>]*>/g, (img) => {
+      const src = (/\bsrc="([^"]*)"/.exec(img) || [])[1] || '', alt = (/\balt="([^"]*)"/.exec(img) || [])[1] || '';
+      if (RTL.test(alt)) measured.add(src.split('/').pop());
+      return img;
+    });
+    const t = rtlTextWidths(vectors(dataUri(decoded, ctx).replace(/\r\n?/g, '\n'))).replace(/\s+$/, '');
     out.push(/^text\/html$/i.test(type) && /<\/head>/i.test(t) ? splitHead(t, label) : '<!-- ===== ' + label + '===== -->\n' + t);
   });
   return eol(out.join('\n'));
 }
 
-module.exports = { html, markdown, docx, mhtml, prettyXml, dataUri };
+module.exports = { html, markdown, docx, mhtml, prettyXml, dataUri, inputPictures, rasterSize };
