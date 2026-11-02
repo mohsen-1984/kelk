@@ -17,10 +17,15 @@
     "test:golden": "node tests/golden/run.js",
     "test:golden:update": "node tests/golden/run.js --update",
     "test:docx": "node tests/docx-validate.js",
-    "test:builders": "node tests/pdf-lab/scripts/roundtrip.js"
+    "test:builders": "node tests/pdf-lab/scripts/roundtrip.js",
+    "check:links": "lychee --config lychee.toml \"**/*.md\" index.html",
+    "check:fresh": "node tools/build-icons.js && node tools/build-samples.js && node tests/pdf-lab/scripts/build-corpus-js.js && git diff --exit-code -- assets/icons.js docs/about-kelk-and-samples.js tests/pdf-lab/corpus.js",
+    "check:a11y": "node tools/check-a11y.js",
+    "check:size": "node tools/check-size.js"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
+    "axe-core": "4.14.0",
     "eslint": "10.13.0",
     "globals": "17.13.0",
     "jsdom": "30.1.3",

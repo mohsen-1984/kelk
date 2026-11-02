@@ -130,7 +130,7 @@ Status: `todo` → `doing` → `report` (report written, waiting) → `approved`
 | P2 | P2.1 RTL fuzz corpus | report | 1405-08-11 | 1405-08-11 | — / 86.0 / 86.9 / — (generator 4, 44 % RTL, CI run 41507779260; generator 3 was 96.0 / 94.6, English only) — [`docs/reports/P2.1-rtl-fuzz.md`](../../docs/reports/P2.1-rtl-fuzz.md) | ☐ |
 | P2 | P2.2 Metamorphic net extended | doing | 1405-08-11 | | 20 transforms, 24 seeds; meta baseline being built on the CI runner — [`docs/reports/P2.2-meta-net.md`](../../docs/reports/P2.2-meta-net.md) | ☐ |
 | P2 | P2.3 Builders in CI, DOCX validation, goldens | report | 1405-08-11 | 1405-08-11 | — (no importer change; 73 cases × 5 goldens, 74 .docx valid, unit tests 86) — [`docs/reports/P2.3-builders-ci.md`](../../docs/reports/P2.3-builders-ci.md) | ☐ |
-| P2 | P2.4 Site quality jobs | todo | | | | ☐ |
+| P2 | P2.4 Site quality jobs | report | 1405-08-11 | 1405-08-11 | — (no importer change; links 0 errors, a11y 0 outside the allow-list, startup 1,982,706 / 1,985,000 bytes) — [`docs/reports/P2.4-site-quality.md`](../../docs/reports/P2.4-site-quality.md) | ☐ |
 | P3 | P3.1 Split long functions | todo | | | | ☐ |
 | P3 | P3.2 Calibration, threshold registry, telemetry | todo | | | | ☐ |
 | P3 | P3.3 Literal migration (metamorphic order) | todo | | | | ☐ |

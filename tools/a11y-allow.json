@@ -1,0 +1,11 @@
+{
+  "_about": "Serious/critical axe findings tools/check-a11y.js accepts for now (format: see the header of that file). Every entry names the plan phase that removes it; remove the entry in that phase. Not here because axe cannot detect them, but known and planned for P5.4: the Tab trap in the editor (WCAG 2.1.2, scripts/editor.js) and the stats aria-live chatter (index.html).",
+  "allow": [
+    {
+      "rule": "scrollable-region-focusable",
+      "selector": "#preview .kelk-math",
+      "reason": "A display formula wider than the preview (the sample's widest one with the settings pane open) scrolls sideways and cannot be reached from the keyboard. Making it focusable only while it overflows needs a re-check after MathJax typesets and on every resize of the pane; a tabindex on every formula would add a tab stop per formula.",
+      "fixedIn": "P5.4"
+    }
+  ]
+}

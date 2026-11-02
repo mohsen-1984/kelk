@@ -49,6 +49,27 @@
         });
     }
 
+    /**
+     * The pane only (after `clean` is taken for the builders, so the exports are unchanged) — WCAG fixes found by
+     * tools/check-a11y.js: a task checkbox is named by its item's text (axe `label`); a code block that scrolls
+     * sideways can be reached and scrolled from the keyboard (axe `scrollable-region-focusable`): tabindex on the
+     * element that scrolls, the <pre> or its highlighted <code>.
+     */
+    function a11y(root) {
+        K.$$('li > input[type="checkbox"]', root).forEach(function (box) {
+            const li = box.parentNode.cloneNode(true);
+            K.$$('ul, ol', li).forEach(function (l) { l.remove(); });
+            const name = li.textContent.replace(/\s+/g, ' ').trim().slice(0, 120);
+            if (name) box.setAttribute('aria-label', name);
+        });
+        K.$$('pre', root).forEach(function (pre) {
+            const code = pre.querySelector(':scope > code');
+            const scrolls = function (el) { return /auto|scroll/.test(getComputedStyle(el).overflowX); };
+            const el = code && scrolls(code) ? code : scrolls(pre) ? pre : null;
+            if (el) el.setAttribute('tabindex', '0');
+        });
+    }
+
     /** HTML of the user through DOMPurify with the preview's rules; without DOMPurify only its text is kept. */
     function sanitize(html) {
         if (typeof DOMPurify !== 'undefined') {
@@ -274,6 +295,7 @@
                 box.setAttribute('dir', BidiView.apply(box, { dir: K.store.get('direction') }).dir);
             }
             K.ui.icons(box);
+            a11y(box);
             K.names.refresh();
             this.typesetMath(pb);
         },

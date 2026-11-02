@@ -20,8 +20,8 @@ unchanged unless noted; each keeps its own license.
 | PDF.js (pdfjs-dist; wrapped as classic scripts by `tools/build-pdfjs.js`, code unchanged) | 6.4.299 | Apache-2.0 | `vendor/pdfjs/` (`LICENSE` there) | https://github.com/mozilla/pdf.js |
 | OpenJPEG and PDFium JBIG2 decoders (WebAssembly builds shipped with PDF.js; base64) | PDF.js 6.4.299 | BSD-2-Clause (OpenJPEG), BSD-3-Clause (PDFium); PDF.js glue Apache-2.0 | `vendor/pdfjs/wasm/` (`LICENSE_*` there) | https://github.com/mozilla/pdf.js |
 | MathJax (startup, core, TeX input + extensions, SVG output, ui/safe) | 4.1.3 | Apache-2.0 | `vendor/mathjax_4.1.3/` (`LICENSE` there) | https://github.com/mathjax/MathJax |
-| MathJax New Computer Modern font (SVG data) | 4.1.3 | Apache-2.0 | `vendor/mathjax_4.1.3/fonts/mathjax-newcm-font/` | https://github.com/mathjax/MathJax-fonts |
-| MathJax mhchem font extension (SVG data) | 4.1.3 | Apache-2.0 | `vendor/mathjax_4.1.3/fonts/mathjax-mhchem-font-extension/` | https://github.com/mathjax/MathJax-fonts |
+| MathJax New Computer Modern font (SVG data) | 4.1.3 | Apache-2.0 | `vendor/mathjax_4.1.3/fonts/mathjax-newcm-font/` | https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/ |
+| MathJax mhchem font extension (SVG data) | 4.1.3 | Apache-2.0 | `vendor/mathjax_4.1.3/fonts/mathjax-mhchem-font-extension/` | https://cdn.jsdelivr.net/npm/@mathjax/mathjax-mhchem-font-extension@4.1.3/ |
 
 The license text of each library is in its file header or at its source.
 
