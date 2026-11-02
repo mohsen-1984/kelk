@@ -28,7 +28,7 @@
             if (window[lib.global]) return Promise.resolve(window[lib.global]);
             const srcs = [].concat(lib.src);
             return srcs.reduce(function (p, src) { return p.then(function () { return K.ui.loadScript(src); }); }, Promise.resolve()).then(function () {
-                if (!window[lib.global]) throw new Error(name + ' did not load');
+                if (!window[lib.global]) throw new Error(K.i18n.t('libFailed', name));
                 return window[lib.global];
             });
         }
@@ -104,10 +104,10 @@
             const ps = Array.from(new Set(pages || [])).sort(function (a, b) { return a - b; }), parts = [];
             for (let i = 0; i < ps.length; i++) {
                 let j = i; while (j + 1 < ps.length && ps[j + 1] === ps[j] + 1) j++;
-                parts.push(j > i + 1 ? ps[i] + '–' + ps[j] : j === i + 1 ? ps[i] + (/^(fa|ar)/.test(K.i18n.lang) ? '، ' : ', ') + ps[j] : String(ps[i]));
+                parts.push(j > i + 1 ? ps[i] + '–' + ps[j] : j === i + 1 ? ps[i] + K.i18n.t('listSep') + ps[j] : String(ps[i]));
                 i = j;
             }
-            const lim = max || 6, sep = /^(fa|ar)/.test(K.i18n.lang) ? '، ' : ', ';
+            const lim = max || 6, sep = K.i18n.t('listSep');
             return parts.slice(0, lim).join(sep) + (parts.length > lim ? ' …' : '');
         },
 
@@ -137,7 +137,7 @@
                     const s = document.createElement('script');
                     s.src = src;
                     s.onload = resolve;
-                    s.onerror = function () { scripts.delete(src); reject(new Error('cannot load ' + src)); };
+                    s.onerror = function () { scripts.delete(src); reject(new Error(K.i18n.t('libFailed', src))); };
                     document.head.appendChild(s);
                 }));
             }
@@ -284,7 +284,7 @@
             const self = this, dlg = $('#task'), bar = $('#task-bar'), lab = $('#task-label'), det = $('#task-detail'), btn = $('#task-cancel');
             const run = function () {
                 const ctl = new AbortController();
-                let shown = false, cancel;
+                let cancel;
                 const aborted = new Promise(function (resolve, reject) {
                     cancel = function () { if (ctl.signal.aborted) return; ctl.abort(); const e = new Error(K.i18n.t('cancelled')); e.code = 'aborted'; reject(e); };
                 });
@@ -303,7 +303,7 @@
                     btn.onclick = cancel;
                     dlg.oncancel = function (e) { e.preventDefault(); cancel(); };       // Esc
                 }
-                const timer = dlg ? setTimeout(function () { if (!dlg.open) { dlg.showModal(); shown = true; } }, o.delay == null ? 200 : o.delay) : 0;
+                const timer = dlg ? setTimeout(function () { if (!dlg.open) dlg.showModal(); }, o.delay == null ? 200 : o.delay) : 0;
                 const done = function () { clearTimeout(timer); if (dlg && dlg.open) dlg.close(); };
                 return Promise.race([Promise.resolve().then(function () { return fn(api); }), aborted])
                     .then(function (v) { done(); return v; }, function (e) { done(); throw e; });

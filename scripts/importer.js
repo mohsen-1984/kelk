@@ -17,8 +17,13 @@
         return MarkdownImporter.create({
             nestedTables: o.nestedTables,
             images: o.images,
-            labels: { table: K.i18n.lang === 'fa' ? 'جدول' : 'Table' }
+            labels: labels()
         });
+    }
+
+    /** The words the importer writes into the text (nested-table references), in the interface's language. */
+    function labels() {
+        return { table: K.i18n.t('tableLabel') };
     }
 
     function ext(name) { const m = /\.[^.]+$/.exec(name || ''); return m ? m[0].toLowerCase() : ''; }
@@ -143,7 +148,7 @@
                 const r = await PdfImporter.create({
                     images: o.images === 'drop' ? 'drop' : 'markdown',
                     asciiNumbers: o.asciiNumbers !== false, persianLetters: o.persianLetters !== false,
-                    markdownImporter: { nestedTables: o.nestedTables, images: o.images, labels: { table: K.i18n.lang === 'fa' ? 'جدول' : 'Table' } },
+                    markdownImporter: { nestedTables: o.nestedTables, images: o.images, labels: labels() },
                     wasmBase: 'vendor/pdfjs/wasm/',
                     loadScript: K.ui.loadScript,
                     signal: t.signal,

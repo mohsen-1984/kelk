@@ -127,6 +127,10 @@
         if (kind === 'pdf') b.registerFonts(window.PdfFonts || {});
         if (kind === 'html') b.registerWebFonts(window.KelkWebFonts || {});
         const hf = headerFooter(s, logo);
+        // {date} of a custom header/footer in the language of its page/of words (Arabic in the Arabic interface)
+        [hf.header, hf.footer].forEach(function (o) {
+            if (o && o.html != null) o.dateLocale = K.i18n.dateLocale(K.names.hfDir());
+        });
         return b.configure({
             direction: s.direction,
             page: { size: s.page.size, orientation: s.page.orientation, margin: s.page.margin },
