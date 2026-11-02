@@ -678,9 +678,10 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 32 | P2.4 accessibility and size checks: `tools/check-a11y.js` (axe-core 4.14.0, fa / en / ar × light / dark, dialogs) with an allow-list; preview fixes for code contrast, task checkbox names and scrolling code blocks; BidiView's empty link removed; `tools/check-size.js` with a committed budget; 6 unit tests. |
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 3 | P2.4 joined on `redesign/P2.4` (package scripts merged, lockfile installed), the size budget set on the whole stack (1,982,706 → 1,985,000 bytes), every check rerun (unit tests 92, a11y, size, freshness, CSP, goldens); report `docs/reports/P2.4-site-quality.md`, Known Issues, Testing, Commands and the tracker. |
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 2 | P2.2 meta baseline on the CI runner: manual `pdf-lab.yml` run 41509321814 with `baseline` ticked (qpdf pin held, 0 unexpected "same" files on Linux), its candidate checked and its meta part written into `baseline.json`; report §5, Known Issues (the `/Rotate` finding and the net's other losses), Testing and the tracker. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 4 | P2.2 – P2.4 pushed with pull requests #12 – #14; first CI runs read: `site.yml` links red on the golden snapshots (recorded `.docx` read-backs with `#bm_` links) — `tests/golden/expected/` excluded in `lychee.toml`; `builders.yml` red on LibreOffice (7 files without a PDF) and two Persian-formula goldens measured differently on Linux, handed back for a fix. |
 
 <!-- generated:totals -->
-**Entries: 95 · Total: 1189 min (19.82 hours) — Zarrabi 1189 min (88 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 96 · Total: 1193 min (19.88 hours) — Zarrabi 1193 min (89 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
