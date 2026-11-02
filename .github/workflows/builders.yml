@@ -22,6 +22,10 @@
 # install step fails with the version apt now offers (apt-cache policy in its log) — update the pin here and in
 # docs/reports/P2.3-builders-ci.md, re-run, and read the goldens' result (xmllint and LibreOffice do not touch
 # the snapshots).
+#
+# Triggers: every push, every pull request and by hand — the same as tooling.yml and pdf-lab.yml. A push to a
+# branch with an open pull request therefore runs twice (push and pull_request); kept for consistency, so a branch
+# without a PR is checked too. Changing it belongs to all three workflows at once.
 name: builders
 
 on:
@@ -82,7 +86,9 @@ jobs:
             got_x=$(dpkg-query -W -f='${Version}' libxml2-utils)
             got_l=$(dpkg-query -W -f='${Version}' libreoffice-writer-nogui)
             echo "libxml2-utils $got_x, libreoffice-writer-nogui $got_l"
-            [ "$got_x" = "$XMLLINT_VERSION" ] && [ "$got_l" = "$LIBREOFFICE_VERSION" ]
+            # two checks, each exits: `[ a ] && [ b ]` is a list, and set -e does not stop on a failing list member
+            [ "$got_x" = "$XMLLINT_VERSION" ] || { echo "::error::libxml2-utils is $got_x, not $XMLLINT_VERSION"; exit 1; }
+            [ "$got_l" = "$LIBREOFFICE_VERSION" ] || { echo "::error::libreoffice-writer-nogui is $got_l, not $LIBREOFFICE_VERSION"; exit 1; }
             xmllint --version
             soffice --version
             npm ci                                          # package-lock.json's versions into ./node_modules

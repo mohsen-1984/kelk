@@ -178,6 +178,22 @@ test('HR (HTML path): <hr> inside a table cell keeps the table intact', function
   assert.match(rows[2], /p1<br>p2/);
 });
 
+test('HR (HTML path): a rule at a cell\'s edge leaves no line break; the cell\'s own line breaks stay', function () {
+  const r = win.MarkdownImporter.create().fromHtml('<table><tr><th>A</th><th>B</th><th>C</th></tr>' +
+    '<tr><td><hr>top rule</td><td>bottom rule<hr></td><td>line one<br><br>line three</td></tr></table>');
+  const rows = tableIntact(r.markdown);
+  assert.match(rows[2], /^\| top rule \| bottom rule \| line one<br><br>line three \|$/, r.markdown);
+});
+
+test('HR: a rule as the first item of a list goes before the list; as the only item it replaces the list', async function () {
+  const first = await md(BORDER_HR(num(1)) + p('two', num(1)) + p('three', num(1)));
+  assert.ok(!first.includes(HR_TOKEN), first);
+  assert.match(first, /^---\n\n- +two\n- +three\n$/, first);
+  const only = await md(p('before') + BORDER_HR(num(2)) + p('after'));
+  assert.ok(!only.includes(HR_TOKEN), only);
+  assert.equal(only, 'before\n\n---\n\nafter\n');
+});
+
 // ── the zip reader (readZip / inflateEntry / writeZip, run when the .docx has equations or rules) ────────────
 
 test('zip reader: deflated, stored, with an archive comment and with data descriptors — the equation comes back', async function () {

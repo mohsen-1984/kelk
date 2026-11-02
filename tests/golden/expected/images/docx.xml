@@ -1,4 +1,4 @@
-# 19 parts: [Content_Types].xml, _rels/.rels, docProps/app.xml, docProps/core.xml, docProps/custom.xml, word/_rels/comments.xml.rels, word/_rels/document.xml.rels, word/_rels/endnotes.xml.rels, word/_rels/fontTable.xml.rels, word/_rels/footnotes.xml.rels, word/comments.xml, word/document.xml, word/endnotes.xml, word/fontTable.xml, word/footnotes.xml, word/media/image1.png, word/numbering.xml, word/settings.xml, word/styles.xml
+# 20 parts: [Content_Types].xml, _rels/.rels, docProps/app.xml, docProps/core.xml, docProps/custom.xml, word/_rels/comments.xml.rels, word/_rels/document.xml.rels, word/_rels/endnotes.xml.rels, word/_rels/fontTable.xml.rels, word/_rels/footnotes.xml.rels, word/comments.xml, word/document.xml, word/endnotes.xml, word/fontTable.xml, word/footnotes.xml, word/media/image1.png, word/media/image2.png, word/numbering.xml, word/settings.xml, word/styles.xml
 
 <!-- ===== [Content_Types].xml ===== -->
 <?xml version="1.0" encoding="UTF-8"?>
@@ -34,6 +34,25 @@
   <Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties" Target="docProps/custom.xml"/>
 </Relationships>
 
+<!-- ===== docProps/app.xml ===== -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"/>
+
+<!-- ===== docProps/core.xml ===== -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cp:coreProperties [5 xmlns declarations sha256 b63ed098059a]>
+  <dc:title>Images</dc:title>
+  <dc:creator>Kelk 2.0-rc1</dc:creator>
+  <cp:lastModifiedBy>Kelk 2.0-rc1</cp:lastModifiedBy>
+  <cp:revision>1</cp:revision>
+  <dcterms:created xsi:type="dcterms:W3CDTF">[date]</dcterms:created>
+  <dcterms:modified xsi:type="dcterms:W3CDTF">[date]</dcterms:modified>
+</cp:coreProperties>
+
+<!-- ===== docProps/custom.xml ===== -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"/>
+
 <!-- ===== word/_rels/comments.xml.rels ===== -->
 <?xml version="1.0" encoding="UTF-8"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>
@@ -48,7 +67,8 @@
   <Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>
   <Relationship Id="rId6" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments" Target="comments.xml"/>
   <Relationship Id="rId7" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.png"/>
-  <Relationship Id="rId8" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/>
+  <Relationship Id="rId8" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image2.png"/>
+  <Relationship Id="rId9" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/>
 </Relationships>
 
 <!-- ===== word/_rels/endnotes.xml.rels ===== -->
@@ -84,6 +104,10 @@
     <w:p>
       <w:pPr><w:bidi w:val="false"/></w:pPr>
       <w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="228600" cy="114300"/><wp:effectExtent t="0" r="0" b="0" l="0"/><wp:docPr id="1" name="a picture alone in its paragraph" descr="a picture alone in its paragraph" title="a picture alone in its paragraph"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="0" name="" descr=""/><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId7" cstate="none"/><a:srcRect/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="228600" cy="114300"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi w:val="false"/></w:pPr>
+      <w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="95250" cy="190500"/><wp:effectExtent t="0" r="0" b="0" l="0"/><wp:docPr id="1" name="a second, different picture" descr="a second, different picture" title="a second, different picture"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="0" name="" descr=""/><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId8" cstate="none"/><a:srcRect/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="95250" cy="190500"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>
     </w:p>
     <w:tbl>
       <w:tblPr><w:bidiVisual w:val="false"/><w:tblW w:type="dxa" w:w="5348"/><w:jc w:val="center"/><w:tblBorders><w:top w:val="nil"/><w:left w:val="nil"/><w:bottom w:val="nil"/><w:right w:val="nil"/><w:insideH w:val="nil"/><w:insideV w:val="nil"/></w:tblBorders><w:tblLayout w:type="fixed"/></w:tblPr>
@@ -197,4 +221,9 @@
 </w:settings>
 
 <!-- ===== word/styles.xml ===== -->
-<!-- shared: _shared/42eabb6e82ce.txt -->
+<!-- shared: _shared/0631e55ba47b.txt -->
+<!-- ===== word/media/image1.png ===== -->
+[raster png 24×12 sha256 b57698b673df = an input picture]
+
+<!-- ===== word/media/image2.png ===== -->
+[raster png 10×20 sha256 faa04b604bab = an input picture]

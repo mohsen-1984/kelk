@@ -1,4 +1,4 @@
-# MHTML, 3 parts
+# MHTML, 4 parts
 
 <!-- ===== file:///C:/document.htm (text/html) head ===== -->
 <!-- shared: _shared/416e8e1fd5ad.txt -->
@@ -8,6 +8,7 @@
         <h1 style="direction:ltr;text-align:left">Images</h1>
 <p style="direction:ltr;text-align:justify" class="MsoNormal">An inline picture <img src="document_files/image001.png" alt="green bar" width="24" height="12"> inside a sentence.</p>
 <p class="MsoNormal"><img src="document_files/image001.png" alt="a picture alone in its paragraph" width="24" height="12"></p>
+<p class="MsoNormal"><img src="document_files/image002.png" alt="a second, different picture" width="10" height="20"></p>
 <div align="center" dir="ltr"><table style="width:52.4%" class="MsoNormalTable">
 <thead>
 <tr>
@@ -31,11 +32,15 @@
 </html>
 
 <!-- ===== file:///C:/document_files/image001.png (image/png) ===== -->
-[raster]
+[raster png 24×12 sha256 b57698b673df = an input picture]
+
+<!-- ===== file:///C:/document_files/image002.png (image/png) ===== -->
+[raster png 10×20 sha256 faa04b604bab = an input picture]
 
 <!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
 <xml xmlns:o="urn:schemas-microsoft-com:office:office">
  <o:MainFile HRef="../document.htm"/>
  <o:File HRef="image001.png"/>
+ <o:File HRef="image002.png"/>
  <o:File HRef="filelist.xml"/>
 </xml>
