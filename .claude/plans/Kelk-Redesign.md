@@ -125,7 +125,7 @@ Status: `todo` → `doing` → `report` (report written, waiting) → `approved`
 | P0 | P0.4 Dev tooling, single version | approved | 1405-08-11 | 1405-08-11 | 95.7 / 96.0 / 94.6 / 92.9 (CI 41421784696, no importer change; lint 0 errors, 24 version checks agree) | ☑ owner, 1405-08-11 |
 | P1 | P1.1 Storage & export correctness | approved | 1405-08-11 | 1405-08-11 | — (no `lib/` change; unit tests 23 / 23, lint 0 errors) — [`docs/reports/P1.1-storage-export.md`](../../docs/reports/P1.1-storage-export.md); merged as PR #7 (`fc2fd52`) | ☑ owner, 1405-08-11 |
 | P1 | P1.2 Security hardening | report | 1405-08-11 | 1405-08-11 | — (no importer change; unit tests 28 / 28, lint 0 errors, builder suite unchanged) — [`docs/reports/P1.2-security.md`](../../docs/reports/P1.2-security.md) | ☐ |
-| P1 | P1.3 Builder bugs B1–B8 | todo | | | | ☐ |
+| P1 | P1.3 Builder bugs B1–B8 | report | 1405-08-11 | 1405-08-11 | 96.2 / 95.8* / 93.9* / 92.9 (*local Windows, +0.0 against the base; corpus 95.7 → 96.2 by the five fa quote files) — [`docs/reports/P1.3-builder-bugs.md`](../../docs/reports/P1.3-builder-bugs.md) | ☐ |
 | P1 | P1.4 i18n & small app bugs | todo | | | | ☐ |
 | P2 | P2.1 RTL fuzz corpus | todo | | | | ☐ |
 | P2 | P2.2 Metamorphic net extended | todo | | | | ☐ |
