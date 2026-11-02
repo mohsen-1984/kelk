@@ -207,3 +207,41 @@ test('HtmlBuilder.toHtml writes no on* handler, script or javascript: URL (B4)',
   assert.equal(box.innerHTML, '<a>a</a><img src="data:image/svg+xml;base64,AAAA">');
   w.close();
 });
+
+test('after the prefix, <a name> anchors, image maps and <area> links still work (review of P1.2)', async function () {
+  const { window: w } = await appWindow(OPENED);
+  setText(
+    w,
+    '<a name="sec"></a>\n\n[go](#sec)\n\n<map name="m"><area shape="rect" coords="0,0,9,9" href="https://example.com/" target="_blank"></map>' +
+      '<img src="x.png" usemap="#m" alt="m">'
+  );
+  const html = w.document.getElementById('preview').innerHTML;
+  assert.ok(html.includes('name="user-content-sec"') && html.includes('href="#user-content-sec"'), 'the link follows the anchor');
+  assert.ok(html.includes('usemap="#user-content-m"'), 'the image follows its map');
+  assert.ok(/<area[^>]*rel="noopener noreferrer"/.test(html), '<area target> gets rel');
+  w.close();
+});
+
+test('DOCX bookmarks: ids alike in their first 24 characters stay distinct (review of P1.2)', async function () {
+  const { window: w } = await appWindow(OPENED);
+  const bm = w.DocxBuilder._bookmarkName;
+  const a = bm('user-content-introduction-to-the-topic-a'),
+    b = bm('user-content-introduction-to-the-topic-b');
+  assert.notEqual(a, b, a + ' / ' + b);
+  assert.equal(a, 'bm_introduction_to_the_topic_a', 'the prefix is not in the name');
+  assert.ok(bm('x'.repeat(80)).length <= 40, 'Word’s 40 characters');
+  w.close();
+});
+
+test('HtmlBuilder.defang removes SVG animation and XML / script data: URLs (review of P1.2)', async function () {
+  const { window: w } = await appWindow(OPENED);
+  const box = w.document.createElement('div');
+  box.innerHTML =
+    '<svg><a><animate attributeName="href" values="javascript:alert(1)"></animate><set attributeName="href" to="javascript:alert(2)"></set><text>s</text></a></svg>' +
+    '<a href="data:text/xml,&lt;x:script/&gt;">x</a><a href="data:application/xml,x">y</a><img src="data:image/png;base64,AAAA">';
+  w.HtmlBuilder.defang(box);
+  assert.ok(!/<animate|<set/i.test(box.innerHTML), 'no SVG animation');
+  assert.ok(!/href="data:/i.test(box.innerHTML), 'no XML data: link');
+  assert.ok(box.innerHTML.includes('src="data:image/png'), 'a picture stays');
+  w.close();
+});

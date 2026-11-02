@@ -225,6 +225,22 @@ async function run(label, url) {
       })
     };
   }
+  // pdf.js's image decoders (JPEG 2000, JBIG2 / CCITT) are WebAssembly on the page's main thread: the CSP must
+  // let them compile ('wasm-unsafe-eval'), or scanned PDFs lose their pictures (no pure-JS fallback is shipped)
+  r.steps.wasm = await page.evaluate(async function () {
+    const out = {};
+    const F = new window.PdfImporter()._binaryDataFactory();
+    for (const name of ['openjpeg.wasm', 'jbig2.wasm']) {
+      try {
+        const buf = await new F().fetch({ kind: 'wasmUrl', filename: name });
+        await WebAssembly.compile(buf);
+        out[name] = 'ok';
+      } catch (e) {
+        out[name] = String(e).slice(0, 160);
+      }
+    }
+    return out;
+  });
   await page.waitForTimeout(500);
   r.violations = await page.evaluate(function () {
     return window.__csp;
@@ -264,6 +280,9 @@ async function run(label, url) {
     });
     if (s.exports.html && s.exports.html.onHandlers) bad.push('on* in the HTML export');
     if (!s.pdfImport.ok) bad.push('PDF import');
+    Object.keys(s.wasm).forEach(function (k) {
+      if (s.wasm[k] !== 'ok') bad.push('WebAssembly ' + k);
+    });
     if (r.pageErrors.length) bad.push(r.pageErrors.length + ' page error(s)');
     console.log(r.label.padEnd(5), bad.length ? 'FAIL ' + bad.join(', ') : 'ok');
     failed += bad.length;
