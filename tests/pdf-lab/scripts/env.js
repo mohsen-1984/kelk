@@ -12,7 +12,7 @@ function req(name) {
     try { return require(path.join(d, name)); } catch (e) { if (e.code !== 'MODULE_NOT_FOUND') throw e; }
   }
   throw new Error('cannot load ' + name + (dirs.length ? ' (looked in ' + dirs.join(', ') + ')' : '') +
-    ': run `npm install playwright@1.56.1 pdf-lib@1.17.1` in a folder outside the repository and set NODE_TOOLS to its node_modules');
+    ': run `npm ci` in the repository root (package.json), or install it in a folder outside the repository and set NODE_TOOLS to its node_modules');
 }
 // LAB_OUT=… puts the results elsewhere (the gate compares two output folders: two versions of the importer on
 // the same PDFs); LAB_FUZZ=… reads the fuzzed PDFs from another folder

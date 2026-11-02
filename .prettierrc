@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json.schemastore.org/prettierrc",
+  "singleQuote": true,
+  "semi": true,
+  "trailingComma": "none",
+  "arrowParens": "always",
+  "bracketSpacing": true,
+  "quoteProps": "as-needed",
+  "endOfLine": "lf",
+  "printWidth": 120,
+  "tabWidth": 2,
+  "useTabs": false,
+  "overrides": [
+    {
+      "files": ["lib/**/*.js", "scripts/**/*.js", "tools/**/*.js", "*.html", "**/*.html"],
+      "options": { "tabWidth": 4 }
+    },
+    {
+      "files": ["lib/PdfImporter.js", "lib/pdfimport/**/*.js"],
+      "options": { "printWidth": 140 }
+    },
+    {
+      "files": ["tests/pdf-lab/scripts/**/*.js"],
+      "options": { "tabWidth": 2, "printWidth": 140 }
+    }
+  ]
+}
