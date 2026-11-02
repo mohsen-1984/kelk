@@ -45,6 +45,20 @@ const MC = 'http://schemas.openxmlformats.org/markup-compatibility/2006';
  */
 const ALLOW = [];
 
+/**
+ * Files LibreOffice is known to fail on although they are schema-valid: { file, reason }. Matched by name, and only for
+ * a crash or abort (exit 134 / a signal) — any other failure, or a crash on another file, fails the run; a listed file
+ * that converts is reported (remove the entry).
+ */
+const SOFFICE_KNOWN = [
+  // CI 1405-08-11 (runs 41519377664, 41519387343): LibreOffice 24.2.7 (noble) headless aborts (exit 134, SIGABRT,
+  // "SfxBaseModel::impl_store … failed: 0xc10 (Io / Write)") while writing the PDF of the two documents with a Word
+  // ToC field, on the first try and the retry; both pass the OOXML schemas, and LibreOffice 24.2.7.2 on Windows
+  // converts them. Not a DocxBuilder fault as far as can be seen; checked again when the LibreOffice pin moves.
+  { file: 'toc-ltr.docx', reason: 'LibreOffice 24.2.7 (Linux) aborts on the ToC field' },
+  { file: 'toc-rtl.docx', reason: 'LibreOffice 24.2.7 (Linux) aborts on the ToC field' }
+];
+
 function args() {
   const a = process.argv.slice(2), o = { cases: null, keep: null, xmllint: true, soffice: true };
   for (let i = 0; i < a.length; i++) {
@@ -408,10 +422,19 @@ async function main() {
   if (o.soffice) {
     const res = soffice(cases.map((c) => c.file), path.join(work, 'pdf'));
     res.filter((r) => r.retried).forEach((r) => console.log('note  LibreOffice: ' + path.basename(r.file) + ' converted on the retry; first try: ' + r.retried));
-    res.filter((r) => !r.ok).forEach((r) => console.log('FAIL  LibreOffice: ' + path.basename(r.file) + ' → ' + r.why));
-    const okN = res.filter((r) => r.ok).length;
-    console.log('LibreOffice: ' + okN + ' / ' + res.length + ' converted to a non-empty PDF');
-    fail += res.length - okN;
+    const known = (r) => {
+      const k = SOFFICE_KNOWN.find((x) => x.file === path.basename(r.file));
+      return k && /exit 134|signal/.test(String(r.why)) ? k : null;
+    };
+    res.filter((r) => !r.ok).forEach((r) => {
+      const k = known(r);
+      console.log((k ? 'known LibreOffice: ' : 'FAIL  LibreOffice: ') + path.basename(r.file) + ' → ' + r.why + (k ? ' — ' + k.reason : ''));
+    });
+    SOFFICE_KNOWN.filter((k) => res.some((r) => r.ok && path.basename(r.file) === k.file)).forEach((k) =>
+      console.log('note  LibreOffice: ' + k.file + ' converted — remove its SOFFICE_KNOWN entry'));
+    const okN = res.filter((r) => r.ok).length, knownN = res.filter((r) => !r.ok && known(r)).length;
+    console.log('LibreOffice: ' + okN + ' / ' + res.length + ' converted to a non-empty PDF' + (knownN ? ', ' + knownN + ' known' : ''));
+    fail += res.length - okN - knownN;
   } else console.log('LibreOffice: skipped (--no-soffice)');
 
   if (!o.keep) fs.rmSync(work, { recursive: true, force: true });
