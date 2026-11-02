@@ -1,0 +1,48 @@
+# MHTML, 2 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/b1656fe21d17.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="rtl">
+        <p class=MsoNormal style='direction:rtl;text-align:right'>&nbsp;</p>
+        <ul>
+<li class="MsoNormal">مورد اول فهرست</li>
+<li style="direction:ltr;text-align:justify" class="MsoNormal">Second item in English<ul>
+<li style="direction:rtl;text-align:justify" class="MsoNormal">زیرمورد فارسی</li>
+<li style="direction:ltr;text-align:justify" class="MsoNormal">English sub item<ol>
+<li style="direction:rtl;text-align:justify" class="MsoNormal">شماره یک</li>
+<li style="direction:ltr;text-align:justify" class="MsoNormal">number two</li>
+</ol>
+</li>
+</ul>
+</li>
+<li class="MsoNormal">مورد سوم با <span dir="ltr">4k</span></li>
+</ul>
+<ol style="direction:ltr;text-align:justify">
+<li style="direction:ltr;text-align:justify" class="MsoNormal"><p style="direction:ltr;text-align:justify;margin-top:0pt;margin-bottom:3pt;mso-margin-top-alt:0pt;mso-margin-bottom-alt:3pt" class="MsoNormal">English only</p>
+</li>
+<li style="direction:ltr;text-align:justify" class="MsoNormal"><p style="direction:ltr;text-align:justify;margin-top:0pt;margin-bottom:3pt;mso-margin-top-alt:0pt;mso-margin-bottom-alt:3pt" class="MsoNormal">Still English</p>
+<ul style="direction:ltr;text-align:justify">
+<li style="direction:ltr;text-align:justify" class="MsoNormal">nested bullet</li>
+</ul>
+</li>
+<li style="direction:ltr;text-align:justify" class="MsoNormal"><p style="direction:ltr;text-align:justify;margin-top:0pt;margin-bottom:3pt;mso-margin-top-alt:0pt;mso-margin-bottom-alt:3pt" class="MsoNormal">Loose item paragraph one</p>
+<p style="direction:ltr;text-align:justify;margin-top:0pt;margin-bottom:3pt;mso-margin-top-alt:0pt;mso-margin-bottom-alt:3pt" class="MsoNormal">Loose item paragraph two</p>
+</li>
+</ol>
+<ul style="direction:ltr;text-align:justify">
+<li style="direction:ltr;text-align:justify" class="MsoNormal">☐  task open</li>
+<li style="direction:ltr;text-align:justify" class="MsoNormal">☑  task done</li>
+</ul>
+
+        <p class=MsoNormal style='direction:rtl;text-align:right'>&nbsp;</p>
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="filelist.xml"/>
+</xml>

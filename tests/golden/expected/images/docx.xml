@@ -1,0 +1,200 @@
+# 19 parts: [Content_Types].xml, _rels/.rels, docProps/app.xml, docProps/core.xml, docProps/custom.xml, word/_rels/comments.xml.rels, word/_rels/document.xml.rels, word/_rels/endnotes.xml.rels, word/_rels/fontTable.xml.rels, word/_rels/footnotes.xml.rels, word/comments.xml, word/document.xml, word/endnotes.xml, word/fontTable.xml, word/footnotes.xml, word/media/image1.png, word/numbering.xml, word/settings.xml, word/styles.xml
+
+<!-- ===== [Content_Types].xml ===== -->
+<?xml version="1.0" encoding="UTF-8"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default ContentType="image/png" Extension="png"/>
+  <Default ContentType="image/jpeg" Extension="jpeg"/>
+  <Default ContentType="image/jpeg" Extension="jpg"/>
+  <Default ContentType="image/bmp" Extension="bmp"/>
+  <Default ContentType="image/gif" Extension="gif"/>
+  <Default ContentType="image/svg+xml" Extension="svg"/>
+  <Default ContentType="application/vnd.openxmlformats-package.relationships+xml" Extension="rels"/>
+  <Default ContentType="application/xml" Extension="xml"/>
+  <Default ContentType="application/vnd.openxmlformats-officedocument.obfuscatedFont" Extension="odttf"/>
+  <Override ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml" PartName="/word/document.xml"/>
+  <Override ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml" PartName="/word/styles.xml"/>
+  <Override ContentType="application/vnd.openxmlformats-package.core-properties+xml" PartName="/docProps/core.xml"/>
+  <Override ContentType="application/vnd.openxmlformats-officedocument.custom-properties+xml" PartName="/docProps/custom.xml"/>
+  <Override ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml" PartName="/docProps/app.xml"/>
+  <Override ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml" PartName="/word/numbering.xml"/>
+  <Override ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml" PartName="/word/footnotes.xml"/>
+  <Override ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.endnotes+xml" PartName="/word/endnotes.xml"/>
+  <Override ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml" PartName="/word/settings.xml"/>
+  <Override ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml" PartName="/word/comments.xml"/>
+  <Override ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml" PartName="/word/fontTable.xml"/>
+</Types>
+
+<!-- ===== _rels/.rels ===== -->
+<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>
+  <Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties" Target="docProps/custom.xml"/>
+</Relationships>
+
+<!-- ===== word/_rels/comments.xml.rels ===== -->
+<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>
+
+<!-- ===== word/_rels/document.xml.rels ===== -->
+<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering" Target="numbering.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footnotes" Target="footnotes.xml"/>
+  <Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/endnotes" Target="endnotes.xml"/>
+  <Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>
+  <Relationship Id="rId6" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments" Target="comments.xml"/>
+  <Relationship Id="rId7" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.png"/>
+  <Relationship Id="rId8" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/>
+</Relationships>
+
+<!-- ===== word/_rels/endnotes.xml.rels ===== -->
+<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>
+
+<!-- ===== word/_rels/fontTable.xml.rels ===== -->
+<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>
+
+<!-- ===== word/_rels/footnotes.xml.rels ===== -->
+<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>
+
+<!-- ===== word/comments.xml ===== -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:comments [31 xmlns declarations sha256 ffc60766786c]/>
+
+<!-- ===== word/document.xml ===== -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document mc:Ignorable="w14 w15 wp14" [32 xmlns declarations sha256 98310b2594fe]>
+  <w:body>
+    <w:p>
+      <w:pPr><w:pStyle w:val="Heading1"/><w:bidi w:val="false"/><w:jc w:val="left"/></w:pPr>
+      <w:r><w:t xml:space="preserve">Images</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi w:val="false"/></w:pPr>
+      <w:r><w:t xml:space="preserve">An inline picture </w:t></w:r>
+      <w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="228600" cy="114300"/><wp:effectExtent t="0" r="0" b="0" l="0"/><wp:docPr id="1" name="green bar" descr="green bar" title="green bar"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="0" name="" descr=""/><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId7" cstate="none"/><a:srcRect/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="228600" cy="114300"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>
+      <w:r><w:t xml:space="preserve"> inside a sentence.</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi w:val="false"/></w:pPr>
+      <w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="228600" cy="114300"/><wp:effectExtent t="0" r="0" b="0" l="0"/><wp:docPr id="1" name="a picture alone in its paragraph" descr="a picture alone in its paragraph" title="a picture alone in its paragraph"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="0" name="" descr=""/><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId7" cstate="none"/><a:srcRect/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="228600" cy="114300"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>
+    </w:p>
+    <w:tbl>
+      <w:tblPr><w:bidiVisual w:val="false"/><w:tblW w:type="dxa" w:w="5348"/><w:jc w:val="center"/><w:tblBorders><w:top w:val="nil"/><w:left w:val="nil"/><w:bottom w:val="nil"/><w:right w:val="nil"/><w:insideH w:val="nil"/><w:insideV w:val="nil"/></w:tblBorders><w:tblLayout w:type="fixed"/></w:tblPr>
+      <w:tblGrid>
+        <w:gridCol w:w="1428"/>
+        <w:gridCol w:w="3920"/>
+      </w:tblGrid>
+      <w:tr>
+        <w:trPr><w:tblHeader/></w:trPr>
+        <w:tc>
+          <w:tcPr><w:tcW w:type="dxa" w:w="1428"/><w:tcBorders><w:top w:val="single" w:color="A9B5C4" w:sz="4"/><w:left w:val="single" w:color="A9B5C4" w:sz="4"/><w:bottom w:val="single" w:color="A9B5C4" w:sz="4"/><w:right w:val="single" w:color="A9B5C4" w:sz="4"/></w:tcBorders><w:shd w:fill="E4E9EF" w:color="auto" w:val="clear"/><w:tcMar><w:top w:type="dxa" w:w="20"/><w:left w:type="dxa" w:w="108"/><w:bottom w:type="dxa" w:w="20"/><w:right w:type="dxa" w:w="108"/></w:tcMar><w:vAlign w:val="center"/></w:tcPr>
+          <w:p>
+            <w:pPr><w:pStyle w:val="TableParagraph"/><w:bidi w:val="false"/><w:jc w:val="center"/></w:pPr>
+            <w:r><w:rPr><w:b/><w:bCs/><w:color w:val="000000"/></w:rPr><w:t xml:space="preserve">Picture</w:t></w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:tcPr><w:tcW w:type="dxa" w:w="3920"/><w:tcBorders><w:top w:val="single" w:color="A9B5C4" w:sz="4"/><w:left w:val="single" w:color="A9B5C4" w:sz="4"/><w:bottom w:val="single" w:color="A9B5C4" w:sz="4"/><w:right w:val="single" w:color="A9B5C4" w:sz="4"/></w:tcBorders><w:shd w:fill="E4E9EF" w:color="auto" w:val="clear"/><w:tcMar><w:top w:type="dxa" w:w="20"/><w:left w:type="dxa" w:w="108"/><w:bottom w:type="dxa" w:w="20"/><w:right w:type="dxa" w:w="108"/></w:tcMar><w:vAlign w:val="center"/></w:tcPr>
+          <w:p>
+            <w:pPr><w:pStyle w:val="TableParagraph"/><w:bidi w:val="false"/><w:jc w:val="center"/></w:pPr>
+            <w:r><w:rPr><w:b/><w:bCs/><w:color w:val="000000"/></w:rPr><w:t xml:space="preserve">Caption</w:t></w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:tcPr><w:tcW w:type="dxa" w:w="1428"/><w:tcBorders><w:top w:val="single" w:color="A9B5C4" w:sz="4"/><w:left w:val="single" w:color="A9B5C4" w:sz="4"/><w:bottom w:val="single" w:color="A9B5C4" w:sz="4"/><w:right w:val="single" w:color="A9B5C4" w:sz="4"/></w:tcBorders><w:tcMar><w:top w:type="dxa" w:w="20"/><w:left w:type="dxa" w:w="108"/><w:bottom w:type="dxa" w:w="20"/><w:right w:type="dxa" w:w="108"/></w:tcMar><w:vAlign w:val="center"/></w:tcPr>
+          <w:p>
+            <w:pPr><w:pStyle w:val="TableParagraph"/><w:bidi w:val="false"/><w:jc w:val="left"/></w:pPr>
+            <w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="228600" cy="114300"/><wp:effectExtent t="0" r="0" b="0" l="0"/><wp:docPr id="1" name="in a cell" descr="in a cell" title="in a cell"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="0" name="" descr=""/><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId7" cstate="none"/><a:srcRect/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="228600" cy="114300"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:tcPr><w:tcW w:type="dxa" w:w="3920"/><w:tcBorders><w:top w:val="single" w:color="A9B5C4" w:sz="4"/><w:left w:val="single" w:color="A9B5C4" w:sz="4"/><w:bottom w:val="single" w:color="A9B5C4" w:sz="4"/><w:right w:val="single" w:color="A9B5C4" w:sz="4"/></w:tcBorders><w:tcMar><w:top w:type="dxa" w:w="20"/><w:left w:type="dxa" w:w="108"/><w:bottom w:type="dxa" w:w="20"/><w:right w:type="dxa" w:w="108"/></w:tcMar><w:vAlign w:val="center"/></w:tcPr>
+          <w:p>
+            <w:pPr><w:pStyle w:val="TableParagraph"/><w:bidi w:val="false"/><w:jc w:val="left"/></w:pPr>
+            <w:r><w:t xml:space="preserve">A picture in a table cell</w:t></w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+    </w:tbl>
+    <w:p>
+      <w:pPr><w:pStyle w:val="ListParagraph"/><w:numPr><w:ilvl w:val="0"/><w:numId w:val="2"/></w:numPr><w:bidi w:val="false"/><w:spacing w:before="120"/><w:ind w:left="480" w:hanging="280"/></w:pPr>
+      <w:r><w:t xml:space="preserve">A list item with a picture </w:t></w:r>
+      <w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="228600" cy="114300"/><wp:effectExtent t="0" r="0" b="0" l="0"/><wp:docPr id="1" name="in a list" descr="in a list" title="in a list"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="0" name="" descr=""/><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId7" cstate="none"/><a:srcRect/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="228600" cy="114300"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:pStyle w:val="ListParagraph"/><w:numPr><w:ilvl w:val="0"/><w:numId w:val="2"/></w:numPr><w:bidi/><w:ind w:left="480" w:hanging="280"/></w:pPr>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">تصویری در فهرست فارسی </w:t></w:r>
+      <w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="228600" cy="114300"/><wp:effectExtent t="0" r="0" b="0" l="0"/><wp:docPr id="1" name="فارسی" descr="فارسی" title="فارسی"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="0" name="" descr=""/><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId7" cstate="none"/><a:srcRect/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="228600" cy="114300"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi w:val="false"/><w:jc w:val="left"/></w:pPr>
+    </w:p>
+    <w:sectPr><w:pgSz w:w="11906" w:h="16838" w:orient="portrait"/><w:pgMar w:top="850" w:right="850" w:bottom="850" w:left="850" w:header="397" w:footer="397" w:gutter="0"/><w:pgNumType/><w:docGrid w:linePitch="360"/></w:sectPr>
+  </w:body>
+</w:document>
+
+<!-- ===== word/endnotes.xml ===== -->
+<?xml version="1.0" encoding="UTF-8"?>
+<w:endnotes [16 xmlns declarations sha256 4af55965bb07] mc:Ignorable="w14 w15 wp14">
+  <w:endnote w:type="separator" w:id="-1">
+    <w:p>
+      <w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr>
+      <w:r><w:rPr><w:rStyle w:val="EndnoteReference"/></w:rPr><w:endnoteRef/></w:r>
+      <w:r><w:separator/></w:r>
+    </w:p>
+  </w:endnote>
+  <w:endnote w:type="continuationSeparator" w:id="0">
+    <w:p>
+      <w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr>
+      <w:r><w:rPr><w:rStyle w:val="EndnoteReference"/></w:rPr><w:endnoteRef/></w:r>
+      <w:r><w:continuationSeparator/></w:r>
+    </w:p>
+  </w:endnote>
+</w:endnotes>
+
+<!-- ===== word/fontTable.xml ===== -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:fonts [10 xmlns declarations sha256 974b1e7deb45] mc:Ignorable="w14 w15 w16se w16cid w16 w16cex w16sdtdh"/>
+
+<!-- ===== word/footnotes.xml ===== -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:footnotes [16 xmlns declarations sha256 4af55965bb07] mc:Ignorable="w14 w15 wp14">
+  <w:footnote w:type="separator" w:id="-1">
+    <w:p>
+      <w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr>
+      <w:r><w:rPr><w:rStyle w:val="FootnoteReference"/></w:rPr><w:footnoteRef/></w:r>
+      <w:r><w:separator/></w:r>
+    </w:p>
+  </w:footnote>
+  <w:footnote w:type="continuationSeparator" w:id="0">
+    <w:p>
+      <w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr>
+      <w:r><w:rPr><w:rStyle w:val="FootnoteReference"/></w:rPr><w:footnoteRef/></w:r>
+      <w:r><w:continuationSeparator/></w:r>
+    </w:p>
+  </w:footnote>
+</w:footnotes>
+
+<!-- ===== word/numbering.xml ===== -->
+<!-- shared: _shared/cfb0a0142ba7.txt -->
+<!-- ===== word/settings.xml ===== -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:settings [16 xmlns declarations sha256 4af55965bb07] mc:Ignorable="w14 w15 wp14">
+  <w:displayBackgroundShape/>
+  <w:evenAndOddHeaders w:val="false"/>
+  <w:compat>
+    <w:compatSetting w:val="15" w:name="compatibilityMode" w:uri="http://schemas.microsoft.com/office/word"/>
+  </w:compat>
+</w:settings>
+
+<!-- ===== word/styles.xml ===== -->
+<!-- shared: _shared/42eabb6e82ce.txt -->

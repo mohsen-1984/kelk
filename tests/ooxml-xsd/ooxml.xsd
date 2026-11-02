@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Kelk's entry schema for tests/docx-validate.js: xmllint with this file as its schema
+  validates any XML part of a .docx (WordprocessingML, VML, extended properties, content types,
+  relationships). It only imports the official schemas, which are kept unchanged (see README.md).
+  The W3C xml.xsd is imported first: wml.xsd imports the XML namespace without a schemaLocation
+  (xml:space on w:t), and the first import of a namespace is the one libxml2 loads.
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:kelk:ooxml-validate">
+  <xsd:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="w3c/xml.xsd"/>
+  <xsd:import namespace="http://schemas.openxmlformats.org/wordprocessingml/2006/main" schemaLocation="transitional/wml.xsd"/>
+  <xsd:import namespace="urn:schemas-microsoft-com:vml" schemaLocation="transitional/vml-main.xsd"/>
+  <xsd:import namespace="urn:schemas-microsoft-com:office:office" schemaLocation="transitional/vml-officeDrawing.xsd"/>
+  <xsd:import namespace="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" schemaLocation="transitional/shared-documentPropertiesExtended.xsd"/>
+  <xsd:import namespace="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties" schemaLocation="transitional/shared-documentPropertiesCustom.xsd"/>
+  <xsd:import namespace="http://schemas.openxmlformats.org/package/2006/content-types" schemaLocation="opc/opc-contentTypes.xsd"/>
+  <xsd:import namespace="http://schemas.openxmlformats.org/package/2006/relationships" schemaLocation="opc/opc-relationships.xsd"/>
+</xsd:schema>

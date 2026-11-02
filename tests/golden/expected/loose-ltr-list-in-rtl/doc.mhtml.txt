@@ -1,0 +1,29 @@
+# MHTML, 2 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/b1656fe21d17.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="rtl">
+        <p class="MsoNormal">یک پاراگراف فارسی در سند.</p>
+<h3 style="direction:ltr;text-align:left">1.2 Current shipped solution ("Mode 1" below)</h3>
+<p style="direction:ltr;text-align:justify" class="MsoNormal">Implemented and working today in <code dir="ltr">App.converter</code>:</p>
+<ul style="direction:ltr;text-align:justify">
+<li style="direction:ltr;text-align:justify" class="MsoNormal"><p style="direction:ltr;text-align:justify;margin-top:0pt;margin-bottom:3pt;mso-margin-top-alt:0pt;mso-margin-bottom-alt:3pt" class="MsoNormal"><strong><code dir="ltr">protectProblematicTables(root)</code></strong> — runs on the parsed DOM <em>before</em></p><p style="direction:ltr;text-align:justify;margin-top:0pt;margin-bottom:3pt;mso-margin-top-alt:0pt;mso-margin-bottom-alt:3pt" class="MsoNormal"><code dir="ltr">cleanTableCells</code>, and flags a table when</p><p style="direction:ltr;text-align:justify;margin-top:0pt;margin-bottom:3pt;mso-margin-top-alt:0pt;mso-margin-bottom-alt:3pt" class="MsoNormal"><code dir="ltr">table.rows.length === 0</code>. Each flagged table is replaced <strong>in the DOM</strong></p>
+<p style="direction:ltr;text-align:justify;margin-top:0pt;margin-bottom:3pt;mso-margin-top-alt:0pt;mso-margin-bottom-alt:3pt" class="MsoNormal"><strong>Why a plain text token:</strong> the sanitized DOM is later serialized to a string</p><p style="direction:ltr;text-align:justify;margin-top:0pt;mso-margin-top-alt:0pt;margin-bottom:6pt;mso-margin-bottom-alt:6pt" class="MsoNormal">unchanged, every time.</p>
+<div align="center" class="MsoNormal"><table class="MsoCodeTable" dir="ltr" border="0" cellspacing="0" cellpadding="0" style="width:auto;border-collapse:collapse;border:none;mso-border-alt:none;mso-yfti-tbllook:1184;mso-padding-alt:0cm 0cm 0cm 0cm;margin-top:6pt;margin-bottom:6pt"><tbody><tr><td valign="top" style="border:none;border-left:0.75pt solid #D4D0C8;border-right:0.75pt solid #D4D0C8;border-bottom:0.75pt solid #D4D0C8;border-top:0.75pt solid #D4D0C8;mso-border-left-alt:0.75pt solid #D4D0C8;mso-border-right-alt:0.75pt solid #D4D0C8;mso-border-bottom-alt:0.75pt solid #D4D0C8;mso-border-top-alt:0.75pt solid #D4D0C8;background:#E7F1EE;padding:1pt 6px 1pt 6px"><p class="MsoNormal" dir="ltr" style="direction:ltr;text-align:left;margin:0cm;line-height:normal;font-family:&quot;Vazir Code Hack&quot;,monospace;mso-ascii-font-family:&quot;Vazir Code Hack&quot;;mso-hansi-font-family:&quot;Vazir Code Hack&quot;;mso-bidi-font-family:&quot;Vazir Code Hack&quot;;font-size:8.0pt;mso-bidi-font-size:8.0pt;color:#595959">code</p></td></tr><tr><td valign="top" style="border:none;border-left:0.75pt solid #D4D0C8;border-right:0.75pt solid #D4D0C8;border-bottom:0.75pt solid #D4D0C8;mso-border-left-alt:0.75pt solid #D4D0C8;mso-border-right-alt:0.75pt solid #D4D0C8;mso-border-bottom-alt:0.75pt solid #D4D0C8;background:#FCFCFC;padding:4pt 6px 4pt 6px"><pre style="border:none;mso-border-alt:none;padding:0cm;margin:0cm;background:transparent;width:auto"><code class="hljs sql" dir="ltr"><span class="hljs-operator">&gt;</span> ⚠️ This table could not be converted
+</code></pre></td></tr></tbody></table></div></li>
+<li style="direction:ltr;text-align:justify;margin-top:6pt;mso-margin-top-alt:6pt" class="MsoNormal"><strong><code dir="ltr">convertBlockByBlock(html, turndownService)</code></strong> — last-resort safety net.<br>If the single call throws.
+</li>
+</ul>
+<p style="direction:ltr;text-align:justify" class="MsoNormal">This document specifies a <strong>new, opt-in alternative</strong> to the raw-HTML</p><p style="direction:ltr;text-align:justify" class="MsoNormal">fallback.</p>
+
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="filelist.xml"/>
+</xml>

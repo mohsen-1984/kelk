@@ -1,0 +1,1691 @@
+# 24 parts: [Content_Types].xml, _rels/.rels, docProps/app.xml, docProps/core.xml, docProps/custom.xml, word/_rels/comments.xml.rels, word/_rels/document.xml.rels, word/_rels/endnotes.xml.rels, word/_rels/fontTable.xml.rels, word/_rels/footnotes.xml.rels, word/comments.xml, word/document.xml, word/endnotes.xml, word/fontTable.xml, word/footnotes.xml, word/media/image1.svg, word/media/image2.png, word/media/image3.svg, word/media/image4.png, word/media/image5.svg, word/media/image6.png, word/numbering.xml, word/settings.xml, word/styles.xml
+
+<!-- ===== [Content_Types].xml ===== -->
+<?xml version="1.0" encoding="UTF-8"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default ContentType="image/png" Extension="png"/>
+  <Default ContentType="image/jpeg" Extension="jpeg"/>
+  <Default ContentType="image/jpeg" Extension="jpg"/>
+  <Default ContentType="image/bmp" Extension="bmp"/>
+  <Default ContentType="image/gif" Extension="gif"/>
+  <Default ContentType="image/svg+xml" Extension="svg"/>
+  <Default ContentType="application/vnd.openxmlformats-package.relationships+xml" Extension="rels"/>
+  <Default ContentType="application/xml" Extension="xml"/>
+  <Default ContentType="application/vnd.openxmlformats-officedocument.obfuscatedFont" Extension="odttf"/>
+  <Override ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml" PartName="/word/document.xml"/>
+  <Override ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml" PartName="/word/styles.xml"/>
+  <Override ContentType="application/vnd.openxmlformats-package.core-properties+xml" PartName="/docProps/core.xml"/>
+  <Override ContentType="application/vnd.openxmlformats-officedocument.custom-properties+xml" PartName="/docProps/custom.xml"/>
+  <Override ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml" PartName="/docProps/app.xml"/>
+  <Override ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml" PartName="/word/numbering.xml"/>
+  <Override ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml" PartName="/word/footnotes.xml"/>
+  <Override ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.endnotes+xml" PartName="/word/endnotes.xml"/>
+  <Override ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml" PartName="/word/settings.xml"/>
+  <Override ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml" PartName="/word/comments.xml"/>
+  <Override ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml" PartName="/word/fontTable.xml"/>
+</Types>
+
+<!-- ===== _rels/.rels ===== -->
+<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>
+  <Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties" Target="docProps/custom.xml"/>
+</Relationships>
+
+<!-- ===== word/_rels/comments.xml.rels ===== -->
+<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>
+
+<!-- ===== word/_rels/document.xml.rels ===== -->
+<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering" Target="numbering.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footnotes" Target="footnotes.xml"/>
+  <Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/endnotes" Target="endnotes.xml"/>
+  <Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>
+  <Relationship Id="rId6" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments" Target="comments.xml"/>
+  <Relationship Id="rId7" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.svg"/>
+  <Relationship Id="rId8" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image2.png"/>
+  <Relationship Id="rId9" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image3.svg"/>
+  <Relationship Id="rId10" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image4.png"/>
+  <Relationship Id="rId11" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image5.svg"/>
+  <Relationship Id="rId12" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image6.png"/>
+  <Relationship Id="rId13" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/>
+</Relationships>
+
+<!-- ===== word/_rels/endnotes.xml.rels ===== -->
+<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>
+
+<!-- ===== word/_rels/fontTable.xml.rels ===== -->
+<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>
+
+<!-- ===== word/_rels/footnotes.xml.rels ===== -->
+<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>
+
+<!-- ===== word/comments.xml ===== -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:comments [31 xmlns declarations sha256 ffc60766786c]/>
+
+<!-- ===== word/document.xml ===== -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document mc:Ignorable="w14 w15 wp14" [32 xmlns declarations sha256 98310b2594fe]>
+  <w:body>
+    <w:p>
+      <w:pPr><w:pStyle w:val="Heading1"/><w:bidi/></w:pPr>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">فرمول‌ها — </w:t></w:r>
+      <w:r><w:t xml:space="preserve">Formulas</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/></w:pPr>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">مورد 1 (</w:t></w:r>
+      <w:r><w:t xml:space="preserve">simple arrows</w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">): </w:t></w:r>
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:r><m:t xml:space="preserve">a</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">→</m:t></m:r>
+        <m:r><m:t xml:space="preserve">b</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">,</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:t xml:space="preserve">a</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">←</m:t></m:r>
+        <m:r><m:t xml:space="preserve">b</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">,</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:t xml:space="preserve">a</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">↦</m:t></m:r>
+        <m:r><m:t xml:space="preserve">b</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">,</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:t xml:space="preserve">A</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⇒</m:t></m:r>
+        <m:r><m:t xml:space="preserve">B</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">,</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:t xml:space="preserve">A</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⟺</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:t xml:space="preserve">B</m:t></m:r>
+      </m:oMath>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve"> پایان.</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi w:val="false"/></w:pPr>
+      <w:r><w:t xml:space="preserve">Case 2 (long arrows): </w:t></w:r>
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⟶</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⟵</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⟹</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⟺</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⟼</m:t></m:r>
+      </m:oMath>
+      <w:r><w:t xml:space="preserve"> </w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">پایان.</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/></w:pPr>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">مورد 3 (</w:t></w:r>
+      <w:r><w:t xml:space="preserve">extensible arrows</w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">):</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/><w:jc w:val="center"/></w:pPr>
+      <m:oMathPara xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:oMathParaPr><m:jc m:val="center"/></m:oMathParaPr>
+        <m:oMath>
+          <m:r><m:t xml:space="preserve">A</m:t></m:r>
+          <m:groupChr>
+            <m:groupChrPr><m:chr m:val="→"/><m:pos m:val="bot"/><m:vertJc m:val="bot"/></m:groupChrPr>
+            <m:e>
+              <m:r><m:t xml:space="preserve">f</m:t></m:r>
+            </m:e>
+          </m:groupChr>
+          <m:r><m:t xml:space="preserve">B</m:t></m:r>
+          <m:limLow>
+            <m:e>
+              <m:groupChr>
+                <m:groupChrPr><m:chr m:val="←"/><m:pos m:val="bot"/><m:vertJc m:val="bot"/></m:groupChrPr>
+                <m:e>
+                  <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve">long label</m:t></m:r>
+                </m:e>
+              </m:groupChr>
+            </m:e>
+            <m:lim>
+              <m:r><m:t xml:space="preserve">g</m:t></m:r>
+            </m:lim>
+          </m:limLow>
+          <m:r><m:t xml:space="preserve">C</m:t></m:r>
+        </m:oMath>
+      </m:oMathPara>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi w:val="false"/></w:pPr>
+      <w:r><w:t xml:space="preserve">Case 4 (hook/twohead/misc): </w:t></w:r>
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">↪</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">↠</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⇝</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">↗</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⇌</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⇆</m:t></m:r>
+      </m:oMath>
+      <w:r><w:t xml:space="preserve"> </w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">پایان.</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/></w:pPr>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">مورد 5 (</w:t></w:r>
+      <w:r><w:t xml:space="preserve">reaction</w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">): </w:t></w:r>
+      <w:r><w:rPr><w:position w:val="-2"/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="1590675" cy="171450"/><wp:effectExtent t="0" r="0" b="0" l="0"/><wp:docPr id="1" name="\ce{H2O -&gt; H+ + OH-}" descr="\ce{H2O -&gt; H+ + OH-}" title="\ce{H2O -&gt; H+ + OH-}"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="0" name="" descr=""/><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId8" cstate="none"><a:extLst><a:ext uri="{96DAC541-7B7A-43D3-8B79-37D633B846F1}"><asvg:svgBlip xmlns:asvg="http://schemas.microsoft.com/office/drawing/2016/SVG/main" r:embed="rId7"/></a:ext></a:extLst></a:blip><a:srcRect/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="1590675" cy="171450"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve"> پایان.</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi w:val="false"/></w:pPr>
+      <w:r><w:t xml:space="preserve">Case 6 (equilibrium + condition):</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/><w:jc w:val="center"/></w:pPr>
+      <w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="1590675" cy="247650"/><wp:effectExtent t="0" r="0" b="0" l="0"/><wp:docPr id="1" name="\ce{N2 + 3H2 &lt;=&gt;[\text{Fe}] 2NH3}" descr="\ce{N2 + 3H2 &lt;=&gt;[\text{Fe}] 2NH3}" title="\ce{N2 + 3H2 &lt;=&gt;[\text{Fe}] 2NH3}"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="0" name="" descr=""/><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId10" cstate="none"><a:extLst><a:ext uri="{96DAC541-7B7A-43D3-8B79-37D633B846F1}"><asvg:svgBlip xmlns:asvg="http://schemas.microsoft.com/office/drawing/2016/SVG/main" r:embed="rId9"/></a:ext></a:extLst></a:blip><a:srcRect/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="1590675" cy="247650"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/></w:pPr>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">مورد 7 (</w:t></w:r>
+      <w:r><w:t xml:space="preserve">ions and states</w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">): </w:t></w:r>
+      <w:r><w:rPr><w:position w:val="-5"/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="2752725" cy="209550"/><wp:effectExtent t="0" r="0" b="0" l="0"/><wp:docPr id="1" name="\ce{CuSO4 . 5H2O},\ \ce{Ca^{2+}},\ \ce{A_{(aq)} + B_{(s)}}" descr="\ce{CuSO4 . 5H2O},\ \ce{Ca^{2+}},\ \ce{A_{(aq)} + B_{(s)}}" title="\ce{CuSO4 . 5H2O},\ \ce{Ca^{2+}},\ \ce{A_{(aq)} + B_{(s)}}"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="0" name="" descr=""/><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId12" cstate="none"><a:extLst><a:ext uri="{96DAC541-7B7A-43D3-8B79-37D633B846F1}"><asvg:svgBlip xmlns:asvg="http://schemas.microsoft.com/office/drawing/2016/SVG/main" r:embed="rId11"/></a:ext></a:extLst></a:blip><a:srcRect/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="2752725" cy="209550"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve"> پایان.</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi w:val="false"/></w:pPr>
+      <w:r><w:t xml:space="preserve">Case 8 (accents): </w:t></w:r>
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:acc>
+          <m:accPr><m:chr m:val="̂"/></m:accPr>
+          <m:e>
+            <m:r><m:t xml:space="preserve">x</m:t></m:r>
+          </m:e>
+        </m:acc>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:acc>
+          <m:accPr><m:chr m:val="̄"/></m:accPr>
+          <m:e>
+            <m:r><m:t xml:space="preserve">x</m:t></m:r>
+          </m:e>
+        </m:acc>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:acc>
+          <m:accPr><m:chr m:val="⃗"/></m:accPr>
+          <m:e>
+            <m:r><m:t xml:space="preserve">v</m:t></m:r>
+          </m:e>
+        </m:acc>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:acc>
+          <m:accPr><m:chr m:val="̇"/></m:accPr>
+          <m:e>
+            <m:r><m:t xml:space="preserve">x</m:t></m:r>
+          </m:e>
+        </m:acc>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:acc>
+          <m:accPr><m:chr m:val="̈"/></m:accPr>
+          <m:e>
+            <m:r><m:t xml:space="preserve">x</m:t></m:r>
+          </m:e>
+        </m:acc>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:acc>
+          <m:accPr><m:chr m:val="̃"/></m:accPr>
+          <m:e>
+            <m:r><m:t xml:space="preserve">x</m:t></m:r>
+          </m:e>
+        </m:acc>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:acc>
+          <m:accPr><m:chr m:val="̊"/></m:accPr>
+          <m:e>
+            <m:r><m:t xml:space="preserve">A</m:t></m:r>
+          </m:e>
+        </m:acc>
+      </m:oMath>
+      <w:r><w:t xml:space="preserve"> </w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">پایان.</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/></w:pPr>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">مورد 9 (</w:t></w:r>
+      <w:r><w:t xml:space="preserve">wide accents</w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">): </w:t></w:r>
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:acc>
+          <m:accPr><m:chr m:val="̂"/></m:accPr>
+          <m:e>
+            <m:r><m:t xml:space="preserve">x</m:t></m:r>
+            <m:r><m:t xml:space="preserve">y</m:t></m:r>
+            <m:r><m:t xml:space="preserve">z</m:t></m:r>
+          </m:e>
+        </m:acc>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:acc>
+          <m:accPr><m:chr m:val="̃"/></m:accPr>
+          <m:e>
+            <m:r><m:t xml:space="preserve">a</m:t></m:r>
+            <m:r><m:t xml:space="preserve">b</m:t></m:r>
+            <m:r><m:t xml:space="preserve">c</m:t></m:r>
+          </m:e>
+        </m:acc>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:bar>
+          <m:barPr><m:pos m:val="top"/></m:barPr>
+          <m:e>
+            <m:r><m:t xml:space="preserve">x</m:t></m:r>
+            <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">+</m:t></m:r>
+            <m:r><m:t xml:space="preserve">y</m:t></m:r>
+          </m:e>
+        </m:bar>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:bar>
+          <m:barPr><m:pos m:val="bot"/></m:barPr>
+          <m:e>
+            <m:r><m:t xml:space="preserve">a</m:t></m:r>
+            <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">+</m:t></m:r>
+            <m:r><m:t xml:space="preserve">b</m:t></m:r>
+          </m:e>
+        </m:bar>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:acc>
+          <m:accPr><m:chr m:val="⃗"/></m:accPr>
+          <m:e>
+            <m:r><m:t xml:space="preserve">A</m:t></m:r>
+            <m:r><m:t xml:space="preserve">B</m:t></m:r>
+          </m:e>
+        </m:acc>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:acc>
+          <m:accPr><m:chr m:val="⃖"/></m:accPr>
+          <m:e>
+            <m:r><m:t xml:space="preserve">C</m:t></m:r>
+            <m:r><m:t xml:space="preserve">D</m:t></m:r>
+          </m:e>
+        </m:acc>
+      </m:oMath>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve"> پایان.</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi w:val="false"/></w:pPr>
+      <w:r><w:t xml:space="preserve">Case 10 (braces):</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/><w:jc w:val="center"/></w:pPr>
+      <m:oMathPara xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:oMathParaPr><m:jc m:val="center"/></m:oMathParaPr>
+        <m:oMath>
+          <m:limUpp>
+            <m:e>
+              <m:groupChr>
+                <m:groupChrPr><m:chr m:val="⏞"/><m:pos m:val="top"/><m:vertJc m:val="bot"/></m:groupChrPr>
+                <m:e>
+                  <m:r><m:t xml:space="preserve">a</m:t></m:r>
+                  <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">+</m:t></m:r>
+                  <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⋯</m:t></m:r>
+                  <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">+</m:t></m:r>
+                  <m:r><m:t xml:space="preserve">a</m:t></m:r>
+                </m:e>
+              </m:groupChr>
+            </m:e>
+            <m:lim>
+              <m:r><m:t xml:space="preserve">n</m:t></m:r>
+            </m:lim>
+          </m:limUpp>
+          <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+          <m:limLow>
+            <m:e>
+              <m:groupChr>
+                <m:groupChrPr><m:chr m:val="⏟"/></m:groupChrPr>
+                <m:e>
+                  <m:r><m:t xml:space="preserve">b</m:t></m:r>
+                  <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">+</m:t></m:r>
+                  <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⋯</m:t></m:r>
+                  <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">+</m:t></m:r>
+                  <m:r><m:t xml:space="preserve">b</m:t></m:r>
+                </m:e>
+              </m:groupChr>
+            </m:e>
+            <m:lim>
+              <m:r><m:t xml:space="preserve">m</m:t></m:r>
+            </m:lim>
+          </m:limLow>
+        </m:oMath>
+      </m:oMathPara>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/></w:pPr>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">مورد 11 (</w:t></w:r>
+      <w:r><w:t xml:space="preserve">over/under set</w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">):</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/><w:jc w:val="center"/></w:pPr>
+      <m:oMathPara xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:oMathParaPr><m:jc m:val="center"/></m:oMathParaPr>
+        <m:oMath>
+          <m:limUpp>
+            <m:e>
+              <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">=</m:t></m:r>
+            </m:e>
+            <m:lim>
+              <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve">def</m:t></m:r>
+            </m:lim>
+          </m:limUpp>
+          <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+          <m:limLow>
+            <m:e>
+              <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">argmax</m:t></m:r>
+            </m:e>
+            <m:lim>
+              <m:r><m:t xml:space="preserve">x</m:t></m:r>
+            </m:lim>
+          </m:limLow>
+          <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+          <m:limUpp>
+            <m:e>
+              <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">=</m:t></m:r>
+            </m:e>
+            <m:lim>
+              <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">?</m:t></m:r>
+            </m:lim>
+          </m:limUpp>
+          <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+          <m:limLow>
+            <m:e>
+              <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">arg</m:t></m:r>
+              <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+              <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">min</m:t></m:r>
+            </m:e>
+            <m:lim>
+              <m:r><m:t xml:space="preserve">θ</m:t></m:r>
+            </m:lim>
+          </m:limLow>
+          <m:r><m:t xml:space="preserve">L</m:t></m:r>
+        </m:oMath>
+      </m:oMathPara>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi w:val="false"/></w:pPr>
+      <w:r><w:t xml:space="preserve">Case 12 (limits):</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/><w:jc w:val="center"/></w:pPr>
+      <m:oMathPara xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:oMathParaPr><m:jc m:val="center"/></m:oMathParaPr>
+        <m:oMath>
+          <m:limLow>
+            <m:e>
+              <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">lim</m:t></m:r>
+            </m:e>
+            <m:lim>
+              <m:r><m:t xml:space="preserve">x</m:t></m:r>
+              <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">→</m:t></m:r>
+              <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">0</m:t></m:r>
+            </m:lim>
+          </m:limLow>
+          <m:f>
+            <m:num>
+              <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">sin</m:t></m:r>
+              <m:r><m:t xml:space="preserve">x</m:t></m:r>
+            </m:num>
+            <m:den>
+              <m:r><m:t xml:space="preserve">x</m:t></m:r>
+            </m:den>
+          </m:f>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">=</m:t></m:r>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">1</m:t></m:r>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">,</m:t></m:r>
+          <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+          <m:nary>
+            <m:naryPr><m:chr m:val="∑"/><m:limLoc m:val="undOvr"/></m:naryPr>
+            <m:sub>
+              <m:m>
+                <m:mPr><m:mcs><m:mc><m:mcPr><m:count m:val="1"/><m:mcJc m:val="center"/></m:mcPr></m:mc></m:mcs></m:mPr>
+                <m:mr>
+                  <m:e>
+                    <m:r><m:t xml:space="preserve">i</m:t></m:r>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">=</m:t></m:r>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">1</m:t></m:r>
+                  </m:e>
+                </m:mr>
+                <m:mr>
+                  <m:e>
+                    <m:r><m:t xml:space="preserve">i</m:t></m:r>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">≠</m:t></m:r>
+                    <m:r><m:t xml:space="preserve">j</m:t></m:r>
+                  </m:e>
+                </m:mr>
+              </m:m>
+            </m:sub>
+            <m:sup>
+              <m:r><m:t xml:space="preserve">n</m:t></m:r>
+            </m:sup>
+            <m:e>
+              <m:sSub>
+                <m:e>
+                  <m:r><m:t xml:space="preserve">a</m:t></m:r>
+                </m:e>
+                <m:sub>
+                  <m:r><m:t xml:space="preserve">i</m:t></m:r>
+                </m:sub>
+              </m:sSub>
+            </m:e>
+          </m:nary>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">,</m:t></m:r>
+          <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+          <m:nary>
+            <m:naryPr><m:chr m:val="∏"/><m:limLoc m:val="undOvr"/></m:naryPr>
+            <m:sub>
+              <m:r><m:t xml:space="preserve">k</m:t></m:r>
+              <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">=</m:t></m:r>
+              <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">1</m:t></m:r>
+            </m:sub>
+            <m:sup>
+              <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">∞</m:t></m:r>
+            </m:sup>
+            <m:e/>
+          </m:nary>
+        </m:oMath>
+      </m:oMathPara>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/></w:pPr>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">مورد 13 (</w:t></w:r>
+      <w:r><w:t xml:space="preserve">inline fractions</w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">): </w:t></w:r>
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:f>
+          <m:num>
+            <m:r><m:t xml:space="preserve">T</m:t></m:r>
+            <m:r><m:t xml:space="preserve">P</m:t></m:r>
+          </m:num>
+          <m:den>
+            <m:r><m:t xml:space="preserve">T</m:t></m:r>
+            <m:r><m:t xml:space="preserve">P</m:t></m:r>
+            <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">+</m:t></m:r>
+            <m:r><m:t xml:space="preserve">F</m:t></m:r>
+            <m:r><m:t xml:space="preserve">P</m:t></m:r>
+          </m:den>
+        </m:f>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">=</m:t></m:r>
+        <m:f>
+          <m:num>
+            <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">1</m:t></m:r>
+          </m:num>
+          <m:den>
+            <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">2</m:t></m:r>
+          </m:den>
+        </m:f>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">,</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:f>
+          <m:num>
+            <m:r><m:t xml:space="preserve">a</m:t></m:r>
+            <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">+</m:t></m:r>
+            <m:r><m:t xml:space="preserve">b</m:t></m:r>
+          </m:num>
+          <m:den>
+            <m:r><m:t xml:space="preserve">c</m:t></m:r>
+          </m:den>
+        </m:f>
+      </m:oMath>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve"> پایان.</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi w:val="false"/></w:pPr>
+      <w:r><w:t xml:space="preserve">Case 14 (nested fraction (inline: script sizes, as TeX)): </w:t></w:r>
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:f>
+          <m:num>
+            <m:f>
+              <m:num>
+                <m:r><m:t xml:space="preserve">a</m:t></m:r>
+              </m:num>
+              <m:den>
+                <m:r><m:t xml:space="preserve">b</m:t></m:r>
+              </m:den>
+            </m:f>
+          </m:num>
+          <m:den>
+            <m:f>
+              <m:num>
+                <m:r><m:t xml:space="preserve">c</m:t></m:r>
+              </m:num>
+              <m:den>
+                <m:r><m:t xml:space="preserve">d</m:t></m:r>
+              </m:den>
+            </m:f>
+          </m:den>
+        </m:f>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">≠</m:t></m:r>
+        <m:f>
+          <m:num>
+            <m:f>
+              <m:num>
+                <m:r><m:t xml:space="preserve">a</m:t></m:r>
+              </m:num>
+              <m:den>
+                <m:r><m:t xml:space="preserve">b</m:t></m:r>
+              </m:den>
+            </m:f>
+          </m:num>
+          <m:den>
+            <m:f>
+              <m:num>
+                <m:r><m:t xml:space="preserve">c</m:t></m:r>
+              </m:num>
+              <m:den>
+                <m:r><m:t xml:space="preserve">d</m:t></m:r>
+              </m:den>
+            </m:f>
+          </m:den>
+        </m:f>
+      </m:oMath>
+      <w:r><w:t xml:space="preserve"> </w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">پایان.</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/></w:pPr>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">مورد 15 (</w:t></w:r>
+      <w:r><w:t xml:space="preserve">fractions</w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">):</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/><w:jc w:val="center"/></w:pPr>
+      <m:oMathPara xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:oMathParaPr><m:jc m:val="center"/></m:oMathParaPr>
+        <m:oMath>
+          <m:f>
+            <m:num>
+              <m:r><m:t xml:space="preserve">a</m:t></m:r>
+            </m:num>
+            <m:den>
+              <m:r><m:t xml:space="preserve">b</m:t></m:r>
+            </m:den>
+          </m:f>
+          <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+          <m:f>
+            <m:num>
+              <m:r><m:t xml:space="preserve">a</m:t></m:r>
+            </m:num>
+            <m:den>
+              <m:r><m:t xml:space="preserve">b</m:t></m:r>
+            </m:den>
+          </m:f>
+          <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+          <m:f>
+            <m:num>
+              <m:r><m:t xml:space="preserve">a</m:t></m:r>
+            </m:num>
+            <m:den>
+              <m:r><m:t xml:space="preserve">b</m:t></m:r>
+            </m:den>
+          </m:f>
+          <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">(</m:t></m:r>
+          <m:f>
+            <m:fPr><m:type m:val="noBar"/></m:fPr>
+            <m:num>
+              <m:r><m:t xml:space="preserve">n</m:t></m:r>
+            </m:num>
+            <m:den>
+              <m:r><m:t xml:space="preserve">k</m:t></m:r>
+            </m:den>
+          </m:f>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">)</m:t></m:r>
+          <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+          <m:f>
+            <m:num>
+              <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">1</m:t></m:r>
+            </m:num>
+            <m:den>
+              <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">1</m:t></m:r>
+              <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">+</m:t></m:r>
+              <m:f>
+                <m:num>
+                  <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">1</m:t></m:r>
+                </m:num>
+                <m:den>
+                  <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">1</m:t></m:r>
+                  <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">+</m:t></m:r>
+                  <m:r><m:t xml:space="preserve">x</m:t></m:r>
+                </m:den>
+              </m:f>
+            </m:den>
+          </m:f>
+        </m:oMath>
+      </m:oMathPara>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi w:val="false"/></w:pPr>
+      <w:r><w:t xml:space="preserve">Case 16 (roots): </w:t></w:r>
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:rad>
+          <m:radPr><m:degHide m:val="1"/></m:radPr>
+          <m:deg/>
+          <m:e>
+            <m:r><m:t xml:space="preserve">x</m:t></m:r>
+          </m:e>
+        </m:rad>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:rad>
+          <m:deg>
+            <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">3</m:t></m:r>
+          </m:deg>
+          <m:e>
+            <m:r><m:t xml:space="preserve">x</m:t></m:r>
+            <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">+</m:t></m:r>
+            <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">1</m:t></m:r>
+          </m:e>
+        </m:rad>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:rad>
+          <m:radPr><m:degHide m:val="1"/></m:radPr>
+          <m:deg/>
+          <m:e>
+            <m:f>
+              <m:num>
+                <m:r><m:t xml:space="preserve">a</m:t></m:r>
+              </m:num>
+              <m:den>
+                <m:r><m:t xml:space="preserve">b</m:t></m:r>
+              </m:den>
+            </m:f>
+          </m:e>
+        </m:rad>
+      </m:oMath>
+      <w:r><w:t xml:space="preserve"> </w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">پایان.</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/></w:pPr>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">مورد 17 (</w:t></w:r>
+      <w:r><w:t xml:space="preserve">delimiters</w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">):</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/><w:jc w:val="center"/></w:pPr>
+      <m:oMathPara xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:oMathParaPr><m:jc m:val="center"/></m:oMathParaPr>
+        <m:oMath>
+          <m:d>
+            <m:dPr><m:begChr m:val="("/><m:endChr m:val=")"/></m:dPr>
+            <m:e>
+              <m:f>
+                <m:num>
+                  <m:r><m:t xml:space="preserve">a</m:t></m:r>
+                </m:num>
+                <m:den>
+                  <m:r><m:t xml:space="preserve">b</m:t></m:r>
+                </m:den>
+              </m:f>
+            </m:e>
+          </m:d>
+          <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+          <m:d>
+            <m:dPr><m:begChr m:val="["/><m:endChr m:val="]"/></m:dPr>
+            <m:e>
+              <m:r><m:t xml:space="preserve">x</m:t></m:r>
+            </m:e>
+          </m:d>
+          <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+          <m:d>
+            <m:dPr><m:begChr m:val="{"/><m:endChr m:val="}"/></m:dPr>
+            <m:e>
+              <m:r><m:t xml:space="preserve">y</m:t></m:r>
+            </m:e>
+          </m:d>
+          <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+          <m:d>
+            <m:dPr><m:begChr m:val="⟨"/><m:endChr m:val="⟩"/></m:dPr>
+            <m:e>
+              <m:r><m:t xml:space="preserve">v</m:t></m:r>
+            </m:e>
+          </m:d>
+          <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⌊</m:t></m:r>
+          <m:r><m:t xml:space="preserve">x</m:t></m:r>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⌋</m:t></m:r>
+          <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⌈</m:t></m:r>
+          <m:r><m:t xml:space="preserve">x</m:t></m:r>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⌉</m:t></m:r>
+          <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">‖</m:t></m:r>
+          <m:r><m:t xml:space="preserve">x</m:t></m:r>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">‖</m:t></m:r>
+        </m:oMath>
+      </m:oMathPara>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi w:val="false"/></w:pPr>
+      <w:r><w:t xml:space="preserve">Case 18 (sized + one-sided):</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/><w:jc w:val="center"/></w:pPr>
+      <m:oMathPara xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:oMathParaPr><m:jc m:val="center"/></m:oMathParaPr>
+        <m:oMath>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">(</m:t></m:r>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">(</m:t></m:r>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">(</m:t></m:r>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">(</m:t></m:r>
+          <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+          <m:sSub>
+            <m:e>
+              <m:f>
+                <m:num>
+                  <m:r><m:t xml:space="preserve">d</m:t></m:r>
+                  <m:r><m:t xml:space="preserve">f</m:t></m:r>
+                </m:num>
+                <m:den>
+                  <m:r><m:t xml:space="preserve">d</m:t></m:r>
+                  <m:r><m:t xml:space="preserve">x</m:t></m:r>
+                </m:den>
+              </m:f>
+              <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">|</m:t></m:r>
+            </m:e>
+            <m:sub>
+              <m:r><m:t xml:space="preserve">x</m:t></m:r>
+              <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">=</m:t></m:r>
+              <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">0</m:t></m:r>
+            </m:sub>
+          </m:sSub>
+        </m:oMath>
+      </m:oMathPara>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/></w:pPr>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">مورد 19 (</w:t></w:r>
+      <w:r><w:t xml:space="preserve">bmatrix/vmatrix</w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">):</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/><w:jc w:val="center"/></w:pPr>
+      <m:oMathPara xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:oMathParaPr><m:jc m:val="center"/></m:oMathParaPr>
+        <m:oMath>
+          <m:d>
+            <m:dPr><m:begChr m:val="["/><m:endChr m:val="]"/></m:dPr>
+            <m:e>
+              <m:m>
+                <m:mPr><m:mcs><m:mc><m:mcPr><m:count m:val="1"/><m:mcJc m:val="center"/></m:mcPr></m:mc><m:mc><m:mcPr><m:count m:val="1"/><m:mcJc m:val="center"/></m:mcPr></m:mc></m:mcs></m:mPr>
+                <m:mr>
+                  <m:e>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">1</m:t></m:r>
+                  </m:e>
+                  <m:e>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">0</m:t></m:r>
+                  </m:e>
+                </m:mr>
+                <m:mr>
+                  <m:e>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">0</m:t></m:r>
+                  </m:e>
+                  <m:e>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">1</m:t></m:r>
+                  </m:e>
+                </m:mr>
+              </m:m>
+            </m:e>
+          </m:d>
+          <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+          <m:d>
+            <m:dPr><m:begChr m:val="|"/><m:endChr m:val="|"/></m:dPr>
+            <m:e>
+              <m:m>
+                <m:mPr><m:mcs><m:mc><m:mcPr><m:count m:val="1"/><m:mcJc m:val="center"/></m:mcPr></m:mc><m:mc><m:mcPr><m:count m:val="1"/><m:mcJc m:val="center"/></m:mcPr></m:mc></m:mcs></m:mPr>
+                <m:mr>
+                  <m:e>
+                    <m:r><m:t xml:space="preserve">a</m:t></m:r>
+                  </m:e>
+                  <m:e>
+                    <m:r><m:t xml:space="preserve">b</m:t></m:r>
+                  </m:e>
+                </m:mr>
+                <m:mr>
+                  <m:e>
+                    <m:r><m:t xml:space="preserve">c</m:t></m:r>
+                  </m:e>
+                  <m:e>
+                    <m:r><m:t xml:space="preserve">d</m:t></m:r>
+                  </m:e>
+                </m:mr>
+              </m:m>
+            </m:e>
+          </m:d>
+          <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+          <m:d>
+            <m:dPr><m:begChr m:val="‖"/><m:endChr m:val="‖"/></m:dPr>
+            <m:e>
+              <m:m>
+                <m:mPr><m:mcs><m:mc><m:mcPr><m:count m:val="1"/><m:mcJc m:val="center"/></m:mcPr></m:mc></m:mcs></m:mPr>
+                <m:mr>
+                  <m:e>
+                    <m:r><m:t xml:space="preserve">x</m:t></m:r>
+                  </m:e>
+                </m:mr>
+              </m:m>
+            </m:e>
+          </m:d>
+        </m:oMath>
+      </m:oMathPara>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi w:val="false"/></w:pPr>
+      <w:r><w:t xml:space="preserve">Case 20 (array with rules):</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/><w:jc w:val="center"/></w:pPr>
+      <m:oMathPara xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:oMathParaPr><m:jc m:val="center"/></m:oMathParaPr>
+        <m:oMath>
+          <m:d>
+            <m:dPr><m:begChr m:val="["/><m:endChr m:val="]"/></m:dPr>
+            <m:e>
+              <m:m>
+                <m:mPr><m:mcs><m:mc><m:mcPr><m:count m:val="1"/><m:mcJc m:val="center"/></m:mcPr></m:mc><m:mc><m:mcPr><m:count m:val="1"/><m:mcJc m:val="center"/></m:mcPr></m:mc><m:mc><m:mcPr><m:count m:val="1"/><m:mcJc m:val="center"/></m:mcPr></m:mc></m:mcs></m:mPr>
+                <m:mr>
+                  <m:e>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">1</m:t></m:r>
+                  </m:e>
+                  <m:e>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">2</m:t></m:r>
+                  </m:e>
+                  <m:e>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">3</m:t></m:r>
+                  </m:e>
+                </m:mr>
+                <m:mr>
+                  <m:e>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">4</m:t></m:r>
+                  </m:e>
+                  <m:e>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">5</m:t></m:r>
+                  </m:e>
+                  <m:e>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">6</m:t></m:r>
+                  </m:e>
+                </m:mr>
+              </m:m>
+            </m:e>
+          </m:d>
+        </m:oMath>
+      </m:oMathPara>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/></w:pPr>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">مورد 21 (</w:t></w:r>
+      <w:r><w:t xml:space="preserve">dots</w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">):</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/><w:jc w:val="center"/></w:pPr>
+      <m:oMathPara xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:oMathParaPr><m:jc m:val="center"/></m:oMathParaPr>
+        <m:oMath>
+          <m:d>
+            <m:dPr><m:begChr m:val="("/><m:endChr m:val=")"/></m:dPr>
+            <m:e>
+              <m:m>
+                <m:mPr><m:mcs><m:mc><m:mcPr><m:count m:val="1"/><m:mcJc m:val="center"/></m:mcPr></m:mc><m:mc><m:mcPr><m:count m:val="1"/><m:mcJc m:val="center"/></m:mcPr></m:mc><m:mc><m:mcPr><m:count m:val="1"/><m:mcJc m:val="center"/></m:mcPr></m:mc></m:mcs></m:mPr>
+                <m:mr>
+                  <m:e>
+                    <m:sSub>
+                      <m:e>
+                        <m:r><m:t xml:space="preserve">a</m:t></m:r>
+                      </m:e>
+                      <m:sub>
+                        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">11</m:t></m:r>
+                      </m:sub>
+                    </m:sSub>
+                  </m:e>
+                  <m:e>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⋯</m:t></m:r>
+                  </m:e>
+                  <m:e>
+                    <m:sSub>
+                      <m:e>
+                        <m:r><m:t xml:space="preserve">a</m:t></m:r>
+                      </m:e>
+                      <m:sub>
+                        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">1</m:t></m:r>
+                        <m:r><m:t xml:space="preserve">n</m:t></m:r>
+                      </m:sub>
+                    </m:sSub>
+                  </m:e>
+                </m:mr>
+                <m:mr>
+                  <m:e>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⋮</m:t></m:r>
+                  </m:e>
+                  <m:e>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⋱</m:t></m:r>
+                  </m:e>
+                  <m:e>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⋮</m:t></m:r>
+                  </m:e>
+                </m:mr>
+                <m:mr>
+                  <m:e>
+                    <m:sSub>
+                      <m:e>
+                        <m:r><m:t xml:space="preserve">a</m:t></m:r>
+                      </m:e>
+                      <m:sub>
+                        <m:r><m:t xml:space="preserve">m</m:t></m:r>
+                        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">1</m:t></m:r>
+                      </m:sub>
+                    </m:sSub>
+                  </m:e>
+                  <m:e>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⋯</m:t></m:r>
+                  </m:e>
+                  <m:e>
+                    <m:sSub>
+                      <m:e>
+                        <m:r><m:t xml:space="preserve">a</m:t></m:r>
+                      </m:e>
+                      <m:sub>
+                        <m:r><m:t xml:space="preserve">m</m:t></m:r>
+                        <m:r><m:t xml:space="preserve">n</m:t></m:r>
+                      </m:sub>
+                    </m:sSub>
+                  </m:e>
+                </m:mr>
+              </m:m>
+            </m:e>
+          </m:d>
+        </m:oMath>
+      </m:oMathPara>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi w:val="false"/></w:pPr>
+      <w:r><w:t xml:space="preserve">Case 22 (smallmatrix): </w:t></w:r>
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:d>
+          <m:dPr><m:begChr m:val="("/><m:endChr m:val=")"/></m:dPr>
+          <m:e>
+            <m:m>
+              <m:mPr><m:mcs><m:mc><m:mcPr><m:count m:val="1"/><m:mcJc m:val="center"/></m:mcPr></m:mc><m:mc><m:mcPr><m:count m:val="1"/><m:mcJc m:val="center"/></m:mcPr></m:mc></m:mcs></m:mPr>
+              <m:mr>
+                <m:e>
+                  <m:r><m:t xml:space="preserve">a</m:t></m:r>
+                </m:e>
+                <m:e>
+                  <m:r><m:t xml:space="preserve">b</m:t></m:r>
+                </m:e>
+              </m:mr>
+              <m:mr>
+                <m:e>
+                  <m:r><m:t xml:space="preserve">c</m:t></m:r>
+                </m:e>
+                <m:e>
+                  <m:r><m:t xml:space="preserve">d</m:t></m:r>
+                </m:e>
+              </m:mr>
+            </m:m>
+          </m:e>
+        </m:d>
+      </m:oMath>
+      <w:r><w:t xml:space="preserve"> </w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">پایان.</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/></w:pPr>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">مورد 23 (</w:t></w:r>
+      <w:r><w:t xml:space="preserve">align</w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">):</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/><w:jc w:val="center"/></w:pPr>
+      <m:oMathPara xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:oMathParaPr><m:jc m:val="center"/></m:oMathParaPr>
+        <m:oMath>
+          <m:m>
+            <m:mPr><m:cGpRule m:val="3"/><m:cGp m:val="0"/><m:mcs><m:mc><m:mcPr><m:count m:val="1"/><m:mcJc m:val="right"/></m:mcPr></m:mc><m:mc><m:mcPr><m:count m:val="1"/><m:mcJc m:val="left"/></m:mcPr></m:mc></m:mcs></m:mPr>
+            <m:mr>
+              <m:e>
+                <m:r><m:t xml:space="preserve">f</m:t></m:r>
+                <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">(</m:t></m:r>
+                <m:r><m:t xml:space="preserve">x</m:t></m:r>
+                <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">)</m:t></m:r>
+              </m:e>
+              <m:e>
+                <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">=</m:t></m:r>
+                <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">(</m:t></m:r>
+                <m:r><m:t xml:space="preserve">x</m:t></m:r>
+                <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">+</m:t></m:r>
+                <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">1</m:t></m:r>
+                <m:sSup>
+                  <m:e>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">)</m:t></m:r>
+                  </m:e>
+                  <m:sup>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">2</m:t></m:r>
+                  </m:sup>
+                </m:sSup>
+              </m:e>
+            </m:mr>
+            <m:mr>
+              <m:e/>
+              <m:e>
+                <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">=</m:t></m:r>
+                <m:sSup>
+                  <m:e>
+                    <m:r><m:t xml:space="preserve">x</m:t></m:r>
+                  </m:e>
+                  <m:sup>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">2</m:t></m:r>
+                  </m:sup>
+                </m:sSup>
+                <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">+</m:t></m:r>
+                <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">2</m:t></m:r>
+                <m:r><m:t xml:space="preserve">x</m:t></m:r>
+                <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">+</m:t></m:r>
+                <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">1</m:t></m:r>
+              </m:e>
+            </m:mr>
+          </m:m>
+        </m:oMath>
+      </m:oMathPara>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi w:val="false"/></w:pPr>
+      <w:r><w:t xml:space="preserve">Case 24 (gather + tag):</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/><w:jc w:val="center"/></w:pPr>
+      <m:oMathPara xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:oMathParaPr><m:jc m:val="center"/></m:oMathParaPr>
+        <m:oMath>
+          <m:m>
+            <m:mPr><m:mcs><m:mc><m:mcPr><m:count m:val="1"/><m:mcJc m:val="center"/></m:mcPr></m:mc></m:mcs></m:mPr>
+            <m:mr>
+              <m:e>
+                <m:r><m:t xml:space="preserve">a</m:t></m:r>
+                <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">=</m:t></m:r>
+                <m:r><m:t xml:space="preserve">b</m:t></m:r>
+              </m:e>
+            </m:mr>
+            <m:mr>
+              <m:e>
+                <m:r><m:t xml:space="preserve">c</m:t></m:r>
+                <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">=</m:t></m:r>
+                <m:r><m:t xml:space="preserve">d</m:t></m:r>
+              </m:e>
+            </m:mr>
+          </m:m>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+          <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve">(</m:t></m:r>
+          <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve">1</m:t></m:r>
+          <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve">)</m:t></m:r>
+        </m:oMath>
+      </m:oMathPara>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/></w:pPr>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">مورد 25 (</w:t></w:r>
+      <w:r><w:t xml:space="preserve">cases</w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">):</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/><w:jc w:val="center"/></w:pPr>
+      <m:oMathPara xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:oMathParaPr><m:jc m:val="center"/></m:oMathParaPr>
+        <m:oMath>
+          <m:r><m:t xml:space="preserve">f</m:t></m:r>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">(</m:t></m:r>
+          <m:r><m:t xml:space="preserve">x</m:t></m:r>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">)</m:t></m:r>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">=</m:t></m:r>
+          <m:d>
+            <m:dPr><m:begChr m:val="{"/><m:endChr m:val=""/></m:dPr>
+            <m:e>
+              <m:m>
+                <m:mPr><m:mcs><m:mc><m:mcPr><m:count m:val="1"/><m:mcJc m:val="left"/></m:mcPr></m:mc><m:mc><m:mcPr><m:count m:val="1"/><m:mcJc m:val="left"/></m:mcPr></m:mc></m:mcs></m:mPr>
+                <m:mr>
+                  <m:e>
+                    <m:sSup>
+                      <m:e>
+                        <m:r><m:t xml:space="preserve">x</m:t></m:r>
+                      </m:e>
+                      <m:sup>
+                        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">2</m:t></m:r>
+                      </m:sup>
+                    </m:sSup>
+                  </m:e>
+                  <m:e>
+                    <m:r><m:t xml:space="preserve">x</m:t></m:r>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">≥</m:t></m:r>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">0</m:t></m:r>
+                  </m:e>
+                </m:mr>
+                <m:mr>
+                  <m:e>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">−</m:t></m:r>
+                    <m:r><m:t xml:space="preserve">x</m:t></m:r>
+                  </m:e>
+                  <m:e>
+                    <m:r><m:t xml:space="preserve">x</m:t></m:r>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">&lt;</m:t></m:r>
+                    <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">0</m:t></m:r>
+                  </m:e>
+                </m:mr>
+              </m:m>
+            </m:e>
+          </m:d>
+        </m:oMath>
+      </m:oMathPara>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi w:val="false"/></w:pPr>
+      <w:r><w:t xml:space="preserve">Case 26 (cancel family): </w:t></w:r>
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:borderBox>
+          <m:borderBoxPr><m:hideTop m:val="1"/><m:hideBot m:val="1"/><m:hideLeft m:val="1"/><m:hideRight m:val="1"/><m:strikeBLTR m:val="1"/></m:borderBoxPr>
+          <m:e>
+            <m:r><m:t xml:space="preserve">a</m:t></m:r>
+          </m:e>
+        </m:borderBox>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:borderBox>
+          <m:borderBoxPr><m:hideTop m:val="1"/><m:hideBot m:val="1"/><m:hideLeft m:val="1"/><m:hideRight m:val="1"/><m:strikeTLBR m:val="1"/></m:borderBoxPr>
+          <m:e>
+            <m:r><m:t xml:space="preserve">b</m:t></m:r>
+          </m:e>
+        </m:borderBox>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:borderBox>
+          <m:borderBoxPr><m:hideTop m:val="1"/><m:hideBot m:val="1"/><m:hideLeft m:val="1"/><m:hideRight m:val="1"/><m:strikeBLTR m:val="1"/><m:strikeTLBR m:val="1"/></m:borderBoxPr>
+          <m:e>
+            <m:r><m:t xml:space="preserve">c</m:t></m:r>
+          </m:e>
+        </m:borderBox>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:sSup>
+          <m:e>
+            <m:borderBox>
+              <m:borderBoxPr><m:hideTop m:val="1"/><m:hideBot m:val="1"/><m:hideLeft m:val="1"/><m:hideRight m:val="1"/><m:strikeBLTR m:val="1"/></m:borderBoxPr>
+              <m:e>
+                <m:r><m:t xml:space="preserve">x</m:t></m:r>
+              </m:e>
+            </m:borderBox>
+          </m:e>
+          <m:sup>
+            <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">0</m:t></m:r>
+          </m:sup>
+        </m:sSup>
+      </m:oMath>
+      <w:r><w:t xml:space="preserve"> </w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">پایان.</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/></w:pPr>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">مورد 27 (</w:t></w:r>
+      <w:r><w:t xml:space="preserve">boxed</w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">): </w:t></w:r>
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:borderBox>
+          <m:e>
+            <m:r><m:t xml:space="preserve">E</m:t></m:r>
+            <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">=</m:t></m:r>
+            <m:r><m:t xml:space="preserve">m</m:t></m:r>
+            <m:sSup>
+              <m:e>
+                <m:r><m:t xml:space="preserve">c</m:t></m:r>
+              </m:e>
+              <m:sup>
+                <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">2</m:t></m:r>
+              </m:sup>
+            </m:sSup>
+          </m:e>
+        </m:borderBox>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:borderBox>
+          <m:e>
+            <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve">text</m:t></m:r>
+          </m:e>
+        </m:borderBox>
+      </m:oMath>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve"> پایان.</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi w:val="false"/></w:pPr>
+      <w:r><w:t xml:space="preserve">Case 28 (alphabets): </w:t></w:r>
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:r><m:rPr><m:scr m:val="double-struck"/><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">R</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:scr m:val="script"/><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">L</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:scr m:val="fraktur"/><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">g</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:scr m:val="script"/><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">F</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:scr m:val="sans-serif"/><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">A</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:scr m:val="monospace"/><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">x</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="b"/></m:rPr><m:t xml:space="preserve">v</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="bi"/></m:rPr><m:t xml:space="preserve">α</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">d</m:t></m:r>
+        <m:r><m:t xml:space="preserve">x</m:t></m:r>
+      </m:oMath>
+      <w:r><w:t xml:space="preserve"> </w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">پایان.</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/></w:pPr>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">مورد 29 (</w:t></w:r>
+      <w:r><w:t xml:space="preserve">greek</w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">): </w:t></w:r>
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:r><m:t xml:space="preserve">α</m:t></m:r>
+        <m:r><m:t xml:space="preserve">β</m:t></m:r>
+        <m:r><m:t xml:space="preserve">γ</m:t></m:r>
+        <m:r><m:t xml:space="preserve">δ</m:t></m:r>
+        <m:r><m:t xml:space="preserve">ϵ</m:t></m:r>
+        <m:r><m:t xml:space="preserve">ε</m:t></m:r>
+        <m:r><m:t xml:space="preserve">θ</m:t></m:r>
+        <m:r><m:t xml:space="preserve">ϑ</m:t></m:r>
+        <m:r><m:t xml:space="preserve">λ</m:t></m:r>
+        <m:r><m:t xml:space="preserve">μ</m:t></m:r>
+        <m:r><m:t xml:space="preserve">π</m:t></m:r>
+        <m:r><m:t xml:space="preserve">σ</m:t></m:r>
+        <m:r><m:t xml:space="preserve">ϕ</m:t></m:r>
+        <m:r><m:t xml:space="preserve">φ</m:t></m:r>
+        <m:r><m:t xml:space="preserve">ω</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">Γ</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">Δ</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">Θ</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">Λ</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">Σ</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">Φ</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">Ψ</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">Ω</m:t></m:r>
+      </m:oMath>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve"> پایان.</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi w:val="false"/></w:pPr>
+      <w:r><w:t xml:space="preserve">Case 30 (integrals):</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/><w:jc w:val="center"/></w:pPr>
+      <m:oMathPara xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:oMathParaPr><m:jc m:val="center"/></m:oMathParaPr>
+        <m:oMath>
+          <m:nary>
+            <m:naryPr><m:chr m:val="∫"/><m:limLoc m:val="subSup"/></m:naryPr>
+            <m:sub>
+              <m:r><m:t xml:space="preserve">a</m:t></m:r>
+            </m:sub>
+            <m:sup>
+              <m:r><m:t xml:space="preserve">b</m:t></m:r>
+            </m:sup>
+            <m:e>
+              <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+            </m:e>
+          </m:nary>
+          <m:nary>
+            <m:naryPr><m:chr m:val="∬"/><m:limLoc m:val="subSup"/><m:subHide m:val="1"/><m:supHide m:val="1"/></m:naryPr>
+            <m:sub/>
+            <m:sup/>
+            <m:e>
+              <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+            </m:e>
+          </m:nary>
+          <m:nary>
+            <m:naryPr><m:chr m:val="∭"/><m:limLoc m:val="subSup"/><m:subHide m:val="1"/><m:supHide m:val="1"/></m:naryPr>
+            <m:sub/>
+            <m:sup/>
+            <m:e>
+              <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+            </m:e>
+          </m:nary>
+          <m:nary>
+            <m:naryPr><m:chr m:val="∮"/><m:limLoc m:val="subSup"/><m:supHide m:val="1"/></m:naryPr>
+            <m:sub>
+              <m:r><m:t xml:space="preserve">C</m:t></m:r>
+            </m:sub>
+            <m:sup/>
+            <m:e>
+              <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+            </m:e>
+          </m:nary>
+          <m:nary>
+            <m:naryPr><m:chr m:val="∫"/><m:limLoc m:val="undOvr"/></m:naryPr>
+            <m:sub>
+              <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">0</m:t></m:r>
+            </m:sub>
+            <m:sup>
+              <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">1</m:t></m:r>
+            </m:sup>
+            <m:e/>
+          </m:nary>
+        </m:oMath>
+      </m:oMathPara>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/></w:pPr>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">مورد 31 (</w:t></w:r>
+      <w:r><w:t xml:space="preserve">symbols</w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">): </w:t></w:r>
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:r><m:t xml:space="preserve">∂</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">∇</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">∞</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">∀</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">∃</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">∈</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">∉</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⊂</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⊇</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">∪</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">∩</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">∅</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">≠</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">≤</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">≥</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">≈</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">≡</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">∼</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">∝</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">±</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">×</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⋅</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">∘</m:t></m:r>
+      </m:oMath>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve"> پایان.</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi w:val="false"/></w:pPr>
+      <w:r><w:t xml:space="preserve">Case 32 (mod + functions): </w:t></w:r>
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:r><m:t xml:space="preserve">a</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">≡</m:t></m:r>
+        <m:r><m:t xml:space="preserve">b</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">(</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">mod</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:t xml:space="preserve">n</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">)</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">,</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:t xml:space="preserve">a</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">mod</m:t></m:r>
+        <m:r><m:t xml:space="preserve">n</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">,</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">sin</m:t></m:r>
+        <m:r><m:t xml:space="preserve">θ</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:sSub>
+          <m:e>
+            <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">log</m:t></m:r>
+          </m:e>
+          <m:sub>
+            <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">2</m:t></m:r>
+          </m:sub>
+        </m:sSub>
+        <m:r><m:t xml:space="preserve">n</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">exp</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">(</m:t></m:r>
+        <m:r><m:t xml:space="preserve">x</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">)</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:limLow>
+          <m:e>
+            <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">max</m:t></m:r>
+          </m:e>
+          <m:lim>
+            <m:r><m:t xml:space="preserve">i</m:t></m:r>
+          </m:lim>
+        </m:limLow>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">det</m:t></m:r>
+        <m:r><m:t xml:space="preserve">A</m:t></m:r>
+      </m:oMath>
+      <w:r><w:t xml:space="preserve"> </w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">پایان.</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/></w:pPr>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">مورد 33 (</w:t></w:r>
+      <w:r><w:t xml:space="preserve">color</w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">): </w:t></w:r>
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:r><w:rPr><w:color w:val="FF0000"/></w:rPr><m:t xml:space="preserve">x</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><w:rPr><w:color w:val="FF0000"/></w:rPr><m:t xml:space="preserve">+</m:t></m:r>
+        <m:r><w:rPr><w:color w:val="0000FF"/></w:rPr><m:t xml:space="preserve">y</m:t></m:r>
+      </m:oMath>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve"> پایان.</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi w:val="false"/></w:pPr>
+      <w:r><w:t xml:space="preserve">Case 34 (primes + spacing): </w:t></w:r>
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:sSup>
+          <m:e>
+            <m:r><m:t xml:space="preserve">f</m:t></m:r>
+          </m:e>
+          <m:sup>
+            <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">′</m:t></m:r>
+          </m:sup>
+        </m:sSup>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">(</m:t></m:r>
+        <m:r><m:t xml:space="preserve">x</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">)</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">,</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:sSup>
+          <m:e>
+            <m:r><m:t xml:space="preserve">f</m:t></m:r>
+          </m:e>
+          <m:sup>
+            <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">″</m:t></m:r>
+          </m:sup>
+        </m:sSup>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">(</m:t></m:r>
+        <m:r><m:t xml:space="preserve">x</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">)</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">,</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:t xml:space="preserve">a</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:t xml:space="preserve">b</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:t xml:space="preserve">c</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:t xml:space="preserve">d</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:t xml:space="preserve">e</m:t></m:r>
+        <m:r><m:t xml:space="preserve">f</m:t></m:r>
+      </m:oMath>
+      <w:r><w:t xml:space="preserve"> </w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">پایان.</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/></w:pPr>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">مورد 35 (</w:t></w:r>
+      <w:r><w:t xml:space="preserve">phantom + not</w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">): </w:t></w:r>
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:phant>
+          <m:phantPr><m:show m:val="0"/></m:phantPr>
+          <m:e>
+            <m:r><m:t xml:space="preserve">x</m:t></m:r>
+          </m:e>
+        </m:phant>
+        <m:r><m:t xml:space="preserve">y</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">,</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">⊄</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">,</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">≠</m:t></m:r>
+      </m:oMath>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve"> پایان.</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi w:val="false"/></w:pPr>
+      <w:r><w:t xml:space="preserve">Case 36 (text Persian):</w:t></w:r>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/><w:jc w:val="center"/></w:pPr>
+      <m:oMathPara xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:oMathParaPr><m:jc m:val="center"/></m:oMathParaPr>
+        <m:oMath>
+          <m:r><m:rPr><m:nor/></m:rPr><w:rPr><w:rtl/></w:rPr><m:t xml:space="preserve">اگر </m:t></m:r>
+          <m:r><m:t xml:space="preserve">x</m:t></m:r>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">&gt;</m:t></m:r>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">0</m:t></m:r>
+          <m:r><m:rPr><m:nor/></m:rPr><w:rPr><w:rtl/></w:rPr><m:t xml:space="preserve"> آنگاه </m:t></m:r>
+          <m:r><m:t xml:space="preserve">y</m:t></m:r>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">=</m:t></m:r>
+          <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">1</m:t></m:r>
+        </m:oMath>
+      </m:oMathPara>
+    </w:p>
+    <w:p>
+      <w:pPr><w:bidi/></w:pPr>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">مورد 37 (</w:t></w:r>
+      <w:r><w:t xml:space="preserve">units (siunitx-like)</w:t></w:r>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve">): </w:t></w:r>
+      <m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">9.81</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">m</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">/</m:t></m:r>
+        <m:sSup>
+          <m:e>
+            <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">s</m:t></m:r>
+          </m:e>
+          <m:sup>
+            <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">2</m:t></m:r>
+          </m:sup>
+        </m:sSup>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">,</m:t></m:r>
+        <m:r><m:rPr><m:nor/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">25</m:t></m:r>
+        <m:sSup>
+          <m:e>
+            <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve"> ​</m:t></m:r>
+          </m:e>
+          <m:sup>
+            <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">∘</m:t></m:r>
+          </m:sup>
+        </m:sSup>
+        <m:r><m:rPr><m:sty m:val="p"/></m:rPr><m:t xml:space="preserve">C</m:t></m:r>
+      </m:oMath>
+      <w:r><w:rPr><w:rtl/></w:rPr><w:t xml:space="preserve"> پایان.</w:t></w:r>
+    </w:p>
+    <w:sectPr><w:pgSz w:w="11906" w:h="16838" w:orient="portrait"/><w:pgMar w:top="850" w:right="850" w:bottom="850" w:left="850" w:header="397" w:footer="397" w:gutter="0"/><w:pgNumType/><w:bidi/><w:docGrid w:linePitch="360"/></w:sectPr>
+  </w:body>
+</w:document>
+
+<!-- ===== word/endnotes.xml ===== -->
+<?xml version="1.0" encoding="UTF-8"?>
+<w:endnotes [16 xmlns declarations sha256 4af55965bb07] mc:Ignorable="w14 w15 wp14">
+  <w:endnote w:type="separator" w:id="-1">
+    <w:p>
+      <w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr>
+      <w:r><w:rPr><w:rStyle w:val="EndnoteReference"/></w:rPr><w:endnoteRef/></w:r>
+      <w:r><w:separator/></w:r>
+    </w:p>
+  </w:endnote>
+  <w:endnote w:type="continuationSeparator" w:id="0">
+    <w:p>
+      <w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr>
+      <w:r><w:rPr><w:rStyle w:val="EndnoteReference"/></w:rPr><w:endnoteRef/></w:r>
+      <w:r><w:continuationSeparator/></w:r>
+    </w:p>
+  </w:endnote>
+</w:endnotes>
+
+<!-- ===== word/fontTable.xml ===== -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:fonts [10 xmlns declarations sha256 974b1e7deb45] mc:Ignorable="w14 w15 w16se w16cid w16 w16cex w16sdtdh"/>
+
+<!-- ===== word/footnotes.xml ===== -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:footnotes [16 xmlns declarations sha256 4af55965bb07] mc:Ignorable="w14 w15 wp14">
+  <w:footnote w:type="separator" w:id="-1">
+    <w:p>
+      <w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr>
+      <w:r><w:rPr><w:rStyle w:val="FootnoteReference"/></w:rPr><w:footnoteRef/></w:r>
+      <w:r><w:separator/></w:r>
+    </w:p>
+  </w:footnote>
+  <w:footnote w:type="continuationSeparator" w:id="0">
+    <w:p>
+      <w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr>
+      <w:r><w:rPr><w:rStyle w:val="FootnoteReference"/></w:rPr><w:footnoteRef/></w:r>
+      <w:r><w:continuationSeparator/></w:r>
+    </w:p>
+  </w:footnote>
+</w:footnotes>
+
+<!-- ===== word/numbering.xml ===== -->
+<!-- shared: _shared/3b5f7a669476.txt -->
+<!-- ===== word/settings.xml ===== -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:settings [16 xmlns declarations sha256 4af55965bb07] mc:Ignorable="w14 w15 wp14">
+  <w:displayBackgroundShape/>
+  <w:evenAndOddHeaders w:val="false"/>
+  <w:compat>
+    <w:compatSetting w:val="15" w:name="compatibilityMode" w:uri="http://schemas.microsoft.com/office/word"/>
+  </w:compat>
+</w:settings>
+
+<!-- ===== word/styles.xml ===== -->
+<!-- shared: _shared/b935586775f8.txt -->

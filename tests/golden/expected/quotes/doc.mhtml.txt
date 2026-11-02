@@ -1,0 +1,28 @@
+# MHTML, 2 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/b1656fe21d17.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="rtl">
+        <p class=MsoNormal style='direction:rtl;text-align:right'>&nbsp;</p>
+        <p class="MsoQuote">نقل‌قول ساده فارسی در یک پاراگراف.</p>
+<p class="MsoNormal" style="direction:rtl;text-align:right;margin:0;mso-margin-top-alt:0;mso-margin-bottom-alt:0;line-height:8pt;mso-line-height-rule:exactly;font-size:4.0pt;mso-bidi-font-size:4.0pt">&nbsp;</p><p class="MsoQuote">نقل‌قول دوم بلافاصله بعد.</p>
+<p class="MsoNormal" style="direction:rtl;text-align:right;margin:0;mso-margin-top-alt:0;mso-margin-bottom-alt:0;line-height:8pt;mso-line-height-rule:exactly;font-size:4.0pt;mso-bidi-font-size:4.0pt">&nbsp;</p><p class="MsoQuote" style="border-top:none;border-bottom:none;border-right:solid #F6F9F8 .25pt;border-left:solid #1F6F5C 3.5pt;padding-left:12pt;padding-right:12pt;background:#F6F9F8;margin-left:14.15pt;margin-right:0cm;direction:ltr;text-align:justify" dir="ltr">This is an English quote in an RTL doc.</p>
+<p class="MsoNormal" style="direction:rtl;text-align:right;margin:0;mso-margin-top-alt:0;mso-margin-bottom-alt:0;line-height:8pt;mso-line-height-rule:exactly;font-size:4.0pt;mso-bidi-font-size:4.0pt">&nbsp;</p><table class="MsoQuoteTable" border="0" cellspacing="0" cellpadding="0" dir="rtl" width="95.2%" style="width:95.2%;border-collapse:collapse;border:none;mso-border-alt:none;mso-yfti-tbllook:1184;mso-padding-alt:0cm 0cm 0cm 0cm;margin-right:14.15pt;margin-left:0cm"><tr><td valign="top" style="border-top:none;border-bottom:none;border-left:none;border-right:solid #1F6F5C 3.5pt;mso-border-top-alt:none;mso-border-bottom-alt:none;mso-border-left-alt:none;mso-border-right-alt:solid #1F6F5C 3.5pt;padding:2pt 0cm 2pt 0cm;padding-right:12pt;padding-left:6pt;background:#F6F9F8;direction:rtl;text-align:right"><p class="MsoQuote" style="border-top:none;border-right:none;border-bottom:none;border-left:none;mso-border-alt:none;padding:0cm;margin-right:0cm;margin-left:0cm">نقل‌قول پیچیده با فهرست:</p><ul>
+<li class="MsoQuote" style="border-top:none;border-right:none;border-bottom:none;border-left:none;mso-border-alt:none;padding:0cm;margin-right:0cm;margin-left:0cm;margin-top:0pt;margin-bottom:3pt;mso-margin-bottom-alt:3pt;line-height:100%">مورد یک</li>
+<li class="MsoQuote" style="border-top:none;border-right:none;border-bottom:none;border-left:none;mso-border-alt:none;padding:0cm;margin-right:0cm;margin-left:0cm;margin-top:0pt;line-height:100%;margin-bottom:6pt;mso-margin-bottom-alt:6pt">مورد دو</li>
+</ul><table class="MsoQuoteTable" border="0" cellspacing="0" cellpadding="0" dir="rtl" width="100%" style="width:100%;border-collapse:collapse;border:none;mso-border-alt:none;mso-yfti-tbllook:1184;mso-padding-alt:0cm 0cm 0cm 0cm;margin-right:0cm;margin-left:0cm"><tr><td valign="top" style="border-top:none;border-bottom:none;border-left:none;border-right:solid #1F6F5C 3.5pt;mso-border-top-alt:none;mso-border-bottom-alt:none;mso-border-left-alt:none;mso-border-right-alt:solid #1F6F5C 3.5pt;padding:2pt 0cm 2pt 0cm;padding-right:12pt;padding-left:6pt;background:#F6F9F8;direction:rtl;text-align:right"><p class="MsoQuote" style="border-top:none;border-right:none;border-bottom:none;border-left:none;mso-border-alt:none;padding:0cm;margin-right:0cm;margin-left:0cm">نقل‌قول تودرتو</p></td></tr></table><p class="MsoQuote" style="border-top:none;border-right:none;border-bottom:none;border-left:none;mso-border-alt:none;padding:0cm;margin-right:0cm;margin-left:0cm;margin-top:6pt;mso-margin-top-alt:6pt">پاراگراف پایانی.</p></td></tr></table>
+<p class="MsoNormal" style="direction:rtl;text-align:right;margin:0;mso-margin-top-alt:0;mso-margin-bottom-alt:0;line-height:8pt;mso-line-height-rule:exactly;font-size:4.0pt;mso-bidi-font-size:4.0pt">&nbsp;</p><p class="MsoQuote">خط اول
+خط دوم در همان پاراگراف</p><p class="MsoQuote">پاراگراف دوم نقل‌قول</p>
+
+        <p class=MsoNormal style='direction:rtl;text-align:right'>&nbsp;</p>
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="filelist.xml"/>
+</xml>

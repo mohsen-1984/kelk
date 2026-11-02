@@ -123,6 +123,7 @@ module.exports = [
   // ---- Browser scripts: lib/, scripts/, the test data files -----------------------------------------------------
   {
     files: ['lib/**/*.js', 'scripts/**/*.js', 'tests/*.js', 'tools/pdfjs-polyfills.js'],
+    ignores: ['tests/docx-validate.js'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'script',
@@ -153,7 +154,9 @@ module.exports = [
     languageOptions: { ecmaVersion: 2022, sourceType: 'commonjs', globals: { ...globals.node } },
   },
   {
-    files: ['tests/pdf-lab/scripts/**/*.js'],
+    // tests/docx-validate.js and tests/golden/ (P2.3): Node scripts driving tests/builder-suite.html with Playwright,
+    // like the lab's
+    files: ['tests/pdf-lab/scripts/**/*.js', 'tests/docx-validate.js', 'tests/golden/**/*.js'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'commonjs',
