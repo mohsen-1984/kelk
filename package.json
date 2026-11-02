@@ -10,7 +10,7 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "test": "node --test tests/unit/",
+    "test": "node --test \"tests/unit/*.test.js\"",
     "format:check": "prettier --check .",
     "check:version": "node tools/check-version.js"
   },
