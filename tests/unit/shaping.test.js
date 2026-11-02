@@ -114,6 +114,33 @@ test('U+06D5 (right-joining, no presentation forms) joins the letter before it, 
   assert.equal(shaped([BEH, 0x06d5, BEH]), 'FE91 06D5 FE8F');
 });
 
+test('a letter with only some forms joins only on the sides they draw (U+06BA as R, U+0677 as U)', function () {
+  // noon ghunna: dual-joining in Unicode, but only isolated FB9E and final FB9F exist
+  assert.equal(joiningType(s(0x06ba)), 'D');
+  assert.equal(shaped([0x06ba]), 'FB9E');
+  assert.equal(shaped([BEH, 0x06ba]), 'FE91 FB9F');
+  assert.equal(shaped([0x06ba, BEH]), 'FB9E FE8F', 'no initial form: the beh after it stays unjoined');
+  assert.equal(shaped([BEH, 0x06ba, BEH]), 'FE91 FB9F FE8F', 'no medial form: final, then an isolated beh');
+  // U+0677: right-joining, an isolated form only (jsPDF draws the letter as FBDD)
+  assert.equal(joiningType(s(0x0677)), 'R');
+  assert.equal(shaped([BEH, 0x0677]), 'FE8F 0677', 'the beh before it does not join into an isolated-only glyph');
+  // every letter of the table, in every position: the form asked for exists, and a neighbour that joins
+  // towards it is answered by a joining form (a medial / initial beh only next to a final / medial / initial form)
+  Object.keys(forms).forEach(function (k) {
+    const f = forms[k];
+    [[+k], [BEH, +k], [+k, BEH], [BEH, +k, BEH]].forEach(function (cps) {
+      const out = Array.from(shapeArabic(s.apply(null, cps))).map(function (c) {
+        return c.charCodeAt(0);
+      });
+      const at = cps.indexOf(+k),
+        me = out[at];
+      assert.ok(f.indexOf(me) >= 0 || me === +k, hex(s.apply(null, cps)) + ' → ' + hex(s.apply(null, out)));
+      if (at > 0 && out[at - 1] === 0xfe91)
+        assert.notEqual(f.indexOf(me) % 2, 0, hex(s.apply(null, cps)) + ': beh joins, the letter does not');
+    });
+  });
+});
+
 test('text without Arabic letters is returned unchanged', function () {
   ['', 'abc', s(0x05d0, 0x05d1), s(0x06f1, 0x06f2), s(0x060c)].forEach(function (t) {
     assert.equal(shapeArabic(t), t);

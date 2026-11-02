@@ -43,10 +43,32 @@ test('B6: BuilderBase.colorHex reads names, #rgb, #rrggbb and rgb(); anything el
   assert.equal(hex('#abc'), 'AABBCC');
   assert.equal(hex('#C07030'), 'C07030');
   assert.equal(hex('rgb(255, 0, 128)'), 'FF0080');
-  assert.equal(hex('rgba(1 2 300 / .5)'), '0102FF');
+  assert.equal(hex('rgba(255, 0, 128, 1)'), 'FF0080');
+  assert.equal(hex('rgb(10 20 30)'), '0A141E');
   ['', null, undefined, 'auto', 'transparent', 'nocolor', '#12', 'toString', 'constructor'].forEach(function (v) {
     assert.equal(hex(v), null, String(v));
   });
+});
+
+test('B6: colorHex: a fully transparent color is no color; partial alpha is composited over white', function () {
+  const hex = BuilderBase.colorHex;
+  // alpha 0 in every syntax → null (DOCX: Word 'auto' / no fill; PDF: no fill), never black
+  ['rgba(0,0,0,0)', 'rgba(0, 0, 0, 0.0)', 'rgb(0 0 0 / 0)', 'rgb(0 0 0 / 0%)', 'rgba(255,255,255,0)',
+    '#0000', '#00000000', 'transparent', 'TRANSPARENT'].forEach(function (v) {
+    assert.equal(hex(v), null, v);
+  });
+  // partial alpha: c·a + 255·(1 − a), the color the page shows on white
+  assert.equal(hex('rgba(0, 0, 0, .05)'), 'F2F2F2');
+  assert.equal(hex('rgba(0,0,0,0.5)'), '808080');
+  assert.equal(hex('rgb(0 0 0 / 50%)'), '808080');
+  assert.equal(hex('rgba(1 2 300 / .5)'), '8081FF');
+  assert.equal(hex('#ff000080'), 'FF7F7F');
+  assert.equal(hex('#f008'), 'FF7777');
+  // alpha 1 (or more) and no alpha are the color itself
+  assert.equal(hex('rgba(18, 52, 86, 1)'), '123456');
+  assert.equal(hex('rgba(18, 52, 86, 2)'), '123456');
+  assert.equal(hex('rgba(18, 52, 86, 100%)'), '123456');
+  assert.equal(hex('#123456ff'), '123456');
 });
 
 test('B6: BidiCore.cssColorHex reads the same table (no copy of its own)', function () {
