@@ -6,7 +6,9 @@ const env = require('./env.js');
 const { chromium } = env.req('playwright');
 // red today, by case → column (the table's header): formula layout reads back out of order (recall 100%,
 // order 84.4% < 85%). Remove a line once it passes; a new red cell fails the run.
-const KNOWN = new Set(['latex-formulas → PDF → MD', 'latex-formulas-mathml → PDF → MD']);
+// shaping-no-forms-uncovered (P1.3, B1): no bundled PDF font has a glyph for ؠ ػ ؼ ؾ ؿ ۺ ۻ ۼ, so they are not
+// drawn and cannot be read back (the shaping of their neighbours is checked by tests/unit/shaping.test.js).
+const KNOWN = new Set(['latex-formulas → PDF → MD', 'latex-formulas-mathml → PDF → MD', 'shaping-no-forms-uncovered → PDF → MD']);
 (async () => {
   const root = process.argv[2] || env.KELK;
   const b = await chromium.launch(); const page = await b.newPage();

@@ -27,7 +27,10 @@
   the <code>table-style-*</code> cases cover every lines and fill option and the total row).
   The PDF → MD column reads each PDF back with <code>PdfImporter</code> (layout only, no embedded source) and compares
   its words with the document's text, formulas left out: recall (source words found, in any order) and order (longest
-  common run of words, as a share of the source); green ≥ 97% / 95%, grey ≥ 85%.</p>
+  common run of words, as a share of the source); green ≥ 97% / 95%, grey ≥ 85%.
+  A case with a <code>pdfCheck</code> also has its PDF's geometry checked in the .pdf column (pages read with pdf.js):
+  the <code>table-rowspan-*</code> cases, that each cell's text starts at its column's edge (rowspan / colspan);
+  the <code>table-tall-*</code> cases, that a row taller than a page is split across pages with no text off a page.</p>
 <div class="bar">
   <button class="primary" id="run" type="button">Run all</button>
   <label><input type="checkbox" id="toc"> with a table of contents</label>
@@ -48,10 +51,12 @@
 <script src="../lib/pdf-base64-ttf-fonts/pdf-font-vazirmatn.js"></script>
 <script src="../lib/pdf-base64-ttf-fonts/pdf-font-sahel.js"></script>
 <script src="../lib/pdf-base64-ttf-fonts/pdf-font-dejavu-sans.js"></script>
+<script src="../lib/pdf-base64-ttf-fonts/pdf-font-dejavu-sans-mono.js"></script>  <!-- code-mono, code-mono-docfont, nested-fence-frames -->
 <script src="../lib/pdf-base64-ttf-fonts/pdf-font-vazir-code-hack.js"></script>
 <script src="../lib/pdf-base64-ttf-fonts/pdf-font-noto-emoji.js"></script>
 <script src="../assets/fonts/embed/vazirmatn.js"></script>
 <script src="../assets/fonts/embed/vazir-code-hack.js"></script>
+<script src="../assets/fonts/embed/dejavu-sans-mono.js"></script>
 <!-- the library, in its load order -->
 <script src="../lib/ImageCore.js"></script>
 <script src="../lib/MathCore.js"></script>
@@ -83,7 +88,7 @@
   const st = document.createElement('style'); st.textContent = BidiView.css(); document.head.appendChild(st);   // the classes' CSS
 
   function cases() {
-    const list = CORPUS.map(function (c) { return { name: c.name, md: c.md, html: c.html, setup: c.setup, cells: c.cells }; });
+    const list = CORPUS.map(function (c) { return { name: c.name, md: c.md, html: c.html, setup: c.setup, cells: c.cells, exact: c.exact, pdfCheck: c.pdfCheck }; });
     Object.keys(window.KelkSamples || {}).forEach(function (lang) {
       list.push({ name: 'about-kelk-and-samples.' + lang, md: KelkSamples[lang].markdown });
     });
@@ -195,6 +200,19 @@
     const cmp = compareWords(sourceWords(html), words(r.markdown));
     return Object.assign(cmp, { markdown: r.markdown });
   }
+  /** the PDF's pages for a case's pdfCheck: { width, height, items: [{ str, x, y, w }] } (pdf.js, y from the bottom) */
+  async function pdfPages(blob) {
+    const task = pdfjsLib.getDocument({ data: new Uint8Array(await blob.arrayBuffer()), isEvalSupported: false, disableFontFace: true, verbosity: 0 });
+    const doc = await task.promise;
+    const pages = [];
+    for (let i = 1; i <= doc.numPages; i++) {
+      const p = await doc.getPage(i), vp = p.getViewport({ scale: 1 }), tc = await p.getTextContent();
+      pages.push({ width: vp.width, height: vp.height, items: tc.items.filter(function (it) { return it.str !== undefined; })
+        .map(function (it) { return { str: it.str, x: it.transform[4], y: it.transform[5], w: it.width }; }) });
+    }
+    await task.destroy();
+    return pages;
+  }
   function cell(td, text, cls, blob, file) {
     td.className = cls;
     if (blob) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file; a.textContent = text; td.appendChild(a); }
@@ -234,14 +252,19 @@
           const b = configure(B.create(), kind, toc);
           if (c.setup) c.setup(b);
           const blob = await b.addFromHtml(html).toBlob();
-          cell(td, (blob.size / 1024).toFixed(0) + ' KB · ' + Math.round(performance.now() - t0) + ' ms', 'ok', blob, c.name + '.' + ext);
-          ok++;
+          // a case may check the PDF's geometry (c.pdfCheck(pages) → messages; none = pass)
+          const errs = kind === 'pdf' && c.pdfCheck ? c.pdfCheck(await pdfPages(blob)) : [];
+          const info = (blob.size / 1024).toFixed(0) + ' KB · ' + Math.round(performance.now() - t0) + ' ms';
+          if (errs.length) { cell(td, info + ' · ' + errs.join('; '), 'err', blob, c.name + '.' + ext); bad++; }
+          else { cell(td, info + (kind === 'pdf' && c.pdfCheck ? ' · geometry ok' : ''), 'ok', blob, c.name + '.' + ext); ok++; }
           if (kind === 'pdf') {
             const rt = document.createElement('td'); tr.appendChild(rt);
             try {
               const t1 = performance.now(), q = await pdfRoundTrip(blob, html);
               const pct = function (x) { return (x * 100).toFixed(1) + '%'; };
-              const cls = q.recall >= 0.97 && q.order >= 0.95 ? 'ok' : q.recall >= 0.85 && q.order >= 0.85 ? 'skip' : 'err';
+              // c.exact (the P1.3 shaping cases): every word back, in order — anything less is red
+              const cls = c.exact ? (q.recall === 1 && q.order === 1 ? 'ok' : 'err')
+                : q.recall >= 0.97 && q.order >= 0.95 ? 'ok' : q.recall >= 0.85 && q.order >= 0.85 ? 'skip' : 'err';
               cell(rt, pct(q.recall) + ' · order ' + pct(q.order) + ' · ' + q.n + ' words · ' + Math.round(performance.now() - t1) + ' ms', cls,
                 new Blob([q.markdown], { type: 'text/markdown' }), c.name + '.from-pdf.md');
               if (cls === 'err') bad++; else ok++;
