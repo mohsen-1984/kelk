@@ -5,7 +5,7 @@
     <!-- Content Security Policy (docs/reports/P1.2-security.md): scripts only from the app's own files (no inline
          script, handler or eval); inline styles (the builders' and MathJax's); images also from the web (a document may
          name a public image); workers from the app or a blob; no plugin, no <base>, no form submission. -->
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: http:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: http:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Kelk — Markdown to Word, PDF and HTML and back, right-to-left first</title>
     <meta name="description" content="Kelk: convert Markdown (GFM) to Word DOCX, Word DOC (MHTML), PDF and standalone HTML — and Word, HTML and PDF back to Markdown — entirely client-side in your browser. Right-to-left first (Persian, Arabic, Hebrew, Urdu) and every left-to-right language; LaTeX formulas; offline, no upload, open source.">
