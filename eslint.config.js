@@ -145,7 +145,8 @@ module.exports = [
   // page; those callbacks read the page's globals, so Kelk's globals and window/document are readonly there too.
   // Not the whole browser set: names like `name`, `status`, `close`, `event` would hide a typo in the Node code.
   {
-    files: ['tools/*.js', 'eslint.config.js'],
+    // tests/unit: Node's test runner + jsdom (the page's objects are reached through the jsdom window `w`)
+    files: ['tools/*.js', 'eslint.config.js', 'tests/unit/**/*.js'],
     ignores: ['tools/pdfjs-polyfills.js'],
     languageOptions: { ecmaVersion: 2022, sourceType: 'commonjs', globals: { ...globals.node } },
   },
