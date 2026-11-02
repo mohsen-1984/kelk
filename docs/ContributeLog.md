@@ -56,7 +56,7 @@ documentation is [`lib/README.md`](../lib/README.md), with [`lib/LATEX.md`](../l
 | Tool | Version | Notes |
 |---|---|---|
 | **A current browser** | Chrome, Edge or Firefox | All the app needs. MathJax and PDF.js are wrapped to load from `file://`. |
-| **Git** | any | `mohsen-1984/Kelk`, branch `main`. |
+| **Git** | any | `mohsen-1984/Kelk`, branch `main`. Text files are LF everywhere (`.gitattributes`); a working tree cloned before P0.1 needs one refresh on a clean tree: `git rm -r --cached -q . && git reset -q --hard`. |
 | Node.js | 18+ (CI uses 22) | Only for the PDF lab and `tools/*.js`. There is **no `package.json`** yet (plan P0.4). |
 | Playwright | 1.56.1 (the CI pin) + `pdf-lib` 1.17.1 | Installed **outside** the repository; `NODE_TOOLS` points at its `node_modules`. |
 | Lab generators | LibreOffice (`soffice`), wkhtmltopdf, pandoc, Python 3 with openpyxl, python-pptx, fontTools, DejaVu fonts, qpdf, poppler-utils | Only to **remake** lab PDFs; importing and scoring need Node + Playwright only. |
@@ -110,6 +110,12 @@ On Windows (notes from the review machine, plan §10): `env.js` falls back to a 
 `npx playwright install` resolved a different Playwright than the one installed and stalled twice — what worked was
 installing `playwright@latest` and making directory junctions from the build number it asks for to the build on disk
 (`mklink /J chromium_headless_shell-<wanted> chromium_headless_shell-<present>`, the same for `chromium-<wanted>`).
+On a second machine (1405-08-10) `playwright@1.56.1` worked once the stalled install was finished by hand: run
+`node_modules/.bin/playwright install chromium-headless-shell` from the tools folder (not `npx`); when it stalls,
+stop it, delete `%LOCALAPPDATA%/ms-playwright/__dirlock`, unzip the downloaded
+`playwright-download-chromium-headless-shell-win64-<build>.zip` (in `%TEMP%`) into
+`ms-playwright/chromium_headless_shell-<build>` with Windows `tar -xf`, and create the empty marker files
+`INSTALLATION_COMPLETE` and `DEPENDENCIES_VALIDATED` there. The headless shell is all the lab needs.
 P0.3 removes the need for this.
 
 ---
@@ -235,7 +241,7 @@ Kelk has no server, no account and no upload: documents never leave the browser.
 | PDF parsing | PDF.js 6.4.299 on a fake worker in the main thread; encrypted PDFs with a user password give a message only. | `scripts/config.js:134` |
 | Third-party code | Vendored and pinned by file name; no checksums, SBOM or Dependabot (plan P8.3). | `vendor/`, `THIRD-PARTY-NOTICES.md` |
 | CI | `pdf-lab.yml` has no `permissions:`, no `concurrency:`, actions not SHA-pinned (plan P0.3). | `.github/workflows/pdf-lab.yml` |
-| Private test data | The owner's real PDFs are never committed (each pattern is rebuilt with our own text); no private data found in the lab PDFs (1405-08-09). `tests/pdf-lab/real/` is **not yet git-ignored** (plan P0.1). | `tests/pdf-lab/` |
+| Private test data | The owner's real PDFs are never committed (each pattern is rebuilt with our own text); no private data found in the lab PDFs (1405-08-09). `tests/pdf-lab/real/` and `private/` are git-ignored (P0.1). | `tests/pdf-lab/` |
 | Local tooling | `.claude/settings.local.json` (personal permissions) is git-ignored; none is kept in the repository. | `.gitignore` |
 
 ---
@@ -301,9 +307,8 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 | 🟠 High | `baseline.json` was made with Chromium 153 and Bitstream Type 1 fonts; CI has Playwright 1.56.1 (Chromium 141) and no such fonts, so the fuzz comparison on the no-base path is always skipped. | `tests/pdf-lab/baseline.json` | Rebuild the baseline in the CI environment (P0.2–P0.3). |
 | 🟠 High | **Release zip made by hand**, no include list: a 2.0 zip would carry `tests/pdf-lab` (16 MB) and `.github/`. | — | P8.1: `tools/build-release.js` with an include list. |
 | 🟠 High | README links `kelk_2.0.zip` under `releases/latest` → 404 (latest is v1.5; a prerelease is skipped by `latest`). | `README.md` | Link the tagged release (P8.1). |
-| 🟠 High | **144 binary PDFs (15.6 MB) are in `main`'s history** as ordinary files — they arrived with PR #1 (`lfs: false` in the workflow). Moving them to LFS now only helps future changes. | `tests/pdf-lab/pdf/` | Decide in P0.1 (keep as binaries, LFS or a release asset); history is not rewritten. |
 | 🟡 Medium | Version strings in ≈ 8 places disagree (`2.0-rc1` / `2.0` / `1.0`). | `scripts/config.js:11` and ≈ 7 other places | P0.4: one `VERSION`, `tools/check-version.js` in CI. |
-| 🟡 Medium | No `package.json`, lockfile, ESLint, Prettier, `.editorconfig` or `.gitattributes`; one file is stored with CRLF line endings (checked 1405-08-10). | root, `lib/pdf-base64-ttf-fonts/NOTO-EMOJI-LICENSE-OFL.txt` | P0.1 (`.gitattributes`, `.editorconfig`), P0.4 (tooling). |
+| 🟡 Medium | No `package.json`, lockfile, ESLint or Prettier. | root | P0.4 (tooling). |
 | 🟡 Medium | The lab harness is Linux-only: `'/opt/npm-tools/node_modules'`, `'file://' + path` ×30, `fc-match`, `/usr/share/fonts`, `/` splits in `features.js`. | `tests/pdf-lab/scripts/env.js`, `features.js` | P0.3: `url.pathToFileURL`, `require.resolve`, `path.sep`. |
 | 🟡 Medium | Pages is a Jekyll branch deploy of the whole repo: no `.nojekyll`, no cache-busting on `lib/`, `scripts/`, `styles/`. | — | P8.1: Pages through Actions with the release set and hashed URLs. |
 | 🟡 Medium | Not in CI: the builder suite, `math-roundtrip.js`, struct / features / crash runs, lint, link check, a11y, bundle size, generated-files freshness. | `.github/workflows/` | P0.3, P2.3, P2.4. |
@@ -318,7 +323,6 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 | 🟠 High | Custom header / footer HTML is never sanitised. | `scripts/exporter.js:109-116` | P1.2: sanitise it like the preview. |
 | 🟠 High | **B4** — `HtmlBuilder.toHtml` parses into a live element; `on*` attributes pass through. | `lib/HtmlBuilder.js:478-493` | P1.2: `BidiCore.inertRoot`, strip `on*` / `javascript:`. |
 | 🟡 Medium | No Content Security Policy. | `index.html` | P1.2: a `<meta>` CSP, tested on `file://` and Pages with MathJax and PDF.js; `rel="noopener noreferrer"` on every `target=_blank`. |
-| 🟡 Medium | `tests/pdf-lab/real/` (the owner's private PDFs when present) is not git-ignored. | `.gitignore` | P0.1: ignore `tests/pdf-lab/real/`, `private/`, `node_modules/`. |
 | 🟡 Medium | Supply chain: vendor files pinned by name only (`6.4.299` repeated ×8, the marked file name ×14), no checksums, SBOM or Dependabot; CI without `permissions:` and SHA-pinned actions. | `vendor/`, `.github/workflows/pdf-lab.yml` | P8.3 vendor manifest with hashes; P0.3 workflow hardening. |
 
 ### 📄 PDF import
@@ -370,7 +374,7 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 No open issues.
 
 <details>
-<summary><strong>✅ Resolved</strong> (5) — click to expand</summary>
+<summary><strong>✅ Resolved</strong> (8) — click to expand</summary>
 
 | Priority | Issue | Location | Suggestion |
 |---|---|---|---|
@@ -379,6 +383,9 @@ No open issues.
 | ✅ Resolved 1405-08-10 | The imported `.claude/` folder carried another project's report hooks and a hook for its HTML plan page. | `.claude/settings.json`, `.claude/hooks/` | Their registrations removed and the plan-page hook deleted. |
 | ✅ Resolved 1405-08-10 | The imported `.claude/settings.local.json` came from another project, with that project’s plaintext credential and ≈ 350 permission rules. | `.claude/settings.local.json` | Deleted (and git-ignored); the owner was advised to change that password. |
 | ✅ Resolved 1405-08-10 | `.claude/settings.json` registered two hooks that were not in `.claude/hooks/` (`todowrite-shim-watch.sh`, `precompact-guard.sh`), so they failed on every run. | `.claude/settings.json` | Entries removed; the context-warning hook already offers `/checkpoint`. |
+| ✅ Resolved 1405-08-10 | No `.gitattributes` / `.editorconfig`; with `core.autocrlf=true` working trees were CRLF and one file was stored with CRLF line endings. | root, `lib/pdf-base64-ttf-fonts/NOTO-EMOJI-LICENSE-OFL.txt` | P0.1: `* text=auto eol=lf` plus `binary` rules, `.editorconfig` matching the tree's style, the file renormalised; corpus scores unchanged on an LF tree (Markdown output byte-identical). |
+| ✅ Resolved 1405-08-10 | `tests/pdf-lab/real/` (the owner's private PDFs when present) was not git-ignored. | `.gitignore` | P0.1: `tests/pdf-lab/real/`, `private/` and `node_modules/` ignored. |
+| ✅ Resolved 1405-08-10 | 144 binary PDFs (15.6 MB) entered `main`'s history as ordinary files with PR #1; storage was undecided (LFS, release asset or plain files). | `tests/pdf-lab/pdf/` | P0.1 decision: kept as ordinary files marked `binary`; history is not rewritten; revisit past 50 MB, > 10 MB of packed churn a year, or a single fixture > 10 MB. |
 
 </details>
 
@@ -403,7 +410,7 @@ the plan, not this list.
 
 | Date | Plan | Creator | Why & What |
 |---|---|---|---|
-| 1405-08-09 | [Kelk 2.0 → 2.x Redesign Plan](../.claude/plans/Kelk-Redesign.md) | Zarrabi | **Status:** accepted by the project owner on 1405-08-09; execution started — P0.0 approved 1405-08-10. Structural changes, not a rewrite: the rule-based PDF importer and its lab are the asset, and the weaknesses found in the review are fixable in place, each step gated by the lab. 8 phases / 31 sub-phases, ≈ 76 working days plus the owner's review — **P0** stabilise and commit · **P1** verified bugs · **P2** test-net completeness · **P3** importer structure, calibration, degradation · **P4** generalisation with real producers and golden-50 · **P5** app and libraries · **P6** optional ML second opinion · **P7** OCR for scans · **P8** release and docs. Next: **P0.1 Git hygiene**. Progress tracker: §5. |
+| 1405-08-09 | [Kelk 2.0 → 2.x Redesign Plan](../.claude/plans/Kelk-Redesign.md) | Zarrabi | **Status:** accepted by the project owner on 1405-08-09; execution started — P0.0 and P0.1 approved 1405-08-10. Structural changes, not a rewrite: the rule-based PDF importer and its lab are the asset, and the weaknesses found in the review are fixable in place, each step gated by the lab. 8 phases / 31 sub-phases, ≈ 76 working days plus the owner's review — **P0** stabilise and commit · **P1** verified bugs · **P2** test-net completeness · **P3** importer structure, calibration, degradation · **P4** generalisation with real producers and golden-50 · **P5** app and libraries · **P6** optional ML second opinion · **P7** OCR for scans · **P8** release and docs. P0.1 Git hygiene approved 1405-08-10 (LF everywhere, lab PDFs kept as ordinary `binary` files). Next: **P0.2 Baseline rebuilt, gate guarded**. Progress tracker: §5. |
 
 </details>
 
@@ -546,9 +553,15 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-10 | 2.0-rc1 | Zarrabi | 11 | Portability: rule that everything the work depends on is committed to the repository, the checklist rule moved into `CLAUDE.md`, commit attribution turned off in `.claude/settings.json`, `Claude-Session` lines stripped by the commit hook, the contributor recognised from the GitHub noreply address, machine prerequisites listed in Getting Started. |
 | 1405-08-10 | 2.0-rc1 | Zarrabi | 3 | Research of the current documentation on cloud and Desktop sessions: which parts of the repository setup (`CLAUDE.md`, hooks, skills, settings) apply there and what differs. |
 | 1405-08-10 | 2.0-rc1 | Zarrabi | 5 | Reviewing the portability changes and the findings on cloud sessions. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 4 | Checking the merge of PR #2 into `main` and writing the brief for continuing the plan in a new session. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 33 | P0.1 Git hygiene: checklist; `.gitattributes` (`* text=auto eol=lf`, `binary` rules), `.gitignore` (`tests/pdf-lab/real/`, `private/`, `node_modules/`), `.editorconfig` matched to the tree's style; the CRLF license file renormalised; working tree converted to LF and the corpus re-run (Markdown byte-identical); Known Issues, Windows lab note and refresh step updated; report `docs/reports/P0.1-git-hygiene.md`; PDF storage decision applied to the plan, tracker and lab README. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 14 | Lab setup on Windows: Playwright 1.56.1 (the CI pin) and pdf-lib installed outside the repository, the stalled Chromium headless-shell install completed by hand; corpus run before the change: 144 files, 95.73 / RTL 90.08, equal to the baseline. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 1 | Comparison of lab-PDF storage options (ordinary files, Git LFS, release asset): pack size, churn, CI and contributor cost, LFS quota; recommendation and revisit thresholds. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 2 | Fresh-clone acceptance test of P0.1: two clone variants checked for status, line endings, binary attributes and ignores; corpus run equal to the baseline in both. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 7 | Reviewing the P0.1 checklist and report, the Playwright question, and approving P0.1 with the PDF storage decision. |
 
 <!-- generated:totals -->
-**Entries: 24 · Total: 347 min (5.78 hours) — Zarrabi 347 min (17 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 30 · Total: 408 min (6.80 hours) — Zarrabi 408 min (23 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
