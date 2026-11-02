@@ -591,9 +591,10 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 5 | `eslint.config.js`: file groups, explicit readonly cross-file globals, rule options with reasons; 0 errors, 109 warnings; the duplicate `hasMix` in `lib/BidiCore.js` removed. |
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 12 | `.prettierrc` / `.prettierignore` measured against the existing style (no reformatting); `pdf-lab.yml` on `npm ci` with lockfile-keyed caches; new `tooling.yml` (lint and version check on every push and PR); lab README install section; actionlint clean. |
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 5 | Review of the P0.4 diff: `npm ci` on Linux with npm 10 and 11, base-run module lookup, 15 mutations of the version check, load order of the version sync, the `hasMix` removal, lint coverage. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 9 | P0.4 first CI runs checked and recorded: `tooling` 41421784781 and `pdf-lab` 41421784696 green on `npm ci` (lint 0 errors, 24 version checks, Chromium 141.0.7390.37 from the lockfile, fuzz compared +0.0); the `minimatch` advisory in ESLint's dependencies assessed; a hand-over prompt for the next session. |
 
 <!-- generated:totals -->
-**Entries: 53 · Total: 620 min (10.33 hours) — Zarrabi 620 min (46 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 54 · Total: 629 min (10.48 hours) — Zarrabi 629 min (47 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
