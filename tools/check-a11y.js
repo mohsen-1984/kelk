@@ -21,6 +21,10 @@
  *   node of the rule>, "reason": …, "fixedIn": <plan phase> }. An entry that matches nothing is reported (stale),
  *   not an error.
  *   `minor` and `moderate` violations are printed and never fail the check.
+ * - A run also fails when it did not check the intended page: a script error on the page, <html lang dir
+ *   data-theme> not the run's language / direction / theme, the preview not finished (web fonts in, every formula
+ *   typeset — waited for, not a fixed sleep) or not the sample document (MIN_PREVIEW headings, characters,
+ *   formulas).
  */
 /* global window, document, axe -- the functions passed to the page run there */
 'use strict';
@@ -38,6 +42,9 @@ const ALLOW_FILE = path.join(__dirname, 'a11y-allow.json');
 const LANGS = ['fa', 'en', 'ar'];
 const THEMES = ['light', 'dark'];
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
+const DIRS = { fa: 'rtl', en: 'ltr', ar: 'rtl' };
+// the first visit shows the sample document (docs/about-kelk-and-samples.js): far more than this in each language
+const MIN_PREVIEW = { headings: 10, chars: 10000, formulas: 10 };
 const FAILING = { serious: true, critical: true };
 
 const TYPES = {
@@ -104,11 +111,43 @@ async function check(browser, url, lang, theme, allow) {
         null,
         { timeout: 30000 }
     );
-    await page.waitForTimeout(1500); // the sample document, its formulas and the icons
+    // ready = the web fonts are in (their arrival re-renders the preview), then every formula of the preview is
+    // typeset (an <svg>/<math> in each .kelk-math, or its error text) — twice, 400 ms apart, so a re-render that
+    // started in between is waited for too. A page that never gets there is a failure (state.ready false).
+    let ready = true;
+    try {
+        await page.evaluate(function () {
+            return document.fonts && document.fonts.ready;
+        });
+        for (let i = 0; i < 2; i++) {
+            await page.waitForFunction(
+                function () {
+                    const box = document.getElementById('preview');
+                    return Array.prototype.every.call(box.querySelectorAll('.kelk-math'), function (m) {
+                        return m.querySelector('svg, math') || m.classList.contains('kelk-math-error');
+                    });
+                },
+                null,
+                { timeout: 30000 }
+            );
+            await page.waitForTimeout(400);
+        }
+    } catch (e) {
+        ready = false;
+    }
     const state = await page.evaluate(function () {
         const r = document.documentElement;
-        return { lang: r.lang, dir: r.dir, theme: r.getAttribute('data-theme') || 'light' };
+        const box = document.getElementById('preview');
+        return {
+            lang: r.lang,
+            dir: r.dir,
+            theme: r.getAttribute('data-theme') || 'light',
+            headings: box.querySelectorAll('h1, h2, h3').length,
+            chars: box.textContent.replace(/\s+/g, '').length,
+            formulas: box.querySelectorAll('.kelk-math svg, .kelk-math math').length
+        };
     });
+    state.ready = ready;
     await page.evaluate(AXE_SOURCE);
     // the page with every settings group expanded, then each dialog open on its own (a node of a dialog is printed
     // as "[#id] selector")
@@ -232,10 +271,41 @@ async function check(browser, url, lang, theme, allow) {
                 lines.forEach(function (l) {
                     console.log(l);
                 });
-                if (r.state.lang !== lang) {
-                    console.log('    FAIL the page did not open in ' + lang);
-                    failing++;
-                }
+                // the run checked the page it meant to: language, direction, theme, the sample document drawn
+                // with its formulas, no script error
+                const s = r.state;
+                const bad = [];
+                if (s.lang !== lang) bad.push('lang ' + s.lang + ', not ' + lang);
+                if (s.dir !== DIRS[lang]) bad.push('dir ' + s.dir + ', not ' + DIRS[lang]);
+                if (s.theme !== theme) bad.push('theme ' + s.theme + ', not ' + theme);
+                if (!s.ready) bad.push('the preview did not finish (formulas not typeset within 30 s)');
+                if (
+                    s.headings < MIN_PREVIEW.headings ||
+                    s.chars < MIN_PREVIEW.chars ||
+                    s.formulas < MIN_PREVIEW.formulas
+                )
+                    bad.push(
+                        'the preview is not the sample document (' +
+                            s.headings +
+                            ' headings, ' +
+                            s.chars +
+                            ' characters, ' +
+                            s.formulas +
+                            ' formulas; at least ' +
+                            MIN_PREVIEW.headings +
+                            ', ' +
+                            MIN_PREVIEW.chars +
+                            ', ' +
+                            MIN_PREVIEW.formulas +
+                            ')'
+                    );
+                r.errors.forEach(function (e) {
+                    bad.push('page error: ' + e);
+                });
+                bad.forEach(function (b) {
+                    console.log('    FAIL ' + b);
+                });
+                failing += bad.length;
             }
         }
     } finally {
@@ -249,7 +319,10 @@ async function check(browser, url, lang, theme, allow) {
     console.log(
         '\n' +
             (failing
-                ? 'FAIL: ' + failing + ' serious/critical node(s) not in tools/a11y-allow.json'
+                ? 'FAIL: ' +
+                  failing +
+                  ' problem(s): serious/critical nodes not in tools/a11y-allow.json, or a run ' +
+                  'that did not check the intended page (FAIL lines above)'
                 : 'ok: no serious/critical violation outside tools/a11y-allow.json')
     );
     if (failing) process.exitCode = 1;

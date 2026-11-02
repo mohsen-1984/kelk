@@ -35,3 +35,17 @@ test('an empty anchor target (<a id>) is kept', function () {
   const root = view('<p>متن <a id="here"></a>GitHub Flavored Markdown.</p>');
   assert.ok(root.querySelector('a#here'), root.innerHTML);
 });
+
+test('a split link with an id: the id stays on exactly one element, the visible link; no empty link', function () {
+  const root = view('<p>متن فارسی با پیوند <a id="ref1" href="https://www.w3.org/">Example Link</a>.</p>');
+  const links = Array.from(root.querySelectorAll('a'));
+  assert.equal(links.length, 1, root.innerHTML);
+  assert.equal(root.querySelectorAll('[id="ref1"]').length, 1, root.innerHTML);
+  assert.equal(links[0].id, 'ref1');
+  assert.equal(links[0].textContent, 'Example Link');
+});
+
+test('an empty <a id href> that is not a split shell stays', function () {
+  const root = view('<p>متن <a id="top" href="#x"></a> GitHub Flavored Markdown.</p>');
+  assert.ok(root.querySelector('a#top'), root.innerHTML);
+});
