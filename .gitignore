@@ -1,3 +1,10 @@
 # Claude Code: personal permissions and machine-local state
 .claude/settings.local.json
 __pycache__/
+
+# Private real-world PDFs and other private material: never committed
+tests/pdf-lab/real/
+private/
+
+# Dev tooling installs (plan P0.4 adds package.json)
+node_modules/

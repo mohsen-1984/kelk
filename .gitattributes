@@ -1,4 +1,30 @@
+# Text files are stored with LF and checked out with LF on every platform (core.autocrlf is overridden).
+# A CRLF corpus .md would shift the lab's scores.
+* text=auto eol=lf
+
 # Scripts run by git and Claude Code hooks must keep LF line endings on every platform.
 .githooks/* text eol=lf
 *.sh text eol=lf
 *.mjs text eol=lf
+
+# Binary: never normalised or diffed as text.
+*.pdf binary
+*.zip binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.pfb binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.wasm binary
+*.bcmap binary
+*.docx binary
+*.doc binary
+*.xlsx binary
+*.pptx binary
+*.odt binary
