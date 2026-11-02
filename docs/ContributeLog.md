@@ -641,9 +641,10 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 30 | Review of the P1.4 diff: the nine removed keys searched across the tree, a browser sweep of fa / en / ar with every pane, dialog and toast, `boot.js` against stored, broken and old profiles, the date locale received by every exporter, and the checker's blind spots probed. |
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 12 | P1.4 review fixes: `check-i18n` skips comments, reads template keys and fails non-literal keys outside a documented allow-list (PDF note keys written out in full); placeholder messages per language; `boot.js` and `i18n.apply` safe against inherited names, unknown themes and old profiles; 10 tests; report §4. |
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 6 | P1.3 merged into `redesign/P1.4`; the P1.4 review fixes joined; unit tests 75 / 75, check-i18n, lint and the CSP browser check; Testing rows; P1.4 pushed with its pull request. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 20 | P2.1 RTL fuzz corpus: `make-fuzz.js` generator 4 — `fa-article`, `fa-report`, `ar-article` and a new `fa-mixed` document, dimensions `dir`, RTL fonts (Vazirmatn, Sahel, Noto Naskh Arabic), `digits`, `tracking`; 44 % RTL in each split; `run-fuzz.js` per-direction and `rtl` means; the gate keeps generators apart; report `docs/reports/P2.1-rtl-fuzz.md`. |
 
 <!-- generated:totals -->
-**Entries: 83 · Total: 963 min (16.05 hours) — Zarrabi 963 min (76 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 84 · Total: 983 min (16.38 hours) — Zarrabi 983 min (77 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---

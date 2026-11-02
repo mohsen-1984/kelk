@@ -21,7 +21,8 @@
 //   links   the links found with their words and address (run-import.js) dropping, per file
 //   markup  inline markup the Markdown lost (markup.js: bold, italic, strike, code a CommonMark parser no longer
 //           finds) rising — on any corpus file, or summed over a fuzz split. A count; it should be 0
-//   fuzz    a crash, or the split's mean total dropping more than TOL_MEAN. Means only — per file
+//   fuzz    a crash, or the split's mean total dropping more than TOL_MEAN — and so each direction's (ltr, rtl) mean
+//           total and the rtl column's mean over the right-to-left files (an old baseline without them: a note). Means only — per file
 //           would read held-out files one by one, and per style value the groups are too small to
 //           tell a change from noise (fewer than 15 files in most)
 //   meta    a crash, or a transform's mean total dropping more than TOL_MEAN (TOL_HARD for the 'hard' ones,
@@ -29,10 +30,10 @@
 // A drop in one metric while the total holds (headings −3, tables +3) is printed, not failed: it is
 // worth a look, not a block.
 //
-// Stored fuzz scores are compared only when the PDFs came from the same environment (Chromium,
-// wkhtmltopdf, fonts — the manifest's env): another browser draws other PDFs, and its scores say nothing
-// about the importer. Then the gate says so and skips the fuzz part; --against (two importers on the
-// very same PDFs) needs no such care — that is what CI uses.
+// Stored fuzz scores are compared only when the PDFs came from the same generator and environment
+// (make-fuzz.js GENERATOR, Chromium, wkhtmltopdf, fonts — the manifest's env): another generator or browser
+// draws other PDFs, and its scores say nothing about the importer. Then the gate says so and skips the fuzz
+// part; --against (two importers on the very same PDFs) needs no such care — that is what CI uses.
 const fs = require('fs'), path = require('path');
 const { LAB, OUT, labPdfs } = require('./env.js');
 
@@ -69,8 +70,11 @@ function load(dir) {
   ['dev', 'heldout'].forEach((split) => {
     const f = read(path.join(dir, 'fuzz-' + split, '_scores.json'));
     if (!f) return;
-    const mean = {}; METRICS.forEach((k) => { if (typeof f.summary.mean[k] === 'number') mean[k] = +f.summary.mean[k].toFixed(4); });
-    run.fuzz[split] = { n: f.summary.n, errors: f.summary.errors, env: f.summary.env, mean, markup: f.summary.markup || 0,
+    const means = (m) => { const o = {}; METRICS.concat(CORPUS_EXTRA).forEach((k) => { if (m && typeof m[k] === 'number') o[k] = +m[k].toFixed(4); }); return o; };
+    const mean = means(f.summary.mean);
+    // per direction (generator 4: ltr / rtl files), each with its mean total and, for rtl, the rtl column and its parts
+    const byDir = f.summary.byDir ? Object.fromEntries(Object.entries(f.summary.byDir).map(([d, x]) => [d, { n: x.n, mean: means(x.mean) }])) : undefined;
+    run.fuzz[split] = { n: f.summary.n, errors: f.summary.errors, env: f.summary.env, mean, byDir, markup: f.summary.markup || 0,
                         // per file, for --against on dev only (never printed for held-out)
                         files: split === 'dev' ? Object.fromEntries(f.rows.map((r) => [r.name, +(r.total || 0).toFixed(4)])) : undefined };
   });
@@ -131,12 +135,25 @@ Object.keys(cur.corpus).forEach((n) => { if (cur.corpus[n].error && !(base && ba
 } });
 
 // ── the fuzz splits: means only ────────────────────────────────────────
-const fuzzRows = [];
+const fuzzRows = [], dirRows = [];
 ['dev', 'heldout'].forEach((split) => {
   const c = cur.fuzz[split], b = base && base.fuzz && base.fuzz[split];
   if (!c) { notes.push('fuzz/' + split + ': not run (scripts/run-fuzz.js ' + split + ')'); return; }
   if (c.errors) fails.push('fuzz/' + split + ': ' + c.errors + ' PDF(s) crash');
   if (!b) { fuzzRows.push([split, null, c.mean]); return; }
+  // another generator (make-fuzz.js GENERATOR: other documents, other dimensions) draws other PDFs from the same
+  // seeds, whatever the browser: its means are of another set — said first, as it is the usual cause after a lab change
+  const bg = (b.env || {}).generator, cg = (c.env || {}).generator;
+  // with --against the two runs read the same fuzz folder, so the same manifest; another env there means two sets
+  if (against && !sameEnv(b.env, c.env)) {
+    notes.push('fuzz/' + split + ': the two runs read different fuzz PDFs (env or generator ' + (bg === undefined ? '?' : bg) + ' → ' + (cg === undefined ? '?' : cg) + ') — not compared');
+    fuzzRows.push([split, null, c.mean]); return;
+  }
+  if (!against && bg !== cg) {
+    notes.push('fuzz/' + split + ': drawn by generator ' + (cg === undefined ? '?' : cg) + ', the baseline\'s by generator ' + (bg === undefined ? '?' : bg) +
+      ' — another set of PDFs, not compared; the baseline\'s fuzz part is rebuilt with --update (on the CI runner: a manual run with "baseline")');
+    fuzzRows.push([split, null, c.mean]); return;
+  }
   if (!against && !sameEnv(b.env, c.env)) {
     notes.push('fuzz/' + split + ': its PDFs come from another environment than the baseline\'s (Chromium ' +
       ((b.env || {}).chromium || '?') + ' → ' + ((c.env || {}).chromium || '?') + ', or wkhtmltopdf / fonts) — not compared; ' +
@@ -148,6 +165,24 @@ const fuzzRows = [];
   const d = c.mean.total - b.mean.total;
   if (d < -TOL_MEAN) fails.push('fuzz/' + split + ': mean ' + p1(b.mean.total) + ' → ' + p1(c.mean.total));
   if ((c.markup || 0) > (b.markup || 0)) fails.push('fuzz/' + split + ': inline markup lost in the Markdown ' + (b.markup || 0) + ' → ' + c.markup);
+  // per direction and the rtl column: a loss on the right-to-left files alone barely moves the split's mean (44 of 100
+  // files: 2 points there ≈ 0.9 on the mean), so each direction's mean total and the rtl column are held on their own
+  if (c.byDir && !b.byDir) notes.push('fuzz/' + split + ': the baseline has no per-direction means (written before they were stored) — ltr / rtl and the rtl column not gated; --update writes them');
+  else if (c.byDir) {
+    Object.entries(c.byDir).forEach(([dir, cd]) => {
+      const bd = b.byDir[dir];
+      if (!bd) { notes.push('fuzz/' + split + ' ' + dir + ': not in the baseline — not gated'); return; }
+      dirRows.push([split, dir, bd, cd]);
+      if (bd.n !== cd.n) notes.push('fuzz/' + split + ' ' + dir + ': ' + bd.n + ' PDFs then, ' + cd.n + ' now');
+      if (typeof bd.mean.total === 'number' && cd.mean.total - bd.mean.total < -TOL_MEAN) fails.push('fuzz/' + split + ' ' + dir + ': mean ' + p1(bd.mean.total) + ' → ' + p1(cd.mean.total));
+      if (typeof bd.mean.rtl === 'number' && typeof cd.mean.rtl === 'number') {
+        if (cd.mean.rtl - bd.mean.rtl < -TOL_MEAN) fails.push('fuzz/' + split + ' ' + dir + ': rtl column ' + p1(bd.mean.rtl) + ' → ' + p1(cd.mean.rtl));
+        // its parts: a note, as the corpus's metrics are
+        const why = CORPUS_EXTRA.slice(1).filter((k) => typeof bd.mean[k] === 'number' && typeof cd.mean[k] === 'number' && cd.mean[k] - bd.mean[k] < -0.02);
+        if (why.length) notes.push('fuzz/' + split + ' ' + dir + ', rtl parts down: ' + why.map((k) => k + ' ' + p1(bd.mean[k]) + '→' + p1(cd.mean[k])).join(', '));
+      }
+    });
+  }
   // dev, two runs on the same PDFs: which files moved most (held-out stays a mean)
   if (split === 'dev' && b.files && c.files) {
     const moved = Object.keys(c.files).filter((n) => n in b.files).map((n) => [n, c.files[n] - b.files[n]]).filter((x) => Math.abs(x[1]) > 0.05)
@@ -182,6 +217,12 @@ if (base && base.corpus) console.log('corpus mean'.padEnd(22), ''.padStart(6 * 7
 fuzzRows.forEach(([split, b, c]) => {
   console.log(('fuzz/' + split).padEnd(22), METRICS.map((k) => p1(c[k]).padStart(6)).join(''));
   if (b) console.log('  change'.padEnd(22), METRICS.map((k) => (typeof b[k] === 'number' && typeof c[k] === 'number' ? d1(c[k] - b[k]) : '-').padStart(6)).join(''));
+  // per direction: the mean total and the rtl column, with their change where the baseline has them
+  Object.entries(cur.fuzz[split].byDir || {}).forEach(([dir, cd]) => {
+    const row = dirRows.find((x) => x[0] === split && x[1] === dir), bd = row && row[2];
+    const ch = (k) => bd && typeof bd.mean[k] === 'number' && typeof cd.mean[k] === 'number' ? ' (' + d1(cd.mean[k] - bd.mean[k]) + ')' : '';
+    console.log(('  ' + dir + ' (' + cd.n + ')').padEnd(22), 'total ' + p1(cd.mean.total) + ch('total') + (typeof cd.mean.rtl === 'number' ? ' · rtl column ' + p1(cd.mean.rtl) + ch('rtl') : ''));
+  });
 });
 if (metaRows.length) {
   console.log('\nmeta (transform: same as the seed · mean total · Δ from the seeds)');
