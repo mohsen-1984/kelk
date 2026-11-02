@@ -528,8 +528,9 @@ CORPUS.push({ name: 'code-in-list-item', md: '- مورد ششم:\n  ```javascrip
 (function () {
   var L = function (cp) { return String.fromCharCode(cp); }, BEH = L(0x0628), NL = String.fromCharCode(10);
   var positions = function (cp) { var x = L(cp); return [x, BEH + x, x + BEH, BEH + x + BEH].join(' '); };
-  // one paragraph per letter, no Latin label: BidiCore does not count ؠ ػ-ؿ ٮ ٯ as strong RTL letters, so a lone
-  // one next to Latin text is placed as a neutral (a BidiCore gap, not shaping; see the B1 note in the report)
+  // one paragraph per letter, no Latin label: each letter's shapes are checked alone (ؠ ػ-ؿ ٮ ٯ are strong RTL letters
+  // in BidiCore since P1.3 — they had been placed as neutrals next to Latin text — but a label would still test the
+  // bidi run order, not the shaping)
   var lines = function (cps) { return cps.map(positions).join(NL + NL); };
   var amk = L(0x0649);
   CORPUS.push({ name: 'shaping-alef-maksura', exact: true, md: '# ' + amk + BEH + amk + NL + NL + lines([0x0649]) + NL + NL +
@@ -543,7 +544,8 @@ CORPUS.push({ name: 'code-in-list-item', md: '- مورد ششم:\n  ```javascrip
 // pdf.js) asserts that every body marker of a column starts at the same x as the others of that
 // column — the left edge in a left-to-right table, the right edge in a right-to-left one — so text
 // sits in the column its lines are drawn for. The tall-row cases assert the row is split across
-// pages: more than one page, every marker found, nothing below or above a page.
+// pages: more than one page, every marker found, no text in a page's top or bottom margin, no page
+// left half empty before the last.
 (function () {
   /** markers (cell text) → expected column; side: the edge cells start at ('left' | 'right') */
   function columnCheck(side, cols) {
@@ -570,16 +572,25 @@ CORPUS.push({ name: 'code-in-list-item', md: '- مورد ششم:\n  ```javascrip
       return errs;
     };
   }
-  /** a table split across pages: more than one page, every marker found, all text inside the page */
+  /**
+   * a table split across pages: more than one page, every marker found, all text inside the page's
+   * margins (no baseline in the 1.8 cm bottom / top margin, 45 pt allowing for descenders), and every
+   * page but the last filled down to its last 100 pt (a split never leaves half a page empty)
+   */
   function splitCheck(markers) {
+    const M = 45, FULL = 100 + 51;
     return function (pages) {
       const errs = [], seen = {};
       if (pages.length < 2) errs.push('one page: the tall row was not split');
       pages.forEach(function (p, i) {
+        let low = p.height;
         p.items.forEach(function (it) {
           seen[it.str.trim()] = true;
-          if (it.str.trim() && (it.y < 0 || it.y > p.height)) errs.push('page ' + (i + 1) + ': "' + it.str.slice(0, 20) + '" outside the page (y ' + it.y.toFixed(0) + ')');
+          if (!it.str.trim()) return;
+          low = Math.min(low, it.y);
+          if (it.y < M || it.y > p.height - M) errs.push('page ' + (i + 1) + ': "' + it.str.slice(0, 20) + '" in the margin or off the page (y ' + it.y.toFixed(0) + ')');
         });
+        if (i < pages.length - 1 && low > FULL) errs.push('page ' + (i + 1) + ' ends early (lowest text at y ' + low.toFixed(0) + ')');
       });
       markers.forEach(function (m) { if (!seen[m]) errs.push(m + ' not found'); });
       return errs.slice(0, 6);
@@ -653,4 +664,29 @@ CORPUS.push({ name: 'code-in-list-item', md: '- مورد ششم:\n  ```javascrip
 <tr><td>پایان</td><td>آخر</td></tr>
 </tbody>
 </table>`, pdfCheck: splitCheck([]) });
+
+  // a tall row whose cells have different line pitches (text in one column, a 17 px image on every line
+  // of the other): no break falls between lines of both, so each cell breaks at its own last fitting line.
+  // The picture column holds no words between its first and last line, so the round trip's word order
+  // reads the text column alone (two worded columns split over pages read back page by page).
+  const dot = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+  CORPUS.push({ name: 'table-tall-misaligned', html: `<p>A tall row whose columns have different line heights.</p>
+<table>
+<thead><tr><th>Text</th><th>Pictures</th></tr></thead>
+<tbody>
+<tr><td>${many(80, 'plain')}</td><td>imgtop<br>${Array.from({ length: 60 }, function () { return '<img src="' + dot + '" width="10" height="17" alt="">'; }).join('<br>')}<br>imgend</td></tr>
+<tr><td>after</td><td>z</td></tr>
+</tbody>
+</table>`, pdfCheck: splitCheck(['imgtop', 'imgend', 'after']) });
+
+  // rowspan="0": the cell spans to the end of its section (HTML), so the cells below it move along
+  CORPUS.push({ name: 'table-rowspan-zero', html: `<p>A cell spanning to the end of its section.</p>
+<table>
+<thead><tr><th>Left</th><th>Right</th></tr></thead>
+<tbody>
+<tr><td rowspan="0">zz</td><td>r1</td></tr>
+<tr><td>r2</td></tr>
+<tr><td>r3</td></tr>
+</tbody>
+</table>`, pdfCheck: columnCheck('left', { zz: 0, r1: 1, r2: 1, r3: 1 }) });
 })();
