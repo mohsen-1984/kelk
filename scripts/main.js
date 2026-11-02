@@ -43,26 +43,10 @@
         }
     }
 
-    /**
-     * First visit: the language from the browser's locale. Any Persian entry
-     * in the user's language list (fa, fa-IR, fa-AF, prs) → Persian; an English
-     * browser with an Iranian or Afghan time zone (common: an English UI on a
-     * Persian speaker's system) → Persian too; otherwise English.
-     */
-    function firstLanguage() {
-        const langs = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''])
-            .map(function (l) { return String(l).toLowerCase(); });
-        if (langs.some(function (l) { return /^(fa|prs)\b/.test(l); })) return 'fa';
-        if (langs.some(function (l) { return /^ar\b/.test(l); })) return 'ar';
-        let tz = '';
-        try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { /* none */ }
-        if (/^Asia\/(Tehran|Kabul)$/.test(tz)) return 'fa';
-        return langs[0] ? 'en' : 'fa';
-    }
-
     function start() {
         const u = K.store.ui();
-        const lang = u.lang || firstLanguage();
+        // first visit: the browser's language (scripts/boot.js, which already set <html lang dir> and the theme)
+        const lang = u.lang || K.boot.firstLanguage();
         K.i18n.apply(lang);
         K.ui.theme(u.theme || '');
         K.ui.layout(u.layout);
@@ -83,6 +67,7 @@
         const langButtons = function () {
             const box = K.$('#lang-switch');
             K.$$('button', box).forEach(function (b) { b.remove(); });
+            box.setAttribute('aria-label', K.i18n.t('languageGroup'));
             Object.keys(K.i18n.languages).forEach(function (code) {
                 if (code === K.i18n.lang) return;
                 const b = document.createElement('button');
@@ -122,6 +107,7 @@
             K.store.setUi('lang', next);
             K.i18n.apply(next);
             langButtons();
+            K.editor.stats();                                // the size's unit
             K.ui.layout(K.store.getUi('layout'));
             K.settings.showLogo();
             K.settings.fontPack();

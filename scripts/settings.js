@@ -239,7 +239,7 @@
             if (logo) {
                 const img = document.createElement('img');
                 img.src = logo;
-                img.alt = 'logo';
+                img.alt = K.i18n.t('logoAlt');
                 thumb.appendChild(img);
             } else {
                 thumb.textContent = K.i18n.t('logoNone');
