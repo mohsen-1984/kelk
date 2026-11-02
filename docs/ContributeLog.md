@@ -642,9 +642,11 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 12 | P1.4 review fixes: `check-i18n` skips comments, reads template keys and fails non-literal keys outside a documented allow-list (PDF note keys written out in full); placeholder messages per language; `boot.js` and `i18n.apply` safe against inherited names, unknown themes and old profiles; 10 tests; report §4. |
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 6 | P1.3 merged into `redesign/P1.4`; the P1.4 review fixes joined; unit tests 75 / 75, check-i18n, lint and the CSP browser check; Testing rows; P1.4 pushed with its pull request. |
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 20 | P2.1 RTL fuzz corpus: `make-fuzz.js` generator 4 — `fa-article`, `fa-report`, `ar-article` and a new `fa-mixed` document, dimensions `dir`, RTL fonts (Vazirmatn, Sahel, Noto Naskh Arabic), `digits`, `tracking`; 44 % RTL in each split; `run-fuzz.js` per-direction and `rtl` means; the gate keeps generators apart; report `docs/reports/P2.1-rtl-fuzz.md`. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 52 | P2.2 Metamorphic net extended: 24 seeds (six RTL added) × 20 transforms (`fontSubst`, `letterSpace`, `pageSize`, `hfInject`, `rotate180`, `cropbox`, `renderMode`, `stamp` added; rotations as turned content made upright by `/Rotate`, slug text outside the CropBox); "same" transforms asserted byte-identical in `run-meta.js` with a per-file allow-list carrying floors; reference-free relations; the gate versioned per transform; `make-meta.js` failing on a file it cannot make; qpdf pinned; review findings applied; report `docs/reports/P2.2-meta-net.md`. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 8 | Review of the P2.2 diff: the transforms against what they claim, the byte-identical assertion and its allow-list, the relations, the gate's notes against real regressions, determinism and the CI run; the report's figures reproduced. |
 
 <!-- generated:totals -->
-**Entries: 84 · Total: 983 min (16.38 hours) — Zarrabi 983 min (77 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 86 · Total: 1043 min (17.38 hours) — Zarrabi 1043 min (79 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
