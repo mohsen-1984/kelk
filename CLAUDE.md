@@ -43,8 +43,8 @@ Machine prerequisites are listed in `docs/ContributeLog.md` → Getting Started 
 - Every change to the importer (`lib/PdfImporter.js`, `lib/pdfimport/`) runs the lab: `run-import.js`,
   `run-fuzz.js dev` and `heldout`, `run-meta.js`, then `gate.js` (all in `tests/pdf-lab/scripts/`).
 - Held-out results are read as means only. Never run `gate.js --update` after a filtered run.
-- On Windows, install Playwright outside the repo, set `NODE_TOOLS` to its `node_modules` and `LAB_OUT` to a folder
-  outside the repo.
+- Install the dev tools with `npm ci` at the root (or set `NODE_TOOLS` to a `node_modules` outside the repo); set
+  `LAB_OUT` to a folder outside the repo.
 
 ## docs/ContributeLog.md
 
