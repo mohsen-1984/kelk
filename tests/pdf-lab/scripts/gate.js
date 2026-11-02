@@ -6,7 +6,8 @@
 //                                            the run lacks lab PDFs, or with --against)
 //   node scripts/gate.js --update --partial  merge this run's files into baseline.json (a filtered run), the rest kept
 //   node scripts/gate.js --baseline FILE ... read and write FILE instead of baseline.json (a candidate baseline)
-// A fuzz split or the meta part this run lacks (no wkhtmltopdf / qpdf here) is kept from the old baseline.
+// A fuzz split or the meta part this run lacks (no wkhtmltopdf / qpdf here) is kept from the old baseline; so is a
+// meta transform this run lacks, when the old baseline holds it with its own records (generator 3 on).
 //
 // What it reads — the results of the runs, it runs nothing itself:
 //   out/_scores.json                         run-import.js (the corpus)
@@ -25,8 +26,12 @@
 //           total and the rtl column's mean over the right-to-left files (an old baseline without them: a note). Means only — per file
 //           would read held-out files one by one, and per style value the groups are too small to
 //           tell a change from noise (fewer than 15 files in most)
-//   meta    a crash, or a transform's mean total dropping more than TOL_MEAN (TOL_HARD for the 'hard' ones,
-//           which take information away and swing more); fewer files read "same" as their seed is a note
+//   meta    a crash; a file of a "same" transform not byte-identical to its reference outside run-meta.js KNOWN (or
+//           listed but under its floor, or crashing); a "same" file the compared side has and this run lacks;
+//           or a transform's mean total, over the seeds both runs have, dropping more than TOL_MEAN (TOL_HARD
+//           for the 'hard' ones, which take information away and swing more) — compared only with a baseline
+//           entry of the same transform version and env (a new or changed transform is a note); fewer files
+//           read "same" as their reference, or a reference-free relation broken more often, is a note
 // A drop in one metric while the total holds (headings −3, tables +3) is printed, not failed: it is
 // worth a look, not a block.
 //
@@ -78,9 +83,16 @@ function load(dir) {
                         // per file, for --against on dev only (never printed for held-out)
                         files: split === 'dev' ? Object.fromEntries(f.rows.map((r) => [r.name, +(r.total || 0).toFixed(4)])) : undefined };
   });
+  // meta, per transform: its own version (v), the env its files depend on, the total of every seed (the means of
+  // two runs are compared over the seeds both have), the seeds read exactly, the "same" files outside the known
+  // exceptions (run-meta.js), the reference-free relation's count
   const meta = read(path.join(dir, 'meta', '_scores.json'));
   if (meta) run.meta = { generator: meta.generator, env: meta.env, transforms: Object.fromEntries(Object.entries(meta.summary).map(([t, x]) =>
-    [t, { kind: x.kind, n: x.n, same: x.same, errors: x.errors, total: +x.total.toFixed(4), delta: +x.delta.toFixed(4) }])) };
+    [t, { kind: x.kind, via: x.via, v: x.v, env: x.env, n: x.n, same: x.same, errors: x.errors, unexpected: x.unexpected || 0, relation: x.relation,
+          // (the mean of the stored per-seed totals, as the comparison takes it: both figures rounded alike)
+          total: x.files ? Object.values(x.files).reduce((a, v) => a + v, 0) / Object.values(x.files).length : +x.total.toFixed(4),
+          delta: +x.delta.toFixed(4), files: x.files,
+          exact: (meta.rows || []).filter((r) => r.transform === t && r.same).map((r) => r.seed) }])) };
   return run;
 }
 const sameEnv = (a, b) => JSON.stringify(a || null) === JSON.stringify(b || null);
@@ -192,21 +204,54 @@ const fuzzRows = [], dirRows = [];
 });
 
 // ── the metamorphic net: per transform ─────────────────────────────────
+// Each transform is compared on its own, and only with a baseline entry that drew the same files: the same
+// transform version (v) and the same env for what it depends on (pdf-lib; qpdf; Chromium and the platform for the
+// generator side) — against another run (--against: the very same PDFs) the env needs no check. The means are taken
+// over the seeds both have, so a seed added to SEEDS does not read as a change. A transform the baseline lacks (new),
+// or one it holds without these records (written before generator 3), is a note: not compared, never a failure.
 const metaRows = [];
 if (!cur.meta) notes.push('meta: not run (scripts/make-meta.js, then run-meta.js)');
 else {
-  const bm = base && base.meta;
-  const comparable = bm && (against || (bm.generator === cur.meta.generator && sameEnv(bm.env, cur.meta.env)));
-  if (bm && !comparable) notes.push('meta: made by another generator or qpdf / pdf-lib than the baseline\'s — not compared');
+  const bm = base && base.meta, uncompared = {}, other = against ? 'the other run' : BNAME;
+  if (base && !bm) notes.push('meta: ' + other + ' has no meta results — not compared');
+  const skip = (why, t) => { (uncompared[why] = uncompared[why] || []).push(t); };
+  const mean = (files, seeds) => seeds.reduce((a, s) => a + files[s], 0) / seeds.length;
   Object.entries(cur.meta.transforms).forEach(([t, c]) => {
-    const b = comparable && bm.transforms[t];
-    metaRows.push([t, b, c]);
-    if (c.errors && !(b && b.errors >= c.errors)) fails.push('meta/' + t + ': ' + c.errors + ' PDF(s) crash');
-    if (!b) return;
+    const b0 = bm && bm.transforms && bm.transforms[t];
+    let cmp = null;
+    if (!bm) { /* nothing to compare with: noted */ }
+    else if (!b0) skip('new transform, not in ' + other, t);
+    else if (!b0.files || b0.v === undefined) skip(other + ' holds it without per-transform records (version, env, per-seed totals: generator ' + (bm.generator || '?') + ')', t);
+    else if (!against && b0.v !== c.v) skip('transform changed (v' + b0.v + ' → v' + c.v + ')', t);
+    else if (!against && !sameEnv(b0.env, c.env)) skip('drawn with another ' + Object.keys(c.env || {}).join(' / ') + ' (' + JSON.stringify(b0.env) + ' → ' + JSON.stringify(c.env) + ')', t);
+    else {
+      const both = Object.keys(c.files || {}).filter((s) => s in b0.files);
+      const added = Object.keys(c.files || {}).filter((s) => !(s in b0.files)), gone = Object.keys(b0.files).filter((s) => !(s in (c.files || {})));
+      if (!both.length) skip('no seed in common with ' + other, t);
+      else {
+        cmp = { n: both.length, total: mean(b0.files, both), cur: mean(c.files, both), same: (b0.exact || []).filter((s) => both.includes(s)).length,
+                curSame: (c.exact || []).filter((s) => both.includes(s)).length };
+        if (added.length || gone.length) notes.push('meta/' + t + ': compared over the ' + both.length + ' seeds both runs have' +
+          (added.length ? ' (new: ' + added.join(', ') + ')' : '') + (gone.length ? ' (gone: ' + gone.join(', ') + ')' : ''));
+      }
+      // a "same" file the other side has and this run lacks: make-meta.js could not make it, or a seed left SEEDS —
+      // either way the assertion no longer covers it (a seed taken out on purpose: rebuild the baseline)
+      if (c.kind === 'same' && gone.length) fails.push('meta/' + t + ': ' + gone.length + ' "same" file(s) in ' + other + ' missing from this run: ' + gone.join(', '));
+    }
+    metaRows.push([t, cmp, c]);
+    if (c.errors && !(b0 && cmp && b0.errors >= c.errors)) fails.push('meta/' + t + ': ' + c.errors + ' PDF(s) crash');
+    // the "same" assertion (run-meta.js): a file outside the known exceptions not byte-identical to its reference
+    if (c.unexpected) fails.push('meta/' + t + ': ' + c.unexpected + ' file(s) of a "same" transform not byte-identical to their reference — outside run-meta.js KNOWN, under their floor, or crashing');
+    if (!cmp) return;
     const tol = c.kind === 'hard' ? TOL_HARD : TOL_MEAN;
-    if (c.total - b.total < -tol) fails.push('meta/' + t + ': mean ' + p1(b.total) + ' → ' + p1(c.total));
-    if (c.same < b.same) notes.push('meta/' + t + ': ' + b.same + ' → ' + c.same + ' files read as their seed');
+    if (cmp.cur - cmp.total < -tol) fails.push('meta/' + t + ': mean ' + p1(cmp.total) + ' → ' + p1(cmp.cur) + (cmp.n !== c.n ? ' (over the ' + cmp.n + ' seeds in common)' : ''));
+    if (cmp.curSame < cmp.same) notes.push('meta/' + t + ': ' + cmp.same + ' → ' + cmp.curSame + ' files read as their reference');
+    Object.keys(c.relation || {}).forEach((rk) => {
+      if (b0.relation && b0.relation[rk] !== undefined && c.relation[rk] > b0.relation[rk] && cmp.n === c.n) notes.push('meta/' + t + ': ' + rk + ' ' + b0.relation[rk] + ' → ' + c.relation[rk]);
+    });
   });
+  if (bm && bm.transforms) Object.keys(bm.transforms).filter((t) => !cur.meta.transforms[t]).forEach((t) => skip('in ' + other + ', not in this run (a tool missing here? make-meta.js says which)', t));
+  Object.entries(uncompared).forEach(([why, ts]) => notes.push('meta: not compared — ' + why + ': ' + ts.join(', ')));
 }
 
 // ── report ─────────────────────────────────────────────────────────────
@@ -225,9 +270,9 @@ fuzzRows.forEach(([split, b, c]) => {
   });
 });
 if (metaRows.length) {
-  console.log('\nmeta (transform: same as the seed · mean total · Δ from the seeds)');
+  console.log('\nmeta (transform: same as the reference · mean total · Δ from the references)');
   metaRows.forEach(([t, b, c]) => console.log('  ' + t.padEnd(12), (c.same + '/' + c.n).padStart(6), p1(c.total).padStart(6), d1(c.delta).padStart(6),
-    b ? '  (was ' + b.same + '/' + b.n + ' ' + p1(b.total) + ')' : ''));
+    b ? '  (was ' + b.same + '/' + b.n + ' ' + p1(b.total) + (b.n !== c.n ? ', now ' + b.curSame + '/' + b.n + ' ' + p1(b.cur) + ' on those seeds' : '') + ')' : ''));
 }
 const mk = (run) => run && run.corpus ? Object.values(run.corpus).reduce((a, r) => a + (r.markup || 0), 0) : '-';
 console.log('inline markup lost'.padEnd(22), 'corpus', mk(cur), 'files' + (base ? ' (was ' + mk(base) + ')' : ''),
@@ -256,7 +301,13 @@ if (opt('--update')) {
   // parts this run lacks (no wkhtmltopdf / qpdf here) stay as they were
   const kept = [];
   ['dev', 'heldout'].forEach((s) => { if (!out.fuzz[s] && old.fuzz && old.fuzz[s]) { out.fuzz[s] = old.fuzz[s]; kept.push('fuzz/' + s); } });
-  if (cur.meta) out.meta = cur.meta; else if (old.meta) { out.meta = old.meta; kept.push('meta'); }
+  // meta per transform: one this run lacks (its tool missing here) stays as it was, when it carries its own records
+  if (cur.meta) {
+    out.meta = Object.assign({}, cur.meta, { transforms: Object.assign({}, cur.meta.transforms) });
+    Object.entries((old.meta && old.meta.transforms) || {}).forEach(([t, x]) => {
+      if (!out.meta.transforms[t] && x.files && x.v !== undefined) { out.meta.transforms[t] = x; kept.push('meta/' + t); }
+    });
+  } else if (old.meta) { out.meta = old.meta; kept.push('meta'); }
   fs.writeFileSync(BASELINE, JSON.stringify(out, null, 1) + '\n');
   if (partial) console.log('\nmerged ' + Object.keys(cur.corpus).length + ' corpus file(s) into ' + Object.keys(old.corpus || {}).length + ' (' +
     Object.keys(cur.corpus).filter((n) => !(old.corpus || {})[n]).length + ' new): ' + Object.keys(out.corpus).length + ' in all');
