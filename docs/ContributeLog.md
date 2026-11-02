@@ -605,9 +605,10 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 31 | P1.1 Storage & export correctness: `schemaVersion` in the defaults, profile and page settings stored as differences, one `K.store.migrate()` for load, settings files and Undo; `K.preview.renderSoon` / `flush()` before every export and Copy; autosave on `pagehide`; a `storage` listener (text as one Undo step, images, profile, logo, language, theme, layout, the export name, cleared storage written back); `tests/unit/` with jsdom 30.1.3 (deps resolved ≥ 14 days old), 23 tests (16 of the first 19 fail on the old code), `npm test` in `tooling.yml`; review findings applied; report `docs/reports/P1.1-storage-export.md`, Known Issues, Testing and the plan updated. |
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 3 | Review of the P1.1 diff: storage diff/merge and migration paths, timers, the storage listener, callers in `scripts/`, i18n wording; three faults confirmed with a jsdom probe (stale export name in a second tab, cleared storage emptying the text, an older tab dropping a newer profile's values). |
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 2 | P1.1 first CI push: `tooling` run 41471258802 red at the unit-test step — Node 22's test runner does not take a folder; `npm test` changed to the glob `tests/unit/*.test.js`. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 3 | P1.1 CI on PR #7 checked and recorded in the report: `tooling` 41471461805 / 41471453294 (lint 0 errors, 24 version checks, 23 / 23 unit tests on Node 22) and `pdf-lab` 41471461751 / 41471453284 (head against `main`: corpus 95.7 → 95.7, fuzz +0.0, meta equal, gate passed). |
 
 <!-- generated:totals -->
-**Entries: 60 · Total: 710 min (11.83 hours) — Zarrabi 710 min (53 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 61 · Total: 713 min (11.88 hours) — Zarrabi 713 min (54 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
