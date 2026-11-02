@@ -6,8 +6,20 @@ from fontTools.ttLib import TTFont
 from fontTools import subset
 
 LAB = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
-REG = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
-BOLD = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
+def dejavu(name):
+    # a DejaVu TTF: DEJAVU=<folder> first, then the Linux folders, then fc-match's when it is installed
+    dirs = [os.environ.get('DEJAVU'), '/usr/share/fonts/truetype/dejavu', '/usr/share/fonts/dejavu', '/usr/share/fonts/TTF']
+    try:
+        import subprocess
+        dirs.append(os.path.dirname(subprocess.run(['fc-match', '-f', '%{file}', 'DejaVu Sans'], capture_output=True, text=True).stdout))
+    except OSError:
+        pass
+    for d in dirs:
+        if d and os.path.isfile(os.path.join(d, name)):
+            return os.path.join(d, name)
+    raise SystemExit(name + ' not found: install DejaVu fonts, or set DEJAVU to the folder that holds them')
+REG = dejavu('DejaVuSans.ttf')
+BOLD = dejavu('DejaVuSans-Bold.ttf')
 
 FORMS = {
  'ا': 'FE8D FE8E', 'آ': 'FE81 FE82', 'ب': 'FE8F FE90 FE91 FE92', 'پ': 'FB56 FB57 FB58 FB59', 'ت': 'FE95 FE96 FE97 FE98',

@@ -1,5 +1,5 @@
 {
- "written": "2026-11-01T17:29:34.933Z",
+ "written": "2026-11-02T05:11:51.921Z",
  "note": "scripts/gate.js --update; the fuzz means hold only for their env",
  "corpus": {
   "acrobat-word--booklet-fa": {
@@ -2113,7 +2113,7 @@
    "errors": 0,
    "env": {
     "generator": 3,
-    "chromium": "153.0.8010.12",
+    "chromium": "141.0.7390.37",
     "wkhtmltopdf": "wkhtmltopdf 0.12.6",
     "fonts": {
      "liberation-serif": "LiberationSerif-Regular.ttf",
@@ -2131,12 +2131,12 @@
    },
    "mean": {
     "recall": 0.9928,
-    "order": 0.9811,
+    "order": 0.9807,
     "headings": 0.9882,
-    "lists": 0.9702,
-    "tables": 0.8883,
-    "code": 0.9568,
-    "quotes": 0.8968,
+    "lists": 0.9688,
+    "tables": 0.8886,
+    "code": 0.9551,
+    "quotes": 0.9048,
     "total": 0.9595
    },
    "markup": 0
@@ -2146,7 +2146,7 @@
    "errors": 0,
    "env": {
     "generator": 3,
-    "chromium": "153.0.8010.12",
+    "chromium": "141.0.7390.37",
     "wkhtmltopdf": "wkhtmltopdf 0.12.6",
     "fonts": {
      "liberation-serif": "LiberationSerif-Regular.ttf",

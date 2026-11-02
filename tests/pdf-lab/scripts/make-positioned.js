@@ -3,12 +3,12 @@
 // for files that draw their spaces (a word break needs 0.45 em) glued every word of such lines.
 //   corpus/positioned.md → pdf/chrome-positioned--positioned.pdf (Chromium: the positioned paragraphs are spans
 //   with a margin and <wbr> between them — no space in the text, a break opportunity all the same)
-const { pdfPath } = require('./env.js');
+const { pdfPath, fileUrl } = require('./env.js');
 const fs = require('fs'), path = require('path'), os = require('os');
 const { KELK, req } = require('./env.js');
 const { chromium } = req('playwright');
 const LAB = path.join(__dirname, '..');
-const WEB = 'file://' + KELK + '/assets/fonts/rastikerdar/webfonts/';
+const WEB = fileUrl(KELK + '/assets/fonts/rastikerdar/webfonts') + '/';
 const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 (async () => {
   const L = fs.readFileSync(path.join(LAB, 'corpus', 'positioned.md'), 'utf8').split('\n').filter((l) => l.trim());
@@ -22,7 +22,7 @@ const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
     .j{text-align:justify}</style></head><body>${body}</body></html>`;
   const f = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'kelk-pos-')), 'p.html'); fs.writeFileSync(f, html);
   const b = await chromium.launch(), page = await b.newPage();
-  await page.goto('file://' + f); await page.evaluate(() => document.fonts.ready);
+  await page.goto(fileUrl(f)); await page.evaluate(() => document.fonts.ready);
   await page.pdf({ path: pdfPath('chrome-positioned--positioned.pdf'), format: 'A4', margin: { top: '0.6in', bottom: '0.6in', left: '0.6in', right: '0.6in' } });
   await b.close(); console.log('chrome-positioned--positioned.pdf');
 })();

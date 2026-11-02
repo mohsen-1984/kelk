@@ -1,12 +1,12 @@
 // Dump the raw glyphs PdfImporter extracts from one page: node scripts/dump.js file.pdf [page] [from] [n]
 const fs = require('fs'), path = require('path');
 const { chromium } = require('./env.js').req('playwright');
-const KELK = require('./env.js').KELK;
+const { KELK, fileUrl } = require('./env.js');
 (async () => {
   const [file, pg = '1', from = '0', n = '80'] = process.argv.slice(2);
   const browser = await chromium.launch();
   const page = await browser.newPage();
-  await page.goto('file://' + KELK + '/tools/pdf-lab.html');
+  await page.goto(fileUrl(KELK + '/tools/pdf-lab.html'));
   const b64 = fs.readFileSync(file).toString('base64');
   const out = await page.evaluate(async ([b64, pg, from, n]) => {
     const bin = atob(b64), u = new Uint8Array(bin.length);

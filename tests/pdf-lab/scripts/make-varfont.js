@@ -2,11 +2,11 @@
 // 800, printed by Chromium. Skia writes each weight of a variable font as a Type 3 font of drawn glyphs — no
 // FontDescriptor weight, no «Bold» in its name — so a [wght] font's bold read as regular: the heading and the bold
 // words came back plain. corpus/fa-weights.md → pdf/rtl/chrome-rtl-varfont--fa-weights.pdf
-const { pdfPath, req, KELK } = require('./env.js');
+const { pdfPath, req, KELK, fileUrl } = require('./env.js');
 const fs = require('fs'), path = require('path'), os = require('os');
 const { chromium } = req('playwright');
 const LAB = path.join(__dirname, '..');
-const FONT = 'file://' + path.join(KELK, 'assets', 'fonts', 'rastikerdar', 'webfonts', 'Vazirmatn[wght].woff2').replace(/\[/g, '%5B').replace(/\]/g, '%5D');
+const FONT = fileUrl(path.join(KELK, 'assets', 'fonts', 'rastikerdar', 'webfonts', 'Vazirmatn[wght].woff2')).replace(/\[/g, '%5B').replace(/\]/g, '%5D');
 const MD = `# گزارش کوتاه طرح
 
 این گزارش وضعیت **کارهای انجام‌شده** در سه ماه گذشته را نشان می‌دهد و برای همه واحدها فرستاده می‌شود.
@@ -31,7 +31,7 @@ const MD = `# گزارش کوتاه طرح
     <p><strong>یادآوری:</strong> نشست بعدی در هفته نخست ماه آینده برگزار می‌شود.</p>
     </body></html>`;
   const f = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'kelk-vf-')), 'p.html'); fs.writeFileSync(f, html);
-  await page.goto('file://' + f); await page.evaluate(() => document.fonts.ready);
+  await page.goto(fileUrl(f)); await page.evaluate(() => document.fonts.ready);
   await page.pdf({ path: pdfPath('chrome-rtl-varfont--fa-weights.pdf'), format: 'A4', margin: { top: '1in', bottom: '1in', left: '1in', right: '1in' } });
   await b.close();
   fs.writeFileSync(path.join(LAB, 'corpus', 'fa-weights.md'), MD);

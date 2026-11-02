@@ -13,13 +13,13 @@
 // The text must come back as text, each word once; the pictures as pictures that hold no words.
 //   node scripts/make-pictures.js     → pdf/chrome-pictures--{slides,slides-fa,brochure,inline,inline-fa}.pdf,
 //                                       pdf/wk-pictures--{brochure,inline}.pdf
-const { pdfPath } = require('./env.js');
+const { pdfPath, fileUrl } = require('./env.js');
 const fs = require('fs'), path = require('path'), cp = require('child_process'), os = require('os');
 const { KELK, req } = require('./env.js');
 const { chromium } = req('playwright');
 const LAB = path.join(__dirname, '..');
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'kelk-pic-'));
-const WEB = 'file://' + KELK + '/assets/fonts/rastikerdar/webfonts/';
+const WEB = fileUrl(KELK + '/assets/fonts/rastikerdar/webfonts') + '/';
 const md = (name) => fs.readFileSync(path.join(LAB, 'corpus', name + '.md'), 'utf8');
 const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
@@ -134,7 +134,7 @@ function inline(src, rtl) {
     ['inline', inline(md('inline'), false)], ['inline-fa', inline(md('inline-fa'), true)]];
   for (const [name, html] of jobs) {
     const f = path.join(TMP, name + '.html'); fs.writeFileSync(f, html);
-    await page.goto('file://' + f); await page.evaluate(() => document.fonts.ready); await page.waitForTimeout(300);
+    await page.goto(fileUrl(f)); await page.evaluate(() => document.fonts.ready); await page.waitForTimeout(300);
     await page.pdf({ path: pdfPath('chrome-pictures--' + name + '.pdf'), preferCSSPageSize: true, printBackground: true });
     if (name === 'brochure' || name === 'inline') {      // wkhtmltopdf: the same page, its canvases drawn by Qt WebKit (the HTML with the pictures already in)
       fs.writeFileSync(path.join(TMP, name + '-wk.html'), await page.content());

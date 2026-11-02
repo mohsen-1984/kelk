@@ -23,10 +23,11 @@ const list = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.
   }, fs.readFileSync(file).toString('base64'));
   if (args[0] === '--json') { console.log(JSON.stringify(await feat(args[1]), null, 1)); await browser.close(); return; }
 
-  const labFiles = list(path.join(LAB, 'pdf')).concat(fs.existsSync(META) ? list(META) : []);
+  const metaFiles = fs.existsSync(META) ? list(META) : [], labFiles = list(path.join(LAB, 'pdf')).concat(metaFiles);
   const cells = new Map();       // cell → [lab file labels]
   for (const f of labFiles) {
-    const label = path.relative(LAB, f).replace(/^pdf\//, '').replace(/\.pdf$/, '');
+    // 'producer--doc' for pdf/<group>/…, 'transform/seed' for meta/ — with '/' on every platform
+    const label = (metaFiles.includes(f) ? path.relative(META, f).split(path.sep).join('/') : path.basename(f)).replace(/\.pdf$/, '');
     (await feat(f)).cells.forEach((c) => { if (!cells.has(c)) cells.set(c, []); cells.get(c).push(label); });
     process.stdout.write('.');
   }
