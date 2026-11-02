@@ -41,15 +41,17 @@ exclude_path = [
   '(^|[/\\])\.claude[/\\]skills[/\\][^/\\]+[/\\]README\.md$',
 ]
 
+# headings that start with an emoji carrying U+FE0F (⚠️, 🏗️): GitHub keeps the selector in the anchor
+# (#️-known-issues, the form the documents use and GitHub follows), lychee 0.24.2 drops it and reports a missing
+# fragment. Such a link is remapped to its file without the fragment: the anchor is not checked, the file still is
+# (a missing file is an error, as for any other link).
+remap = ['^(file://[^#]*)#%EF%B8%8F-.*$ $1']
+
 # regular expressions on the link (after it is resolved)
 exclude = [
   # prose that mentions the scheme ("file://-capable", "from file://"), autolinked by the Markdown parser: a file URL
   # with a host is never one of our relative links (those resolve to file:///…)
   '^file://[^/]',
-  # headings that start with an emoji carrying U+FE0F (⚠️, 🏗️): GitHub keeps the selector in the anchor
-  # (#️-known-issues, the form the documents use and GitHub follows), lychee 0.24.2 drops it and reports a missing
-  # fragment. Only these anchors are skipped; the files they point to are still checked by the other links.
-  '#%EF%B8%8F-',
   # online run: a known 404 (Known Issues: the 2.0 zip is not under releases/latest); P8.1 links the tagged release
   # and removes this line
   '^https://github\.com/mohsen-1984/kelk/releases/latest/download/kelk_2\.0\.zip$',
