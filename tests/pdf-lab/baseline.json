@@ -1,6 +1,6 @@
 {
  "written": "2026-11-02T05:11:51.921Z",
- "note": "scripts/gate.js --update; the fuzz means hold only for their env",
+ "note": "scripts/gate.js --update; the fuzz means hold only for their env. Corpus and meta as written 2026-11-02T05:11Z; fuzz (generator 4, P2.1) from the CI runner, pdf-lab run 41507779260 (baseline ticked), 2026-11-02T19:17Z",
  "corpus": {
   "acrobat-word--booklet-fa": {
    "error": null,
@@ -2112,7 +2112,7 @@
    "n": 100,
    "errors": 0,
    "env": {
-    "generator": 3,
+    "generator": 4,
     "chromium": "141.0.7390.37",
     "wkhtmltopdf": "wkhtmltopdf 0.12.6",
     "fonts": {
@@ -2126,18 +2126,59 @@
      "caladea": "Caladea-Regular.ttf",
      "dejavu-mono": "DejaVuSansMono.ttf",
      "liberation-mono": "LiberationMono-Regular.ttf",
-     "courier": "c0419bt_.pfb"
+     "courier": "c0419bt_.pfb",
+     "vazirmatn": "vazirmatn-sahel-ttf.zip#9005eec761e0",
+     "sahel": "vazirmatn-sahel-ttf.zip#9005eec761e0",
+     "noto-naskh": "NotoNaskhArabic-Regular.ttf#86b7d6cd9ca1"
     }
    },
    "mean": {
-    "recall": 0.9928,
-    "order": 0.9807,
-    "headings": 0.9882,
-    "lists": 0.9688,
-    "tables": 0.8886,
-    "code": 0.9551,
-    "quotes": 0.9048,
-    "total": 0.9595
+    "recall": 0.9327,
+    "order": 0.9133,
+    "headings": 0.9089,
+    "lists": 0.8107,
+    "tables": 0.7641,
+    "code": 0.883,
+    "quotes": 0.7184,
+    "total": 0.8598,
+    "rtl": 0.85,
+    "zwnj": 0.8189,
+    "yehKaf": 0.8333,
+    "digits": 0.9224,
+    "brackets": 0.8171
+   },
+   "byDir": {
+    "ltr": {
+     "n": 56,
+     "mean": {
+      "recall": 0.9927,
+      "order": 0.9744,
+      "headings": 0.9821,
+      "lists": 0.8913,
+      "tables": 0.8824,
+      "code": 0.8991,
+      "quotes": 0.8667,
+      "total": 0.9296
+     }
+    },
+    "rtl": {
+     "n": 44,
+     "mean": {
+      "recall": 0.8563,
+      "order": 0.8357,
+      "headings": 0.8159,
+      "lists": 0.7228,
+      "tables": 0.6431,
+      "code": 0.8626,
+      "quotes": 0.6061,
+      "total": 0.7711,
+      "rtl": 0.85,
+      "zwnj": 0.8189,
+      "yehKaf": 0.8333,
+      "digits": 0.9224,
+      "brackets": 0.8171
+     }
+    }
    },
    "markup": 0
   },
@@ -2145,7 +2186,7 @@
    "n": 100,
    "errors": 0,
    "env": {
-    "generator": 3,
+    "generator": 4,
     "chromium": "141.0.7390.37",
     "wkhtmltopdf": "wkhtmltopdf 0.12.6",
     "fonts": {
@@ -2159,18 +2200,59 @@
      "caladea": "Caladea-Regular.ttf",
      "dejavu-mono": "DejaVuSansMono.ttf",
      "liberation-mono": "LiberationMono-Regular.ttf",
-     "courier": "c0419bt_.pfb"
+     "courier": "c0419bt_.pfb",
+     "vazirmatn": "vazirmatn-sahel-ttf.zip#9005eec761e0",
+     "sahel": "vazirmatn-sahel-ttf.zip#9005eec761e0",
+     "noto-naskh": "NotoNaskhArabic-Regular.ttf#86b7d6cd9ca1"
     }
    },
    "mean": {
-    "recall": 0.9922,
-    "order": 0.9667,
-    "headings": 0.9704,
-    "lists": 0.9327,
-    "tables": 0.8684,
-    "code": 0.9679,
-    "quotes": 0.8605,
-    "total": 0.9463
+    "recall": 0.9426,
+    "order": 0.9301,
+    "headings": 0.9176,
+    "lists": 0.8316,
+    "tables": 0.7693,
+    "code": 0.8856,
+    "quotes": 0.7091,
+    "total": 0.8691,
+    "rtl": 0.8577,
+    "zwnj": 0.7576,
+    "yehKaf": 0.8684,
+    "digits": 0.9337,
+    "brackets": 0.835
+   },
+   "byDir": {
+    "ltr": {
+     "n": 56,
+     "mean": {
+      "recall": 0.9885,
+      "order": 0.972,
+      "headings": 0.9817,
+      "lists": 0.9367,
+      "tables": 0.7934,
+      "code": 0.8577,
+      "quotes": 0.8636,
+      "total": 0.9187
+     }
+    },
+    "rtl": {
+     "n": 44,
+     "mean": {
+      "recall": 0.8843,
+      "order": 0.8767,
+      "headings": 0.836,
+      "lists": 0.7217,
+      "tables": 0.743,
+      "code": 0.921,
+      "quotes": 0.6061,
+      "total": 0.8059,
+      "rtl": 0.8577,
+      "zwnj": 0.7576,
+      "yehKaf": 0.8684,
+      "digits": 0.9337,
+      "brackets": 0.835
+     }
+    }
    },
    "markup": 0
   }

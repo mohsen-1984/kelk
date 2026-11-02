@@ -127,7 +127,7 @@ Status: `todo` → `doing` → `report` (report written, waiting) → `approved`
 | P1 | P1.2 Security hardening | report | 1405-08-11 | 1405-08-11 | — (no importer change; unit tests 28 / 28, lint 0 errors, builder suite unchanged) — [`docs/reports/P1.2-security.md`](../../docs/reports/P1.2-security.md) | ☐ |
 | P1 | P1.3 Builder bugs B1–B8 | report | 1405-08-11 | 1405-08-11 | 96.2 / 95.8* / 93.9* / 92.9 (*local Windows, +0.0 against the base; corpus 95.7 → 96.2 by the five fa quote files) — [`docs/reports/P1.3-builder-bugs.md`](../../docs/reports/P1.3-builder-bugs.md) | ☐ |
 | P1 | P1.4 i18n & small app bugs | report | 1405-08-11 | 1405-08-11 | — (no `lib/` change; check-i18n 0 / 0, unit tests 60 / 60 on the stack) — [`docs/reports/P1.4-i18n.md`](../../docs/reports/P1.4-i18n.md) | ☐ |
-| P2 | P2.1 RTL fuzz corpus | doing | 1405-08-11 | | generator 4: baseline being built on the CI runner — [`docs/reports/P2.1-rtl-fuzz.md`](../../docs/reports/P2.1-rtl-fuzz.md) | ☐ |
+| P2 | P2.1 RTL fuzz corpus | report | 1405-08-11 | 1405-08-11 | — / 86.0 / 86.9 / — (generator 4, 44 % RTL, CI run 41507779260; generator 3 was 96.0 / 94.6, English only) — [`docs/reports/P2.1-rtl-fuzz.md`](../../docs/reports/P2.1-rtl-fuzz.md) | ☐ |
 | P2 | P2.2 Metamorphic net extended | doing | 1405-08-11 | | 20 transforms, 24 seeds; meta baseline being built on the CI runner — [`docs/reports/P2.2-meta-net.md`](../../docs/reports/P2.2-meta-net.md) | ☐ |
 | P2 | P2.3 Builders in CI, DOCX validation, goldens | todo | | | | ☐ |
 | P2 | P2.4 Site quality jobs | todo | | | | ☐ |
