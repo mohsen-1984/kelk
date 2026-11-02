@@ -122,7 +122,7 @@ Status: `todo` → `doing` → `report` (report written, waiting) → `approved`
 | P0 | P0.1 Git hygiene | approved | 1405-08-10 | 1405-08-10 | 95.7 / — / — / 92.9 (corpus only; no importer change) | ☑ owner, 1405-08-10 |
 | P0 | P0.2 Baseline rebuilt, gate guarded | approved | 1405-08-10 | 1405-08-10 | 95.7 / 95.8* / 93.9* / 92.9 (*Windows, no wkhtmltopdf: not comparable; baseline keeps 96.0 / 94.6) | ☑ owner, 1405-08-10 |
 | P0 | P0.3 CI first green run | approved | 1405-08-10 | 1405-08-10 | 95.7 / 96.0 / 94.6 / 92.9 (CI runner; fuzz and meta of `baseline.json` rebuilt on the runner 1405-08-11, run 41391608314) | ☑ owner, 1405-08-10 |
-| P0 | P0.4 Dev tooling, single version | todo | | | | ☐ |
+| P0 | P0.4 Dev tooling, single version | report | 1405-08-11 | | — (no importer change; lint 0 errors, 24 version checks agree) | ☐ |
 | P1 | P1.1 Storage & export correctness | todo | | | | ☐ |
 | P1 | P1.2 Security hardening | todo | | | | ☐ |
 | P1 | P1.3 Builder bugs B1–B8 | todo | | | | ☐ |
@@ -289,7 +289,7 @@ Infrastructure items that behave like features: settings schema versioning (P1.1
 
 ## 10. Running the lab on Windows (notes from the review machine)
 
-- The repo has no `package.json`; `env.js` falls back to a Linux path for `NODE_TOOLS`. Install Playwright in a folder outside the repo and point `NODE_TOOLS` at its `node_modules`; send results outside the repo with `LAB_OUT`.
+- The repo has no `package.json`; `env.js` falls back to a Linux path for `NODE_TOOLS`. Install Playwright in a folder outside the repo and point `NODE_TOOLS` at its `node_modules`; send results outside the repo with `LAB_OUT`. (Since P0.4, 1405-08-11: `package.json` exists and `npm ci` at the root is enough; `NODE_TOOLS` stays an option.)
 - `npx playwright install` resolved a *different* Playwright than the one installed and twice stalled at 0 MB; what worked: install `playwright@latest`, then make directory junctions so the build number it asks for maps to the complete build already on disk (`mklink /J chromium_headless_shell-<wanted> chromium_headless_shell-<present>`, same for `chromium-<wanted>`). P0.3 removes the need for this by fixing `env.js` and adding `package.json`.
 - Never run `gate.js --update` after a filtered run (P0.2 adds the guard).
 
