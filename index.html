@@ -2,6 +2,10 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="utf-8">
+    <!-- Content Security Policy (docs/reports/P1.2-security.md): scripts only from the app's own files (no inline
+         script, handler or eval); inline styles (the builders' and MathJax's); images also from the web (a document may
+         name a public image); workers from the app or a blob; no plugin, no <base>, no form submission. -->
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: http:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Kelk — Markdown to Word, PDF and HTML and back, right-to-left first</title>
     <meta name="description" content="Kelk: convert Markdown (GFM) to Word DOCX, Word DOC (MHTML), PDF and standalone HTML — and Word, HTML and PDF back to Markdown — entirely client-side in your browser. Right-to-left first (Persian, Arabic, Hebrew, Urdu) and every left-to-right language; LaTeX formulas; offline, no upload, open source.">
@@ -407,7 +411,7 @@
                             <span class="hint" data-i18n="wordFontsGetHint"></span>
                             <div class="btn-row">
                                 <a class="btn soft" id="word-font-zip" download><i data-lucide="download"></i><span data-i18n="wordFontsGet"></span></a>
-                                <a class="btn ghost" id="word-font-site" target="_blank" rel="noopener"><i data-lucide="external-link"></i><span data-i18n="wordFontsSite"></span></a>
+                                <a class="btn ghost" id="word-font-site" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i><span data-i18n="wordFontsSite"></span></a>
                             </div>
                         </div>
                         <label class="check"><input type="checkbox" data-ui="previewWordFont"><span data-i18n="previewWordFont"></span></label>
@@ -462,7 +466,7 @@
     <footer class="note">
         <span data-i18n="footerOffline"></span>
         <span data-i18n="footerLib"></span>
-        <a id="repo-link" href="#" rel="noopener" target="_blank">GitHub</a>
+        <a id="repo-link" href="#" rel="noopener noreferrer" target="_blank">GitHub</a>
     </footer>
 </div>
 

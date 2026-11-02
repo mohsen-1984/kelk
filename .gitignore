@@ -8,3 +8,6 @@ private/
 
 # Dev tooling installs (plan P0.4 adds package.json)
 node_modules/
+
+# Claude Code agent worktrees (local only)
+.claude/worktrees/

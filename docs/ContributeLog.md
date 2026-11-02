@@ -244,10 +244,10 @@ Kelk has no server, no account and no upload: documents never leave the browser.
 | Concern | Implementation | Location |
 |---|---|---|
 | Processing | Every conversion runs in the page; no network request is needed (fonts, MathJax and PDF.js are local). A user may reference a public image URL, which the browser then fetches. | `scripts/`, `lib/` |
-| Rendering Markdown | marked → **DOMPurify** → preview; the config keeps `id` / `style` / `form` / `input` (see Known Issues). | `scripts/preview.js:18,159` |
-| Custom header / footer HTML | Inserted into exports **without sanitising** (see Known Issues). | `scripts/exporter.js:109-116` |
-| HTML export | `HtmlBuilder.toHtml` parses into a live element; `on*` attributes pass through (B4, see Known Issues). | `lib/HtmlBuilder.js:478-493` |
-| Content Security Policy | **None.** Cheap to add: the page has no inline scripts or handlers (plan P1.2). | `index.html` |
+| Rendering Markdown | marked → **DOMPurify** → preview: `SANITIZE_NAMED_PROPS` (ids prefixed `user-content-`), `form` / `input` / `button` / `textarea` / `select` / `style` forbidden, task-list checkboxes rebuilt disabled, `rel="noopener noreferrer"` on links with a `target` (P1.2). | `scripts/preview.js` |
+| Custom header / footer HTML | Sanitised by `K.preview.sanitize` after its fields are filled (P1.2). | `scripts/exporter.js` |
+| HTML export | `HtmlBuilder.toHtml` parses into an inert document and `HtmlBuilder.defang` removes scripts, embedded pages, `on*`, `srcdoc` and script URLs (P1.2). | `lib/HtmlBuilder.js` |
+| Content Security Policy | A `<meta>` CSP: `script-src 'self'` (no inline script anywhere), `style-src 'self' 'unsafe-inline'`, `img-src 'self' data: blob: https: http:` (remote images in Markdown), `worker-src 'self' blob:`, `object-src 'none'`, `base-uri 'self'`, `form-action 'none'`; measured on `file://` and http (P1.2, `tests/unit/csp-browser.js`). | `index.html` |
 | Browser storage | `localStorage`: settings, the document, images as base64 data URIs — no credentials. | `scripts/storage.js`, `scripts/images.js:38-46` |
 | PDF parsing | PDF.js 6.4.299 on a fake worker in the main thread; encrypted PDFs with a user password give a message only. | `scripts/config.js:134` |
 | Third-party code | Vendored and pinned by file name; no checksums, SBOM or Dependabot (plan P8.3). | `vendor/`, `THIRD-PARTY-NOTICES.md` |
@@ -273,7 +273,8 @@ Kelk has no server, no account and no upload: documents never leave the browser.
 | Formulas | `tests/math-file.html`, `math-modes.html`, `math-roundtrip.js` | Browser pages, checked by eye; since P0.3 `math-roundtrip.js` exits 1 on a failed case (76 / 76 pass, 1405-08-10) and `roundtrip.js` on a red builder-suite cell outside its two-entry allow-list (404 pass). |
 | Lint | `npm run lint` (`eslint.config.js`) | Since P0.4 (1405-08-11): **0 errors, 109 warnings** (`no-useless-escape` 42, `no-unused-vars` 32, `no-useless-assignment` 18, `no-misleading-character-class` 7, `no-control-regex` 6, `no-sparse-arrays` 4); CI workflow `tooling.yml` on every push and PR. Prettier is configured (`.prettierrc`) but the tree is not formatted, so `npm run format:check` is not in CI. |
 | Version | `npm run check:version` (`tools/check-version.js`) | 24 places checked against `K.config.version` (`scripts/config.js`): `package.json` (semver form), CHANGELOG heading, `BuilderBase.version`, the `lib/` headers and README download (release form `2.0`), `PdfImporter` its own `1.0`; in `tooling.yml`. |
-| Unit tests | `npm test` (`tests/unit/`, Node's test runner + jsdom) | Since P1.1 (1405-08-11): **23 tests**, all pass — `storage.test.js` (14: a fresh profile keeps its choices across reloads, only differences stored, legacy profiles with and without markers, the ui/profile split, settings files, a newer schema read and written by an older tab, page settings) and `app.test.js` (9: `index.html` with all its scripts in jsdom — an HTML / MD export right after a keystroke contains it, the title follows a new first heading, the last keystrokes saved on `pagehide`, a second tab follows text, settings, images, logo, the file name, theme and layout, unsaved typing kept, a cleared storage written back, a settings file and Reset / Undo through the Settings pane). On the code before P1.1, 16 of the first 19 fail. In `tooling.yml`. |
+| Unit tests | `npm test` (`tests/unit/`, Node's test runner + jsdom) | Since P1.1 (1405-08-11): **23 tests**, all pass — `storage.test.js` (14: a fresh profile keeps its choices across reloads, only differences stored, legacy profiles with and without markers, the ui/profile split, settings files, a newer schema read and written by an older tab, page settings) and `app.test.js` (9: `index.html` with all its scripts in jsdom — an HTML / MD export right after a keystroke contains it, the title follows a new first heading, the last keystrokes saved on `pagehide`, a second tab follows text, settings, images, logo, the file name, theme and layout, unsaved typing kept, a cleared storage written back, a settings file and Reset / Undo through the Settings pane). On the code before P1.1, 16 of the first 19 fail. Since P1.2: **28 tests** — `security.test.js` (5: hostile Markdown leaves the app's elements, styles and toasts intact; task-list checkboxes kept, other inputs removed; HTML / MD exports of hostile Markdown carry no script, handler or `javascript:`; custom header / footer sanitised; `HtmlBuilder.toHtml` writes no `on*` / script URL and does not parse into the app's document), all 5 failing on the code before P1.2. In `tooling.yml`. |
+| CSP (browser) | `node tests/unit/csp-browser.js` (Playwright) | Since P1.2 (1405-08-11): `file://` and `http://localhost` in Chromium 141 — 0 violations, an inline probe refused, MathJax, PDF / DOCX / DOC / HTML / MD exports and a PDF.js import all work. Not in CI. |
 
 ### Protocol for every change
 
@@ -326,11 +327,10 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 
 | Priority | Issue | Location | Suggestion |
 |---|---|---|---|
-| 🟠 High | Preview DOMPurify config keeps `id` / `style` / `form` / `input`: Markdown such as `<div id="toasts">` hijacks app elements and a `<style>` restyles the app. | `scripts/preview.js:18,159`, `scripts/ui.js:46,284` | P1.2: `SANITIZE_NAMED_PROPS`, forbid `form`, `input`, `button`, `textarea`, `select`, `style`. |
-| 🟠 High | Custom header / footer HTML is never sanitised. | `scripts/exporter.js:109-116` | P1.2: sanitise it like the preview. |
-| 🟠 High | **B4** — `HtmlBuilder.toHtml` parses into a live element; `on*` attributes pass through. | `lib/HtmlBuilder.js:478-493` | P1.2: `BidiCore.inertRoot`, strip `on*` / `javascript:`. |
-| 🟡 Medium | No Content Security Policy. | `index.html` | P1.2: a `<meta>` CSP, tested on `file://` and Pages with MathJax and PDF.js; `rel="noopener noreferrer"` on every `target=_blank`. |
 | 🟡 Medium | Supply chain: vendor files pinned by name only (`6.4.299` repeated ×8, the marked file name ×14), no checksums, SBOM or Dependabot. (The CI workflow got `permissions:` and SHA-pinned actions in P0.3, 1405-08-10.) | `vendor/` | P8.3 vendor manifest with hashes. |
+| 🟡 Medium | An inline `style` in Markdown can still overlay the app (`position:fixed`); no script runs (found in P1.2, 1405-08-11). | `scripts/preview.js` | Drop `position` / `z-index` in a preview-only DOMPurify hook. |
+| ⚪ Low | Builders other than HtmlBuilder still parse HTML into the live page (`BuilderBase.js:535`, `WordHtmlBuilder.js:610,738,743,1276`, `MathCore.js:511`); only matters for library use with unsanitised HTML — the app sanitises first (P1.2, 1405-08-11). | `lib/` | `BidiCore.inertRoot` as in B4 (P5.2). |
+| ⚪ Low | The CSP is measured in Chromium only; `frame-ancestors` cannot be set by a `<meta>` (Pages sends no headers); the HTML export carries no CSP of its own; `csp-browser.js` is not in CI (P1.2, 1405-08-11). | `index.html`, `tests/unit/csp-browser.js` | A Firefox run; a `script-src 'none'` meta in the HTML export; a Chromium step in CI (P2.4). |
 
 ### 📄 PDF import
 
@@ -381,7 +381,7 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 No open issues.
 
 <details>
-<summary><strong>✅ Resolved</strong> (17) — click to expand</summary>
+<summary><strong>✅ Resolved</strong> (21) — click to expand</summary>
 
 | Priority | Issue | Location | Suggestion |
 |---|---|---|---|
@@ -402,6 +402,10 @@ No open issues.
 | ✅ Resolved 1405-08-11 | **Settings migrations ran against fresh profiles**: the one-shot markers (`_auto`, `_vch`, `_vz`, `_auto2`, `_hfauto`, `_lh`) were not in the defaults, so a fresh profile's own choices (DejaVu Sans Mono, Sahel, 98 %, `rtl`, 110 %, Calibri, an emptied title or edition) were "migrated" on the next reload; the stored profile was the whole merge of the defaults (old defaults frozen); `settings.js` repeated part of it for settings files. | `scripts/storage.js`, `config.js`, `settings.js` | P1.1: `schemaVersion: 1` in `K.config.defaults`; profile and page settings stored as their differences from the defaults; one `K.store.migrate()` for the stored profile at load, a settings file and Undo of Reset — its steps run only below schemaVersion 1, the markers are dropped. `tests/unit/storage.test.js`. |
 | ✅ Resolved 1405-08-11 | **Exports could read stale preview HTML**: the preview renders 250 ms after typing, the exporter read it at once (the last keystroke, a changed first heading in the file name, were missing). | `scripts/exporter.js`, `editor.js`, `preview.js` | P1.1: one preview timer (`K.preview.renderSoon`), `K.preview.flush()` before every export and Copy. `tests/unit/app.test.js`. |
 | ✅ Resolved 1405-08-11 | No `storage` event: a second tab wrote back the text it showed before, and its next image save dropped the other tab's images; the last keystrokes of the 600 ms autosave pause were lost when the tab closed. | `scripts/main.js`, `editor.js`, `images.js` | P1.1: a `storage` listener — text taken as one Undo step unless this tab holds unsaved typing, images merged, profile, logo and page settings (language, theme, layout, the imported file's name) followed, a cleared storage written back from this tab; autosave written on `pagehide` and when the tab hides. `tests/unit/app.test.js`. |
+| ✅ Resolved 1405-08-11 | Preview DOMPurify config kept `id` / `style` / `form` / `input`: Markdown such as `<div id="toasts">` hijacked app elements and a `<style>` restyled the app. | `scripts/preview.js` | P1.2: `SANITIZE_NAMED_PROPS` (ids become `user-content-…`, the document's own `#links` follow), `FORBID_TAGS` `form` `input` `button` `textarea` `select` `style`; task-list checkboxes rebuilt disabled; `tests/unit/security.test.js`. |
+| ✅ Resolved 1405-08-11 | Custom header / footer HTML was never sanitised. | `scripts/exporter.js` | P1.2: through `K.preview.sanitize` after the fields are filled; the shipped fa / en / ar samples come out unchanged. |
+| ✅ Resolved 1405-08-11 | **B4** — `HtmlBuilder.toHtml` parsed into a live element; `on*` attributes passed through. | `lib/HtmlBuilder.js` | P1.2: an inert document (`BidiCore.inertRoot`) and `HtmlBuilder.defang` (scripts, embedded pages, `on*`, `srcdoc`, script URLs); an ordinary HTML export is byte-identical. |
+| ✅ Resolved 1405-08-11 | No Content Security Policy; `target=_blank` links without `rel`. | `index.html` | P1.2: a `<meta>` CSP (`script-src 'self'`; `style-src 'self' 'unsafe-inline'`; `img-src 'self' data: blob: https: http:`; `worker-src 'self' blob:`; `object-src 'none'`; `base-uri 'self'`; `form-action 'none'`): 0 violations on `file://` and `http://localhost` in Chromium 141 with MathJax, PDF.js and all five exports (`tests/unit/csp-browser.js`); `rel="noopener noreferrer"` on every link with a `target`. |
 
 </details>
 
@@ -609,9 +613,11 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 12 | P1.1 merged into `main`: PR #7 merged with merge commit `fc2fd52` after its green checks; `main`'s runs after the merge checked green (tooling 41494645319, pdf-lab 41494645572, Pages 41494644682). |
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 3 | Approving P1.1 and instructions for P1.2–P2.4 as one stacked batch with parallel work, reported once at the end of P2. |
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 3 | P1.1 approval recorded on `redesign/P1.2`: tracker row, Summary, Status, PR #7 merge note in the plan; the P1.1 report's status. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 17 | P1.2–P2.2 started as parallel work: checklist; self-contained briefs for P1.2, P1.3 (shaping, tables, cleanups, `fa-features` bisect), P1.4, P2.1 and P2.2, each in its own worktree; P1.2 integrated on `redesign/P1.2`; Known Issues, Security Architecture, Testing and the tracker updated; `.claude/worktrees/` ignored by git and ESLint. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 14 | P1.2 Security hardening: DOMPurify `SANITIZE_NAMED_PROPS` and `FORBID_TAGS` with task-list checkboxes kept; header / footer HTML sanitised; `HtmlBuilder.toHtml` through an inert document with `defang` (B4); CSP `<meta>` measured on `file://` and http with MathJax, PDF.js and every export; `rel="noopener noreferrer"`; 5 unit tests and a browser CSP check; report `docs/reports/P1.2-security.md`. |
 
 <!-- generated:totals -->
-**Entries: 64 · Total: 731 min (12.18 hours) — Zarrabi 731 min (57 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 66 · Total: 762 min (12.70 hours) — Zarrabi 762 min (59 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
