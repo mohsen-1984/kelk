@@ -140,7 +140,7 @@ node scripts/run-import.js [filter]   # import pdf/*/*.pdf, score against corpus
 node scripts/roundtrip.js             # Kelk's own round trip: tests/builder-suite.html, md → PDF → md
 node scripts/math-roundtrip.js        # formulas through Kelk and back: every case of tests/math-cases.js, en and fa (76 checks)
 DIR=folder node scripts/run-real.js   # any PDFs: words found (recall) and their order, against pdftotext
-node scripts/run-crash.js folder      # stability: every PDF of a folder; errors, timeouts, slow files
+node scripts/run-crash.js [folder]    # stability: every PDF under a folder (default pdf/, subfolders too); exit 1 on an error or timeout
 node scripts/run-stress.js big.pdf small.pdf   # a long file (thread held < 1 s), injected faults, an abort
 node scripts/cmp.js A B dir…             # two versions of the importer (a Kelk folder or its lib/PdfImporter.js): what changed
 node scripts/snapshot.js pdfs/ snap/ [--against older/]   # a regression set of real (private) PDFs: Markdown + signals, compared

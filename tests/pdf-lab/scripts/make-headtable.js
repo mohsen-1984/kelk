@@ -2,13 +2,13 @@
 // header tables are) — over a report whose long table goes on over pages with its header row repeated. The head
 // must go (its rules end with it in the margin); the table's repeated header row must stay one table (its rules
 // go on down into its rows). corpus/report.md and fa-report.md → pdf/chrome-headtable--{report,fa-report}.pdf
-const { pdfPath } = require('./env.js');
+const { pdfPath, fileUrl } = require('./env.js');
 const fs = require('fs'), path = require('path'), os = require('os');
 const { KELK, req } = require('./env.js');
 const { chromium } = req('playwright');
 const marked = require(KELK + '/vendor/marked.umd.min_18.0.14.js');
 const LAB = path.join(__dirname, '..');
-const WEB = 'file://' + KELK + '/assets/fonts/rastikerdar/webfonts/';
+const WEB = fileUrl(KELK + '/assets/fonts/rastikerdar/webfonts') + '/';
 (async () => {
   const b = await chromium.launch(), page = await b.newPage();
   for (const [doc, rtl] of [['report', false], ['fa-report', true]]) {
@@ -19,7 +19,7 @@ const WEB = 'file://' + KELK + '/assets/fonts/rastikerdar/webfonts/';
       body{font:14px/1.6 "${font}"} table{border-collapse:collapse} th,td{border:1px solid #888;padding:3px 8px} thead{display:table-header-group}
       </style></head><body>${marked.parse(md)}</body></html>`;
     const f = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'kelk-ht-')), 'p.html'); fs.writeFileSync(f, html);
-    await page.goto('file://' + f); await page.evaluate(() => document.fonts.ready);
+    await page.goto(fileUrl(f)); await page.evaluate(() => document.fonts.ready);
     const cell = 'border:0.6px solid #555;padding:2px 8px;font-size:9px;font-family:' + (rtl ? 'Vazirmatn' : 'Arial');
     const head = `<table dir="${rtl ? 'rtl' : 'ltr'}" style="width:100%;margin:0 0.5in;border-collapse:collapse"><tr><td style="${cell};width:75%">${rtl ? 'گزارش پیشرفت پروژه‌ها — نسخهٔ داخلی' : 'Quarterly operations report — internal'}</td><td style="${cell}">${rtl ? 'نسخهٔ اول' : 'Version 1'}</td></tr></table>`;
     await page.pdf({ path: pdfPath('chrome-headtable--' + doc + '.pdf'), format: 'A4', displayHeaderFooter: true, headerTemplate: head,

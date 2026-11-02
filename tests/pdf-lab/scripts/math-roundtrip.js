@@ -3,13 +3,16 @@
 // words, display ones alone, both in English and in Persian text — through PdfBuilder (vectors) and PdfImporter.
 // A case passes when the Markdown gives its TeX back exactly, with its delimiters ($…$ / $$…$$), and the words
 // around it stay. Also checked: the setting { math: { source: false } } writes no map (the vectors are read as before).
+// Exit 1 on any failed case, a page error or a crash (CI) — all 76 pass today, so there is no allow-list.
 //   node scripts/math-roundtrip.js [KELK folder]
-const { chromium } = require('./env.js').req('playwright');
+const env = require('./env.js');
+const { chromium } = env.req('playwright');
 (async () => {
-  const root = process.argv[2] || require('./env.js').KELK;
+  const root = process.argv[2] || env.KELK;
   const b = await chromium.launch(); const page = await b.newPage();
-  page.on('pageerror', (e) => console.log('pageerror', String(e).slice(0, 200)));
-  await page.goto('file://' + root + '/tests/builder-suite.html');
+  const errors = [];
+  page.on('pageerror', (e) => { errors.push(e); console.log('pageerror', String(e).slice(0, 200)); });
+  await page.goto(env.fileUrl(root + '/tests/builder-suite.html'));
   const r = await page.evaluate(async () => {
     const out = [];
     const build = async (md, opts) => {
@@ -43,5 +46,6 @@ const { chromium } = require('./env.js').req('playwright');
   const bad = r.filter((x) => !x.ok);
   bad.forEach((x) => console.log('FAIL', x.name, '\n   ', JSON.stringify(x.got)));
   console.log((r.length - bad.length) + ' passed, ' + bad.length + ' failed');
+  if (bad.length || errors.length || r.length < 3) process.exitCode = 1;
   await b.close();
-})();
+})().catch((e) => { console.error(e); process.exitCode = 1; process.exit(); });

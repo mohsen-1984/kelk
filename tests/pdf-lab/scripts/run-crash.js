@@ -1,17 +1,20 @@
-// Stability sweep: import every PDF of a folder; report errors, timeouts and slow files.
-//   node scripts/run-crash.js <dir> [kelk root] [timeout ms]
+// Stability sweep: import every PDF under a folder (subfolders too; default: the lab's pdf/); report errors,
+// timeouts and slow files. Exit 1 on any error or timeout (CI); files over 25 MB are skipped, slow ones only listed.
+//   node scripts/run-crash.js [dir] [kelk root] [timeout ms]
 const fs = require('fs'), path = require('path');
-const { chromium } = require('./env.js').req('playwright');
+const env = require('./env.js');
+const { chromium } = env.req('playwright');
 (async () => {
-  const [dir, root = require('./env.js').KELK, tmo = '45000'] = process.argv.slice(2);
-  const files = fs.readdirSync(dir).filter((f) => /\.pdf$/i.test(f)).sort();
+  const [dir = path.join(env.LAB, 'pdf'), root = env.KELK, tmo = '45000'] = process.argv.slice(2);
+  const files = env.labPdfs(dir);
+  if (!files.length) throw new Error('no PDFs under ' + dir);
   const browser = await chromium.launch();
   let page = null;
-  const fresh = async () => { if (page) await page.close().catch(() => {}); page = await browser.newPage(); await page.goto('file://' + root + '/tools/pdf-lab.html'); };
+  const fresh = async () => { if (page) await page.close().catch(() => {}); page = await browser.newPage(); await page.goto(env.fileUrl(root + '/tools/pdf-lab.html')); };
   await fresh();
   const out = [];
-  for (const f of files) {
-    const buf = fs.readFileSync(path.join(dir, f));
+  for (const { name: f, file } of files) {
+    const buf = fs.readFileSync(file);
     if (buf.length > 25e6) { out.push({ f, skip: 'big' }); continue; }
     const t0 = Date.now();
     let timer;
@@ -30,8 +33,9 @@ const { chromium } = require('./env.js').req('playwright');
     if (r.timeout || /evaluate:/.test(r.error || '')) await fresh();
     if (r.error || r.timeout || ms > 8000) console.log(f, ms + 'ms', r.timeout ? 'TIMEOUT' : '', r.error || '', r.stack || '');
   }
-  fs.writeFileSync(path.join(require('./env.js').LAB, 'out', 'crash-' + path.basename(root) + '-' + path.basename(dir) + '.json'), JSON.stringify(out, null, 1));
+  fs.writeFileSync(path.join(env.OUT, 'crash-' + path.basename(root) + '-' + path.basename(dir) + '.json'), JSON.stringify(out, null, 1));
   const err = out.filter((x) => x.error), to = out.filter((x) => x.timeout);
   console.log('files', out.length, 'errors', err.length, 'timeouts', to.length, 'total s', Math.round(out.reduce((a, x) => a + (x.ms || 0), 0) / 1000));
+  if (err.length || to.length) process.exitCode = 1;
   await browser.close();
-})();
+})().catch((e) => { console.error(e); process.exitCode = 1; process.exit(); });

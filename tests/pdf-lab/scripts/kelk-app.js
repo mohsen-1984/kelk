@@ -6,12 +6,12 @@
 //   node scripts/kelk-app.js trip <file.pdf> <out-prefix>    both: <prefix>.md and <prefix>.pdf
 const fs = require('fs'), path = require('path');
 const { chromium } = require('./env.js').req('playwright');
-const KELK = require('./env.js').KELK;
+const { KELK, fileUrl } = require('./env.js');
 (async () => {
   const [mode, src, dst] = process.argv.slice(2);
   const b = await chromium.launch(), page = await b.newPage();
   const errs = []; page.on('pageerror', (e) => errs.push(String(e)));
-  await page.goto('file://' + KELK + '/index.html');
+  await page.goto(fileUrl(KELK + '/index.html'));
   await page.waitForFunction(() => window.Kelk && Kelk.editor && Kelk.exporter, null, { timeout: 30000 });
   let md = mode === 'pdf' ? fs.readFileSync(src, 'utf8') : null;
   if (mode === 'import' || mode === 'trip') {

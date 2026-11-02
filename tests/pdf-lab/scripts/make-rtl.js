@@ -9,7 +9,7 @@
 //   node scripts/make-rtl.js [doc-prefix]
 // Needs the Vazirmatn and Sahel TTFs installed for LibreOffice and wkhtmltopdf (assets/fonts/download/
 // vazirmatn-sahel-ttf.zip into ~/.fonts); Chromium takes the web fonts from assets/fonts/.
-const { pdfPath } = require('./env.js');
+const { pdfPath, fileUrl } = require('./env.js');
 const fs = require('fs'), path = require('path'), cp = require('child_process'), os = require('os');
 const { KELK, req } = require('./env.js');
 const { chromium } = req('playwright');
@@ -18,7 +18,7 @@ const LAB = path.join(__dirname, '..');
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'kelk-rtl-'));
 const only = process.argv[2];
 const docs = fs.readdirSync(path.join(LAB, 'corpus')).filter((f) => /^(fa|ar)-[\w-]+\.md$/.test(f) && (!only || f.startsWith(only))).map((f) => f.replace(/\.md$/, ''));
-const WEB = 'file://' + KELK + '/assets/fonts/rastikerdar/webfonts/';
+const WEB = fileUrl(KELK + '/assets/fonts/rastikerdar/webfonts') + '/';
 const FACES = `@font-face{font-family:"Vazirmatn";src:url("${WEB}Vazirmatn[wght].woff2") format("woff2");font-weight:100 900}
   @font-face{font-family:"Sahel";src:url("${WEB}Sahel-VF.woff2") format("woff2");font-weight:300 900}`;
 const GH = (font) => `body{font:15px/1.7 "${font}",sans-serif;color:#1f2328;margin:0 auto;max-width:900px}
@@ -48,7 +48,7 @@ const lo = (src, outName) => {
     for (const v of variants) {
       const f = path.join(TMP, d + '-' + v.id + '.html');
       fs.writeFileSync(f, page(md, v.css, lang));
-      await p.goto('file://' + f); await p.evaluate(() => document.fonts.ready);
+      await p.goto(fileUrl(f)); await p.evaluate(() => document.fonts.ready);
       await p.pdf({ path: pdfPath('chrome-' + v.id + '--' + d + '.pdf'), format: v.fmt, printBackground: v.bg, displayHeaderFooter: v.hf,
         headerTemplate: HEADER, footerTemplate: FOOTER, margin: { top: '0.4in', bottom: '0.4in', left: '0.4in', right: '0.4in' }, tagged: !!v.tagged, outline: !!v.tagged });
     }
@@ -60,7 +60,7 @@ const lo = (src, outName) => {
     console.log(d, 'chrome × 3, wk, lohtml');
   }
   // Kelk's builders, in the test page (all libraries loaded)
-  await p.goto('file://' + KELK + '/tests/builder-suite.html');
+  await p.goto(fileUrl(KELK + '/tests/builder-suite.html'));
   for (const d of docs) {
     const md = fs.readFileSync(path.join(LAB, 'corpus', d + '.md'), 'utf8');
     const out = await p.evaluate(async (md) => {

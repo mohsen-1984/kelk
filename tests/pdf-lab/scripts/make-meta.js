@@ -3,7 +3,7 @@
 // are countless; the ways they draw are not: a scale, a rotation, condensed or tracked type, colours, a page
 // background, object streams, a missing ToUnicode, no tags. Each transform stands for many producers at once.
 //   node scripts/make-meta.js            → meta/<transform>/<seed>.pdf and meta/manifest.json
-// Needs pdf-lib (npm) and qpdf with fix-qdf. LAB_META=… writes elsewhere. The PDFs are not shipped (seconds to
+// Needs pdf-lib (npm) and qpdf with fix-qdf (without qpdf, only the pdf-lib transforms are made). LAB_META=… writes elsewhere. The PDFs are not shipped (seconds to
 // make again). Raise GENERATOR when a transform changes: every file then differs.
 const { pdfPath } = require('./env.js');
 const fs = require('fs'), path = require('path'), cp = require('child_process'), os = require('os');
@@ -39,6 +39,9 @@ const TRANSFORMS = {
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'kelk-meta-'));
 const run = (cmd, args, opts) => cp.execFileSync(cmd, args, Object.assign({ stdio: ['pipe', 'pipe', 'pipe'] }, opts || {}));
+// qpdf's version line, or null when it is not installed (fix-qdf ships with it)
+const QPDF = (() => { try { return run('qpdf', ['--version']).toString().split('\n')[0]; } catch (e) { return null; } })();
+const PAGE_LEVEL = ['scale80', 'scale125', 'rotate90', 'pagebg', 'band'];   // pdf-lib only; the rest need qpdf
 
 /** page-level rewrites with pdf-lib: a content stream before and after the page's own, the boxes, /Rotate */
 async function pageLevel(bytes, t) {
@@ -120,10 +123,13 @@ function opLevel(bytes, t) {
 
 (async () => {
   fs.rmSync(META, { recursive: true, force: true });
-  const manifest = { generator: GENERATOR, env: { qpdf: run('qpdf', ['--version']).toString().split('\n')[0], pdfLib: req('pdf-lib/package.json').version },
+  const manifest = { generator: GENERATOR, env: { qpdf: QPDF, pdfLib: req('pdf-lib/package.json').version },
     transforms: TRANSFORMS, seeds: SEEDS, files: [] };
   let n = 0, skipped = 0;
+  const made = Object.keys(TRANSFORMS).filter((t) => QPDF || PAGE_LEVEL.includes(t));
+  if (!QPDF) console.log('qpdf not found: skipped ' + Object.keys(TRANSFORMS).filter((t) => !made.includes(t)).join(', ') + ' (they need qpdf / fix-qdf)');
   for (const [t, spec] of Object.entries(TRANSFORMS)) {
+    if (!made.includes(t)) continue;
     fs.mkdirSync(path.join(META, t), { recursive: true });
     for (const seed of SEEDS) {
       const src = fs.readFileSync(pdfPath(seed + '.pdf'));
@@ -133,7 +139,7 @@ function opLevel(bytes, t) {
         if (t === 'objstm') {
           const a = path.join(tmp, 's.pdf'), o = path.join(tmp, 'so.pdf');
           fs.writeFileSync(a, src); run('qpdf', ['--object-streams=generate', '--compress-streams=y', '--recompress-flate', a, o]); out = fs.readFileSync(o);
-        } else if (['scale80', 'scale125', 'rotate90', 'pagebg', 'band'].includes(t)) out = await pageLevel(src, t);
+        } else if (PAGE_LEVEL.includes(t)) out = await pageLevel(src, t);
         else out = opLevel(src, t);
       } catch (e) { console.log('✗', t, seed, String(e.message || e).split('\n')[0]); continue; }
       fs.writeFileSync(path.join(META, t, seed + '.pdf'), out);
@@ -143,5 +149,5 @@ function opLevel(bytes, t) {
   }
   fs.writeFileSync(path.join(META, 'manifest.json'), JSON.stringify(manifest, null, 1));
   fs.rmSync(tmp, { recursive: true, force: true });
-  console.log(n + ' PDFs in ' + META + ' (' + Object.keys(TRANSFORMS).length + ' transforms × ' + SEEDS.length + ' seeds' + (skipped ? ', ' + skipped + ' untagged seeds skipped for untag' : '') + ')');
+  console.log(n + ' PDFs in ' + META + ' (' + made.length + ' transforms × ' + SEEDS.length + ' seeds' + (skipped ? ', ' + skipped + ' untagged seeds skipped for untag' : '') + ')');
 })();
