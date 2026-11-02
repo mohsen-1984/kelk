@@ -229,7 +229,7 @@
             if (!md.trim()) {
                 // the empty pane's hint is in the interface's language: its direction, not the last document's
                 box.innerHTML = ''; clean = '';
-                box.setAttribute('dir', K.i18n.lang === 'en' ? 'ltr' : 'rtl');
+                box.setAttribute('dir', K.i18n.dir());
                 K.names.refresh(); return;
             }
             // Settings → Text → line breaks: a single new line is a line break (as chat apps show a model's

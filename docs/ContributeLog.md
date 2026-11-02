@@ -76,10 +76,12 @@ documentation is [`lib/README.md`](../lib/README.md), with [`lib/LATEX.md`](../l
 # the app — nothing to install or build
 start index.html                      # Windows; or open it in any browser, or serve the folder statically
 
-# dev checks (after `npm ci` at the root; the same three run in CI, tooling.yml)
+# dev checks (after `npm ci` at the root; the same four run in CI, tooling.yml)
 npm run lint                          # ESLint, 0 errors expected
 npm run check:version                 # every version string against K.config.version
-npm test                              # tests/unit: storage, exports, two tabs (Node + jsdom)
+npm test                              # tests/unit: storage, exports, two tabs, security, i18n, builders (Node + jsdom)
+npm run check:i18n                    # interface strings: missing / unused keys in fa, en, ar
+node tests/unit/csp-browser.js        # the CSP in Chromium on file:// and http (Playwright; not in CI)
 
 # the browser test pages (open from file://)
 start tests/index.html                # links to the suites below
@@ -273,7 +275,8 @@ Kelk has no server, no account and no upload: documents never leave the browser.
 | Formulas | `tests/math-file.html`, `math-modes.html`, `math-roundtrip.js` | Browser pages, checked by eye; since P0.3 `math-roundtrip.js` exits 1 on a failed case (76 / 76 pass, 1405-08-10) and `roundtrip.js` on a red builder-suite cell outside its two-entry allow-list (404 pass). |
 | Lint | `npm run lint` (`eslint.config.js`) | Since P0.4 (1405-08-11): **0 errors, 109 warnings** (`no-useless-escape` 42, `no-unused-vars` 32, `no-useless-assignment` 18, `no-misleading-character-class` 7, `no-control-regex` 6, `no-sparse-arrays` 4); CI workflow `tooling.yml` on every push and PR. Prettier is configured (`.prettierrc`) but the tree is not formatted, so `npm run format:check` is not in CI. |
 | Version | `npm run check:version` (`tools/check-version.js`) | 24 places checked against `K.config.version` (`scripts/config.js`): `package.json` (semver form), CHANGELOG heading, `BuilderBase.version`, the `lib/` headers and README download (release form `2.0`), `PdfImporter` its own `1.0`; in `tooling.yml`. |
-| Unit tests | `npm test` (`tests/unit/`, Node's test runner + jsdom) | Since P1.1 (1405-08-11): **23 tests**, all pass — `storage.test.js` (14: a fresh profile keeps its choices across reloads, only differences stored, legacy profiles with and without markers, the ui/profile split, settings files, a newer schema read and written by an older tab, page settings) and `app.test.js` (9: `index.html` with all its scripts in jsdom — an HTML / MD export right after a keystroke contains it, the title follows a new first heading, the last keystrokes saved on `pagehide`, a second tab follows text, settings, images, logo, the file name, theme and layout, unsaved typing kept, a cleared storage written back, a settings file and Reset / Undo through the Settings pane). On the code before P1.1, 16 of the first 19 fail. Since P1.2: **28 tests** — `security.test.js` (5: hostile Markdown leaves the app's elements, styles and toasts intact; task-list checkboxes kept, other inputs removed; HTML / MD exports of hostile Markdown carry no script, handler or `javascript:`; custom header / footer sanitised; `HtmlBuilder.toHtml` writes no `on*` / script URL and does not parse into the app's document), all 5 failing on the code before P1.2. Since P1.3: **45 tests** — `shaping.test.js` (7: U+0649 forms, joining types from Unicode, the forms table complete for U+0620–077F) and `builders.test.js` (10: one named-colour table, delayed revoke for the three `save()`s, the importer's URI filter). In `tooling.yml`. |
+| Unit tests | `npm test` (`tests/unit/`, Node's test runner + jsdom) | Since P1.1 (1405-08-11): **23 tests**, all pass — `storage.test.js` (14: a fresh profile keeps its choices across reloads, only differences stored, legacy profiles with and without markers, the ui/profile split, settings files, a newer schema read and written by an older tab, page settings) and `app.test.js` (9: `index.html` with all its scripts in jsdom — an HTML / MD export right after a keystroke contains it, the title follows a new first heading, the last keystrokes saved on `pagehide`, a second tab follows text, settings, images, logo, the file name, theme and layout, unsaved typing kept, a cleared storage written back, a settings file and Reset / Undo through the Settings pane). On the code before P1.1, 16 of the first 19 fail. Since P1.2: **28 tests** — `security.test.js` (5: hostile Markdown leaves the app's elements, styles and toasts intact; task-list checkboxes kept, other inputs removed; HTML / MD exports of hostile Markdown carry no script, handler or `javascript:`; custom header / footer sanitised; `HtmlBuilder.toHtml` writes no `on*` / script URL and does not parse into the app's document), all 5 failing on the code before P1.2. Since P1.4: **60 tests** — `i18n.test.js` (15: the table word and header dates in ar / fa / en, the strings once hard-coded follow the language, `boot.js` stored and first-visit cases and its place in `<head>`, check-i18n exit codes), 6 of them failing on the code before P1.4. Since P1.3: **45 tests** — `shaping.test.js` (7: U+0649 forms, joining types from Unicode, the forms table complete for U+0620–077F) and `builders.test.js` (10: one named-colour table, delayed revoke for the three `save()`s, the importer's URI filter). In `tooling.yml`. |
+| Interface strings | `npm run check:i18n` (`tools/check-i18n.js`) | Since P1.4 (1405-08-11): fa / en / ar — missing, unused and placeholder-mismatched keys; 278 keys, 0 / 0 / 0; in `tooling.yml`. |
 | CSP (browser) | `node tests/unit/csp-browser.js` (Playwright) | Since P1.2 (1405-08-11): `file://` and `http://localhost` in Chromium 141 — 0 violations, an inline probe refused, MathJax, PDF / DOCX / DOC / HTML / MD exports and a PDF.js import all work. Not in CI. |
 
 ### Protocol for every change
@@ -355,11 +358,11 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 | 🟡 Medium | PDF.js on a fake worker (main thread); builders synchronous, so Cancel cannot interrupt an export. | `scripts/config.js:134`, `exporter.js:172-189` | P5.1 real Worker on http(s); later async builders. |
 | 🟡 Medium | Images as base64 in `localStorage` (≈ 5 MB quota); Clear survives only in the page's Undo history, not a reload. | `scripts/images.js`, `main.js:200-206` | P5.3 IndexedDB + recovery snapshots. |
 | 🟡 Medium | Every render redoes marked + DOMPurify + hljs + MathJax; startup renders 3–4 times. | `scripts/preview.js:147-195` | Cache per block; render once at startup. |
-| 🟡 Medium | `<html lang="fa" dir="rtl">` hard-coded → a wrong-language flash; Tab trap in the editor (WCAG 2.1.2); stats `aria-live` chatter. | `index.html:2,111`, `scripts/editor.js:142-146` | P1.4 boot script; P5.4 a11y. |
-| 🟡 Medium | The Arabic UI gets the Persian word «جدول» and Persian dates. | `scripts/importer.js:20,146`, `exporter.js:114` | P1.4: through `K.i18n`, date locale by language. |
-| ⚪ Low | ≈ 10 hard-coded English strings; 9 unused i18n keys; `vendor/lucide.min_1.48.0.js` (444 KB) and a duplicate hljs CSS shipped unused. | `scripts/`, `vendor/` | P1.4 `tools/check-i18n.js`; P5.1 drop the unused files. |
+| 🟡 Medium | Tab trap in the editor (WCAG 2.1.2); stats `aria-live` chatter. (The wrong-language flash: resolved in P1.4.) | `scripts/editor.js:142-146`, `index.html:111` | P5.4 a11y. |
 | ⚪ Low | Missing: PWA, print CSS, find / replace, snapshots, export presets, reorder before a multi-file join, outline navigation, auto theme. | — | P5.3–P5.4. |
 | ⚪ Low | Two tabs (since P1.1, 1405-08-11): two tabs typing within the same 600 ms autosave pause — the later save wins, and the other tab takes it once idle; a tab of an older Kelk version keeps a newer profile's other values but cannot read the ones it does not know. | `scripts/main.js` (storage listener), `editor.js` (`external`), `storage.js` (`set`) | P5.3 with IndexedDB and snapshots, if it matters in use. |
+| ⚪ Low | `vendor/lucide.min_1.48.0.js` (444 KB) and a duplicate hljs CSS shipped unused. | `vendor/` | P5.1: drop them. |
+| ⚪ Low | The stored side / stack layout is applied only after the scripts load (a class on `#workspace` in `<body>`), so it can flash (P1.4, 1405-08-11). | `scripts/main.js` | Set it from `boot.js` on `<html>` with a CSS rule, if it shows. |
 
 ### 📚 Builder libraries (`lib/`)
 
@@ -376,7 +379,7 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 No open issues.
 
 <details>
-<summary><strong>✅ Resolved</strong> (27) — click to expand</summary>
+<summary><strong>✅ Resolved</strong> (30) — click to expand</summary>
 
 | Priority | Issue | Location | Suggestion |
 |---|---|---|---|
@@ -407,6 +410,9 @@ No open issues.
 | ✅ Resolved 1405-08-11 | **B5** — the builder suite never loaded `dejavu-sans-mono`, so three cases passed on a fallback font. | `tests/builder-suite.html` | P1.3: both font files loaded; `code-mono`, `code-mono-docfont`, `nested-fence-frames` now embed DejaVu Sans Mono (before: Courier) and pass. |
 | ✅ Resolved 1405-08-11 | **B6** three divergent named-colour tables (DocxBuilder 19, PdfBuilder 14, BidiCore 20 names) · **B7** blob URL revoked right after `click()` (DOCX, DOC) · **B8** dead `data:image` branch in `ALLOWED_URI_REGEXP` · `hasMix` declared twice. | `lib/BuilderBase.js`, `DocxBuilder.js`, `WordHtmlBuilder.js`, `MarkdownImporter.js` | P1.3: one `BuilderBase.NAMED_COLORS` (148 CSS names + `windowtext`) via `BuilderBase.colorHex` (PDF / DOCX also read `rgb()` and every name now); `BuilderBase.downloadBlob` revokes after 4 s; the branch removed (it could never match); `hasMix` single since P0.4. `tests/unit/builders.test.js`. |
 | ✅ Resolved 1405-08-11 | **`fa-features` scored quote 0 on all four producers** (Kelk, Chrome plain, GitHub-style, tagged; totals ≈ 85). | `tests/pdf-lab/scripts/score.js`, `lib/pdfimport/order.js`, `blocks.js` | P1.3, two causes: the scorer kept a soft line break's `>` inside a nested quote's key (no import could match; `softJoin`, no score of the old importer moves) and the nested-quote rules assumed left-to-right text (inner box / bar side, depth by x0, list continuation through a heading, quote gap below Vazirmatn's leading). Quote 100 on all four (totals 100 / 98.9 / 98.9 / 100), `chrome-rtl-plain-hf--fa-article` 71.2 → 85.5; corpus 95.7 → 96.2, `rtl` unchanged, fuzz +0.0. |
+| ✅ Resolved 1405-08-11 | The Arabic UI got "Table" in nested-table references (the row said «جدول»; the code chose `fa ? 'جدول' : 'Table'`) and Persian dates in custom headers. | `scripts/importer.js`, `exporter.js` | P1.4: `K.i18n.t('tableLabel')`; `K.i18n.dateLocale(dir)` — RTL in the Arabic UI `ar-u-nu-latn`, other RTL `fa-IR-u-nu-latn`, LTR `en-GB`. `tests/unit/i18n.test.js`. |
+| ✅ Resolved 1405-08-11 | ≈ 10 hard-coded English strings; 9 unused i18n keys. | `scripts/` | P1.4: 9 strings through `K.i18n` (table word, size unit, language group label, load errors, page-list separator, logo `alt`), 9 keys removed; `tools/check-i18n.js` (`npm run check:i18n`: 278 keys × 3, 0 missing / 0 unused / 0 placeholder mismatches) in `tooling.yml`. |
+| ✅ Resolved 1405-08-11 | Wrong-language / theme flash: `<html lang="fa" dir="rtl">` hard-coded, the stored language and theme applied only after ≈ 40 scripts. | `index.html`, `scripts/boot.js` | P1.4: `scripts/boot.js` early in `<head>` (external, allowed by the CSP) sets `lang` / `dir` / `data-theme` from `kelk.ui` before first paint; checked at `<body>` creation in fa / en / ar, light / dark. |
 
 </details>
 
@@ -621,9 +627,11 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 14 | P1.3 B2 / B3 PDF tables: columns from the `_tableStyleGrid` occupancy, spanning cells drawn once, rows taller than a page split with closed cells and the header repeated; five table cases with a PDF geometry check; pages rendered and inspected. |
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 7 | P1.3 B5–B8: DejaVu Sans Mono loaded in the builder suite; one named-colour table in `BuilderBase`; delayed blob revoke in one helper; the dead data-URI branch removed; 10 unit tests. |
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 12 | P1.3 `fa-features` quote bisect on a copy of the importer: the scorer's nested-quote key and four left-to-right assumptions in the quote rules found and fixed; full lab base against head on the same PDFs. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 1 | P1.4 stacked on `redesign/P1.3`: applied over P1.2's `index.html`, `exporter.js` and `preview.js` (CSP `<meta>` kept before `boot.js`); unit tests 60 / 60, lint, version, check-i18n and the CSP browser check with `boot.js` on `file://` and http; report figures for the stack, Known Issues, Testing, Commands and the tracker. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 14 | P1.4 i18n and small app bugs: Arabic table word and date locale through `K.i18n`; 9 hard-coded strings moved and 9 unused keys removed; `tools/check-i18n.js` with an npm script and a CI step; `scripts/boot.js` setting language, direction and theme before first paint; size unit order fixed; 15 unit tests; fa / en / ar screenshot review; report `docs/reports/P1.4-i18n.md`. |
 
 <!-- generated:totals -->
-**Entries: 71 · Total: 812 min (13.53 hours) — Zarrabi 812 min (64 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 73 · Total: 827 min (13.78 hours) — Zarrabi 827 min (66 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
