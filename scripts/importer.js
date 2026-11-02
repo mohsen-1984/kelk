@@ -17,8 +17,13 @@
         return MarkdownImporter.create({
             nestedTables: o.nestedTables,
             images: o.images,
-            labels: { table: K.i18n.lang === 'fa' ? 'جدول' : 'Table' }
+            labels: labels()
         });
+    }
+
+    /** The words the importer writes into the text (nested-table references), in the interface's language. */
+    function labels() {
+        return { table: K.i18n.t('tableLabel') };
     }
 
     function ext(name) { const m = /\.[^.]+$/.exec(name || ''); return m ? m[0].toLowerCase() : ''; }
@@ -132,6 +137,26 @@
         return null;
     }
 
+    /**
+     * PdfImporter's notes (r.notes) → a toast: its message key, written in full (tools/check-i18n.js counts a
+     * computed pdf_ key as used only where it is written out), its type, and whether it names pages (pages: the
+     * importer's self-diagnosis, r.quality.flags; pageFailed: r.failedPages). An unknown note is not shown.
+     */
+    const PDF_NOTES = {
+        noText: { key: 'pdf_noText', type: 'warn' },
+        figureFailed: { key: 'pdf_figureFailed', type: 'warn' },
+        pageLimit: { key: 'pdf_pageLimit', type: 'warn' },
+        printNoLinks: { key: 'pdf_printNoLinks', type: 'info' },
+        ocrLayer: { key: 'pdf_ocrLayer', type: 'info' },
+        pageFailed: { key: 'pdf_pageFailed', type: 'warn' },
+        lostGlyphs: { key: 'pdf_lostGlyphs', type: 'warn', pages: true },
+        suspectSpaces: { key: 'pdf_suspectSpaces', type: 'warn', pages: true },
+        textInPictures: { key: 'pdf_textInPictures', type: 'warn', pages: true }
+    };
+    /** PdfImporter's errors with a message of their own (err.code); others show the error's text. */
+    const PDF_ERRORS = { password: 'pdf_password', invalid: 'pdf_invalid' };
+    const own = function (o, k) { return Object.prototype.hasOwnProperty.call(o, k); };
+
     /** A PDF → Markdown, page by page on the task's bar; Cancel stops it at the next page. */
     async function fromPdf(file, name, t) {
         await K.libs.need('pdfjs');                  // loaded on the first .pdf import
@@ -143,7 +168,7 @@
                 const r = await PdfImporter.create({
                     images: o.images === 'drop' ? 'drop' : 'markdown',
                     asciiNumbers: o.asciiNumbers !== false, persianLetters: o.persianLetters !== false,
-                    markdownImporter: { nestedTables: o.nestedTables, images: o.images, labels: { table: K.i18n.lang === 'fa' ? 'جدول' : 'Table' } },
+                    markdownImporter: { nestedTables: o.nestedTables, images: o.images, labels: labels() },
                     wasmBase: 'vendor/pdfjs/wasm/',
                     loadScript: K.ui.loadScript,
                     signal: t.signal,
@@ -165,12 +190,10 @@
                     onProgress: function (i, n) { t.progress(i, n, K.i18n.t('taskPage', i, n)); }
                 });
                 (r.notes || []).forEach(function (n) {
-                    if (n === 'noText' || n === 'figureFailed' || n === 'pageLimit') K.ui.toast(K.i18n.t('pdf_' + n), 'warn');
-                    else if (n === 'printNoLinks' || n === 'ocrLayer') K.ui.toast(K.i18n.t('pdf_' + n), 'info');
-                    else if (n === 'pageFailed') K.ui.toast(K.i18n.t('pdf_pageFailed', K.ui.pageList(r.failedPages)), 'warn');
-                    // the importer's self-diagnosis (r.quality): pages that may have come back worse than their text
-                    else if (n === 'lostGlyphs' || n === 'suspectSpaces' || n === 'textInPictures')
-                        K.ui.toast(K.i18n.t('pdf_' + n, K.ui.pageList(r.quality && r.quality.flags[n])), 'warn');
+                    if (!own(PDF_NOTES, n)) return;
+                    const note = PDF_NOTES[n];
+                    const pages = n === 'pageFailed' ? r.failedPages : note.pages ? r.quality && r.quality.flags[n] : null;
+                    K.ui.toast(K.i18n.t(note.key, pages ? K.ui.pageList(pages) : ''), note.type);
                 });
                 if (r.messages && r.messages.length) console.info('PdfImporter:', r.messages);
                 return r.markdown;
@@ -237,7 +260,7 @@
             } catch (err) {
                 if (err && err.code === 'aborted') { K.ui.toast(K.i18n.t('cancelled')); return; }
                 console.error(err);
-                if (err && (err.code === 'password' || err.code === 'invalid')) K.ui.toast(K.i18n.t('pdf_' + err.code), 'error');
+                if (err && own(PDF_ERRORS, err.code)) K.ui.toast(K.i18n.t(PDF_ERRORS[err.code]), 'error');
                 else K.ui.toast(K.i18n.t('failed', err && err.message || ''), 'error');
                 return;
             }

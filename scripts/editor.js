@@ -291,7 +291,9 @@
             const bytes = new Blob([v]).size;
             K.$('#st-words').textContent = words.toLocaleString('en-US');
             K.$('#st-chars').textContent = v.length.toLocaleString('en-US');
-            K.$('#st-size').textContent = (bytes / 1024).toFixed(1) + ' KB';
+            const size = K.$('#st-size');
+            size.textContent = K.i18n.t('sizeKb', (bytes / 1024).toFixed(1));
+            size.dir = 'auto';                     // index.html's ltr suited «41.1 KB», not «41.1 كيلوبايت»
             const f = K.$('#st-file');
             f.hidden = !fileName;
             K.$('#st-file-name').textContent = fileName;

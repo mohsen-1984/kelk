@@ -12,7 +12,8 @@
     "lint": "eslint .",
     "test": "node --test \"tests/unit/*.test.js\"",
     "format:check": "prettier --check .",
-    "check:version": "node tools/check-version.js"
+    "check:version": "node tools/check-version.js",
+    "check:i18n": "node tools/check-i18n.js"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
