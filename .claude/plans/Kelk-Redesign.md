@@ -1,13 +1,13 @@
 # Kelk 2.0 → 2.x Redesign Plan
 
 **Creator:** Zarrabi · **Created:** 1405-08-09
-**Summary:** Structural changes, not a rewrite: the rule-based PDF importer and its lab are the asset, and the weaknesses found in the review are fixable in place, each step gated by the lab. 8 phases / 31 sub-phases, ≈ 76 working days plus the owner's review — **P0** stabilise and commit · **P1** verified bugs · **P2** test-net completeness · **P3** importer structure, calibration, degradation · **P4** generalisation with real producers and golden-50 · **P5** app and libraries · **P6** optional ML second opinion · **P7** OCR for scans · **P8** release and docs. P0.1 Git hygiene approved 1405-08-10 (LF everywhere, lab PDFs kept as ordinary `binary` files). P0.2 approved 1405-08-10 (gate guarded, 144-file corpus baseline; fuzz and meta kept until P0.3 rebuilds them in CI). Next: **P0.3 CI first green run**. Progress tracker: §5.
+**Summary:** Structural changes, not a rewrite: the rule-based PDF importer and its lab are the asset, and the weaknesses found in the review are fixable in place, each step gated by the lab. 8 phases / 31 sub-phases, ≈ 76 working days plus the owner's review — **P0** stabilise and commit · **P1** verified bugs · **P2** test-net completeness · **P3** importer structure, calibration, degradation · **P4** generalisation with real producers and golden-50 · **P5** app and libraries · **P6** optional ML second opinion · **P7** OCR for scans · **P8** release and docs. P0.1 Git hygiene approved 1405-08-10 (LF everywhere, lab PDFs kept as ordinary `binary` files). P0.2 approved 1405-08-10 (gate guarded, 144-file corpus baseline; fuzz and meta kept until P0.3 rebuilds them in CI). P0.3 approved 1405-08-10 (CI green and a deliberate ZWNJ break turns it red; one step left: the fuzz and meta parts of `baseline.json` rebuilt from a manual CI run with `baseline` ticked, not yet run — the token could not start it). Next: that run, then **P0.4 Dev tooling, single version**. Progress tracker: §5.
 
 *Master plan, `.claude/plans/Kelk-Redesign.md`. Dates are Solar Hijri `YYYY-MM-DD`.
 Written 1405-08-09 (2026-10-31) from a full review of the 2.0-rc1 tree; raw corpus scores of that day:
 [`docs/reports/corpus-run-1405-08-09.json`](../../docs/reports/corpus-run-1405-08-09.json).*
 
-**Status: accepted by the project owner on 1405-08-09; execution started — P0.0, P0.1 and P0.2 approved 1405-08-10.** Work continues on another machine —
+**Status: accepted by the project owner on 1405-08-09; execution started — P0.0, P0.1, P0.2 and P0.3 approved 1405-08-10.** Work continues on another machine —
 everything needed to resume is in this file. Nothing in the repository has been changed by the review.
 
 ---
@@ -121,7 +121,7 @@ Status: `todo` → `doing` → `report` (report written, waiting) → `approved`
 | P0 | P0.0 Plan files into project | approved | 1405-08-09 | 1405-08-10 | — (no code change) | ☑ owner, 1405-08-10 |
 | P0 | P0.1 Git hygiene | approved | 1405-08-10 | 1405-08-10 | 95.7 / — / — / 92.9 (corpus only; no importer change) | ☑ owner, 1405-08-10 |
 | P0 | P0.2 Baseline rebuilt, gate guarded | approved | 1405-08-10 | 1405-08-10 | 95.7 / 95.8* / 93.9* / 92.9 (*Windows, no wkhtmltopdf: not comparable; baseline keeps 96.0 / 94.6) | ☑ owner, 1405-08-10 |
-| P0 | P0.3 CI first green run | todo | | | | ☐ |
+| P0 | P0.3 CI first green run | approved | 1405-08-10 | 1405-08-10 | 95.7 / 96.0 / 94.6 / 92.9 (CI runner; fuzz and meta not yet compared: the CI baseline run is still to do) | ☑ owner, 1405-08-10 |
 | P0 | P0.4 Dev tooling, single version | todo | | | | ☐ |
 | P1 | P1.1 Storage & export correctness | todo | | | | ☐ |
 | P1 | P1.2 Security hardening | todo | | | | ☐ |
@@ -167,7 +167,7 @@ Effort figures are working days and include the report; the owner's review time 
 
 **P0.2 Baseline rebuilt, gate guarded** — `gate.js --update` refuses when the corpus count < `labPdfs().length` unless `--partial`; full run → `baseline.json` with all 144 files + `rtl` per file; gate `rtl` per file (TOL 0.5) like total. *Accept:* `Object.keys(base.corpus).length === 144`; disabling the ZWNJ rule locally fails the gate. ½ d. → report & approval.
 
-**P0.3 CI first green run** — remove `> /dev/null || true` (`pdf-lab.yml:53-64`), `set -o pipefail`, `tee` logs to the artifact; `permissions: contents: read`, `concurrency`, SHA-pinned actions, npm cache; rebuild the fuzz and meta parts of `baseline.json` in the CI environment (P0.2 kept the review machine's, Chromium 153); `make-meta.js` skips the qpdf transforms with a note instead of crashing, `make-fuzz.js` prints a wkhtmltopdf substitution; add `roundtrip.js`, `math-roundtrip.js` (set `process.exitCode`), `run-crash.js` smoke; Windows-friendly harness: `fileUrl()` on `url.pathToFileURL` in `env.js` replacing `'file://' + path` ×30, `NODE_TOOLS` via `require.resolve`, `fc-match` optional, `path.sep`-safe splits in `features.js`. *Accept:* green run on the branch, artifact uploaded, a deliberate rule break turns red. 1½ d. → report & approval.
+**P0.3 CI first green run** — remove `> /dev/null || true` (`pdf-lab.yml:53-64`), `set -o pipefail`, `tee` logs to the artifact; `permissions: contents: read`, `concurrency`, SHA-pinned actions, npm cache; rebuild the fuzz and meta parts of `baseline.json` in the CI environment (P0.2 kept the review machine's, Chromium 153); `make-meta.js` skips the qpdf transforms with a note instead of crashing, `make-fuzz.js` prints a wkhtmltopdf substitution; add `roundtrip.js`, `math-roundtrip.js` (set `process.exitCode`), `run-crash.js` smoke; Windows-friendly harness: `fileUrl()` on `url.pathToFileURL` in `env.js` replacing `'file://' + path` ×30, `NODE_TOOLS` via `require.resolve`, `fc-match` optional, `path.sep`-safe splits in `features.js`. *Accept:* green run on the branch, artifact uploaded, a deliberate rule break turns red. 1½ d. → report & approval. *Done 1405-08-10:* green run 41333786984; the two-line ZWNJ break failed at the gate only (run 41333855809, 40 failures); still to do: the fuzz and meta parts of `baseline.json` rebuilt on the CI runner (manual run with `baseline` ticked, then commit the `baseline-candidate` artifact) — `docs/reports/P0.3-ci-green.md` §5.
 
 **P0.4 Dev tooling and single version** — `package.json` (devDependencies: playwright pinned to the version CI uses, pdf-lib, eslint, prettier, the DOCX validator of P2.3), `package-lock.json`; `eslint.config.js` (script globals `Kelk`, `PdfImporter`, …), `.prettierrc`; `VERSION` single source in `scripts/config.js`; `tools/check-version.js` in CI. *Accept:* `npm run lint` 0 errors; one version string. 1 d. → report & approval.
 
