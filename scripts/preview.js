@@ -49,6 +49,53 @@
         });
     }
 
+    /**
+     * The pane only — WCAG fixes found by tools/check-a11y.js. Applied after `clean` is taken for the builders and
+     * stripped again by copyAll() (unA11y), so neither the exports nor Copy carry them; every attribute set here
+     * is marked with A11Y.
+     * - a task checkbox (tight list: li > input; loose list: li > p > input) is named by its item's own text, its
+     *   nested lists left out (axe `label`);
+     * - scrollers(): a code block or display formula whose content is wider than its box can be reached and
+     *   scrolled from the keyboard (axe `scrollable-region-focusable`): tabindex="0" on the element that scrolls —
+     *   only while it really overflows, so a short block adds no tab stop. Re-checked on every render (the pane's
+     *   resize and the web fonts' arrival re-render) and once the formulas are typeset.
+     */
+    const A11Y = 'data-kelk-a11y';
+    function a11y(root) {
+        K.$$('li input[type="checkbox"]', root).forEach(function (box) {
+            const li = box.closest('li');
+            if (!li) return;
+            const own = li.cloneNode(true);
+            K.$$('ul, ol', own).forEach(function (l) { l.remove(); });
+            const name = own.textContent.replace(/\s+/g, ' ').trim().slice(0, 120);
+            if (name) { box.setAttribute('aria-label', name); box.setAttribute(A11Y, 'aria-label'); }
+        });
+        scrollers(root);
+    }
+    function scrollers(root) {
+        const overflows = function (el) { return el.scrollWidth > el.clientWidth + 1; };
+        K.$$('pre, .kelk-math', root).forEach(function (el) {
+            const code = el.tagName === 'PRE' ? el.querySelector(':scope > code') : null;
+            [el, code].forEach(function (x) {
+                if (x && x.getAttribute(A11Y) === 'tabindex') { x.removeAttribute('tabindex'); x.removeAttribute(A11Y); }
+            });
+            const target = code && overflows(code) ? code : overflows(el) ? el : null;
+            if (target && !target.hasAttribute('tabindex')) {
+                target.setAttribute('tabindex', '0');
+                target.setAttribute(A11Y, 'tabindex');
+            }
+        });
+    }
+    /** A copy of the pane without what a11y() added (for Copy). */
+    function unA11y(root) {
+        K.$$('[' + A11Y + ']', root).forEach(function (el) {
+            const a = el.getAttribute(A11Y);
+            if (a === 'aria-label' || a === 'tabindex') el.removeAttribute(a);
+            el.removeAttribute(A11Y);
+        });
+        return root;
+    }
+
     /** HTML of the user through DOMPurify with the preview's rules; without DOMPurify only its text is kept. */
     function sanitize(html) {
         if (typeof DOMPurify !== 'undefined') {
@@ -274,6 +321,7 @@
                 box.setAttribute('dir', BidiView.apply(box, { dir: K.store.get('direction') }).dir);
             }
             K.ui.icons(box);
+            a11y(box);
             K.names.refresh();
             this.typesetMath(pb);
         },
@@ -316,6 +364,7 @@
             const run = ++mathRun;
             const s = K.store.settings();
             const job = pb ? pb.typeset(box) : MathCore.typeset(box, { mode: 'svg', textFont: s.fonts && s.fonts.bidi });
+            job.then(function () { if (run === mathRun) scrollers(box); }, function () {});   // wide formulas: keyboard
             job.catch(function (e) {
                 if (run !== mathRun) return;
                 MathCore.fallbackText(box);
@@ -338,7 +387,7 @@
             this.flush();
             try {
                 if (navigator.clipboard && typeof ClipboardItem !== 'undefined') {
-                    const clone = box.cloneNode(true);
+                    const clone = unA11y(box.cloneNode(true));   // the pane's own aria-label / tabindex: not the document's
                     if (typeof BidiCore !== 'undefined') BidiCore.unwrapCodeBlocks(clone);
                     if (typeof BidiView !== 'undefined') BidiView.toAttributes(clone);   // Word reads dir, not classes
                     await navigator.clipboard.write([new ClipboardItem({

@@ -1,0 +1,4 @@
+{
+  "_about": "Serious/critical axe findings tools/check-a11y.js accepts for now (format: see the header of that file). Every entry names the plan phase that removes it; remove the entry in that phase. Empty since the P2.4 review: wide display formulas, allow-listed before (scrollable-region-focusable), get a tab stop while they overflow (scripts/preview.js scrollers). Not here because axe cannot detect them, but known and planned for P5.4: the Tab trap in the editor (WCAG 2.1.2, scripts/editor.js) and the stats aria-live chatter (index.html).",
+  "allow": []
+}
