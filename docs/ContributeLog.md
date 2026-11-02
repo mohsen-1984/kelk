@@ -397,6 +397,7 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 | ⚪ Low | ؠ ػ ؼ ؾ ؿ ۺ ۻ ۼ (U+0620, 063B, 063C, 063E, 063F, 06FA–06FC) have no glyph in any bundled PDF font: not drawn, lost on a round trip (`shaping-no-forms-uncovered`, a known red cell in `roundtrip.js`). A single text line taller than a page in a table cell still overflows (warning only). (P1.3, 1405-08-11) | `lib/pdf-base64-ttf-fonts/`, `lib/PdfBuilder.js` | A fallback font when needed. |
 | ✅ Resolved 1405-08-11 | Found by P2.3: a horizontal rule from a .docx leaked as `⟦KHR⟧` in lists and running text and broke a GFM table when inside a cell; MathCore wrote `m:strikeBLTR` twice for `\cancelto` (invalid OOXML). | `lib/MarkdownImporter.js`, `lib/MathCore.js` | P2.3: a rule in a cell becomes a line break, in a list it moves into the item before, inside text it is dropped; each strike flag written once in schema order. |
 | ⚪ Low | DocxBuilder drops page breaks (the PDF breaks, HTML and DOC keep the CSS); internal links in a .docx come back from the importer as `#bm_<id>` and through a PDF are lost; a ToC read back from a PDF runs titles and page numbers together (P2.3, 1405-08-11). | `lib/DocxBuilder.js`, `lib/MarkdownImporter.js`, `lib/pdfimport/` | Seen in the goldens; P5.2 / P3. |
+| ⚪ Low | LibreOffice 24.2.7 on Linux (headless) aborts (exit 134, `SfxBaseModel::impl_store … 0xc10`) while writing the PDF of the two corpus documents with a Word ToC field (`toc-ltr`, `toc-rtl`); both pass the OOXML schemas and LibreOffice 24.2.7.2 on Windows converts them; listed in `SOFFICE_KNOWN` in `tests/docx-validate.js` (P2.3, 1405-08-11). | `tests/docx-validate.js`, `lib/DocxBuilder.js` (ToC field) | Recheck when the LibreOffice pin moves; open the file in Word to rule out a DocxBuilder fault. |
 
 ### 🛠️ Claude Code tooling
 
@@ -686,9 +687,12 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 13 | Review of the P2.3 diff: goldens against a damaged picture, a tampered shared section, stray files and a partial update; the importer change on ordinary cells; the validator against a silent xmllint, Markup Compatibility tricks and a stale PDF; the workflow's version check. |
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 20 | P2.3 first CI run and review fixes: LibreOffice one process per file with retries and exit status (7 files lost after a crash in one call); right-to-left formula widths measured differently on Linux normalised in the goldens; pictures kept as size and hash, a second picture; only the rule's `<br>` dropped in cells; xmllint per-part confirmation, Markup Compatibility errors, shared-file hashes, all-or-nothing `--update`, `docProps/` in the goldens; 7 tests; report §4 / §5. |
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 18 | P2.3 fixes joined on `redesign/P2.3` (unit tests 93, goldens equal, lint) and merged up into `redesign/P2.4`; the branches pushed for the second CI run. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 8 | P2.3 and P2.4 second CI runs read: goldens green on Ubuntu, LibreOffice 74 / 76 with an abort on the two ToC documents — a known-abort list (`SOFFICE_KNOWN`) added to `docx-validate.js` with its reason, report §5 and Known Issues; CI run ids of every pull request collected; the workload of every row checked against the logs. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 35 | P2.3 first CI run and review fixes, continued: LibreOffice 24.2.7 for Windows unpacked to reproduce the Linux failure, the right-to-left formula measurement traced to platform text layout, the validator's Markup Compatibility, picture and xmllint checks with 5 unit tests, all-or-nothing `--update`, the report's counts. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 2 | Review of the P1.2 diff, continued: the bookmark and overlay probes and the report's statements checked. |
 
 <!-- generated:totals -->
-**Entries: 103 · Total: 1287 min (21.45 hours) — Zarrabi 1287 min (96 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 106 · Total: 1332 min (22.20 hours) — Zarrabi 1332 min (99 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
