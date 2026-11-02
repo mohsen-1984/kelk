@@ -69,16 +69,22 @@
      * rel="noopener noreferrer".
      */
     function fixLinks(root) {
-        K.$$('a[href^="#"]', root).forEach(function (a) {
-            let id = a.getAttribute('href').slice(1);
+        // the prefixed names: ids, and the name of an <a name> anchor or an image <map>
+        const named = {};
+        K.$$('[id], a[name], map[name]', root).forEach(function (el) {
+            if (el.id) named[el.id] = true;
+            if (el.getAttribute('name')) named[el.getAttribute('name')] = true;
+        });
+        function follow(el, attr) {
+            let id = el.getAttribute(attr).slice(1);
             try { id = decodeURIComponent(id); } catch (e) { /* as written */ }
             if (!id || id.indexOf(NAMED_PREFIX) === 0) return;
-            const target = NAMED_PREFIX + id;
-            const found = Array.prototype.some.call(root.querySelectorAll('[id]'), function (el) { return el.id === target; });
-            if (found) a.setAttribute('href', '#' + target);
-        });
+            if (named[NAMED_PREFIX + id]) el.setAttribute(attr, '#' + NAMED_PREFIX + id);
+        }
+        K.$$('a[href^="#"], area[href^="#"]', root).forEach(function (a) { follow(a, 'href'); });
+        K.$$('img[usemap^="#"]', root).forEach(function (img) { follow(img, 'usemap'); });
         K.$$('a[href^="http"]', root).forEach(function (a) { a.target = '_blank'; });
-        K.$$('a[target]', root).forEach(function (a) { a.rel = 'noopener noreferrer'; });
+        K.$$('a[target], area[target]', root).forEach(function (a) { a.rel = 'noopener noreferrer'; });
     }
 
     // ── the app's dark theme: the document's own colors, translated for the preview only ──────
