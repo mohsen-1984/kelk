@@ -1,0 +1,32 @@
+# MHTML, 3 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/d6baaf1d4e00.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="ltr">
+        <p style="direction:ltr;text-align:justify" class="MsoNormal">An English technical report.</p>
+
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/header.htm (text/html) head ===== -->
+<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=utf-8">
+<link id=Main-File rel=Main-File href="../document.htm">
+</head>
+<!-- ===== file:///C:/document_files/header.htm (text/html) body ===== -->
+<body>
+<div style='mso-element:header' id=h1><table class='headerFooterTable' dir=ltr border=0 cellspacing=0 cellpadding=0 style='border-collapse:collapse;border:none;margin-top:0pt;margin-bottom:0pt'><tr><td width=10% align=center valign=center style='width:10%;border:none;border-bottom:solid black 0.5pt;margin-top:4pt;margin-bottom:4pt'><span dir=rtl>لوگو</span></td><td width=75% align=center valign=center style='width:75%;border:none;border-bottom:solid black 0.5pt;border-right:solid black 0.5pt;border-left:solid black 0.5pt;margin-top:4pt;margin-bottom:4pt'><span dir=rtl>گزارش فنی ایزو 2000</span> ISO 2000</td><td width=15% align=center valign=center style='width:15%;border:none;border-bottom:solid black 0.5pt;margin-top:4pt;margin-bottom:4pt'>v1.2</td></tr></table></div>
+<div style='mso-element:footer' id=f1><table class='headerFooterTable' dir=ltr align='center' border=0 cellspacing=0 cellpadding=0 style='border-collapse:collapse;border:none;margin-top:0pt;margin-bottom:0pt'><tr><td width=80% align=left valign=center style='width:80%;border:none;border-top:solid black 0.5pt;border-right:solid black 0.5pt;margin-left:10.0pt;margin-top:0pt;margin-bottom:0pt'><span dir=rtl>مرکز فناوری اطلاعات</span> | <a href="https://example.com"><span dir=LTR>example.com</span></a></td><td width=20% align=center valign=center style='width:20%;border:none;border-top:solid black 0.5pt;margin-top:0pt;margin-bottom:0pt'>Page <span style='mso-field-code:" PAGE "'></span> of <span style='mso-field-code:" NUMPAGES "'></span></td></tr></table></div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="header.htm"/>
+ <o:File HRef="filelist.xml"/>
+</xml>

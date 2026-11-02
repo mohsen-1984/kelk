@@ -28,3 +28,6 @@
 *.xlsx binary
 *.pptx binary
 *.odt binary
+
+# Third-party schemas kept byte for byte as published (their CRLF line ends too), so tests/ooxml-xsd/README.md hashes hold
+tests/ooxml-xsd/** -text

@@ -1,0 +1,18 @@
+# MHTML, 2 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/b1656fe21d17.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="rtl">
+        <p class="MsoNormal">متن فارسی سند.</p><p class="MsoQuote" style="border-top:none;border-bottom:none;border-right:solid #F6F9F8 .25pt;border-left:solid #1F6F5C 3.5pt;padding-left:12pt;padding-right:12pt;background:#F6F9F8;margin-left:14.15pt;margin-right:0cm;direction:ltr;text-align:justify" dir="ltr">I'll send you 6 Persian sentences with «<span dir="rtl">شد</span>» and «<span dir="rtl">می‌شود</span>» and my English translation of each.</p><p class="MsoQuote" style="border-top:none;border-bottom:none;border-right:solid #F6F9F8 .25pt;border-left:solid #1F6F5C 3.5pt;padding-left:12pt;padding-right:12pt;background:#F6F9F8;margin-left:14.15pt;margin-right:0cm;direction:ltr;text-align:justify" dir="ltr">Focus only on: the passive structure (be + past participle), the correct past participle form, and whether <em>by</em> is needed.</p><p class="MsoQuote" style="border-top:none;border-bottom:none;border-right:solid #F6F9F8 .25pt;border-left:solid #1F6F5C 3.5pt;padding-left:12pt;padding-right:12pt;background:#F6F9F8;margin-left:14.15pt;margin-right:0cm;direction:ltr;text-align:justify" dir="ltr">For each: show my English, then the natural English, then explain the difference in Persian in one line.</p><p class="MsoQuote" style="border-top:none;border-bottom:none;border-right:solid #F6F9F8 .25pt;border-left:solid #1F6F5C 3.5pt;padding-left:12pt;padding-right:12pt;background:#F6F9F8;margin-left:14.15pt;margin-right:0cm;direction:ltr;text-align:justify" dir="ltr">Don't translate before I try.</p>
+        <p class=MsoNormal style='direction:rtl;text-align:right'>&nbsp;</p>
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="filelist.xml"/>
+</xml>

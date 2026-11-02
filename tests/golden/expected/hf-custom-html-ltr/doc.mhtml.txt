@@ -1,0 +1,33 @@
+# MHTML, 3 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/d6baaf1d4e00.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="ltr">
+        <h1 style="direction:ltr;text-align:left">A report with a custom header</h1>
+<p style="direction:ltr;text-align:justify" class="MsoNormal">The header is a table with the title field; the footer counts pages.</p>
+
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/header.htm (text/html) head ===== -->
+<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=utf-8">
+<link id=Main-File rel=Main-File href="../document.htm">
+</head>
+<!-- ===== file:///C:/document_files/header.htm (text/html) body ===== -->
+<body>
+<div style='mso-element:header' id=h1><table class=headerFooterTable dir=ltr border=0 cellspacing=0 cellpadding=0 width='100%' style='width:100.0%;border-collapse:collapse;border:none;mso-border-alt:none;mso-padding-alt:0cm 0cm 0cm 0cm;mso-table-dir:ltr'><tr><td width='30.0%' valign=middle style='width:30.0%;border-top:none;mso-border-top-alt:none;border-right:none;mso-border-right-alt:none;border-bottom:none;mso-border-bottom-alt:none;border-left:none;mso-border-left-alt:none;padding:2pt 2pt 2pt 2pt'><p class=MsoNormal dir=ltr style='margin:0cm;text-align:left;direction:ltr;unicode-bidi:embed'><span style='font-weight:bold;mso-bidi-font-weight:bold;'>Kelk</span></p></td><td width='50.0%' valign=middle style='width:50.0%;border-top:none;mso-border-top-alt:none;border-right:none;mso-border-right-alt:none;border-bottom:solid #888888 1.00pt;mso-border-bottom-alt:solid #888888 1.00pt;border-left:none;mso-border-left-alt:none;padding:2pt 2pt 2pt 2pt'><p class=MsoNormal dir=ltr style='margin:0cm;text-align:center;direction:ltr;unicode-bidi:embed'>A report with a custom header</p></td><td width='20.0%' valign=middle style='width:20.0%;border-top:none;mso-border-top-alt:none;border-right:none;mso-border-right-alt:none;border-bottom:none;mso-border-bottom-alt:none;border-left:none;mso-border-left-alt:none;padding:2pt 2pt 2pt 2pt'><p class=MsoNormal dir=ltr style='margin:0cm;text-align:right;direction:ltr;unicode-bidi:embed'><span style='color:#1F6F5C;'>v2</span></p></td></tr></table></div>
+<div style='mso-element:footer' id=f1><p class=MsoNormal dir=ltr style='margin:0cm;text-align:center;direction:ltr;unicode-bidi:embed'>Page <span style='mso-field-code:" PAGE "'></span> of <span style='mso-field-code:" NUMPAGES "'></span></p></div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="header.htm"/>
+ <o:File HRef="filelist.xml"/>
+</xml>

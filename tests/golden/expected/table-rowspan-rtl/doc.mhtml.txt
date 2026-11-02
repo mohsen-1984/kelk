@@ -1,0 +1,27 @@
+# MHTML, 2 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/b1656fe21d17.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="rtl">
+        <p style="margin-bottom:6pt;mso-margin-bottom-alt:6pt" class="MsoNormal">جدولی فارسی که خانه‌هایش در چند سطر به هم پیوسته‌اند.</p>
+<div align="center" dir="rtl"><table style="width:50.0%" class="MsoNormalTable">
+<thead><tr><th style="border-top:solid #A9B5C4 0.5pt;border-bottom:solid #A9B5C4 0.5pt;border-left:solid #A9B5C4 0.5pt;border-right:solid #A9B5C4 0.5pt;background:#E4E9EF;color:#000000;font-weight:bold;width:33.3%"><p class="MsoTableText" style="font-weight:bold;color:#000000">ستون یک</p></th><th style="border-top:solid #A9B5C4 0.5pt;border-bottom:solid #A9B5C4 0.5pt;border-left:solid #A9B5C4 0.5pt;border-right:solid #A9B5C4 0.5pt;background:#E4E9EF;color:#000000;font-weight:bold;width:33.3%"><p class="MsoTableText" style="font-weight:bold;color:#000000">ستون دو</p></th><th style="border-top:solid #A9B5C4 0.5pt;border-bottom:solid #A9B5C4 0.5pt;border-left:solid #A9B5C4 0.5pt;border-right:solid #A9B5C4 0.5pt;background:#E4E9EF;color:#000000;font-weight:bold;width:33.3%"><p class="MsoTableText" style="font-weight:bold;color:#000000">ستون سه</p></th></tr></thead>
+<tbody>
+<tr><td rowspan="2" style="border-top:solid #A9B5C4 0.5pt;border-bottom:solid #A9B5C4 0.5pt;border-left:solid #A9B5C4 0.5pt;border-right:solid #A9B5C4 0.5pt;font-weight:normal;width:33.3%"><p class="MsoTableText" style="font-weight:normal">۱۱</p></td><td style="border-top:solid #A9B5C4 0.5pt;border-bottom:solid #A9B5C4 0.5pt;border-left:solid #A9B5C4 0.5pt;border-right:solid #A9B5C4 0.5pt;font-weight:normal;width:33.3%"><p class="MsoTableText" style="font-weight:normal">۱۲</p></td><td rowspan="3" style="border-top:solid #A9B5C4 0.5pt;border-bottom:solid #A9B5C4 0.5pt;border-left:solid #A9B5C4 0.5pt;border-right:solid #A9B5C4 0.5pt;font-weight:normal;width:33.3%"><p class="MsoTableText" style="font-weight:normal">۱۳</p></td></tr>
+<tr><td style="border-top:solid #A9B5C4 0.5pt;border-bottom:solid #A9B5C4 0.5pt;border-left:solid #A9B5C4 0.5pt;border-right:solid #A9B5C4 0.5pt;background:#F5F7FA;color:#000000;font-weight:normal;width:33.3%"><p class="MsoTableText" style="font-weight:normal;color:#000000">۲۲</p></td></tr>
+<tr><td style="border-top:solid #A9B5C4 0.5pt;border-bottom:solid #A9B5C4 0.5pt;border-left:solid #A9B5C4 0.5pt;border-right:solid #A9B5C4 0.5pt;font-weight:normal;width:33.3%"><p class="MsoTableText" style="font-weight:normal">۳۱</p></td><td style="border-top:solid #A9B5C4 0.5pt;border-bottom:solid #A9B5C4 0.5pt;border-left:solid #A9B5C4 0.5pt;border-right:solid #A9B5C4 0.5pt;font-weight:normal;width:33.3%"><p class="MsoTableText" style="font-weight:normal">۳۲</p></td></tr>
+<tr><td style="border-top:solid #A9B5C4 0.5pt;border-bottom:solid #A9B5C4 0.5pt;border-left:solid #A9B5C4 0.5pt;border-right:solid #A9B5C4 0.5pt;background:#F5F7FA;color:#000000;font-weight:normal;width:33.3%"><p class="MsoTableText" style="font-weight:normal;color:#000000">۴۱</p></td><td style="border-top:solid #A9B5C4 0.5pt;border-bottom:solid #A9B5C4 0.5pt;border-left:solid #A9B5C4 0.5pt;border-right:solid #A9B5C4 0.5pt;background:#F5F7FA;color:#000000;font-weight:normal;width:33.3%"><p class="MsoTableText" style="font-weight:normal;color:#000000">۴۲</p></td><td style="border-top:solid #A9B5C4 0.5pt;border-bottom:solid #A9B5C4 0.5pt;border-left:solid #A9B5C4 0.5pt;border-right:solid #A9B5C4 0.5pt;background:#F5F7FA;color:#000000;font-weight:normal;width:33.3%"><p class="MsoTableText" style="font-weight:normal;color:#000000">۴۳</p></td></tr>
+</tbody>
+</table></div>
+<p style="margin-top:6pt;mso-margin-top-alt:6pt" class="MsoNormal">پس از جدول.</p>
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="filelist.xml"/>
+</xml>

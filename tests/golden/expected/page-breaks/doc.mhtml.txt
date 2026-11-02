@@ -1,0 +1,22 @@
+# MHTML, 2 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/416e8e1fd5ad.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="ltr">
+        <h1 style="direction:ltr;text-align:left">Page breaks</h1>
+<p style="direction:ltr;text-align:justify" class="MsoNormal">The first page.</p>
+<div style="page-break-before:always" class="MsoNormal"></div>
+<p style="direction:ltr;text-align:justify" class="MsoNormal">The second page, after a page-break-before.</p>
+<p style="break-after:page;direction:ltr;text-align:justify" class="MsoNormal">The last paragraph of the second page.</p>
+<p style="direction:ltr;text-align:justify" class="MsoNormal">The third page.</p>
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="filelist.xml"/>
+</xml>

@@ -690,3 +690,87 @@ CORPUS.push({ name: 'code-in-list-item', md: '- مورد ششم:\n  ```javascrip
 </tbody>
 </table>`, pdfCheck: columnCheck('left', { zz: 0, r1: 1, r2: 1, r3: 1 }) });
 })();
+
+// ── P2.3: builders in CI — the features the goldens (tests/golden/) and the DOCX validation
+// (tests/docx-validate.js) must cover that no earlier case had. Rowspan: the P1.3 table-rowspan-* cases above.
+//   links-internal       #links to headings with ids, and an external link
+//   images               a PNG data URI inline, alone in a paragraph, in a table cell and in list items, and a
+//                        second, different PNG (the goldens keep each picture's size and, when an output carries
+//                        the input's bytes unchanged, their hash)
+//   hf-custom-html-*     setHeader / setFooter({ html }) with the {page} {pages} {title} fields ({date} is left
+//                        out: it prints today's date, which a golden cannot hold)
+//   toc-*                setToc: three levels with the title given for both directions; a right-to-left document
+//   page-breaks          page-break-before / break-after: page (PdfBuilder breaks the page, the .html and .doc
+//                        keep the CSS, DocxBuilder drops them: see the P2.3 report, Open issues)
+//   hr-in-list-and-cell  horizontal rules at the top level, inside a list item and inside a table cell — the
+//                        .docx's rule comes back through MarkdownImporter's HR_TOKEN (plan §2.3: it leaked as text)
+(function () {
+  const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAMCAIAAAD3UuoiAAAAF0lEQVR42mOQz4+hCmIYNWjUoFGD8CEAQKoHUDfC1K4AAAAASUVORK5CYII=';
+  // a second, different picture (10 × 20, another colour): each output must keep the two apart
+  const PNG2 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAUCAIAAAA7jDsBAAAAFUlEQVR42mM44KCABzGMSo9KU0saAAVr4QF/0jtWAAAAAElFTkSuQmCC';
+
+  CORPUS.push({ name: 'links-internal', html: `<h1 id="top">Links inside the document</h1>
+<p>Jump to <a href="#part-two">part two</a>, to <a href="#part-three">the third part</a> or back to <a href="#top">the top</a>.
+An external link: <a href="https://example.com/kelk">example.com</a>.</p>
+<h2 id="part-two">Part two</h2>
+<p>Some text in part two, with a link to <a href="#part-three">part three</a>.</p>
+<h2 id="part-three">Part three</h2>
+<p>پیوند به <a href="#part-two">بخش دوم</a> در متن فارسی.</p>` });
+
+  CORPUS.push({ name: 'images', md: `# Images
+
+An inline picture ![green bar](${PNG}) inside a sentence.
+
+![a picture alone in its paragraph](${PNG})
+
+![a second, different picture](${PNG2})
+
+| Picture | Caption |
+|---|---|
+| ![in a cell](${PNG}) | A picture in a table cell |
+
+- A list item with a picture ![in a list](${PNG})
+- تصویری در فهرست فارسی ![فارسی](${PNG})
+` });
+
+  const hfHeader = '<table><tr><td style="width:30%;font-weight:bold">Kelk</td>' +
+    '<td style="text-align:center;border-bottom:1pt solid #888888">{title}</td>' +
+    '<td style="width:20%;text-align:right;color:#1F6F5C">v2</td></tr></table>';
+  CORPUS.push({ name: 'hf-custom-html-ltr', md: '# A report with a custom header\n\nThe header is a table with the title field; the footer counts pages.\n',
+    setup: function (b) {
+      b.setHeader({ html: hfHeader }).setFooter({ html: '<p style="text-align:center">Page {page} of {pages}</p>' });
+    } });
+  CORPUS.push({ name: 'hf-custom-html-rtl', md: '# گزارشی با سرصفحهٔ سفارشی\n\nسرصفحه عنوان سند را دارد و پانویس شمارهٔ صفحه را می‌نویسد.\n',
+    setup: function (b) {
+      b.setHeader({ html: '<p style="text-align:center;font-weight:bold">{title} — <span style="color:#1F6F5C">کلک</span></p>' })
+        .setFooter({ html: '<p style="text-align:center">صفحهٔ {page} از {pages}</p>' });
+    } });
+
+  const tocBody = function (h) {
+    return '# ' + h[0] + '\n\n' + h[3] + '\n\n## ' + h[1] + ' 1\n\n' + h[3] + '\n\n### ' + h[2] + ' 1.1\n\n' + h[3] +
+      '\n\n## ' + h[1] + ' 2\n\n' + h[3] + '\n\n### ' + h[2] + ' 2.1\n\n' + h[3] + '\n\n### ' + h[2] + ' 2.2\n\n' + h[3] + '\n';
+  };
+  CORPUS.push({ name: 'toc-ltr', md: tocBody(['Document with a table of contents', 'Chapter', 'Section', 'A paragraph of text.']),
+    setup: function (b) { b.setToc({ levels: 3, title: { rtl: 'فهرست', ltr: 'Contents' } }); } });
+  CORPUS.push({ name: 'toc-rtl', md: tocBody(['سندی با فهرست مطالب', 'فصل', 'بخش', 'یک پاراگراف متن.']),
+    setup: function (b) { b.setToc({ levels: 2 }); } });
+
+  CORPUS.push({ name: 'page-breaks', html: `<h1>Page breaks</h1>
+<p>The first page.</p>
+<div style="page-break-before:always"></div>
+<p>The second page, after a page-break-before.</p>
+<p style="break-after:page">The last paragraph of the second page.</p>
+<p>The third page.</p>` });
+
+  CORPUS.push({ name: 'hr-in-list-and-cell', html: `<p>A rule at the top level:</p>
+<hr>
+<ul>
+<li><p>A list item with a rule after its text</p><hr></li>
+<li>The second item</li>
+</ul>
+<table>
+<thead><tr><th>Cell</th><th>Content</th></tr></thead>
+<tbody><tr><td>a rule</td><td><p>above</p><hr><p>below</p></td></tr></tbody>
+</table>
+<p>پایان.</p>` });
+})();

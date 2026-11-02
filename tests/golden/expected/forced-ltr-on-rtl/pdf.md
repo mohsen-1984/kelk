@@ -1,0 +1,1 @@
+متن فارسی با setDirection.
