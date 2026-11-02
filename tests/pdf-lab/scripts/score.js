@@ -11,6 +11,22 @@ function words(t) {
 }
 const norm = (s) => String(s || '').replace(HEH_HAMZA, '\u06C0').replace(/<[^>]+>/g, '').replace(/[*_`\\]/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, ' ').trim();
 
+// A quote's text with its soft line breaks undone at every depth: a nested quote's paragraph written over two lines
+// («> > A\n> > B», one paragraph «A B» on the page) kept the second line's «>» in the text, so no PDF — where the
+// paragraph wraps where its measure says — could match it (fa-features' nested quote: 0 on every producer). A line
+// joins the one above when both hold text at the same depth and it opens no block of its own (an item, a heading,
+// a fence, a table row); at depth 0 this is what the whitespace folding did already.
+function softJoin(text) {
+  const out = [];
+  let prev = null;
+  String(text || '').split('\n').forEach((line) => {
+    const m = /^((?:\s{0,3}>)*)\s*(.*)$/.exec(line), depth = (m[1].match(/>/g) || []).length, body = m[2];
+    if (prev && body && prev.depth === depth && prev.body && !/^([-*+]\s|\d+[.)]\s|#|```|~~~|\|)/.test(body)) { prev.body += ' ' + body; return; }
+    prev = { depth: depth, body: body }; out.push(prev);
+  });
+  return out.map((l) => '> '.repeat(l.depth) + l.body).join('\n');
+}
+
 function structure(md) {
   const s = { headings: [], items: [], tables: [], code: [], quotes: [], text: '' };
   const walk = (tokens, depth) => {
@@ -22,7 +38,7 @@ function structure(md) {
       });
       else if (t.type === 'table') s.tables.push([t.header.map((c) => norm(c.text))].concat(t.rows.map((r) => r.map((c) => norm(c.text)))));
       else if (t.type === 'code') s.code.push(t.text.replace(/\s+$/gm, '').trim());
-      else if (t.type === 'blockquote') s.quotes.push(norm(t.text));
+      else if (t.type === 'blockquote') s.quotes.push(norm(softJoin(t.text)));
     });
   };
   walk(marked.lexer(md), 0);
