@@ -1,0 +1,25 @@
+{
+  "name": "kelk",
+  "version": "2.0.0-rc1",
+  "private": true,
+  "description": "Client-side Markdown ⇄ DOCX / DOC / PDF / HTML converter, Persian / Arabic first. No build step: the app runs from index.html; this file holds the dev tooling only.",
+  "license": "MIT",
+  "repository": "github:mohsen-1984/kelk",
+  "engines": {
+    "node": "^20.19 || ^22.13 || >=24"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "format:check": "prettier --check .",
+    "check:version": "node tools/check-version.js"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.13.0",
+    "globals": "17.13.0",
+    "jszip": "3.10.2",
+    "pdf-lib": "1.17.1",
+    "playwright": "1.56.1",
+    "prettier": "3.9.10"
+  }
+}

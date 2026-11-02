@@ -165,4 +165,7 @@
             zip: ['.zip']
         }
     };
+
+    // the creator written into exported files comes from the one version above (lib/BuilderBase.js loads first)
+    if (typeof BuilderBase !== 'undefined') BuilderBase.version = K.config.version;
 })(window.Kelk = window.Kelk || {});
