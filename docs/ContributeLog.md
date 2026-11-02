@@ -65,8 +65,10 @@ documentation is [`lib/README.md`](../lib/README.md), with [`lib/LATEX.md`](../l
 | GitHub CLI (`gh`) | optional | Reading CI runs and opening pull requests; `gh auth login` once per machine. |
 
 > ⚠️ **Never run `gate.js --update` after a filtered run** (e.g. `run-import.js math`). The committed
-> `baseline.json` holds 2 of the 144 corpus files because of exactly that, and the gate has been passing without
-> checking anything (see Known Issues). Plan P0.2 adds the guard.
+> `baseline.json` held 2 of the 144 corpus files because of exactly that, and the gate passed without checking
+> anything until P0.2 rebuilt it. Since P0.2 `--update` refuses a run that lacks any lab PDF (use `--partial`
+> to merge a filtered run into an existing baseline), and `--baseline <file>` tries a candidate without touching
+> `baseline.json`.
 
 ### Commands
 
@@ -256,7 +258,7 @@ Kelk has no server, no account and no upload: documents never leave the browser.
 | PDF lab — right-to-left | (same run) | **55 RTL files: mean total 90.1**, `rtl` column 92.9. Weakest producers `lohtml-rtl` 59.0, `wk-rtl` 61.2, `chrome-rtl-plain-hf` 81.4, `kelkdocx-lo` 88.7. |
 | PDF lab — style fuzz | `run-fuzz.js dev` / `heldout` | **dev 96.0, held-out 94.6** (CHANGELOG 2.0-rc1, taken as the plan's baseline). The held-out set is English Chromium / wkhtmltopdf output only. |
 | PDF lab — metamorphic net | `run-meta.js` | 12 transforms × 18 seeds (5 RTL). Losses it proves: `noToUnicode` −85, `trackLoose` −16.3, `tz85` −11.4, `trackTight` −4.8, `objstm` −1.0. |
-| PDF lab — gate | `gate.js` | **Passes while checking nothing**: `baseline.json` holds 2 of 144 corpus files; the run printed 142 "new file" notes, fuzz and meta "not run", "passed". |
+| PDF lab — gate | `gate.js` | Since P0.2 (1405-08-10): `baseline.json` holds **all 144 corpus files** (55 with `rtl`), the clean run passes and a deliberate ZWNJ break fails 21 files; fuzz and meta in the baseline are still the review machine's (Chromium 153) until P0.3. Before: 2 of 144 files, "passed" while checking nothing. |
 | CI | `.github/workflows/pdf-lab.yml` | Two runs, both **green and both meaningless**: the fork run (1405-08-09) had no base and fell back to the blind `baseline.json`; the `main` run (1405-08-10) compared against `4beee81` (1.5, no importer) and passed because every base / head step ends in `> /dev/null \|\| true`. |
 | Builder suite | `tests/builder-suite.html` | 383 cases through the four builders, preview parity and a PDF round trip; DOCX / DOC "pass" whenever a blob is produced (no XML validation, no goldens). **Not in CI.** |
 | Formulas | `tests/math-file.html`, `math-modes.html` | Browser pages, checked by eye; `math-roundtrip.js` never sets an exit code. |
@@ -302,14 +304,13 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 
 | Priority | Issue | Location | Suggestion |
 |---|---|---|---|
-| 🟠 High | **The local gate is blind**: `baseline.json` holds 2 of 144 corpus files; `gate.js:87` only iterates the baseline's keys, so 142 files give a "new file" note; `--update` has no guard against a filtered run. This is how the Persian regressions slipped through. | `tests/pdf-lab/baseline.json`, `tests/pdf-lab/scripts/gate.js:87` | P0.2: full baseline, `rtl` per file, guard on `--update`. |
 | 🟠 High | **CI hides every failure**: base and head steps end in `> /dev/null \|\| true`; both runs so far are green without proving anything. | `.github/workflows/pdf-lab.yml:53-64` | P0.3: remove, `set -o pipefail`, `tee` logs into the artifact. |
 | 🟠 High | `baseline.json` was made with Chromium 153 and Bitstream Type 1 fonts; CI has Playwright 1.56.1 (Chromium 141) and no such fonts, so the fuzz comparison on the no-base path is always skipped. | `tests/pdf-lab/baseline.json` | Rebuild the baseline in the CI environment (P0.2–P0.3). |
 | 🟠 High | **Release zip made by hand**, no include list: a 2.0 zip would carry `tests/pdf-lab` (16 MB) and `.github/`. | — | P8.1: `tools/build-release.js` with an include list. |
 | 🟠 High | README links `kelk_2.0.zip` under `releases/latest` → 404 (latest is v1.5; a prerelease is skipped by `latest`). | `README.md` | Link the tagged release (P8.1). |
 | 🟡 Medium | Version strings in ≈ 8 places disagree (`2.0-rc1` / `2.0` / `1.0`). | `scripts/config.js:11` and ≈ 7 other places | P0.4: one `VERSION`, `tools/check-version.js` in CI. |
 | 🟡 Medium | No `package.json`, lockfile, ESLint or Prettier. | root | P0.4 (tooling). |
-| 🟡 Medium | The lab harness is Linux-only: `'/opt/npm-tools/node_modules'`, `'file://' + path` ×30, `fc-match`, `/usr/share/fonts`, `/` splits in `features.js`. | `tests/pdf-lab/scripts/env.js`, `features.js` | P0.3: `url.pathToFileURL`, `require.resolve`, `path.sep`. |
+| 🟡 Medium | The lab harness is Linux-only: `'/opt/npm-tools/node_modules'`, `'file://' + path` ×30, `fc-match`, `/usr/share/fonts`, `/` splits in `features.js`. On Windows (checked 1405-08-10): `make-meta.js` crashes at once without `qpdf` (`spawnSync qpdf ENOENT`, before making any file) — 7 of 12 transforms need it; `make-fuzz.js` silently draws the wkhtmltopdf share with Chromium when wkhtmltopdf is missing; without `fc-match` every font in the fuzz `env` is `null`. | `tests/pdf-lab/scripts/env.js`, `features.js`, `make-meta.js`, `make-fuzz.js` | P0.3: `url.pathToFileURL`, `require.resolve`, `path.sep`; `make-meta.js` skips the qpdf transforms with a note; `make-fuzz.js` prints the substitution. |
 | 🟡 Medium | Pages is a Jekyll branch deploy of the whole repo: no `.nojekyll`, no cache-busting on `lib/`, `scripts/`, `styles/`. | — | P8.1: Pages through Actions with the release set and hashed URLs. |
 | 🟡 Medium | Not in CI: the builder suite, `math-roundtrip.js`, struct / features / crash runs, lint, link check, a11y, bundle size, generated-files freshness. | `.github/workflows/` | P0.3, P2.3, P2.4. |
 | ⚪ Low | Docs out of step: the lab described in four places, stale numbers ("106 PDFs", "27 producers"), metamorphic net stated as 15 seeds / 171 PDFs (actual 18 / 205), Noto Emoji version "—", hljs theme 11.11.1 vs JS 11.12.0; `PDFIMPORT.md` (155 KB) has no TOC. | `lib/PDFIMPORT.md`, `tests/pdf-lab/README.md`, `THIRD-PARTY-NOTICES.md` | P8.2: split the doc, generated TOC, `tools/check-docs.js`. |
@@ -338,6 +339,7 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 | 🟡 Medium | **Degradation measures but never repairs**: `r.quality` flags (`lostGlyphs`, `suspectSpaces`, `textInPictures`) have no fallback path; diagnostics reach the user as ≤ 4 transient toasts. | `lib/PdfImporter.js`, `scripts/importer.js:167-175` | P3.4 confidence and fallback ladder; P3.5 import report panel. |
 | 🟡 Medium | Very long functions: `_pageBlocks` 910 lines, `_lines` 607, `_extractPage` 523, `_joinAcrossPages` 376, `_xyCut` 286, `_groupLines` 266. | `lib/pdfimport/order.js`, `lines.js`, `extract.js`, `blocks.js` | P3.1: split along the documented pipeline, `cmp.js` 0 diffs. |
 | 🟡 Medium | No real Word / Excel / PowerPoint / Microsoft Print to PDF output in the lab — those producers are imitated glyph by glyph (risk: fitting the imitation). | `tests/pdf-lab/pdf/producers/` | P4.1: real-producer Persian corpus from the owner's Windows machine. |
+| 🟡 Medium | The narrow-space → ZWNJ rule hurts wkhtmltopdf Persian: with it switched off, the three `wk-rtl--*` files gain `zwnj` 0 → 10–24 and `rtl` +3 to +7.5 (found by the P0.2 deliberate-break test, 1405-08-10). The Chrome zero-width-space rule (`extract.js:813`) and this one back each other up, so neither alone shows in the gate. | `lib/pdfimport/lines.js:489`, `extract.js:813` | Look at it with the wkhtmltopdf ToUnicode row above (P3.3 word-space batch). |
 | ⚪ Low | Open import items of the backlog (rotated text, footnotes kept in place, rowspan, tables inside quotes, OCR …). | `TODO.md` → PDF import | Worked through the plan's phases; the full list stays in `TODO.md`. |
 
 ### 🧩 Application (`scripts/`, `index.html`, `styles/`)
@@ -374,7 +376,7 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 No open issues.
 
 <details>
-<summary><strong>✅ Resolved</strong> (8) — click to expand</summary>
+<summary><strong>✅ Resolved</strong> (9) — click to expand</summary>
 
 | Priority | Issue | Location | Suggestion |
 |---|---|---|---|
@@ -386,6 +388,7 @@ No open issues.
 | ✅ Resolved 1405-08-10 | No `.gitattributes` / `.editorconfig`; with `core.autocrlf=true` working trees were CRLF and one file was stored with CRLF line endings. | root, `lib/pdf-base64-ttf-fonts/NOTO-EMOJI-LICENSE-OFL.txt` | P0.1: `* text=auto eol=lf` plus `binary` rules, `.editorconfig` matching the tree's style, the file renormalised; corpus scores unchanged on an LF tree (Markdown output byte-identical). |
 | ✅ Resolved 1405-08-10 | `tests/pdf-lab/real/` (the owner's private PDFs when present) was not git-ignored. | `.gitignore` | P0.1: `tests/pdf-lab/real/`, `private/` and `node_modules/` ignored. |
 | ✅ Resolved 1405-08-10 | 144 binary PDFs (15.6 MB) entered `main`'s history as ordinary files with PR #1; storage was undecided (LFS, release asset or plain files). | `tests/pdf-lab/pdf/` | P0.1 decision: kept as ordinary files marked `binary`; history is not rewritten; revisit past 50 MB, > 10 MB of packed churn a year, or a single fixture > 10 MB. |
+| ✅ Resolved 1405-08-10 | **The local gate was blind**: `baseline.json` held 2 of 144 corpus files (a filtered run written with `--update`), so 142 files were never gated — how the Persian regressions slipped through. | `tests/pdf-lab/baseline.json`, `tests/pdf-lab/scripts/gate.js` | P0.2: `--update` refuses a run lacking any lab PDF (`--partial` merges, `--baseline` tries a candidate); baseline rewritten with all 144 files (55 with `rtl`); switching off the ZWNJ rules now fails 21 files. |
 
 </details>
 
@@ -410,7 +413,7 @@ the plan, not this list.
 
 | Date | Plan | Creator | Why & What |
 |---|---|---|---|
-| 1405-08-09 | [Kelk 2.0 → 2.x Redesign Plan](../.claude/plans/Kelk-Redesign.md) | Zarrabi | **Status:** accepted by the project owner on 1405-08-09; execution started — P0.0 and P0.1 approved 1405-08-10. Structural changes, not a rewrite: the rule-based PDF importer and its lab are the asset, and the weaknesses found in the review are fixable in place, each step gated by the lab. 8 phases / 31 sub-phases, ≈ 76 working days plus the owner's review — **P0** stabilise and commit · **P1** verified bugs · **P2** test-net completeness · **P3** importer structure, calibration, degradation · **P4** generalisation with real producers and golden-50 · **P5** app and libraries · **P6** optional ML second opinion · **P7** OCR for scans · **P8** release and docs. P0.1 Git hygiene approved 1405-08-10 (LF everywhere, lab PDFs kept as ordinary `binary` files). Next: **P0.2 Baseline rebuilt, gate guarded**. Progress tracker: §5. |
+| 1405-08-09 | [Kelk 2.0 → 2.x Redesign Plan](../.claude/plans/Kelk-Redesign.md) | Zarrabi | **Status:** accepted by the project owner on 1405-08-09; execution started — P0.0, P0.1 and P0.2 approved 1405-08-10. Structural changes, not a rewrite: the rule-based PDF importer and its lab are the asset, and the weaknesses found in the review are fixable in place, each step gated by the lab. 8 phases / 31 sub-phases, ≈ 76 working days plus the owner's review — **P0** stabilise and commit · **P1** verified bugs · **P2** test-net completeness · **P3** importer structure, calibration, degradation · **P4** generalisation with real producers and golden-50 · **P5** app and libraries · **P6** optional ML second opinion · **P7** OCR for scans · **P8** release and docs. P0.1 Git hygiene approved 1405-08-10 (LF everywhere, lab PDFs kept as ordinary `binary` files). P0.2 approved 1405-08-10 (gate guarded, 144-file corpus baseline; fuzz and meta kept until P0.3 rebuilds them in CI). Next: **P0.3 CI first green run**. Progress tracker: §5. |
 
 </details>
 
@@ -559,9 +562,15 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-10 | 2.0-rc1 | Zarrabi | 1 | Comparison of lab-PDF storage options (ordinary files, Git LFS, release asset): pack size, churn, CI and contributor cost, LFS quota; recommendation and revisit thresholds. |
 | 1405-08-10 | 2.0-rc1 | Zarrabi | 2 | Fresh-clone acceptance test of P0.1: two clone variants checked for status, line endings, binary attributes and ignores; corpus run equal to the baseline in both. |
 | 1405-08-10 | 2.0-rc1 | Zarrabi | 7 | Reviewing the P0.1 checklist and report, the Playwright question, and approving P0.1 with the PDF storage decision. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 14 | P0.2 Baseline rebuilt, gate guarded: checklist; candidate baselines tried with `--baseline`; fixes from the review of `gate.js` (`--partial` without a baseline refused, "no longer scored" failure, run-import naming, `--k=v`, exit 2); Known Issues (Windows harness gaps, ZWNJ rule on wkhtmltopdf Persian); report `docs/reports/P0.2-baseline-gate.md`; on approval `baseline.json` rewritten with all 144 corpus files (fuzz and meta kept), plan and tracker updated. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 2 | `gate.js`: `--update` refuses a run lacking any lab PDF, `--partial` merge, `--baseline <file>`, `--update --against` refused, fuzz and meta kept from the old baseline, one note for many missing files; README "The gate"; tested on fake runs. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 4 | Full lab run on Windows: corpus identical to the baseline (95.73 / RTL 90.08); fuzz dev 95.76 and held-out 93.88 (all-Chromium, substituted fonts); 5 of 12 metamorphic transforms (no `qpdf`), identical to the baseline. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 3 | Deliberate-break test: both ZWNJ rules switched off on a throwaway worktree — 21 files fail on right-to-left details, gate exit 1; the narrow-space rule found to hurt wkhtmltopdf Persian. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 2 | Review of the `gate.js` change: name matching, merge semantics, CI paths byte-identical; two defects found. |
+| 1405-08-10 | 2.0-rc1 | Zarrabi | 9 | Reviewing the P0.2 report and approving the baseline choice. |
 
 <!-- generated:totals -->
-**Entries: 30 · Total: 408 min (6.80 hours) — Zarrabi 408 min (23 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 36 · Total: 442 min (7.37 hours) — Zarrabi 442 min (29 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
