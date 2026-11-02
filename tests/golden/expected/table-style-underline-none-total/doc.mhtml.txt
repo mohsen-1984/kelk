@@ -1,0 +1,68 @@
+# MHTML, 2 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/b1656fe21d17.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="rtl">
+        <p style="margin-bottom:6pt;mso-margin-bottom-alt:6pt" class="MsoNormal">جدول نمونه:</p>
+<div align="center" dir="rtl"><table style="width:50.0%" class="MsoNormalTable">
+<thead>
+<tr>
+<th style="border-top:none;border-bottom:solid #A9B5C4 0.5pt;border-left:none;border-right:none;font-weight:bold;width:32.1%"><p class="MsoTableText" style="font-weight:bold">ردیف</p></th>
+<th style="border-top:none;border-bottom:solid #A9B5C4 0.5pt;border-left:none;border-right:none;font-weight:bold;width:30.1%"><p class="MsoTableText" style="font-weight:bold">نام</p></th>
+<th align="right" style="text-align:right;border-top:none;border-bottom:solid #A9B5C4 0.5pt;border-left:none;border-right:none;font-weight:bold;width:37.7%"><p class="MsoTableText" style="text-align:right;font-weight:bold">مقدار</p></th>
+</tr>
+</thead>
+<tbody><tr>
+<td style="border-top:solid #A9B5C4 0.5pt;border-bottom:none;border-left:none;border-right:none;font-weight:normal;width:32.1%"><p class="MsoTableText" style="font-weight:normal">1</p></td>
+<td style="border-top:solid #A9B5C4 0.5pt;border-bottom:none;border-left:none;border-right:none;font-weight:normal;width:30.1%"><p class="MsoTableText" style="font-weight:normal">آلفا</p></td>
+<td align="right" style="text-align:right;border-top:solid #A9B5C4 0.5pt;border-bottom:none;border-left:none;border-right:none;font-weight:normal;width:37.7%"><p class="MsoTableText" style="text-align:right;font-weight:normal">1,234</p></td>
+</tr>
+<tr>
+<td style="border-top:none;border-bottom:none;border-left:none;border-right:none;font-weight:normal;width:32.1%"><p class="MsoTableText" style="font-weight:normal">2</p></td>
+<td style="border-top:none;border-bottom:none;border-left:none;border-right:none;font-weight:normal;width:30.1%"><p class="MsoTableText" style="font-weight:normal">بتا</p></td>
+<td align="right" style="text-align:right;border-top:none;border-bottom:none;border-left:none;border-right:none;font-weight:normal;width:37.7%"><p class="MsoTableText" style="text-align:right;font-weight:normal">98.6%</p></td>
+</tr>
+<tr>
+<td style="border-top:none;border-bottom:solid #A9B5C4 0.5pt;border-left:none;border-right:none;font-weight:normal;width:32.1%"><p class="MsoTableText" style="font-weight:normal">3</p></td>
+<td style="border-top:none;border-bottom:solid #A9B5C4 0.5pt;border-left:none;border-right:none;font-weight:normal;width:30.1%"><p class="MsoTableText" style="font-weight:normal">گاما</p></td>
+<td align="right" style="text-align:right;border-top:none;border-bottom:solid #A9B5C4 0.5pt;border-left:none;border-right:none;font-weight:normal;width:37.7%"><p class="MsoTableText" style="text-align:right;font-weight:normal">42</p></td>
+</tr>
+<tr>
+<td style="border-top:solid #A9B5C4 0.5pt;border-bottom:none;border-left:none;border-right:none;font-weight:bold;width:32.1%"><p class="MsoTableText" style="font-weight:bold">جمع</p></td>
+<td style="border-top:solid #A9B5C4 0.5pt;border-bottom:none;border-left:none;border-right:none;font-weight:bold;width:30.1%"></td>
+<td align="right" style="text-align:right;border-top:solid #A9B5C4 0.5pt;border-bottom:none;border-left:none;border-right:none;font-weight:bold;width:37.7%"><p class="MsoTableText" style="text-align:right;font-weight:bold">1,383</p></td>
+</tr>
+</tbody></table></div>
+<p class="MsoNormal" style="direction:rtl;text-align:right;margin:0;mso-margin-top-alt:0;mso-margin-bottom-alt:0;line-height:8pt;mso-line-height-rule:exactly;font-size:4.0pt;mso-bidi-font-size:4.0pt">&nbsp;</p><div align="center" dir="ltr"><table style="width:50.0%" class="MsoNormalTable">
+<thead>
+<tr>
+<th style="direction:ltr;text-align:center;border-top:none;border-bottom:solid #A9B5C4 0.5pt;border-left:none;border-right:none;font-weight:bold;width:48.3%"><p class="MsoTableText" style="direction:ltr;text-align:center;font-weight:bold">Name</p></th>
+<th align="right" style="direction:ltr;text-align:right;border-top:none;border-bottom:solid #A9B5C4 0.5pt;border-left:none;border-right:none;font-weight:bold;width:51.7%"><p class="MsoTableText" style="direction:ltr;text-align:right;font-weight:bold">Value</p></th>
+</tr>
+</thead>
+<tbody><tr>
+<td style="direction:ltr;text-align:left;border-top:solid #A9B5C4 0.5pt;border-bottom:none;border-left:none;border-right:none;font-weight:normal;width:48.3%"><p class="MsoTableText" style="direction:ltr;text-align:left;font-weight:normal">alpha</p></td>
+<td align="right" style="direction:ltr;text-align:right;border-top:solid #A9B5C4 0.5pt;border-bottom:none;border-left:none;border-right:none;font-weight:normal;width:51.7%"><p class="MsoTableText" style="direction:ltr;text-align:right;font-weight:normal">1</p></td>
+</tr>
+<tr>
+<td style="direction:ltr;text-align:left;border-top:none;border-bottom:solid #A9B5C4 0.5pt;border-left:none;border-right:none;font-weight:normal;width:48.3%"><p class="MsoTableText" style="direction:ltr;text-align:left;font-weight:normal">beta</p></td>
+<td align="right" style="direction:ltr;text-align:right;border-top:none;border-bottom:solid #A9B5C4 0.5pt;border-left:none;border-right:none;font-weight:normal;width:51.7%"><p class="MsoTableText" style="direction:ltr;text-align:right;font-weight:normal">2</p></td>
+</tr>
+<tr>
+<td style="direction:ltr;text-align:left;border-top:solid #A9B5C4 0.5pt;border-bottom:none;border-left:none;border-right:none;font-weight:bold;width:48.3%"><p class="MsoTableText" style="direction:ltr;text-align:left;font-weight:bold">Total</p></td>
+<td align="right" style="direction:ltr;text-align:right;border-top:solid #A9B5C4 0.5pt;border-bottom:none;border-left:none;border-right:none;font-weight:bold;width:51.7%"><p class="MsoTableText" style="direction:ltr;text-align:right;font-weight:bold">3</p></td>
+</tr>
+</tbody></table></div>
+
+        <p class=MsoNormal style='direction:rtl;text-align:right'>&nbsp;</p>
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="filelist.xml"/>
+</xml>

@@ -1,0 +1,72 @@
+# MHTML, 2 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/b1656fe21d17.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="rtl">
+        <h1>آزمون قواعد جهت فهرست</h1>
+<p class="MsoNormal">این سند عمداً فارسی است تا جهت سند <span dir="ltr">RTL</span> تشخیص داده شود.</p>
+<h2>مورد 1: متن زیرفهرست در تصمیم آیتم والد حساب می‌شود</h2>
+<p class="MsoNormal">فهرست الف — آیتم انگلیسی با زیرآیتم فارسی (رفتار فعلی: آیتم دوم <span dir="ltr">RTL</span> می‌ماند):</p>
+<ul>
+<li class="MsoNormal">مورد اول فارسی</li>
+<li style="direction:ltr;text-align:justify" class="MsoNormal">Second item in English<ul>
+<li style="direction:rtl;text-align:justify" class="MsoNormal">زیرمورد فارسی</li>
+<li style="direction:rtl;text-align:justify" class="MsoNormal">زیرمورد دوم</li>
+</ul>
+</li>
+<li class="MsoNormal">مورد سوم فارسی</li>
+</ul>
+<p class="MsoNormal">فهرست ب — همان ساختار، ولی زیرآیتم‌ها انگلیسی (کنترل: آیتم دوم <span dir="ltr">LTR</span> می‌شود):</p>
+<ul>
+<li class="MsoNormal">مورد اول فارسی</li>
+<li style="direction:ltr;text-align:justify" class="MsoNormal">Second item in English<ul>
+<li style="direction:ltr;text-align:justify" class="MsoNormal">English sub item</li>
+<li style="direction:ltr;text-align:justify" class="MsoNormal">Another sub item</li>
+</ul>
+</li>
+<li class="MsoNormal">مورد سوم فارسی</li>
+</ul>
+<p class="MsoNormal">فهرست ج — فهرست شماره‌دار با آیتم انگلیسی که زیرفهرست مختلط دارد:</p>
+<ol>
+<li class="MsoNormal">گام نخست</li>
+<li style="direction:ltr;text-align:justify" class="MsoNormal">Configure the server<ol>
+<li style="direction:rtl;text-align:justify" class="MsoNormal">نصب بسته‌ها</li>
+<li style="direction:ltr;text-align:justify" class="MsoNormal">Restart the service</li>
+</ol>
+</li>
+<li class="MsoNormal">گام پایانی</li>
+</ol>
+<h2>مورد 2: یک ویرگول فارسی کل فهرست را <span dir="ltr">RTL</span> حساب می‌کند</h2>
+<p class="MsoNormal">فهرست د — تمام انگلیسی (کنترل: کل درخت <span dir="ltr">LTR</span>، علامت‌ها سمت چپ):</p>
+<ul style="direction:ltr;text-align:justify">
+<li style="direction:ltr;text-align:justify" class="MsoNormal">Budget</li>
+<li style="direction:ltr;text-align:justify" class="MsoNormal">1,250,000</li>
+<li style="direction:ltr;text-align:justify" class="MsoNormal">2024 - 2025</li>
+<li style="direction:ltr;text-align:justify" class="MsoNormal">Total</li>
+</ul>
+<p class="MsoNormal">فهرست هـ — همان فهرست، فقط یک ویرگول فارسی در آیتم اول (رفتار فعلی: آیتم‌های عددی <span dir="ltr">RTL</span> می‌شوند):</p>
+<ul style="direction:ltr;text-align:justify">
+<li style="direction:ltr;text-align:justify" class="MsoNormal">Budget، approved</li>
+<li style="direction:ltr;text-align:justify" class="MsoNormal">1,250,000</li>
+<li style="direction:ltr;text-align:justify" class="MsoNormal">2024 - 2025</li>
+<li style="direction:ltr;text-align:justify" class="MsoNormal">Total</li>
+</ul>
+<p class="MsoNormal">فهرست و — به‌جای ویرگول، نقطه‌ویرگول و علامت سؤال فارسی:</p>
+<ul style="direction:ltr;text-align:justify">
+<li style="direction:ltr;text-align:justify" class="MsoNormal">Is it ready؟</li>
+<li style="direction:ltr;text-align:justify" class="MsoNormal">42</li>
+<li style="direction:ltr;text-align:justify" class="MsoNormal">Done؛ closed</li>
+</ul>
+
+        <p class=MsoNormal style='direction:rtl;text-align:right'>&nbsp;</p>
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="filelist.xml"/>
+</xml>

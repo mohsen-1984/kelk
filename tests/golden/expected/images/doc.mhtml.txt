@@ -1,0 +1,41 @@
+# MHTML, 3 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/416e8e1fd5ad.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="ltr">
+        <h1 style="direction:ltr;text-align:left">Images</h1>
+<p style="direction:ltr;text-align:justify" class="MsoNormal">An inline picture <img src="document_files/image001.png" alt="green bar" width="24" height="12"> inside a sentence.</p>
+<p class="MsoNormal"><img src="document_files/image001.png" alt="a picture alone in its paragraph" width="24" height="12"></p>
+<div align="center" dir="ltr"><table style="width:52.4%" class="MsoNormalTable">
+<thead>
+<tr>
+<th style="direction:ltr;text-align:center;border-top:solid #A9B5C4 0.5pt;border-bottom:solid #A9B5C4 0.5pt;border-left:solid #A9B5C4 0.5pt;border-right:solid #A9B5C4 0.5pt;background:#E4E9EF;color:#000000;font-weight:bold;width:26.7%"><p class="MsoTableText" style="direction:ltr;text-align:center;font-weight:bold;color:#000000">Picture</p></th>
+<th style="direction:ltr;text-align:center;border-top:solid #A9B5C4 0.5pt;border-bottom:solid #A9B5C4 0.5pt;border-left:solid #A9B5C4 0.5pt;border-right:solid #A9B5C4 0.5pt;background:#E4E9EF;color:#000000;font-weight:bold;width:73.3%"><p class="MsoTableText" style="direction:ltr;text-align:center;font-weight:bold;color:#000000">Caption</p></th>
+</tr>
+</thead>
+<tbody><tr>
+<td style="direction:ltr;text-align:left;border-top:solid #A9B5C4 0.5pt;border-bottom:solid #A9B5C4 0.5pt;border-left:solid #A9B5C4 0.5pt;border-right:solid #A9B5C4 0.5pt;font-weight:normal;width:26.7%"><p class="MsoTableText" style="direction:ltr;text-align:left;font-weight:normal"><img src="document_files/image001.png" alt="in a cell" width="24" height="12"></p></td>
+<td style="direction:ltr;text-align:left;border-top:solid #A9B5C4 0.5pt;border-bottom:solid #A9B5C4 0.5pt;border-left:solid #A9B5C4 0.5pt;border-right:solid #A9B5C4 0.5pt;font-weight:normal;width:73.3%"><p class="MsoTableText" style="direction:ltr;text-align:left;font-weight:normal">A picture in a table cell</p></td>
+</tr>
+</tbody></table></div>
+<ul>
+<li style="direction:ltr;text-align:justify;margin-top:6pt;mso-margin-top-alt:6pt" class="MsoNormal">A list item with a picture <img src="document_files/image001.png" alt="in a list" width="24" height="12"></li>
+<li style="direction:rtl;text-align:justify" class="MsoNormal">تصویری در فهرست فارسی <img src="document_files/image001.png" alt="فارسی" width="24" height="12"></li>
+</ul>
+
+        <p class=MsoNormal style='direction:ltr;text-align:left'>&nbsp;</p>
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/image001.png (image/png) ===== -->
+[raster]
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="image001.png"/>
+ <o:File HRef="filelist.xml"/>
+</xml>
