@@ -290,24 +290,59 @@ font's supplementary private-use codes, which only the tagged file's `/ActualTex
 ## Metamorphic testing: `make-meta.js`, `run-meta.js`
 
 The corpus and the fuzz sets ask "is this PDF read right?". The metamorphic net asks "does the reading
-survive a change that should not matter?" — and needs no new document for it. Fifteen seeds (one or two lab
-PDFs of every producer family, Persian ones included) are rewritten by twelve transforms (`pdf-lib` for the
-page level, qpdf's QDF form for the operators):
+survive a change that should not matter?" — and needs no new document for it. Twenty-four seeds (one or two lab
+PDFs of every producer family; 11 right-to-left: Chrome's Arabic and Persian, Kelk, Word print, a Word memo, a
+PowerPoint deck, Prince, iText, Acrobat, a Persian encyclopedia page) are rewritten by twenty transforms
+(generator 3): `pdf-lib` for the page level, qpdf's QDF form for the operators, and Chromium for the generator
+side — the seed's Markdown drawn again with a change, for the five seeds whose recipe `make-meta.js` knows
+(`recipe()`: make-chrome.js / make-rtl.js variants). A generator-side file is compared with a *control* drawn
+the same way without the change (`meta/_control/`), never with the shipped seed.
 
-| Transform | Kind | What changes |
-|---|---|---|
-| `scale80`, `scale125` | same | content at 80 % on the same paper (a "fit to page" print); page and content at 125 % |
-| `rotate90` | same | `/Rotate 90` |
-| `objstm` | same | object streams and recompression (qpdf, as post-processors do) |
-| `untag` | same | structure tree and MarkInfo removed (tagged seeds only) |
-| `color`, `pagebg`, `band` | near | dark fills turned dark blue; a light fill under the page; a coloured band behind its top third |
-| `tz85`, `trackTight`, `trackLoose` | near | type condensed to 85 % (`Tz`); letters 0.04 em closer, 0.08 em apart (`Tc`) |
-| `noToUnicode` | hard | every ToUnicode map removed: the repairs must read the fonts |
+| Transform | Kind | Via | What changes |
+|---|---|---|---|
+| `scale80`, `scale125` | same | pdf-lib | content at 80 % on the same paper (a "fit to page" print); page and content at 125 % |
+| `rotate90`, `rotate180` | same | pdf-lib | the content turned by its matrix (a quarter, a half) and `/Rotate 90` / `180` turning it upright again: Word's landscape page, a page scanned upside down (`v2`; `v1` only added `/Rotate` to upright content, which an importer reading user space passes by construction) |
+| `cropbox` | same | pdf-lib | MediaBox grown by a 36 pt bleed (origin negative); CropBox and TrimBox the old visible page; crop marks and a job / plate line in the slug outside the CropBox, to drop |
+| `hfInject` | same | pdf-lib | a running head and «Page n of N» at the paper's edges, marked `/Artifact /Pagination` (Acrobat's Header & Footer): furniture to drop |
+| `renderMode` | same | pdf-lib | the page's text again, invisible (`3 Tr`), over itself — fills, pictures and forms left out of the copy |
+| `objstm` | same | qpdf | object streams and recompression (as post-processors do) |
+| `untag` | same | qpdf | structure tree and MarkInfo removed (tagged seeds only) |
+| `color`, `pagebg`, `band` | near | qpdf, pdf-lib | dark fills turned dark blue; a light fill under the page; a coloured band behind its top third |
+| `stamp` | hard | pdf-lib | a diagonal «CONFIDENTIAL DRAFT» watermark, grey at 30 % opacity, unmarked (the plan's "near"; measured it behaves "hard") |
+| `tz85`, `trackTight`, `trackLoose` | near | qpdf | type condensed to 85 % (`Tz`); letters 0.04 em closer, 0.08 em apart (`Tc`) |
+| `fontSubst`, `letterSpace`, `pageSize` | near | Chromium | body font replaced (Latin → DejaVu Sans, Vazirmatn ↔ Sahel); CSS `letter-spacing: 0.05em`; A4 ↔ Letter (reflow) |
+| `noToUnicode` | hard | qpdf | every ToUnicode map removed: the repairs must read the fonts |
 
 ```sh
-node scripts/make-meta.js     # 171 PDFs in meta/, seconds (pdf-lib, qpdf with fix-qdf)
-node scripts/run-meta.js      # per transform: files read exactly as their seed, mean total, Δ from the seeds, the worst
+node scripts/make-meta.js     # 404 PDFs in meta/, seconds (pdf-lib; qpdf with fix-qdf; Playwright's Chromium)
+node scripts/run-meta.js      # per transform: files read exactly as their reference, mean total, Δ, a relation, the worst
 ```
+
+A family whose tool is missing is skipped with a note (`manifest.json` → `skipped`): without qpdf, 13 of the 20
+transforms are made. A file a transform finds nothing to change in is an expected note (`∅`, `manifest.json` →
+`notMade`); any other file that cannot be made fails `make-meta.js` (exit 1). Each transform carries its own
+version `v` (raised when its code changes) and `via`. The generator-side files depend on the platform's fonts
+(the GitHub style's Segoe UI on Windows, Liberation Sans on Linux): their env records Chromium and the platform.
+
+**The "same" assertion.** A "same" transform must give back its reference's Markdown byte for byte: `run-meta.js`
+exits 1 on any file that does not, unless the file is listed in `KNOWN` (in `run-meta.js`) with the total measured
+when it was listed, its Δ and the reason — importer findings, kept visible until fixed. A listed file still fails
+when it crashes or falls more than `FLOOR_TOL` (1 point) under its listed total; one that reads exactly again is a
+note (take it off). Before a file is listed, the transform is checked to be right (`rotate90`, `cropbox`,
+`renderMode` render pixel for pixel as their seed; `rotate180` within a few anti-aliased pixels). **Reference-free
+relations**, counted per transform: under "same" the multiset of words equals the reference's (`words≠`), under
+`untag` also the heading count does not rise (`heads↑`), under "near" the block count stays within ± 1
+(`blocks±>1`). The run ends with the transforms ordered by loss — the order to work through them in. Measured at
+generator 3 (1405-08-11, 24 seeds, references 99.9): `rotate180` −83.0, `rotate90` −82.4 (the importer does not
+apply `/Rotate`), `noToUnicode` −81.0, `stamp` −32.7, `trackLoose` −12.2, `tz85` −9.2, `trackTight` −3.6, `pagebg`
+−3.3, `band` −2.7, `scale80` −1.4, `objstm` −0.7, `pageSize` −0.4, `renderMode` −0.3, `scale125` −0.2, the rest 0.0;
+"same": 133 of 199 files exact, 66 known exceptions (`docs/reports/P2.2-meta-net.md`).
+
+**In the gate**, each transform is compared on its own with a baseline entry of the same `v` and the same env
+for what it depends on (pdf-lib; qpdf and its package version; Chromium and the platform), over the seeds both
+have (a seed added to `SEEDS` is not a change); a new or changed transform, or a baseline entry without these
+records (generator 2), is a note — not compared, never a failure. A "same" file outside `KNOWN` (or under its
+floor, or crashing) fails the gate too, and so does a "same" file the compared side has and this run lacks.
 
 "same" transforms should give back the seed's Markdown byte for byte, "near" ones nearly, "hard" ones are
 measured only. Where it stood at its first run (October 2026, seeds 99.8): rotate, untag and colour fully
