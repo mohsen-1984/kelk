@@ -267,7 +267,7 @@ Kelk has no server, no account and no upload: documents never leave the browser.
 |---|---|---|
 | PDF lab — corpus | `run-import.js` | **144 PDFs from 49 producer variants, 0 crashes, ≈ 15 s; mean total 95.7** (114 files ≥ 99, 19 < 90) — reproduces the CHANGELOG figure. Raw scores: [`docs/reports/corpus-run-1405-08-09.json`](reports/corpus-run-1405-08-09.json). |
 | PDF lab — right-to-left | (same run) | **55 RTL files: mean total 90.1**, `rtl` column 92.9. Weakest producers `lohtml-rtl` 59.0, `wk-rtl` 61.2, `chrome-rtl-plain-hf` 81.4, `kelkdocx-lo` 88.7. |
-| PDF lab — style fuzz | `run-fuzz.js dev` / `heldout` | **dev 96.0, held-out 94.6** (CHANGELOG 2.0-rc1, taken as the plan's baseline). The held-out set is English Chromium / wkhtmltopdf output only. |
+| PDF lab — style fuzz | `run-fuzz.js dev` / `heldout` | Since P2.1 (1405-08-11), **generator 4**: 100 dev + 100 held-out PDFs, 9 documents (4 RTL: `fa-article`, `fa-report`, `ar-article`, `fa-mixed`; 44 % RTL), Chromium 3 : wkhtmltopdf 1, dimensions + `dir`, RTL fonts (Vazirmatn, Sahel, Noto Naskh Arabic), `latinFont`, `digits` (`ascii` / `native` / `asis`), `tracking`; per-direction means and the `rtl` column printed, stored and gated (TOL 1). CI baseline (run 41507779260): **dev 86.0, held-out 86.9** (means only); LTR 93.0 / 91.9, RTL 77.1 / 80.6, `rtl` column 85.0 / 85.8. Generator 3 (English only, before): dev 96.0, held-out 94.6 — not comparable. |
 | PDF lab — metamorphic net | `run-meta.js` | 12 transforms × 18 seeds (5 RTL). Losses it proves: `noToUnicode` −85, `trackLoose` −16.3, `tz85` −11.4, `trackTight` −4.8, `objstm` −1.0. |
 | PDF lab — gate | `gate.js` | Since P0.2 (1405-08-10): `baseline.json` holds **all 144 corpus files** (55 with `rtl`), the clean run passes and a deliberate ZWNJ break fails 21 files; since 1405-08-11 its fuzz and meta parts come from the CI runner (run 41391608314: Chromium 141.0.7390.37, wkhtmltopdf 0.12.6, qpdf 11.9.0), so CI's fallback path compares fuzz too (until then the review machine's Chromium 153, never compared). Before: 2 of 144 files, "passed" while checking nothing. |
 | CI | `.github/workflows/pdf-lab.yml` | Since P0.3 (1405-08-10) failures fail the job (no `\|\| true`, `bash -euo pipefail`, logs in the artifact); without a base commit the gate falls back to `baseline.json` and says so in the step summary. Green run 41333786984 (`f6ea8e9`): corpus 95.7, fuzz dev 96.0, held-out 94.6 (means only), all 12 metamorphic transforms equal to the baseline, round trip ok (2 known cells), math 76 / 76, crash sweep 144 files / 0 errors, gate passed. The deliberate break (both ZWNJ rules off, run 41333855809) is **red** at the gate only: 40 failures (21 `rtl`, 19 total). Before: two green runs that proved nothing (`> /dev/null \|\| true`). |
@@ -341,7 +341,6 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 
 | Priority | Issue | Location | Suggestion |
 |---|---|---|---|
-| 🟠 High | **The held-out set has no Persian**: five English documents, Chromium 3 : wkhtmltopdf 1. "dev 96.0 / held-out 94.6" says nothing about Persian, Word, LibreOffice, Prince or PowerPoint. | `tests/pdf-lab/scripts/make-fuzz.js:24` | P2.1 RTL fuzz corpus; P4.3 held-out protocol. |
 | 🟠 High | LibreOffice-path RTL files: `brackets` 0 in every one (mirrored brackets — probably Vazirmatn's RTL bracket glyphs outside the cmap), lists 0–28, tables 0–42 (`lohtml-rtl` 59.0, `kelkdocx-lo` fa / ar 55–96). | `lib/pdfimport/extract.js`, `blocks.js` | Read brackets by outline; RTL list / table rules (P3, P4). |
 | 🟡 Medium | wkhtmltopdf Persian: `zwnj` 0, `yehKaf` 53–68 — a broken ToUnicode in the PDF itself (`wk-rtl` 61.2). | `lib/pdfimport/extract.js` | Name the glyphs from the font's own cmap, as for Word's «ت → "». |
 | 🟡 Medium | Chrome browser-default style loses `quote` and `code` in fa / ar while the text is perfect (`chrome-rtl-plain-hf--ar-article` 69.6 with `rtl` 100). | `lib/pdfimport/blocks.js` | Layout rules for unstyled RTL quotes and code. |
@@ -351,6 +350,9 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 | 🟡 Medium | No real Word / Excel / PowerPoint / Microsoft Print to PDF output in the lab — those producers are imitated glyph by glyph (risk: fitting the imitation). | `tests/pdf-lab/pdf/producers/` | P4.1: real-producer Persian corpus from the owner's Windows machine. |
 | 🟡 Medium | The narrow-space → ZWNJ rule hurts wkhtmltopdf Persian: with it switched off, the three `wk-rtl--*` files gain `zwnj` 0 → 10–24 and `rtl` +3 to +7.5 (found by the P0.2 deliberate-break test, 1405-08-10). The Chrome zero-width-space rule (`extract.js:813`) and this one back each other up, so neither alone shows in the gate. | `lib/pdfimport/lines.js:489`, `extract.js:813` | Look at it with the wkhtmltopdf ToUnicode row above (P3.3 word-space batch). |
 | ⚪ Low | Open import items of the backlog (rotated text, footnotes kept in place, rowspan, tables inside quotes, OCR …). | `TODO.md` → PDF import | Worked through the plan's phases; the full list stays in `TODO.md`. |
+| 🟡 Medium | **RTL fuzz files score well below English ones** (generator 4, CI: RTL 77.1 dev / 80.6 held-out against LTR 93.0 / 91.9; tables 64 / 74, quotes 61 / 61 on RTL files; `rtl` column 85.0 / 85.8, `zwnj` weakest) and CSS `letter-spacing: loose` costs ≈ 15 points on English files (P2.1, 1405-08-11). | `lib/pdfimport/` | P3.3 (calibration, word-space batch first); the RTL fuzz baseline is P3.3's floor. |
+| 🟡 Medium | Persian digits whose glyph is shared with the Arabic-Indic one (Times New Roman, Tahoma map ۱ and ١ to one glyph) come back as Arabic-Indic: the PDF's text is right (P2.1, 1405-08-11). | `lib/pdfimport/extract.js` | Prefer the document's own digit script when a glyph maps to both (P3). |
+| ⚪ Low | Not verified whether wkhtmltopdf 0.12.6 honours the fuzz styles' `unicode-range` / `local()` faces (Latin in the RTL font, Noto Naskh not loaded in the ≈ 11 wkhtmltopdf RTL files per split) (P2.1, 1405-08-11). | `tests/pdf-lab/scripts/make-fuzz.js` | Read the font list of one `fz…-wk--fa-*.pdf` from a CI run. |
 
 ### 🧩 Application (`scripts/`, `index.html`, `styles/`)
 
@@ -381,7 +383,7 @@ Locations are relative to the repository root. Source: the review of 1405-08-09 
 No open issues.
 
 <details>
-<summary><strong>✅ Resolved</strong> (30) — click to expand</summary>
+<summary><strong>✅ Resolved</strong> (31) — click to expand</summary>
 
 | Priority | Issue | Location | Suggestion |
 |---|---|---|---|
@@ -415,6 +417,7 @@ No open issues.
 | ✅ Resolved 1405-08-11 | ≈ 10 hard-coded English strings; 9 unused i18n keys. | `scripts/` | P1.4: 9 strings through `K.i18n` (table word, size unit, language group label, load errors, page-list separator, logo `alt`), 9 keys removed; `tools/check-i18n.js` (`npm run check:i18n`: 278 keys × 3, 0 missing / 0 unused / 0 placeholder mismatches) in `tooling.yml`. |
 | ✅ Resolved 1405-08-11 | Wrong-language / theme flash: `<html lang="fa" dir="rtl">` hard-coded, the stored language and theme applied only after ≈ 40 scripts. | `index.html`, `scripts/boot.js` | P1.4: `scripts/boot.js` early in `<head>` (external, allowed by the CSP) sets `lang` / `dir` / `data-theme` from `kelk.ui` before first paint; checked at `<body>` creation in fa / en / ar, light / dark. |
 | ✅ Resolved 1405-08-11 | No Content Security Policy; `target=_blank` links without `rel`. | `index.html` | P1.2: a `<meta>` CSP (`script-src 'self' 'wasm-unsafe-eval'`; `style-src 'self' 'unsafe-inline'`; `img-src 'self' data: blob: https: http:`; `worker-src 'self' blob:`; `object-src 'none'`; `base-uri 'self'`; `form-action 'none'`): 0 violations on `file://` and `http://localhost` in Chromium 141 with MathJax, PDF.js and all five exports (`tests/unit/csp-browser.js`); `rel="noopener noreferrer"` on every link with a `target`. |
+| ✅ Resolved 1405-08-11 | **The held-out set had no Persian**: five English documents; "dev 96.0 / held-out 94.6" said nothing about Persian. | `tests/pdf-lab/scripts/make-fuzz.js` | P2.1: generator 4 adds `fa-article`, `fa-report`, `ar-article` and a new `fa-mixed` (44 % RTL in each split), RTL fonts, `digits`, `tracking`; per-direction and `rtl` means stored and gated; baseline from the CI runner (run 41507779260): dev 86.0 / held-out 86.9, RTL files 77.1 / 80.6. |
 
 </details>
 
@@ -644,9 +647,12 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 20 | P2.1 RTL fuzz corpus: `make-fuzz.js` generator 4 — `fa-article`, `fa-report`, `ar-article` and a new `fa-mixed` document, dimensions `dir`, RTL fonts (Vazirmatn, Sahel, Noto Naskh Arabic), `digits`, `tracking`; 44 % RTL in each split; `run-fuzz.js` per-direction and `rtl` means; the gate keeps generators apart; report `docs/reports/P2.1-rtl-fuzz.md`. |
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 52 | P2.2 Metamorphic net extended: 24 seeds (six RTL added) × 20 transforms (`fontSubst`, `letterSpace`, `pageSize`, `hfInject`, `rotate180`, `cropbox`, `renderMode`, `stamp` added; rotations as turned content made upright by `/Rotate`, slug text outside the CropBox); "same" transforms asserted byte-identical in `run-meta.js` with a per-file allow-list carrying floors; reference-free relations; the gate versioned per transform; `make-meta.js` failing on a file it cannot make; qpdf pinned; review findings applied; report `docs/reports/P2.2-meta-net.md`. |
 | 1405-08-11 | 2.0-rc1 | Zarrabi | 8 | Review of the P2.2 diff: the transforms against what they claim, the byte-identical assertion and its allow-list, the relations, the gate's notes against real regressions, determinism and the CI run; the report's figures reproduced. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 10 | Review of the P2.1 diff: held-out leakage, determinism of the draw, digit rewriting against the scored source, RTL mirroring, the gate across generators, the RTL share and the workflow change; the font tables of the RTL fonts read. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 9 | P2.1 review fixes: per-direction and `rtl` means stored and gated, RTL faces limited by `unicode-range` so `latinFont` applies, digits attached to Latin words kept, `digits: asis`, run comparisons only within one env, the Noto font hashed in the env, code blocks not mirrored; report §4. |
+| 1405-08-11 | 2.0-rc1 | Zarrabi | 7 | P2.1 baseline on the CI runner: manual `pdf-lab.yml` run 41507779260 with `baseline` ticked, its candidate checked (generator 4, 44 RTL per split, Noto hashed, meta identical, corpus differing only by P1.3's gains) and its fuzz part written into `baseline.json`; report §3 / §5, Known Issues, Testing, the tracker and the plan's P3.3 held-out target; P2.2 joined on `redesign/P2.2` (workflow apt lines combined). |
 
 <!-- generated:totals -->
-**Entries: 86 · Total: 1043 min (17.38 hours) — Zarrabi 1043 min (79 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 89 · Total: 1069 min (17.82 hours) — Zarrabi 1069 min (82 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
