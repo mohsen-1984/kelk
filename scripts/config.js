@@ -32,8 +32,10 @@
                         maxMB: '20', separator: 'name' }   // largest file to import (MB); between files: name | rule | none
         },
 
-        /** Export profile (Kelk.store.settings). */
+        /** Export profile (Kelk.store.settings; stored: what differs from these, and schemaVersion). */
         defaults: {
+            // the profile's schema: Kelk.store.migrate brings an older stored profile or settings file up to it
+            schemaVersion: 1,
             document: { title: null, edition: null, author: '', link: '' },   // null → automatic (first H1 / words; Draft / پیش‌نویس)
             logoHeight: '1cm',
             headerFooter: {
