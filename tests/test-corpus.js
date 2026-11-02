@@ -517,3 +517,176 @@ CORPUS.push({ name: 'one-row-table', md: 'جدول یک‌سطری:\n\n| فقط 
 CORPUS.push({ name: 'single-line', md: 'فقط یک سطر.' });
 CORPUS.push({ name: 'code-span-rtl', md: 'تصویر را با `![نام](نام)` در متن می‌گذارد؛ نیز `(متن)` و `f({ a: \'متن فارسی\' })`.\n\nEnglish with `![name](نام)` too.\n' });
 CORPUS.push({ name: 'code-in-list-item', md: '- مورد ششم:\n  ```javascript\n  // کد درون لیست\n  const array = [1, 2, 3];\n  ```\n' });
+
+// ── P1.3 (bug B1): Arabic shaping round trip ─────────────────────────────────────────────────────
+// Markdown → PDF → PdfImporter → the same words, exactly (`exact`: the PDF → MD cell needs 100% recall
+// and order). Each letter in its four positions around beh: alone, final, initial, medial. U+0649 has
+// presentation forms (FEEF FEF0 FBE8 FBE9); the other letters have none in Unicode: they keep their
+// nominal glyph and their neighbours still join them. «covered»: a bundled font has the glyph
+// (Vazirmatn: 063D 066E 066F 06D5); «uncovered»: no bundled font draws it (0620 063B 063C 063E 063F 06FA-06FC),
+// so those letters are lost in the PDF whatever the shaping — red, listed in roundtrip.js KNOWN.
+(function () {
+  var L = function (cp) { return String.fromCharCode(cp); }, BEH = L(0x0628), NL = String.fromCharCode(10);
+  var positions = function (cp) { var x = L(cp); return [x, BEH + x, x + BEH, BEH + x + BEH].join(' '); };
+  // one paragraph per letter, no Latin label: each letter's shapes are checked alone (ؠ ػ-ؿ ٮ ٯ are strong RTL letters
+  // in BidiCore since P1.3 — they had been placed as neutrals next to Latin text — but a label would still test the
+  // bidi run order, not the shaping)
+  var lines = function (cps) { return cps.map(positions).join(NL + NL); };
+  var amk = L(0x0649);
+  CORPUS.push({ name: 'shaping-alef-maksura', exact: true, md: '# ' + amk + BEH + amk + NL + NL + lines([0x0649]) + NL + NL +
+    'ذهب موسى إلى المستشفى حتى المساء ' + amk + BEH + amk + BEH + ' ' + amk + amk + amk + NL });
+  CORPUS.push({ name: 'shaping-no-forms-covered', exact: true, md: lines([0x063D, 0x066E, 0x066F, 0x06D5]) + NL });
+  CORPUS.push({ name: 'shaping-no-forms-uncovered', exact: true, md: lines([0x0620, 0x063B, 0x063C, 0x063E, 0x063F, 0x06FA, 0x06FB, 0x06FC]) + NL });
+})();
+
+// ── P1.3b: PDF tables — rowspan (B2) and rows taller than a page (B3) ──────────────────────────
+// Each cell holds one marker; `pdfCheck` (run by builder-suite.html on the PDF, pages read with
+// pdf.js) asserts that every body marker of a column starts at the same x as the others of that
+// column — the left edge in a left-to-right table, the right edge in a right-to-left one — so text
+// sits in the column its lines are drawn for. The tall-row cases assert the row is split across
+// pages: more than one page, every marker found, no text in a page's top or bottom margin, no page
+// left half empty before the last.
+(function () {
+  /** markers (cell text) → expected column; side: the edge cells start at ('left' | 'right') */
+  function columnCheck(side, cols) {
+    return function (pages) {
+      const at = {};
+      pages.forEach(function (p) {
+        p.items.forEach(function (it) { const t = it.str.trim(); if (cols[t] !== undefined && !at[t]) at[t] = it; });
+      });
+      const errs = [], edge = {};
+      Object.keys(cols).forEach(function (m) {
+        const it = at[m];
+        if (!it) { errs.push(m + ' not found'); return; }
+        const x = side === 'left' ? it.x : it.x + it.w;
+        (edge[cols[m]] = edge[cols[m]] || []).push({ m: m, x: x });
+      });
+      const firsts = [];
+      Object.keys(edge).forEach(function (k) {
+        const xs = edge[k], x0 = xs[0].x;
+        xs.forEach(function (e) { if (Math.abs(e.x - x0) > 1.5) errs.push(e.m + ' at ' + e.x.toFixed(1) + ', column ' + k + ' at ' + x0.toFixed(1)); });
+        firsts.push(x0);
+      });
+      firsts.sort(function (a, z) { return a - z; });
+      for (let i = 1; i < firsts.length; i++) if (firsts[i] - firsts[i - 1] < 5) errs.push('two columns start at the same x');
+      return errs;
+    };
+  }
+  /**
+   * a table split across pages: more than one page, every marker found, all text inside the page's
+   * margins (no baseline in the 1.8 cm bottom / top margin, 45 pt allowing for descenders), and every
+   * page but the last filled down to its last 100 pt (a split never leaves half a page empty)
+   */
+  function splitCheck(markers) {
+    const M = 45, FULL = 100 + 51;
+    return function (pages) {
+      const errs = [], seen = {};
+      if (pages.length < 2) errs.push('one page: the tall row was not split');
+      pages.forEach(function (p, i) {
+        let low = p.height;
+        p.items.forEach(function (it) {
+          seen[it.str.trim()] = true;
+          if (!it.str.trim()) return;
+          low = Math.min(low, it.y);
+          if (it.y < M || it.y > p.height - M) errs.push('page ' + (i + 1) + ': "' + it.str.slice(0, 20) + '" in the margin or off the page (y ' + it.y.toFixed(0) + ')');
+        });
+        if (i < pages.length - 1 && low > FULL) errs.push('page ' + (i + 1) + ' ends early (lowest text at y ' + low.toFixed(0) + ')');
+      });
+      markers.forEach(function (m) { if (!seen[m]) errs.push(m + ' not found'); });
+      return errs.slice(0, 6);
+    };
+  }
+
+  // rowspan in the first column (xa) and the last (xd); cells below them pushed along
+  CORPUS.push({ name: 'table-rowspan-ltr', html: `<p>A table with cells joined across rows.</p>
+<table>
+<thead><tr><th>Col A</th><th>Col B</th><th>Col C</th><th>Col D</th></tr></thead>
+<tbody>
+<tr><td rowspan="2">xa</td><td>b1</td><td>c1</td><td>d1</td></tr>
+<tr><td>b2</td><td>c2</td><td>d2</td></tr>
+<tr><td>a3</td><td rowspan="3">xb</td><td>c3</td><td rowspan="2">xd</td></tr>
+<tr><td>a4</td><td>c4</td></tr>
+<tr><td>a5</td><td>c5</td><td>d5</td></tr>
+</tbody>
+</table>
+<p>After the table.</p>`,
+  pdfCheck: columnCheck('left', { xa: 0, a3: 0, a4: 0, a5: 0, b1: 1, b2: 1, xb: 1, c1: 2, c2: 2, c3: 2, c4: 2, c5: 2, d1: 3, d2: 3, xd: 3, d5: 3 }) });
+
+  // rowspan + colspan: one cell over two rows and two columns; a tall spanning cell (its rows grow)
+  CORPUS.push({ name: 'table-rowspan-colspan', html: `<p>Spans in both directions.</p>
+<table>
+<thead><tr><th>One</th><th>Two</th><th>Three</th><th>Four</th></tr></thead>
+<tbody>
+<tr><td rowspan="2" colspan="2">pq</td><td>c1</td><td>d1</td></tr>
+<tr><td>c2</td><td>d2</td></tr>
+<tr><td>a3</td><td>b3</td><td colspan="2">cd</td></tr>
+<tr><td>a4</td><td rowspan="2">bz<br>second line<br>third line<br>fourth line<br>fifth line</td><td>c4</td><td>d4</td></tr>
+<tr><td>a5</td><td>c5</td><td>d5</td></tr>
+</tbody>
+</table>`,
+  pdfCheck: columnCheck('left', { pq: 0, a3: 0, a4: 0, a5: 0, b3: 1, bz: 1, c1: 2, c2: 2, cd: 2, c4: 2, c5: 2, d1: 3, d2: 3, d4: 3, d5: 3 }) });
+
+  // a right-to-left table: rowspan in its first column (on the right) and its last (on the left)
+  CORPUS.push({ name: 'table-rowspan-rtl', html: `<p>جدولی فارسی که خانه‌هایش در چند سطر به هم پیوسته‌اند.</p>
+<table>
+<thead><tr><th>ستون یک</th><th>ستون دو</th><th>ستون سه</th></tr></thead>
+<tbody>
+<tr><td rowspan="2">۱۱</td><td>۱۲</td><td rowspan="3">۱۳</td></tr>
+<tr><td>۲۲</td></tr>
+<tr><td>۳۱</td><td>۳۲</td></tr>
+<tr><td>۴۱</td><td>۴۲</td><td>۴۳</td></tr>
+</tbody>
+</table>
+<p>پس از جدول.</p>`,
+  pdfCheck: columnCheck('right', { '۱۱': 0, '۳۱': 0, '۴۱': 0, '۱۲': 1, '۲۲': 1, '۳۲': 1, '۴۲': 1, '۱۳': 2, '۴۳': 2 }) });
+
+  // a row taller than a page (B3): split between its lines; the header repeats on the next page
+  const many = function (n, word) { return Array.from({ length: n }, function (x, i) { return word + ' ' + (i + 1); }).join('<br>'); };
+  CORPUS.push({ name: 'table-tall-row', html: `<p>A table row taller than a page.</p>
+<table>
+<thead><tr><th>Item</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>first</td><td>short</td></tr>
+<tr><td>tallrow</td><td>${many(90, 'line')}<br>lastline</td></tr>
+<tr><td>after</td><td>end</td></tr>
+</tbody>
+</table>
+<p>After the table.</p>`, pdfCheck: splitCheck(['first', 'tallrow', 'lastline', 'after', 'end']) });
+
+  // a rowspan group taller than a page in a right-to-left table: split between its rows
+  CORPUS.push({ name: 'table-tall-rowspan-rtl', html: `<p>جدولی با گروهی از سطرها که از یک صفحه بلندتر است.</p>
+<table>
+<thead><tr><th>بخش</th><th>شرح</th></tr></thead>
+<tbody>
+<tr><td rowspan="3">گروه</td><td>${many(30, 'سطر')}</td></tr>
+<tr><td>${many(30, 'بند')}</td></tr>
+<tr><td>${many(30, 'خط')}</td></tr>
+<tr><td>پایان</td><td>آخر</td></tr>
+</tbody>
+</table>`, pdfCheck: splitCheck([]) });
+
+  // a tall row whose cells have different line pitches (text in one column, a 17 px image on every line
+  // of the other): no break falls between lines of both, so each cell breaks at its own last fitting line.
+  // The picture column holds no words between its first and last line, so the round trip's word order
+  // reads the text column alone (two worded columns split over pages read back page by page).
+  const dot = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+  CORPUS.push({ name: 'table-tall-misaligned', html: `<p>A tall row whose columns have different line heights.</p>
+<table>
+<thead><tr><th>Text</th><th>Pictures</th></tr></thead>
+<tbody>
+<tr><td>${many(80, 'plain')}</td><td>imgtop<br>${Array.from({ length: 60 }, function () { return '<img src="' + dot + '" width="10" height="17" alt="">'; }).join('<br>')}<br>imgend</td></tr>
+<tr><td>after</td><td>z</td></tr>
+</tbody>
+</table>`, pdfCheck: splitCheck(['imgtop', 'imgend', 'after']) });
+
+  // rowspan="0": the cell spans to the end of its section (HTML), so the cells below it move along
+  CORPUS.push({ name: 'table-rowspan-zero', html: `<p>A cell spanning to the end of its section.</p>
+<table>
+<thead><tr><th>Left</th><th>Right</th></tr></thead>
+<tbody>
+<tr><td rowspan="0">zz</td><td>r1</td></tr>
+<tr><td>r2</td></tr>
+<tr><td>r3</td></tr>
+</tbody>
+</table>`, pdfCheck: columnCheck('left', { zz: 0, r1: 1, r2: 1, r3: 1 }) });
+})();
