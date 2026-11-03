@@ -20,13 +20,18 @@
      *   await K.libs.need('jspdf')    .pdf export
      *   await K.libs.need('mammoth')  .docx import
      *   await K.libs.need('pdfjs')    .pdf import (library + its worker, in order)
+     *   await K.libs.need('pdfimport') .pdf import (PdfImporter + lib/pdfimport/*.js, in order, after pdfjs)
+     * A library of several files counts as loaded once ALL its files ran: its global exists after the first
+     * one, so a load that failed half way is finished on the next call (the files that ran are not run twice).
+     * A global already on the page (a test page with its own script tags) is taken as it is.
      */
     K.libs = {
         need: function (name) {
             const lib = K.config.libs[name];
             if (!lib) return Promise.reject(new Error('unknown library ' + name));
-            if (window[lib.global]) return Promise.resolve(window[lib.global]);
             const srcs = [].concat(lib.src);
+            const started = srcs.some(function (src) { return scripts.has(src); });
+            if (window[lib.global] && !started) return Promise.resolve(window[lib.global]);
             return srcs.reduce(function (p, src) { return p.then(function () { return K.ui.loadScript(src); }); }, Promise.resolve()).then(function () {
                 if (!window[lib.global]) throw new Error(K.i18n.t('libFailed', name));
                 return window[lib.global];
