@@ -17,7 +17,7 @@ pdf/       the PDFs made from them: <producer>--<doc>.pdf (188 files), in six fo
              producers/  producers we cannot run here, imitated glyph by glyph: Word, PowerPoint, Prince,
                          iText, Acrobat, Adobe PDF Library (17)
              real-producers/  the real programs on Windows (make-real.ps1, make-real.js): Word, Excel, PowerPoint
-                         2024 "Save as PDF", Microsoft Print to PDF, Edge, Chrome, Firefox — our own CC0 documents
+                         2024 "Save as PDF", Microsoft Print to PDF, Edge, Chromium (chrome--: Playwright's, not a desktop Chrome), Firefox — our own CC0 documents
                          (corpus/real-*, sources in corpus/real-src/) and the lab's Word and Excel files (44)
            A file's folder follows from its name (scripts/env.js: pdfGroup); generators write through
            pdfPath(name) and the runners walk every folder (labPdfs), so names stay unique across folders
