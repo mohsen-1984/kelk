@@ -20,13 +20,18 @@
      *   await K.libs.need('jspdf')    .pdf export
      *   await K.libs.need('mammoth')  .docx import
      *   await K.libs.need('pdfjs')    .pdf import (library + its worker, in order)
+     *   await K.libs.need('pdfimport') .pdf import (PdfImporter + lib/pdfimport/*.js, in order, after pdfjs)
+     * A library of several files counts as loaded once ALL its files ran: its global exists after the first
+     * one, so a load that failed half way is finished on the next call (the files that ran are not run twice).
+     * A global already on the page (a test page with its own script tags) is taken as it is.
      */
     K.libs = {
         need: function (name) {
             const lib = K.config.libs[name];
             if (!lib) return Promise.reject(new Error('unknown library ' + name));
-            if (window[lib.global]) return Promise.resolve(window[lib.global]);
             const srcs = [].concat(lib.src);
+            const started = srcs.some(function (src) { return scripts.has(src); });
+            if (window[lib.global] && !started) return Promise.resolve(window[lib.global]);
             return srcs.reduce(function (p, src) { return p.then(function () { return K.ui.loadScript(src); }); }, Promise.resolve()).then(function () {
                 if (!window[lib.global]) throw new Error(K.i18n.t('libFailed', name));
                 return window[lib.global];
@@ -305,12 +310,19 @@
                     dlg.oncancel = function (e) { e.preventDefault(); cancel(); };       // Esc
                 }
                 const timer = dlg ? setTimeout(function () { if (!dlg.open) dlg.showModal(); }, o.delay == null ? 200 : o.delay) : 0;
-                const done = function () { clearTimeout(timer); if (dlg && dlg.open) dlg.close(); };
+                // done: the dialog's handlers go too (they would keep this task's scope, and what it read, alive)
+                const done = function () {
+                    clearTimeout(timer);
+                    if (dlg) { if (dlg.open) dlg.close(); btn.onclick = null; dlg.oncancel = null; }
+                };
                 return Promise.race([Promise.resolve().then(function () { return fn(api); }), aborted])
                     .then(function (v) { done(); return v; }, function (e) { done(); throw e; });
             };
             const p = (self._tasks || Promise.resolve()).then(run, run);
-            self._tasks = p.catch(function () {});
+            // the queue waits for the task, not for its value: resolving to undefined, it holds no result alive
+            // (an import's text, a PDF's bytes) after the caller has taken it
+            const settle = function () {};
+            self._tasks = p.then(settle, settle);
             return p;
         },
 

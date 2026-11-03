@@ -331,18 +331,17 @@ test('check-i18n: a template literal is a key; a variable or an expression is NO
   assert.equal(r.status, 1, r.stdout);
   assert.match(r.stdout, /NONLITERAL +scripts\/ui\.js:\d+ t\(kk\)/);
   assert.match(r.stdout, /NONLITERAL +scripts\/ui\.js:\d+ t\(`a\$\{kk\}`\)/);
-  assert.match(r.stdout, /NONLITERAL +scripts\/ui\.js:\d+ t\('pdf_' \+ kk\)/, 'pdf_ is allowed in importer.js only');
+  assert.match(r.stdout, /NONLITERAL +scripts\/ui\.js:\d+ t\('pdf_' \+ kk\)/, 'pdf_ is allowed in importer.js and report.js only');
 });
 
-test('check-i18n: a pdf_ key counts only where importer.js writes it in full', function () {
+test('check-i18n: a pdf_ key counts only where report.js writes it in full', function () {
   const r = checkEdited({
     // the table entry gone, the suffix still written elsewhere in the file
-    'scripts/importer.js': (s) =>
-      s.replace("ocrLayer: { key: 'pdf_ocrLayer', type: 'info' },", '') + "\nconst zzSuffix = 'ocrLayer';\n"
+    'scripts/report.js': (s) => s.replace("ocrLayer: { key: 'pdf_ocrLayer' },", '') + "\nconst zzSuffix = 'ocrLayer';\n"
   });
   assert.equal(r.status, 1, r.stdout);
   assert.match(r.stdout, /UNUSED +pdf_ocrLayer/);
-  assert.doesNotMatch(r.stdout, /NONLITERAL/, 'importer.js may compute pdf_ keys');
+  assert.doesNotMatch(r.stdout, /NONLITERAL/, 'report.js may compute pdf_ and rep_ keys');
 });
 
 test('check-i18n: PLACEHOLDER names each language with its own placeholders', function () {

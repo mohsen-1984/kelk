@@ -1,6 +1,12 @@
 // Import every pdf/*.pdf with Kelk's PdfImporter (tools/pdf-lab.html in Chromium, from file://),
 // write out/<name>.md, and score it against corpus/<doc>.md when the file name says which (…--<doc>.pdf).
-//   node scripts/run-import.js [filter]
+//   node scripts/run-import.js [filter] [--mode auto|safe|full]
+//   node scripts/run-import.js --real-heldout   the held-out real-producer documents (heldout.js, tests/pdf-lab/HELDOUT.md):
+//                                               their mean only, to out/real-heldout/_scores.json — no file name, no
+//                                               per-file score and no Markdown is printed or written
+// The held-out real-producer PDFs are left out of the normal run (and so of the corpus gate, file by file).
+// --mode: the importer's options.mode (lib/pdfimport/ladder.js; default auto). Run safe mode into a LAB_OUT of its own —
+// its scores are not the gate's (plan P3.4: safe mode on the corpus keeps words and order ≥ 70); the means are printed.
 const { pdfPath, fileUrl } = require('./env.js');
 const fs = require('fs'), path = require('path');
 const { chromium } = require('./env.js').req('playwright');
@@ -10,44 +16,58 @@ const LAB = path.join(__dirname, '..');
 const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
 
 (async () => {
-  const filter = process.argv[2] ? new RegExp(process.argv[2]) : null;
+  const args = process.argv.slice(2), mi = args.indexOf('--mode');
+  const mode = mi >= 0 ? args.splice(mi, 2)[1] : 'auto';
+  if (!/^(auto|safe|full)$/.test(mode)) throw new Error('--mode: auto, safe or full');
+  const realHeldout = args.includes('--real-heldout');
+  const arg = args.find((a) => !a.startsWith('--'));
+  if (realHeldout && arg) { console.error('--real-heldout takes no filter: its files are read as one mean'); process.exit(2); }
+  const filter = arg ? new RegExp(arg) : null;
   const browser = await chromium.launch();
   const page = await browser.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(String(e)));
   await page.goto(fileUrl(KELK + '/tools/pdf-lab.html'));
   // (each file read where it is: a name the groups would place elsewhere is still found)
-  const where = {}; require('./env.js').labPdfs().forEach((x) => { where[x.name] = x.file; });
+  // the PDFs of the held-out documents, wherever they lie (heldout.js, env.js heldSplit): only with --real-heldout,
+  // and then only they
+  const pdfs = require('./env.js').labPdfs();
+  const split = require('./env.js').heldSplit();
+  const held = new Set(split.heldout.map((x) => x.name));
+  const where = {}; pdfs.forEach((x) => { if (held.has(x.name) === realHeldout) where[x.name] = x.file; });
   const files = Object.keys(where).sort().filter((f) => !filter || filter.test(f));
-  const rows = [];
+  const rows = [], rules = {};      // r.rules per file (lib/pdfimport/thresholds.js) → _rules.json, read by rules.js and gate.js
   for (const f of files) {
     const b64 = fs.readFileSync(where[f]).toString('base64');
     const t0 = Date.now();
-    const r = await page.evaluate(async (b64) => {
+    const r = await page.evaluate(async ({ b64, mode }) => {
       const bin = atob(b64), u = new Uint8Array(bin.length);
       for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
       try {
         // pictures kept, each as a short name (the crops themselves are not scored, where they land is)
-        const r = await PdfImporter.create({ images: 'markdown', onImage: (src, o) => 'img-' + o.page + '-' + o.index, asciiNumbers: false, persianLetters: false }).fromArrayBuffer(u.buffer);
+        const r = await PdfImporter.create({ images: 'markdown', onImage: (src, o) => 'img-' + o.page + '-' + o.index, asciiNumbers: false, persianLetters: false, mode }).fromArrayBuffer(u.buffer);
         const q = (r.quality && r.quality.pages) || [];
         const cov = q.reduce((a, x) => [a[0] + x.covered, a[1] + x.glyphs], [0, 0]);
-        return { markdown: r.markdown, html: r.html, messages: r.messages, pic: cov[1] ? cov[0] / cov[1] : 0 };
+        return { markdown: r.markdown, html: r.html, messages: r.messages, pic: cov[1] ? cov[0] / cov[1] : 0, rules: r.rules, ladder: r.report && r.report.summary };
       } catch (e) { return { error: e.stack || String(e) }; }
-    }, b64);
+    }, { b64, mode });
     const ms = Date.now() - t0;
     const name = f.replace(/\.pdf$/, '');
-    if (r.error) { rows.push({ name, error: r.error.split('\n')[0] }); console.log(name, 'ERROR', r.error.slice(0, 300)); continue; }
+    if (r.error) { rows.push({ name, error: r.error.split('\n')[0] }); if (!realHeldout) console.log(name, 'ERROR', r.error.slice(0, 300)); continue; }
     // text wins over pictures: a Markdown line holding a picture and words is counted (mix, should be 0); the
     // pictures are taken out before scoring — the corpus Markdown has none
+    if (r.rules) rules[name] = r.rules;
     const IMG = /!\[[^\]]*\]\(img-[\d-]+\)/g;
     const lines = r.markdown.split('\n');
     const figs = lines.reduce((n, l) => n + (l.match(IMG) || []).length, 0);
     const mix = lines.filter((l) => /!\[[^\]]*\]\(img-/.test(l) && l.replace(IMG, '').replace(/^[\s>|*+-]*(\d+[.)])?/, '').replace(/[\s|]/g, '') !== '').length;
     const md = r.markdown.replace(IMG, '').replace(/\n[ \t]*\n([ \t]*\n)+/g, '\n\n');
-    fs.writeFileSync(path.join(OUT, name + '.md'), r.markdown); fs.writeFileSync(path.join(OUT, name + '.html'), r.html || '');
+    if (!realHeldout) { fs.writeFileSync(path.join(OUT, name + '.md'), r.markdown); fs.writeFileSync(path.join(OUT, name + '.html'), r.html || ''); }
     const m = name.match(/--([\w-]+)$/);
     const src = m && path.join(LAB, 'corpus', m[1] + '.md');
     const row = { name, ms };
+    // pages not given in full by the ladder (lib/pdfimport/ladder.js): none on the corpus in auto mode
+    if (r.ladder && r.ladder.full < r.ladder.pages) row.demoted = r.ladder.pages - r.ladder.full;
     if (src && fs.existsSync(src)) {
       const want = fs.readFileSync(src, 'utf8');
       Object.assign(row, score(want, md));
@@ -70,13 +90,40 @@ const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
     row.mix = mix; row.figs = figs;                            // lines with a picture and words (should be 0); pictures
     rows.push(row);
   }
+  if (realHeldout) {
+    // the mean only (a crash counts 0, as in the fuzz): the gate compares it (TOL 1), nothing else of these files is
+    // kept — a per-file score read once makes its document a dev document (tests/pdf-lab/HELDOUT.md)
+    const errs = rows.filter((r) => r.error).length;
+    const mean = (k) => {
+      const v = rows.map((r) => (r.error ? (k === 'total' ? 0 : undefined) : r[k])).filter((x) => typeof x === 'number');
+      return v.length ? +(v.reduce((a, b) => a + b, 0) / v.length).toFixed(4) : null;
+    };
+    // files: the sorted names of the PDFs read (public, as the documents are: the gate compares like with like)
+    const res = { at: new Date().toISOString(), n: rows.length, errors: errs, docs: split.docs.heldout, files: files.slice().sort(),
+                  mean: { total: mean('total'), rtl: mean('rtl') } };
+    const dir = path.join(OUT, 'real-heldout');
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, '_scores.json'), JSON.stringify(res, null, 1));
+    const p1 = (x) => (x === null ? '-' : (100 * x).toFixed(1));
+    console.log('real-producer held-out — ' + res.n + ' PDFs of ' + res.docs.length + ' documents: mean total ' + p1(res.mean.total) +
+      (res.mean.rtl === null ? '' : ' · rtl column ' + p1(res.mean.rtl)) + (errs ? ' · ' + errs + ' crash(es)' : '') + '\n(means only — tests/pdf-lab/HELDOUT.md)');
+    if (errors.length) console.log('page errors:', errors.length);
+    await browser.close();
+    if (errs) process.exitCode = 1;
+    return;
+  }
   const pct = (x) => x === undefined ? '  -  ' : (100 * x).toFixed(1).padStart(5);
   console.log('name'.padEnd(46), 'words', 'order', ' head', ' list', ' tabl', ' code', 'quote', 'total', 'mkup', '  rtl', '  pic', 'mix', 'figs', ' lnk');
   rows.forEach((r) => {
     if (r.error) return console.log(r.name.padEnd(46), 'ERROR', r.error);
     console.log(r.name.padEnd(46), pct(r.recall), pct(r.order), pct(r.headings), pct(r.lists), pct(r.tables), pct(r.code), pct(r.quotes), pct(r.total), String(r.markup).padStart(4), pct(r.rtl), pct(r.pic), String(r.mix).padStart(3), String(r.figs).padStart(4), pct(r.links), r.ms + 'ms');
   });
+  const ok = rows.filter((r) => !r.error && r.recall !== undefined), mean = (k) => ok.length ? (100 * ok.reduce((s, r) => s + (r[k] || 0), 0) / ok.length).toFixed(1) : '-';
+  const dem = rows.filter((r) => r.demoted);
+  console.log('\nmode ' + mode + ': ' + ok.length + ' scored, means words ' + mean('recall') + ' order ' + mean('order') + ' total ' + mean('total') +
+    ' · files with pages not in full: ' + dem.length + (dem.length ? ' (' + dem.slice(0, 8).map((r) => r.name + ' ' + r.demoted).join(', ') + (dem.length > 8 ? ' …' : '') + ')' : ''));
   fs.writeFileSync(path.join(OUT, '_scores.json'), JSON.stringify(rows, null, 1));
+  fs.writeFileSync(path.join(OUT, '_rules.json'), JSON.stringify(rules, null, 1));
   if (errors.length) console.log('page errors:', errors.slice(0, 5));
   await browser.close();
   if (rows.some((r) => r.error)) process.exitCode = 1;       // a crash fails the run (scores are the gate's: gate.js)

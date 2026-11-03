@@ -1,7 +1,8 @@
 # Dev tooling on every push and pull request: ESLint (npm run lint, eslint.config.js), the single version
 # string (npm run check:version, tools/check-version.js), the interface strings (npm run check:i18n,
 # tools/check-i18n.js; since P1.4) and the app's unit tests (npm test: tests/unit, Node's test runner + jsdom;
-# since P1.1). A workflow of its own, not a job in pdf-lab.yml: that
+# since P1.1).
+# A workflow of its own, not a job in pdf-lab.yml: that
 # one runs only when the lab's paths change, this one on any change, and a lint failure never hides the lab's
 # results. No formatter check: the tree keeps its own hand-written style.
 #
