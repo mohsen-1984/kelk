@@ -70,4 +70,15 @@ test('P3.2: a line as ctx resolves to its page, not its list number', function (
   assert.equal(imp._t('zzPageProbe', { num: 1, page: 2 }), 2);
   assert.equal(imp._t('zzPageProbe', { p: { num: 3 } }), 3);
   assert.equal(imp._t('zzPageProbe', { num: 4 }), 4);
+  // a page record or the walk's state: .page is pdf.js's page object, the page is .num
+  assert.equal(imp._t('zzPageProbe', { num: 5, page: { _pageIndex: 4 } }), 5);
+});
+
+test('P3.3 review: r.rules pages are page numbers, also when a page record or the walk state is passed', function () {
+  const imp = PdfImporter.create();
+  imp._rulesStart();
+  imp._fire('zz.pageRecord', { num: 2, page: { _pageIndex: 1 } });
+  imp._fire('zz.pageRecord', 3);
+  const r = imp._rulesFinish({});
+  assert.deepEqual(r.rules['zz.pageRecord'], { count: 2, pages: [2, 3] });
 });
