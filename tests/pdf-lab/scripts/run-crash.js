@@ -1,12 +1,14 @@
-// Stability sweep: import every PDF under a folder (subfolders too; default: the lab's pdf/); report errors,
+// Stability sweep: import every PDF under a folder (subfolders too; default: the lab's pdf/ and ladder/ — the files
+// the fallback ladder must demote, lib/pdfimport/ladder.js); report errors,
 // timeouts and slow files. Exit 1 on any error or timeout (CI); files over 25 MB are skipped, slow ones only listed.
 //   node scripts/run-crash.js [dir] [kelk root] [timeout ms]
 const fs = require('fs'), path = require('path');
 const env = require('./env.js');
 const { chromium } = env.req('playwright');
 (async () => {
-  const [dir = path.join(env.LAB, 'pdf'), root = env.KELK, tmo = '45000'] = process.argv.slice(2);
-  const files = env.labPdfs(dir);
+  const [dirArg, root = env.KELK, tmo = '45000'] = process.argv.slice(2);
+  const dir = dirArg || path.join(env.LAB, 'pdf');
+  const files = dirArg ? env.labPdfs(dirArg) : env.labPdfs(dir).concat(env.labPdfs(path.join(env.LAB, 'ladder')));
   if (!files.length) throw new Error('no PDFs under ' + dir);
   const browser = await chromium.launch();
   let page = null;
