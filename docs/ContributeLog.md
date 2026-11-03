@@ -716,9 +716,10 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 24 | The stress run's 19–27 s main-thread block found and removed: `_formsByWidth` listed every font's ids once per candidate font (cubic in fonts — 52 s under Chromium 141, whose long-task observer never reported it, 27 s under 156), now once; `_gsubBogus` scanned every page once per font, now groups the glyphs by font once; `run-stress.js` adds a heartbeat (longest gap between 50 ms ticks) so the check no longer depends on the browser's observer; big file 48 → 18 s, longest task 453 ms; byte-identical on corpus, fuzz dev and meta. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 12 | P3.1 report `docs/reports/P3.1-split.md`: the splits per file, the items carried in the sub-phase (Playwright, lazy loading, the stress block, engines, the commit check), the stress finding, the lab, the review findings and their verdicts, CI and the open items. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 10 | P3.2 report `docs/reports/P3.2-registry.md`: the registry, calibration and telemetry, the 1,007 entries and 377 rules by part, the rules that never fire on the corpus, the lab, the review findings and where each went. |
+| 1405-08-12 | 2.0-rc1 | Zarrabi | 6 | P3.1 baseline rebuilt on the CI runner for Playwright 1.64.1 (manual `pdf-lab` run 41593890106 with `baseline` ticked, its `baseline-candidate` committed whole): corpus 95.72 → 96.22 (P1.3's five files, written at last), fuzz and meta in the Chromium 156 environment — dev 85.98 → 85.91, held-out 86.91 → 86.89 with the same importer (the browser's drawing), meta Chromium 141 → 156. |
 
 <!-- generated:totals -->
-**Entries: 130 · Total: 1742 min (29.03 hours) — Zarrabi 1742 min (123 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 131 · Total: 1748 min (29.13 hours) — Zarrabi 1748 min (124 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
