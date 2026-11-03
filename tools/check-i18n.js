@@ -26,8 +26,11 @@ const path = require('path');
 const vm = require('vm');
 
 const DYNAMIC = [
-    // PdfImporter's notes and errors → a toast: PDF_NOTES / PDF_ERRORS hold each key in full
+    // PdfImporter's errors → a toast: PDF_ERRORS holds each key in full
     { file: 'scripts/importer.js', prefix: 'pdf_' },
+    // the import report (plan P3.5): its tables hold each note / flag (pdf_) and mode / why / label (rep_) key in full
+    { file: 'scripts/report.js', prefix: 'pdf_' },
+    { file: 'scripts/report.js', prefix: 'rep_' },
     // Kelk.i18n.apply(): the markup's own keys, checked above from index.html
     { file: 'scripts/i18n.js', arg: "el.getAttribute('data-i18n')" },
     { file: 'scripts/i18n.js', arg: 'kv[1].trim()' }
