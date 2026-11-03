@@ -761,9 +761,10 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 8 | P3.4 review fixes applied on the branch after the P3.3 merge (the watermark note and the rung's text count joined in PdfImporter.js); auto mode compared byte for byte with P3.3 on corpus, fuzz dev and meta (no file differs), stress run and unit tests. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 8 | P3.4 report written (docs/reports/P3.4-ladder.md): the confidence, the rungs and modes, the logical-order textContent rung, the lab (byte-identical auto mode, no page demoted, safe mode, forced textContent, stress), the reviewer's right-to-left cases before and after, review findings, what stays open. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 9 | docs/ContributeLog.md brought to the P3–P4 state: Known Issues (the ladder, the importer split, the real producers and /Rotate resolved; calibration, the metamorphic remainder and startup size updated; the textContent rung, the held-out documents seen before the split, the goldens' importer misses and the Persian percent display added), Testing (corpus 171 visible, meta 185 / 199, golden files, real held-out, the fallback ladder, unit tests 185, startup 1,330,719 bytes), Prerequisites (qpdf on Windows), the design note on lazy loading. |
+| 1405-08-12 | 2.0-rc1 | Zarrabi | 11 | Review of the P4.3 diff: the held-out split against added and opened documents, a held-out document from another producer folder, per-file held-out output on disk and the lab tools that open files without a log, where the opened log lives, the --real-heldout output, the gate's like-for-like and missing-result checks, held-out names in gate notes, the rtl column. |
 
 <!-- generated:totals -->
-**Entries: 166 · Total: 2253 min (37.55 hours) — Zarrabi 2253 min (159 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 167 · Total: 2264 min (37.73 hours) — Zarrabi 2264 min (160 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
