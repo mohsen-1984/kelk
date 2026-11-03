@@ -13,7 +13,7 @@
  * numbering); "new in 2.0" in docs/about-kelk-and-samples.* and TODO.md (history, stays at 2.0);
  * CHANGELOG's older headings and body; o:Version 16.00 (Word) in msOfficeWordHtmlTemplate.js,
  * MIME-Version 1.0 in WordHtmlBuilder.js; sample data ("Version 1.2" in config.js, sample tables);
- * the version lines of .claude/skills/*; third-party versions (vendor/, fonts, THIRD-PARTY-NOTICES.md).
+ * third-party versions (vendor/, fonts, THIRD-PARTY-NOTICES.md).
  */
 const fs = require('fs'), path = require('path');
 const root = path.join(__dirname, '..');

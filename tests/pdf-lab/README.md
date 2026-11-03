@@ -266,7 +266,7 @@ file. Still weak in both: two columns (held-out 78: tables 53, lists 69) and A5 
 or a column break inside a wrapped row. That is generator 3 on the CI runner (dev 96.0, held-out 94.6).
 
 Generator 4 (1405-08-11: the right-to-left documents, `digits`, `tracking`) draws another set; its baseline is
-built on the CI runner (`docs/reports/P2.1-rtl-fuzz.md`). On a Windows machine without wkhtmltopdf or Noto Naskh
+built on the CI runner. On a Windows machine without wkhtmltopdf or Noto Naskh
 Arabic — indicative only — dev 86.0 (ltr 92.4, rtl 78.0, `rtl` 91.0), held-out 86.8 (ltr 91.1, rtl 81.4, `rtl`
 93.0), where generator 3 there gave 95.8 / 93.9. Weak: right-to-left headings (dev 68) and quotes (67);
 `tracking: loose` (dev 75.4: ltr 80.7 against 96.2 untracked); Noto Naskh Arabic, and its fallback here.
@@ -336,7 +336,7 @@ relations**, counted per transform: under "same" the multiset of words equals th
 generator 3 (1405-08-11, 24 seeds, references 99.9): `rotate180` −83.0, `rotate90` −82.4 (the importer does not
 apply `/Rotate`), `noToUnicode` −81.0, `stamp` −32.7, `trackLoose` −12.2, `tz85` −9.2, `trackTight` −3.6, `pagebg`
 −3.3, `band` −2.7, `scale80` −1.4, `objstm` −0.7, `pageSize` −0.4, `renderMode` −0.3, `scale125` −0.2, the rest 0.0;
-"same": 133 of 199 files exact, 66 known exceptions (`docs/reports/P2.2-meta-net.md`).
+"same": 133 of 199 files exact, 66 known exceptions.
 
 **In the gate**, each transform is compared on its own with a baseline entry of the same `v` and the same env
 for what it depends on (pdf-lib; qpdf and its package version; Chromium and the platform), over the seeds both
@@ -483,7 +483,7 @@ of a page (`pdftoppm -f N -l N -r 200 -x … -y … -W … -H … -png`) settles
 
 ## Regenerating the PDFs
 
-The PDFs are ordinary git files marked `binary` (no LFS; decision of 1405-08-10, `docs/reports/P0.1-git-hygiene.md`).
+The PDFs are ordinary git files marked `binary` (no LFS).
 Every regeneration writes a whole new binary (creation dates and IDs are not pinned), and the old one stays in history
 for good — so commit a regenerated PDF only when its content changed, and pin timestamps where a producer allows it.
 

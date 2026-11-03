@@ -14,7 +14,7 @@ offline = true
 include_fragments = "anchor-only"   # #id anchors; text fragments (#:~:text=) are not used here
 # a link to a folder is fine when the folder has a README.md or index.html (GitHub shows it)
 index_files = ["README.md", "index.html"]
-# the plan and the skills under .claude/ are checked too (hidden folders are skipped otherwise)
+# hidden folders (.github/) are checked too
 hidden = true
 # links inside code spans and fenced blocks are examples, not links
 include_verbatim = false
@@ -30,15 +30,10 @@ accept = ["200..=299", "429"]
 exclude_path = [
   '(^|[/\\])node_modules[/\\]',
   '(^|[/\\])\.git[/\\]',
-  '(^|[/\\])\.claude[/\\]worktrees[/\\]',          # other branches' working trees (local only)
   '(^|[/\\])vendor[/\\]',                          # third-party files, not ours to fix
   '(^|[/\\])tests[/\\]pdf-lab[/\\]out[/\\]',       # lab results
   '(^|[/\\])tests[/\\]pdf-lab[/\\]corpus[/\\]',    # lab fixtures: their links are document content the lab scores, not navigation
   '(^|[/\\])tests[/\\]golden[/\\]expected[/\\]',   # golden snapshots (P2.3): recorded builder output, e.g. a .docx read back with #bm_ links
-  # the skills' READMEs describe them in the skills' home repository (a dist/ folder with the packaged zip, sibling
-  # skills /detect and /api-smoke-test, that repository's root README and tools/): 15 links that cannot resolve here.
-  # Their SKILL.md and references/ are checked. Known Issue: the READMEs are to be rewritten for this repository.
-  '(^|[/\\])\.claude[/\\]skills[/\\][^/\\]+[/\\]README\.md$',
 ]
 
 # headings that start with an emoji carrying U+FE0F (⚠️, 🏗️): GitHub keeps the selector in the anchor

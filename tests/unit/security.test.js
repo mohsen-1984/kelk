@@ -2,7 +2,7 @@
  * Security hardening (plan P1.2): hostile Markdown in the preview leaves the app intact (DOMPurify with
  * SANITIZE_NAMED_PROPS and no <style> / form controls), the custom header / footer HTML is sanitised, and
  * HtmlBuilder.toHtml writes no on* handler, script or javascript: URL (B4). The CSP itself is checked in a
- * browser (docs/reports/P1.2-security.md): jsdom does not enforce it.
+ * browser: jsdom does not enforce it.
  */
 'use strict';
 

@@ -1,6 +1,6 @@
 # Site quality on every push and pull request (plan P2.4): links, generated files, accessibility, startup size.
 # Four jobs, run side by side, each red on its own failure:
-#   links      lychee 0.24.2 over every *.md and index.html (lychee.toml) — relative links and #anchors. Offline on
+#   links      lychee 0.24.2 over every *.md and index.html (.github/lychee.toml) — relative links and #anchors. Offline on
 #              push / PR: external URLs depend on other people's servers (rate limits, 403s to bots, timeouts) and a
 #              red check nobody can fix in the change is soon ignored. External URLs are checked by the weekly
 #              scheduled run, and by a manual run with "online" ticked.
@@ -78,7 +78,7 @@ jobs:
           if [ "$ONLINE" = true ]; then offline=false; fi
           echo "offline=$offline"
           # the inputs are lychee's own globs (quoted: not the shell's), the same as `npm run check:links`
-          lychee --config lychee.toml --offline="$offline" '**/*.md' index.html 2>&1 | tee "$RUNNER_TEMP/logs/links.log"
+          lychee --config .github/lychee.toml --offline="$offline" '**/*.md' index.html 2>&1 | tee "$RUNNER_TEMP/logs/links.log"
 
       - name: Logs
         if: always()
