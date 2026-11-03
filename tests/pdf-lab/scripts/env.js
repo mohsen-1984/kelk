@@ -61,4 +61,45 @@ function labPdfs(root) {
 }
 // a file:// URL for a local path on any platform ('file://' + path breaks on Windows drive letters and spaces)
 const fileUrl = (f) => require('url').pathToFileURL(path.resolve(f)).href;
-module.exports = { pdfPath, pdfGroup, labPdfs, importerFiles, fileUrl, KELK, LAB, OUT, FUZZ, ORIG: process.env.KELK_ORIG || null, req, lab: fileUrl(path.join(KELK, 'tools', 'pdf-lab.html')) };
+
+// The held-out protocol on the lab (heldout.js, docs/HELDOUT.md): the split of the lab's PDFs by document — every PDF
+// whose document is held out, wherever it lies — computed once per process
+let heldCache = null;
+function heldSplit() {
+  if (!heldCache) heldCache = require('./heldout.js').splitLab(labPdfs(), (n) => pdfGroup(n) === 'real-producers');
+  return heldCache;
+}
+// a fuzz held-out file: under FUZZ/heldout, a …/fuzz/heldout/ folder elsewhere (LAB_FUZZ), or run-fuzz.js's fuzz-heldout/
+function isFuzzHeld(file) {
+  const f = path.resolve(file), inside = (d) => { const r = path.relative(d, f); return r && !r.startsWith('..') && !path.isAbsolute(r); };
+  const parts = f.split(/[\\/]+/);
+  return inside(path.join(FUZZ, 'heldout')) || parts.some((p, i) => (p === 'heldout' && parts[i - 1] === 'fuzz') || p === 'fuzz-heldout');
+}
+// The guard of the lab's file-by-file tools (dbg.js, dump.js, cmp.js, lines.js, shapes.js, words.js, snapshot.js,
+// run-crash.js --show-held): given the files a tool is about to open and print, it logs every held-out one to
+// docs/reports/heldout-opened.log — fuzz:heldout once, real:<document> once per document — with the tool's name, and
+// warns. Returns the held-out files among them. Logging is the record: the tool still runs.
+function openHeld(files, script) {
+  const H = require('./heldout.js'), held = new Set(heldSplit().docs.heldout), out = [], seen = new Set();
+  (files || []).filter((f) => f).forEach((f) => {
+    const doc = /\.(pdf|md|html)$/i.test(f) ? H.docOf(f.replace(/\.(md|html)$/i, '')) : null;
+    let split = null;
+    if (isFuzzHeld(f)) split = 'fuzz:heldout';
+    else if (doc && held.has(doc)) split = 'real:' + doc;
+    if (!split) return;
+    out.push(f);
+    if (seen.has(split)) return;
+    seen.add(split);
+    const o = { split: split + ' (' + (script || path.basename(process.argv[1] || '?')) + ')' };
+    if (split === 'fuzz:heldout') {
+      try {
+        const m = JSON.parse(require('fs').readFileSync(path.join(FUZZ, 'heldout', 'manifest.json'), 'utf8'));
+        o.generator = (m.env || {}).generator;
+        o.base = m.base !== undefined ? m.base : m.samples.length ? Math.min(...m.samples.map((s) => s.seed)) : null;
+      } catch (e) { /* no manifest: generator and seed base unknown */ }
+    }
+    H.logOpened(o);
+  });
+  return out;
+}
+module.exports = { pdfPath, pdfGroup, labPdfs, heldSplit, isFuzzHeld, openHeld, importerFiles, fileUrl, KELK, LAB, OUT, FUZZ, ORIG: process.env.KELK_ORIG || null, req, lab: fileUrl(path.join(KELK, 'tools', 'pdf-lab.html')) };

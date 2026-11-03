@@ -4,6 +4,7 @@ const { chromium } = require('./env.js').req('playwright');
 const { KELK, fileUrl } = require('./env.js');
 (async () => {
   const [file, pg = '1', from = '0', n = '80'] = process.argv.slice(2);
+  require('./env.js').openHeld([file], 'dump.js');      // a held-out file opened: logged (docs/HELDOUT.md)
   const browser = await chromium.launch();
   const page = await browser.newPage();
   await page.goto(fileUrl(KELK + '/tools/pdf-lab.html'));
