@@ -10,8 +10,9 @@ The third release. Kelk reads **PDF** — a PDF becomes Markdown again — and w
 the Markdown on screen becomes an editable .pptx deck. Both in the browser, offline. The libraries in `lib/` are
 2.0; the new `PdfImporter` and `PptxBuilder` are 1.0 (the slide convention: `lib/SLIDES.md`).
 
-PDF import, where it stands: a lab of 188 PDFs reads at 94.6 on average (96.2 for the 144 made by our generators;
-the other 44 come from Word, Excel, PowerPoint, Microsoft Print to PDF, Edge, Chrome and Firefox on Windows);
+PDF import, where it stands: a lab of 188 PDFs — 144 from our generators (96.2 on average), 44 from Word, Excel,
+PowerPoint, Microsoft Print to PDF, Edge, Chrome and Firefox on Windows — reads at 95.6 on the 171 open files (84.5 on
+the 17 held out);
 style-fuzzed PDFs in English, Persian and Arabic at 86.8 (held out 88.0), right-to-left ones the weaker side. Also
 weak: Persian PDFs from wkhtmltopdf and LibreOffice's HTML import, borderless two-column tables, turned text,
 formulas from other programs; a scan needs an OCR layer. How it
