@@ -109,6 +109,11 @@
             // line spacing: automatic by default (an early 1.1 was the paragraphs' value only)
             if (!s._lh && isObj(s.text) && s.text.lineHeight === '110%') s.text.lineHeight = '';
         }
+        // Slides themes got general names during 2.0 (kelk → modern-emerald …): a renamed value, never a default
+        if (isObj(s.slides) && s.slides.theme) {
+            const renamed = { kelk: 'modern-emerald', pasargad: 'scholarly-blue', ocean: 'ocean-teal', graphite: 'minimal-mono' }[s.slides.theme];
+            if (renamed) s.slides.theme = renamed;
+        }
         MARKERS.forEach(function (m) { delete s[m]; });
         s.schemaVersion = Math.max(v, K.config.defaults.schemaVersion);
         return s;

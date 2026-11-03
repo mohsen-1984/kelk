@@ -4,16 +4,89 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
-## [2.0-rc1] — release candidate (the date of 2.0 at its release)
+## [2.0] — 2026-11-03
 
-The third release, and the first that reads **PDF**: a PDF becomes Markdown again, in the browser, offline. Built
-for documents as people make them in Persian, Arabic and English. Formulas in Kelk's own PDFs come back as their
-LaTeX. The libraries in `lib/` are 2.0; the new `PdfImporter` is 1.0.
+The third release. Kelk reads **PDF** — a PDF becomes Markdown again — and writes a fifth output, **PowerPoint**:
+the Markdown on screen becomes an editable .pptx deck. Both in the browser, offline. The libraries in `lib/` are
+2.0; the new `PdfImporter` and `PptxBuilder` are 1.0 (the slide convention: `lib/SLIDES.md`).
 
-Where it stands: a lab of 144 PDFs from 49 producer variants reads at 95.7 on average (114 files at 99 or more),
-style-fuzzed PDFs at 96.0 (94.6 on a held-out set). Weaker: Persian PDFs from wkhtmltopdf and from LibreOffice's
-HTML import (51–71), borderless two-column tables, turned text, formulas from other programs; a scan needs an OCR
-layer. How it works and its limits: `lib/PDFIMPORT.md`.
+PDF import, where it stands: a lab of 188 PDFs — 144 from our generators (96.2 on average), 44 from Word, Excel,
+PowerPoint, Microsoft Print to PDF, Edge, Chrome and Firefox on Windows — reads at 95.6 on the 171 open files (84.5 on
+the 17 held out);
+style-fuzzed PDFs in English, Persian and Arabic at 86.8 (held out 88.0), right-to-left ones the weaker side. Also
+weak: Persian PDFs from wkhtmltopdf and LibreOffice's HTML import, borderless two-column tables, turned text,
+formulas from other programs; a scan needs an OCR layer. How it
+works and its limits: `lib/PDFIMPORT.md`.
+
+### Added — slides (PowerPoint)
+
+- **Document | Slides** above the preview shows the same text as slides, with each slide's layout and
+  warnings and its speaker notes. **PPTX** sits in the export bar (Ctrl+Alt+Enter); **Present** (F5)
+  shows the slides full screen.
+- **The convention:** the first `#` is the title slide, later `#`s are numbered section slides and the
+  last one is the closing slide. Every `##` is a slide, a `<!-- … -->` comment holds its speaker notes,
+  `> [!NOTE]` and the other GitHub alerts are callouts, and front matter sets the title, footer,
+  direction, theme and size.
+- **Layouts from the content:** cards, steps, stats, statement, quote, columns, a picture beside a list,
+  and an agenda made from the sections. `<!-- layout: … -->` chooses one by name, and **timelines** are
+  horizontal or vertical, with one date highlighted.
+- **Diagrams as PowerPoint shapes:** process (chevrons), cycle, pyramid, funnel, hierarchy (from a
+  nested list), matrix and Venn. All of them stay editable.
+- **Native charts from tables:** `<!-- chart: column -->` before a table makes a column, bar, line,
+  area, pie, doughnut or radar chart (stacked, percent, labels). Edit Data opens the chart's sheet.
+- **Icons:** any Lucide name (`:rocket:`) or an emoji before an item's label.
+- **Right to left:** the slides are mirrored and each paragraph takes its direction from BidiCore.
+  Persian and Arabic text and English text each get their own font and language. Table columns and
+  chart categories start on the right.
+- **Text that fits:** text is measured and shrunk down to 70%. A long list or table continues on the
+  next slide, and the preview marks any text that still overflows.
+- Titles go into real title placeholders, so the outline view and accessibility tools work. Code stays
+  colored and editable under its language label (as in Word and PDF), and pictures keep their size.
+- **Formulas are PowerPoint's own equations** (OMML), display and inline, editable in PowerPoint's
+  equation editor as in the Word output. Programs that do not read them show the formula's picture.
+- **Sections:** each `#` also starts a PowerPoint section, so the slide sorter groups the slides.
+- **The deck's identity:** `logo:` puts a logo on the title, section and closing slides and at the end of
+  every title row, like a letterhead; without one, the document's logo (Header and footer) is used.
+  `tagline:` adds a brand line to the title and closing slides, `classification:` a badge («Internal»,
+  «محرمانه») on every slide, `contact:` a line on the closing slide. Settings → Slides: logo on every slide,
+  the cover only, or none.
+- **Bullets and title marks:** the list bullet (• ○ ▪ ❖ ➢ ✓ ❑ –) and the mark beside titles (steps, bar,
+  none — each theme has its own) are settings, or `bullet:` and `decoration:` in the front matter.
+- **A deck's front matter is its default, and Settings override it:** a `theme:` (or colors, bullet, title
+  mark, aspect, footer) written into the deck shows in Settings → Slides as the deck's value; picking
+  another one there changes this deck at once, for this document only — the settings kept for other decks
+  stay as they were. A note under the theme lists what the deck brings and what was changed, with a link
+  back to the deck's own values; another document starts from its own front matter again.
+- A `statement` directive on a slide with a chart no longer drops the chart: the layout follows the
+  content, with a warning.
+- **Title slide:** a picture under the first `#` (an SVG logo too) stands over the title, and
+  `presenter:` in the front matter adds “Presenter: …” in the deck's language.
+- **Ten themes** with general names: Modern Emerald, Scholarly Blue, Corporate Blue, Tech Dark (dark
+  slides), Tech Warm, Minimal Mono, Ocean Teal, Sunset Coral, Forest Green and Royal Purple. Text on every
+  fill is white or black according to the fill's luminance.
+- **Right to left in PowerPoint:** each run is split by script, decided over the whole paragraph. Spaces,
+  «», brackets and dashes take the side they belong to (`(ML)`, `فارسی — English`, `فارسی - 2024`), and
+  digits stay Latin. Every run states its direction (`a:rtl`) and every paragraph keeps one set of
+  paragraph properties. Speaker notes are right to left, line by line, in the deck's fonts; the theme's
+  complex-script font is the bidi font, so charts are no longer drawn in Times New Roman. A list mixing
+  Persian and English items keeps the deck's direction.
+- **Settings → Slides** comes after the Word group. Its heading stands out in the Slides view, and a note
+  says which other settings reach the slides. It sets the theme, two colors, light or dark title slides,
+  16:9 or 4:3, text size, timeline direction, footer, slide and section numbers, PowerPoint sections, speaker notes,
+  automatic layouts, and long slides split. A button copies the convention as a prompt for AI models,
+  with its rules for nesting.
+- **A light preview:** the first two slides are drawn at once and the rest as they scroll into view. In
+  the Slides view the hidden document is drawn only when an export needs it. Pictures and icons are
+  read once.
+- **Slides sample:** “AI literacy” (generative, general-purpose AI) in fa, en and ar, 33 slides that use
+  every layout, both charts, every diagram, Lucide icons and emoji, an SVG logo and a presenter, code,
+  display and inline formulas, a quote, callouts and speaker notes. It opens with the sample button in the Slides view. A sample written for the other
+  view is swapped when the view changes, with a toast; Undo brings the text back.
+- **Word fonts in PowerPoint:** the Word fonts set in Settings (complex scripts and Latin) are the deck's
+  fonts too — they were read from the wrong place and the deck stayed in Vazirmatn. The slides preview
+  redraws when they change.
+- **File names:** the exports take the name of the file on screen — an imported file or the sample
+  (`slides-sample.fa.pptx`), also after a reload of a text an older version stored.
 
 ### Added — PDF import
 
@@ -31,6 +104,13 @@ layer. How it works and its limits: `lib/PDFIMPORT.md`.
 - **It says what may be wrong:** pages with unreadable characters, words run together or text under a picture;
   scans, password-protected and damaged files — in the interface's three languages.
 
+- **An import report** instead of toasts: page by page, what was read in full, what may be wrong (characters a font
+  could not name, words run together, text under a picture) and how the page was read. A PDF that was not read well
+  can be imported again in **safe mode** (headings and paragraphs only).
+- Pages set upright by the PDF's own rotation (Word landscape pages, upside-down pages) are read upright; a diagonal
+  watermark stays out of the text; text and its `/ActualText` are read from compressed object streams too.
+- The importer loads on the first PDF import (the page starts lighter).
+
 ### Added — formulas through PDF
 
 - PdfBuilder writes each formula's LaTeX into the PDF (an `/ActualText` span and an XMP map); PdfImporter gives it
@@ -42,6 +122,9 @@ layer. How it works and its limits: `lib/PDFIMPORT.md`.
   in numeric order), each after a separator chosen in Settings (its name and a rule, a rule, or a blank line). A
   zip's md, txt, html, docx and pdf files are imported, and its images found by the paths the text gives them
   (JSZip, loaded on the first zip).
+- **The order of several files:** before they are imported, a window lists them with the icon of their kind (md,
+  txt, html, docx, pdf), in name order — drag them or move them with the arrows, leave some out; files that cannot
+  be converted, or are too large, are listed apart with the reason.
 - **A progress dialog** while a file is imported or made: the page waits, a PDF shows its pages going by, and
   Cancel stops it.
 - **The MD file keeps its images:** pictures the text names (dropped, pasted, or from a PDF) go into the file as
@@ -73,18 +156,45 @@ layer. How it works and its limits: `lib/PDFIMPORT.md`.
   shook and lagged).
 - The empty preview's hint takes the interface's direction, not the last document's.
 - .doc export no longer has the page try to load its picture parts (`document_files/…` errors in the console).
+- Markdown import: a `|` in a table cell is escaped (`\|`); it had split the cell, and the table was no table.
+- Dark theme: scrollbars and form controls in their dark version (they were white).
+
+### Quality and security
+
+- **Safer preview and exports:** a Content Security Policy for the page; Markdown can no longer take over the app's
+  own elements or restyle it (ids prefixed, `<style>`, forms and inputs removed); the custom header and footer HTML is
+  sanitized; the HTML export strips scripts, `on…` handlers and embedded pages.
+- **Settings keep what you chose:** the stored profile holds only what differs from the defaults, with a schema
+  version — old migrations no longer overwrite a choice made on purpose; two tabs no longer undo each other's text
+  and images.
+- **An export right after typing** has the last keystroke in it (the preview's pending render is drawn first).
+- PDF output: ى (U+0649) joins with its proper initial and medial forms (it was drawn as a Cyrillic mark); letters
+  without presentation forms join their neighbors; a table row taller than a page no longer runs off it; one table
+  of named colors for every builder; a download's link is kept long enough for every browser.
+- PDF import: nested Persian quotes come back as quotes (they were lost in every producer).
+- Arabic interface: Arabic words and dates in the documents it makes (they were Persian); the interface language and
+  theme are set before the first paint (no flash of the wrong language).
+- Accessibility: code colors with enough contrast in both themes, named task checkboxes, scrolling code blocks and wide
+  formulas reachable by keyboard.
 
 ### Documentation and tests
 
 - `lib/PDFIMPORT.md`: how the importer works, a field guide to the producers, what a PDF itself loses.
-- `tests/pdf-lab/`: the import lab (Node + Playwright) — corpus, generators, scorer, style fuzzing, a metamorphic
-  net, a gate against regressions (also in CI), the formula round trip.
+- `tests/pdf-lab/`: the import lab (Node + Playwright) — corpus, generators, scorer, style fuzzing in English, Persian
+  and Arabic, a metamorphic net of 20 transforms × 24 seeds (185 of 199 unchanged files read exactly the same), a gate
+  against regressions, PDFs from real producers on Windows, hand-written reference Markdown (golden files) and a
+  held-out protocol (`tests/pdf-lab/HELDOUT.md`). Inside, the importer is split into one function per step, with
+  one registry of its 1,007 thresholds and a calibration of each document (`lib/pdfimport/README.md`).
+- Continuous integration on GitHub (`.github/workflows/`): the lab and its gate, the four builders against golden
+  snapshots, every .docx checked against the OOXML schemas and opened by LibreOffice, unit tests, lint, links,
+  accessibility (axe) in fa / en / ar, a startup size budget, generated files kept fresh, one version string.
 - `tests/pdf-import-suite.html` (was `import-suite.html`): PDFs you pick, scored in the browser, offline.
+- `tests/slides-suite.html` runs the slide cases and samples and reads each .pptx back.
 
 ### Third-party
 
 - Added: PDF.js 6.4.299 (Apache-2.0) with its OpenJPEG and JBIG2 decoders (BSD), wrapped as classic scripts by
-  `tools/build-pdfjs.js` so it runs from `file://`; JSZip 3.10.2 (MIT, for .zip import).
+  `tools/build-pdfjs.js` so it runs from `file://`; JSZip 3.10.2 (MIT, for .zip import); PptxGenJS 4.0.1 (MIT, for .pptx).
 
 ## [1.5] — 2026-10-03
 

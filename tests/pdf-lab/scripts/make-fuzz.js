@@ -4,7 +4,7 @@
 // written down in manifest.json.
 //
 //   node scripts/make-fuzz.js [split] [count]     split: dev (default) | heldout
-//   node scripts/make-fuzz.js --rotate            the held-out block now and the next one, and how to rotate (docs/HELDOUT.md)
+//   node scripts/make-fuzz.js --rotate            the held-out block now and the next one, and how to rotate (tests/pdf-lab/HELDOUT.md)
 //
 // Two splits, two uses (PDFIMPORT.md §11):
 //   dev      debug freely: open the files, read the Markdown, write rules from what you see
@@ -23,8 +23,8 @@ const LAB = path.join(__dirname, '..'), FUZZ = require('./env.js').FUZZ, fileUrl
 // 1: the first draw; 2: + headCase, tagged; 3: two-column content fits its column;
 // 4: + the right-to-left documents (4 of 9: dir rtl, Persian / Arabic body fonts, digits), tracking (letter-spacing)
 const GENERATOR = 4;
-// The held-out split's first seed. It rotates (docs/HELDOUT.md, "Rotation"): every 6 months, or as soon as a held-out
-// file was opened (run-fuzz.js heldout --show, logged in docs/reports/heldout-opened.log) — then it moves up by 100000
+// The held-out split's first seed. It rotates (tests/pdf-lab/HELDOUT.md, "Rotation"): every 6 months, or as soon as a held-out
+// file was opened (run-fuzz.js heldout --show, logged in tests/pdf-lab/heldout-opened.log) — then it moves up by 100000
 // (the next unused block: 200001, 300001, …), HELDOUT_ROTATION goes up by one, a row is added below, and the gate's
 // held-out baseline is rebuilt (the rotation is part of the manifest's env, so the old means are never compared
 // with the new set's). Never back to an earlier block: those files were seen.
@@ -227,13 +227,13 @@ const MARGIN = { narrow: '1cm', normal: '2cm', wide: '3cm' };
 const HF = `<div style="font-size:7px;width:100%;display:flex;justify-content:space-between;padding:0 1cm;font-family:Arial"><span class="title"></span><span><span class="pageNumber"></span>/<span class="totalPages"></span></span></div>`;
 
 (async () => {
-  // --rotate: what the next rotation is and how it is done (docs/HELDOUT.md) — it changes nothing itself
+  // --rotate: what the next rotation is and how it is done (tests/pdf-lab/HELDOUT.md) — it changes nothing itself
   if (process.argv.includes('--rotate')) {
     const next = HELDOUT_ROTATION + 1;
     console.log('held-out now: rotation ' + HELDOUT_ROTATION + ', seeds ' + HELDOUT_BASE + '–' + (HELDOUT_BASE + SPLITS.heldout.count - 1) + '\n' +
       'next:         rotation ' + next + ', seeds ' + (100001 + 100000 * next) + '–' + (100001 + 100000 * next + SPLITS.heldout.count - 1) + '\n' +
       'to rotate: set HELDOUT_ROTATION = ' + next + ' in scripts/make-fuzz.js, add its row to the rotation history, run make-fuzz.js heldout,\n' +
-      'and rebuild the held-out part of baseline.json in the approval step — docs/HELDOUT.md, "Rotation"');
+      'and rebuild the held-out part of baseline.json in the approval step — tests/pdf-lab/HELDOUT.md, "Rotation"');
     return;
   }
   const split = process.argv[2] || 'dev';

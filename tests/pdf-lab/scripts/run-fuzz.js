@@ -6,7 +6,7 @@
 //          nothing in LAB_OUT names a held-out file next to its score. Looking at a held-out file to write a rule
 //          turns it into dev. --show prints the file names and per-file totals and writes the Markdown and rows as
 //          dev does; it first appends a line (date, split, user, generator, seed base) to
-//          docs/reports/heldout-opened.log and warns: the split must then be rotated (docs/HELDOUT.md).
+//          tests/pdf-lab/heldout-opened.log and warns: the split must then be rotated (tests/pdf-lab/HELDOUT.md).
 // Each run is compared with the previous one of the same split (_scores.prev.json): what moved — only when both read
 // PDFs of the same generator and env (else a note).
 const fs = require('fs'), path = require('path');
@@ -32,7 +32,7 @@ const mean = (rows, k) => { const v = rows.map((r) => r[k]).filter((x) => typeof
   const dir = path.join(FUZZ, split), res = path.join(OUT, 'fuzz-' + split);   // the PDFs; the results
   if (!fs.existsSync(path.join(dir, 'manifest.json'))) { console.error('no fuzz/' + split + '/manifest.json — run make-fuzz.js ' + split); process.exit(1); }
   const manifest = JSON.parse(fs.readFileSync(path.join(dir, 'manifest.json'), 'utf8'));
-  // a held-out split opened: written down before anything is printed (docs/HELDOUT.md)
+  // a held-out split opened: written down before anything is printed (tests/pdf-lab/HELDOUT.md)
   if (show && split !== 'dev') {
     require('./heldout.js').logOpened({ split: 'fuzz:' + split + ' (run-fuzz.js --show)', generator: (manifest.env || {}).generator,
       base: manifest.base !== undefined ? manifest.base : manifest.samples.length ? Math.min(...manifest.samples.map((s) => s.seed)) : null });

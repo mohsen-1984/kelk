@@ -3,6 +3,45 @@
 Open work and backlog only — what is done lives in the code, `lib/README.md`, `lib/LATEX.md`,
 `lib/PDFIMPORT.md` and the release notes (`CHANGELOG.md`: 2.0, the first with the PDF import).
 
+## Next — priorities after 2.0
+
+From the review of the 2.0 tree. Done and in 2.0: CI and the lab's gate, security, storage, builder bugs, i18n, the
+importer split into steps with a threshold registry and calibration, the fallback ladder and the import report,
+page rotation and watermarks, real Word / Excel / PowerPoint / Print to PDF files in the lab, golden files and a
+held-out protocol (`tests/pdf-lab/HELDOUT.md`).
+
+**High (2.1)**
+
+- PDF import, right to left: RTL fuzz files score well below English ones (RTL ≈ 77–81 against LTR ≈ 92–93; tables
+  and quotes weakest, then `zwnj`); LibreOffice-path RTL files lose brackets (mirrored), lists and tables; Chrome's
+  browser-default style loses quotes and code in fa / ar while the text is right
+- PDF import: wkhtmltopdf Persian (`zwnj` 0, `yehKaf` 53–68 — a broken ToUnicode in the file); the narrow-space → ZWNJ
+  rule hurts those files
+- Startup: the builders (≈ 1.3 MB with PowerPoint) load before the first paint — load them on first use, as the
+  importer already is; drop the unused `vendor/lucide.min_1.48.0.js` and the duplicate highlight.js stylesheet
+- Release: a build script with an include list (two zips: the app, and the app with `tests/pdf-lab`), and GitHub Pages
+  served from that set rather than from the whole repository (no `.nojekyll`, no cache-busting today)
+
+**Medium (2.2)**
+
+- PDF import: put the calibrated thresholds to use (1,007 registered, none switched to calibrated yet); fonts with no
+  ToUnicode at all; Persian digits that share a glyph with Arabic-Indic ones come back Arabic-Indic; bordered form boxes
+  as tables
+- Text kept safe: images and text in IndexedDB instead of `localStorage` (≈ 5 MB), and recovery snapshots (Clear and a
+  crash can be undone after a reload)
+- Accessibility and editor: Tab no longer traps the keyboard in the editor; quieter statistics for screen readers;
+  find / replace; print stylesheet; automatic theme from the system
+- Speed: the preview redoes every step on each render (cache per block); PDF.js on a real worker over http(s)
+- Builders: shared helpers in one place (≈ 150 lines copied between builders, ≈ 1,400 lines of parallel per-feature
+  code); DocxBuilder relies on docx.js internals
+- Security: an inline `style` (`position: fixed`) can still overlay the preview pane; vendor files with checksums
+- Docs: `lib/PDFIMPORT.md` (155 KB) split with a table of contents; the lab described in one place
+
+**Optional, later**
+
+- A layout model as an optional download (http(s) only, never from `file://`), as a second opinion on headings and tables
+- OCR for scanned PDFs (tesseract.js, Persian / Arabic / English), on demand
+
 ## Backlog
 
 ### Formulas
@@ -277,6 +316,16 @@ mixed-direction lists and tables)
 - Minified PDF.js: build `vendor/pdfjs/pdf.min_<v>.js` / `pdf.worker.min_<v>.js` from jsDelivr's
   `build/pdf.min.mjs` and `build/pdf.worker.min.mjs` with `tools/build-pdfjs.js`, then switch `scripts/config.js`
 - Encrypted PDFs with a user password: a message only (`password` option exists, no prompt in the page)
+
+### Slides (`lib/PptxBuilder.js`; convention: `lib/SLIDES.md`; tests: `tests/slides-suite.html`)
+
+- Equations (`a14:m`) checked in more PowerPoint versions (Mac, the web) and with \text{…} in Persian
+- Transitions and simple builds (one bullet at a time): written into the slide XML after PptxGenJS
+- Speaker notes with formatting (bold, lists), and notes per callout
+- Pictures as backgrounds (`slide: image=…`, a dark veil under the title)
+- More chart options: axis titles, a secondary axis, scatter with numeric X
+- Import: .pptx → Markdown in the same convention (titles, lists, tables, notes)
+- The slide preview drawn with the Word fonts when installed (now: the page's fonts)
 
 ### Other
 

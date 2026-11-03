@@ -74,7 +74,9 @@
         'code.bg': 'PHFW', 'code.headerBg': 'PHFW', 'code.border': 'PHFW', 'quote.border': 'PHFW', 'quote.width': 'PHFW', 'quote.bg': 'PHFW', 'quote.text': 'PHFW',
         'math.html': 'PH', 'math.word': 'W', 'ui.previewWordFont': 'P'
     };
-    const reachesPreview = function (path) { return (SCOPES[path] || '').indexOf('P') >= 0; };
+    // Settings → Slides reach the slides preview and the .pptx only
+    const reachesPreview = function (path) { return (SCOPES[path] || '').indexOf('P') >= 0 || ((path.indexOf('slides.') === 0 || /^(fonts\.word|code\.wordFont)/.test(path)) && K.slides && K.slides.active()); };
+    let renderTimer = 0;
 
     K.settings = {
         init: function () {
@@ -90,7 +92,9 @@
                 el.addEventListener(live(el), function () {
                     const path = el.getAttribute('data-setting'), v = read(el);
                     if (v === undefined) return;
-                    K.store.set(path, v);
+                    // a setting the deck on screen brings itself (front matter): the change is for this deck only
+                    if (K.slides && K.slides.deckOwns && K.slides.deckOwns(path)) K.slides.override(path, v);
+                    else K.store.set(path, v);
                     el.classList.remove('auto');
                     self.onChange(path, live(el) === 'input');     // typing: redraw after a short pause
                 });
@@ -121,6 +125,7 @@
                 btn.addEventListener('click', function () {
                     const keys = btn.getAttribute('data-reset-keys').split(',');
                     keys.forEach(function (path) {
+                        if (K.slides && K.slides.deckOwns && K.slides.deckOwns(path)) { K.slides.override(path, null); return; }
                         const d = pathGet(K.config.defaults, path);
                         K.store.set(path, d);
                         const el = K.$('[data-setting="' + path + '"]');
@@ -133,7 +138,8 @@
             K.$$('[data-reset]').forEach(function (btn) {
                 btn.addEventListener('click', function () {
                     const path = btn.getAttribute('data-reset');
-                    K.store.set(path, null);
+                    if (K.slides && K.slides.deckOwns && K.slides.deckOwns(path)) K.slides.override(path, null);
+                    else K.store.set(path, null);
                     self.fillDefaults(true);
                     self.onChange(path);
                 });
@@ -259,7 +265,8 @@
                 'fonts.wordBidi': function () { return K.settings.wordFontDefault('bidi'); },
                 'fonts.wordLatin': function () { return K.settings.wordFontDefault('latin'); },
                 'headerFooter.header': function () { return (K.config.samples[K.i18n.lang] || K.config.samples.fa).header; },
-                'headerFooter.footer': function () { return (K.config.samples[K.i18n.lang] || K.config.samples.fa).footer; }
+                'headerFooter.footer': function () { return (K.config.samples[K.i18n.lang] || K.config.samples.fa).footer; },
+                'slides.footer': function () { const m = K.slides && K.slides.deckMeta ? K.slides.deckMeta() : {}; return m.footer != null ? String(m.footer) : (m.title || K.names.title() || ''); }
             };
             Object.keys(auto).forEach(function (path) {
                 const el = K.$('[data-setting="' + path + '"]');
@@ -291,6 +298,23 @@
                 if (!el) return;
                 el.disabled = !uses[key];
                 el.closest('.field').classList.toggle('unused', el.disabled);
+            });
+        },
+
+        /**
+         * Settings → Slides: the two color pickers show the theme's colors while no color of one's own
+         * is set ('' — the ↺ of the pair brings that back); a theme of the deck's front matter still wins.
+         */
+        slideColors: function (sl) {
+            const B = typeof PptxBuilder !== 'undefined' ? PptxBuilder : null;
+            const name = sl.theme && B ? (B.THEMES[sl.theme] ? sl.theme : B.THEME_ALIAS[sl.theme]) : 'modern-emerald';
+            const T = (B && B.THEMES[name || 'modern-emerald']) || null;
+            if (!T) return;
+            ['primary', 'accent'].forEach(function (k) {
+                const el = K.$('[data-setting="slides.' + k + '"]');
+                if (!el) return;
+                el.value = sl[k] || '#' + T[k].toLowerCase();
+                el.classList.toggle('auto', !sl[k]);
             });
         },
 
@@ -361,6 +385,7 @@
                     return String(v === undefined ? d : v).toLowerCase() !== String(d).toLowerCase();
                 });
             });
+            if (all || path.indexOf('slides.') === 0) this.slideColors(Object.assign({}, s.slides || {}, K.slides && K.slides.effective ? K.slides.effective() : {}));
             if (all || path === 'headerFooter.mode') {
                 K.$('#hf-custom').hidden = s.headerFooter.mode !== 'custom';
             }

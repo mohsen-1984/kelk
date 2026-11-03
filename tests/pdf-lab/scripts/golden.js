@@ -7,7 +7,7 @@
 //   { dir, lab, filter, n, errors, mean: { <metric>: …, edits }, rows: [ { name, ms, <score.js metrics>, struct } ] }
 // (lab: the run read the lab's own golden/ folder; gate.js --update writes only such a run, unfiltered, or with --partial).
 // A golden whose PDF is not in the lab (env.js labPdfs) is an error row; any error row exits 1.
-// A golden on the PDF of a held-out document (heldout.js, env.js heldSplit, docs/HELDOUT.md) is read as the held-out
+// A golden on the PDF of a held-out document (heldout.js, env.js heldSplit, tests/pdf-lab/HELDOUT.md) is read as the held-out
 // is: its import is scored, but no row, no name with a score and no Markdown of it is printed or written — only the
 // mean of those files (_scores.json heldout: { n, errors, mean }), compared by gate.js as a mean; a filtered run leaves
 // them out. summarise() and report() are pure (tests/unit/heldout.test.js checks that no held-out name gets out).
@@ -47,7 +47,7 @@ function report(out) {
     });
     if (ok.length) line('mean (' + ok.length + ' files)', mean, ' | edits per file: headings ' + mean.headingsEdits + ', tables ' + mean.tablesEdits + ', lists ' + mean.listsEdits + ' (all ' + mean.edits + ')');
     if (heldout) lines.push([('held-out (' + heldout.n + ' files)').padEnd(40), 'mean total ' + pct(heldout.mean.total).trim() + (heldout.mean.rtl === null ? '' : ' · rtl ' + pct(heldout.mean.rtl).trim()) +
-      ' · structure edits per file ' + heldout.mean.edits + (heldout.errors ? ' · ' + heldout.errors + ' crash(es)' : '') + '   (means only — docs/HELDOUT.md)'].join(' '));
+      ' · structure edits per file ' + heldout.mean.edits + (heldout.errors ? ' · ' + heldout.errors + ' crash(es)' : '') + '   (means only — tests/pdf-lab/HELDOUT.md)'].join(' '));
     lines.push('\nstructure cells: golden/import count, −missing +extra ~changed (level, shape or depth) after aligning the two sequences');
   }
   return lines;

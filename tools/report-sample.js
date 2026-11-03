@@ -1,6 +1,6 @@
 /**
  * A sample PDF import report (the P3.4 contract, plan P3.5) with every page mode, every `why`, every quality flag
- * and every note code — for tools/check-a11y.js (axe on the open panel), docs/reports/P3.5/screenshots.js and the
+ * and every note code — for tools/check-a11y.js (axe on the open panel), and the
  * unit tests (tests/unit/report.test.js). Kept in step with scripts/report.js (Kelk.importReport: NOTES, FLAGS,
  * WHY, MODES, MODE_KEYS): the unit tests check that it holds every code there is, a page that failed among them.
  */

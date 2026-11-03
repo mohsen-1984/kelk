@@ -326,6 +326,165 @@
             return p;
         },
 
+        /**
+         * Several documents (a zip, a multi-file drop) before they are imported: the order they come in, and
+         * which of them. o: { title, docs: [{ name, path, size }], skipped: [{ name, path, size, reason:
+         * 'type' | 'size' }], images: n, maxMB }. Each document has the icon of its kind (md, txt, html, docx,
+         * pdf), a checkbox, a handle to drag (mouse or touch) and up/down buttons (Alt + ↑/↓ on a focused row);
+         * the files that cannot come in are listed apart, with the reason. Resolves with the documents
+         * chosen, in their order, or null on Cancel / Esc.
+         */
+        order: function (o) {
+            const dlg = $('#order');
+            if (!dlg) return Promise.resolve(o.docs);
+            const list = $('#order-list'), ok = $('#order-ok'), count = $('#order-count');
+            const KIND = { '.md': 'md', '.markdown': 'md', '.txt': 'txt', '.html': 'html', '.htm': 'html', '.docx': 'docx', '.pdf': 'pdf' };
+            const ICON = { md: 'file-pen-line', txt: 'file-text', html: 'file-code', docx: 'file-type', pdf: 'file-badge', image: 'file-image', none: 'file-x' };
+            const ext = function (n) { const m = /\.[^.\/]+$/.exec(n || ''); return m ? m[0].toLowerCase() : ''; };
+            const size = function (b) {
+                if (!(b >= 0)) return '';
+                return b < 1024 ? b + ' B' : b < 1048576 ? Math.max(1, Math.round(b / 1024)) + ' KB' : (b / 1048576).toFixed(1) + ' MB';
+            };
+            const el = function (tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+            const iconOf = function (kind) { const i = el('i', 'order-icon k-' + kind); i.setAttribute('data-lucide', ICON[kind] || 'file'); return i; };
+            /** name (bold) and its folder in the zip (muted), the kind's tag, the size */
+            const label = function (d, kind, note) {
+                const box = el('span', 'order-name');
+                const dir = d.path && d.path.indexOf('/') >= 0 ? d.path.slice(0, d.path.lastIndexOf('/') + 1) : '';
+                box.appendChild(el('bdi', 'n', d.name));
+                if (dir) box.appendChild(el('bdi', 'dir', dir));
+                const meta = el('span', 'order-meta');
+                meta.appendChild(el('span', 'order-tag k-' + kind, (ext(d.name).slice(1) || '?').toUpperCase()));
+                if (note) meta.appendChild(el('span', 'order-note', note));
+                else if (size(d.size)) { const z = meta.appendChild(el('span', 'order-size', size(d.size))); z.dir = 'ltr'; }
+                return [box, meta];
+            };
+
+            list.textContent = '';
+            o.docs.forEach(function (d, i) {
+                const kind = KIND[ext(d.name)] || 'none';
+                const li = el('li', 'order-row');
+                li._doc = d; li.tabIndex = -1;
+                const grip = el('span', 'order-grip');
+                grip.title = K.i18n.t('orderDrag'); grip.setAttribute('aria-hidden', 'true');
+                const gi = el('i'); gi.setAttribute('data-lucide', 'grip-vertical'); grip.appendChild(gi);
+                const cb = el('input'); cb.type = 'checkbox'; cb.checked = true; cb.setAttribute('aria-label', d.name);
+                const up = el('button', 'btn ghost icon order-up'), down = el('button', 'btn ghost icon order-down');
+                [[up, 'arrow-up', K.i18n.t('orderUp')], [down, 'arrow-down', K.i18n.t('orderDown')]].forEach(function (b) {
+                    b[0].type = 'button'; b[0].title = b[2]; b[0].setAttribute('aria-label', b[2]);
+                    const ic = el('i'); ic.setAttribute('data-lucide', b[1]); b[0].appendChild(ic);
+                });
+                li.append(grip, cb, iconOf(kind));
+                label(d, kind).forEach(function (x) { li.appendChild(x); });
+                li.append(up, down);
+                list.appendChild(li);
+            });
+
+            const skip = $('#order-skip'), skipList = $('#order-skip-list');
+            skipList.textContent = '';
+            (o.skipped || []).forEach(function (d) {
+                const li = el('li', 'order-row off');
+                li.appendChild(iconOf('none'));
+                label(d, 'none', d.reason === 'size' ? K.i18n.t('orderTooBig', o.maxMB) : K.i18n.t('orderNoType')).forEach(function (x) { li.appendChild(x); });
+                skipList.appendChild(li);
+            });
+            if (o.images) {
+                const li = el('li', 'order-row off img');
+                li.appendChild(iconOf('image'));
+                li.appendChild(el('span', 'order-name', K.i18n.t('orderImages', o.images)));
+                skipList.appendChild(li);
+            }
+            $('#order-skip-head').textContent = K.i18n.t('orderSkipped', (o.skipped || []).length);
+            $('#order-skip-head').hidden = !(o.skipped || []).length;
+            skip.hidden = !skipList.children.length;
+            $('#order-label').textContent = o.title || '';
+            this.icons(dlg);
+
+            const rows = function () { return Array.from(list.children); };
+            const refresh = function () {
+                const all = rows(), on = all.filter(function (r) { return r.querySelector('input').checked; });
+                all.forEach(function (r, i) {
+                    r.classList.toggle('unchecked', !r.querySelector('input').checked);
+                    r.querySelector('.order-up').disabled = i === 0;
+                    r.querySelector('.order-down').disabled = i === all.length - 1;
+                });
+                count.textContent = K.i18n.t('orderCount', on.length, all.length);
+                ok.disabled = !on.length;
+            };
+            const move = function (li, by) {
+                const all = rows(), j = all.indexOf(li) + by;
+                if (j < 0 || j >= all.length) return;
+                list.insertBefore(li, by > 0 ? all[j].nextSibling : all[j]);
+                refresh();
+                li.scrollIntoView({ block: 'nearest' });
+            };
+
+            list.onclick = function (e) {
+                const b = e.target.closest('button'), li = e.target.closest('li');
+                if (!b || !li) return;
+                const upward = b.classList.contains('order-up');
+                if (!upward && !b.classList.contains('order-down')) return;
+                move(li, upward ? -1 : 1);
+                // the button moved with its row and keeps the focus; at an end it is disabled: its sibling takes it
+                (b.disabled ? li.querySelector(upward ? '.order-down' : '.order-up') : b).focus();
+            };
+            list.onchange = refresh;
+            list.onkeydown = function (e) {
+                if (!e.altKey || (e.key !== 'ArrowUp' && e.key !== 'ArrowDown')) return;
+                const li = e.target.closest('li');
+                if (!li) return;
+                e.preventDefault();
+                const f = document.activeElement;
+                move(li, e.key === 'ArrowUp' ? -1 : 1);
+                if (f && !f.disabled) f.focus(); else li.querySelector('input').focus();
+            };
+            // drag by the handle: pointer events, so a mouse and a finger both work (HTML5 drag does not on touch)
+            list.onpointerdown = function (e) {
+                const grip = e.target.closest('.order-grip');
+                if (!grip || e.button > 0) return;
+                const li = grip.closest('li');
+                e.preventDefault();
+                grip.setPointerCapture(e.pointerId);
+                li.classList.add('dragging');
+                const onMove = function (ev) {
+                    const all = rows().filter(function (r) { return r !== li; });
+                    const after = all.filter(function (r) { const b = r.getBoundingClientRect(); return ev.clientY > b.top + b.height / 2; }).pop();
+                    const ref = after ? after.nextSibling : all[0];
+                    if (ref !== li && li.nextSibling !== ref) list.insertBefore(li, ref || null);
+                    // the list scrolls under a pointer held near its edges
+                    const lb = list.getBoundingClientRect();
+                    if (ev.clientY < lb.top + 24) list.scrollTop -= 8; else if (ev.clientY > lb.bottom - 24) list.scrollTop += 8;
+                };
+                const onUp = function () {
+                    grip.removeEventListener('pointermove', onMove);
+                    grip.removeEventListener('pointerup', onUp);
+                    grip.removeEventListener('pointercancel', onUp);
+                    li.classList.remove('dragging');
+                    refresh();
+                };
+                grip.addEventListener('pointermove', onMove);
+                grip.addEventListener('pointerup', onUp);
+                grip.addEventListener('pointercancel', onUp);
+            };
+            $('#order-sort').onclick = function () {
+                const by = function (a, b) { return String(a._doc.path).localeCompare(String(b._doc.path), undefined, { numeric: true, sensitivity: 'base' }); };
+                rows().sort(by).forEach(function (r) { list.appendChild(r); });
+                refresh();
+            };
+            refresh();
+
+            return new Promise(function (resolve) {
+                const end = function (v) { dlg.close(); resolve(v); };
+                ok.onclick = function () {
+                    end(rows().filter(function (r) { return r.querySelector('input').checked; }).map(function (r) { return r._doc; }));
+                };
+                $('#order-cancel').onclick = function () { end(null); };
+                dlg.oncancel = function (e) { e.preventDefault(); end(null); };      // Esc
+                dlg.showModal();
+                ok.focus();                                  // Enter: import in the order shown
+            });
+        },
+
         /** Let the page paint (the task dialog) before a long synchronous step. */
         paint: function () {
             return new Promise(function (r) { requestAnimationFrame(function () { setTimeout(r, 0); }); });

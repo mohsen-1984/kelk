@@ -1,6 +1,14 @@
 /* Kelk — base elements and page layout */
 
 *, *::before, *::after { box-sizing: border-box; }
+/* scrollbars in the theme's colors: the standard properties (Firefox, Chrome/Edge 121+), and the WebKit
+   pseudo-elements for Safari and older Chromium (which ignore them where scrollbar-color is supported) */
+* { scrollbar-color: var(--scroll-thumb) var(--scroll-track); }
+*:hover { scrollbar-color: var(--scroll-thumb-hover) var(--scroll-track); }
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track, ::-webkit-scrollbar-corner { background: var(--scroll-track); }
+::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 8px; border: 3px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background-color: var(--scroll-thumb-hover); }
 
 html, body { height: 100%; }
 

@@ -6,7 +6,7 @@
 //   node scripts/features.js --json f.pdf    one file's whole r.features
 // The other folders' file names are printed, never written: keep private names out of the repository.
 // The lab's own files are counted, never named: a cell lists its producers (the part before '--'), not documents, so
-// the held-out real-producer documents (docs/HELDOUT.md) stay out of the output; keep it that way.
+// the held-out real-producer documents (tests/pdf-lab/HELDOUT.md) stay out of the output; keep it that way.
 const fs = require('fs'), path = require('path');
 const { LAB, lab, req } = require('./env.js');
 const { chromium } = req('playwright');

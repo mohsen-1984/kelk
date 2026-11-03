@@ -1,7 +1,7 @@
 // Import every pdf/*.pdf with Kelk's PdfImporter (tools/pdf-lab.html in Chromium, from file://),
 // write out/<name>.md, and score it against corpus/<doc>.md when the file name says which (…--<doc>.pdf).
 //   node scripts/run-import.js [filter] [--mode auto|safe|full]
-//   node scripts/run-import.js --real-heldout   the held-out real-producer documents (heldout.js, docs/HELDOUT.md):
+//   node scripts/run-import.js --real-heldout   the held-out real-producer documents (heldout.js, tests/pdf-lab/HELDOUT.md):
 //                                               their mean only, to out/real-heldout/_scores.json — no file name, no
 //                                               per-file score and no Markdown is printed or written
 // The held-out real-producer PDFs are left out of the normal run (and so of the corpus gate, file by file).
@@ -92,7 +92,7 @@ const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
   }
   if (realHeldout) {
     // the mean only (a crash counts 0, as in the fuzz): the gate compares it (TOL 1), nothing else of these files is
-    // kept — a per-file score read once makes its document a dev document (docs/HELDOUT.md)
+    // kept — a per-file score read once makes its document a dev document (tests/pdf-lab/HELDOUT.md)
     const errs = rows.filter((r) => r.error).length;
     const mean = (k) => {
       const v = rows.map((r) => (r.error ? (k === 'total' ? 0 : undefined) : r[k])).filter((x) => typeof x === 'number');
@@ -106,7 +106,7 @@ const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
     fs.writeFileSync(path.join(dir, '_scores.json'), JSON.stringify(res, null, 1));
     const p1 = (x) => (x === null ? '-' : (100 * x).toFixed(1));
     console.log('real-producer held-out — ' + res.n + ' PDFs of ' + res.docs.length + ' documents: mean total ' + p1(res.mean.total) +
-      (res.mean.rtl === null ? '' : ' · rtl column ' + p1(res.mean.rtl)) + (errs ? ' · ' + errs + ' crash(es)' : '') + '\n(means only — docs/HELDOUT.md)');
+      (res.mean.rtl === null ? '' : ' · rtl column ' + p1(res.mean.rtl)) + (errs ? ' · ' + errs + ' crash(es)' : '') + '\n(means only — tests/pdf-lab/HELDOUT.md)');
     if (errors.length) console.log('page errors:', errors.length);
     await browser.close();
     if (errs) process.exitCode = 1;

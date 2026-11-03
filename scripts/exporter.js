@@ -4,6 +4,7 @@
  * direction, code, header/footer, logo and images.
  *   docx → DocxBuilder     pdf → PdfBuilder (fonts loaded on demand)
  *   doc  → WordHtmlBuilder (MHTML)   html → HtmlBuilder (fonts and images embedded)
+ *   pptx → PptxBuilder (Kelk.slides: the Word fonts, Settings → Slides)
  *   md   → the text
  */
 (function (K) {
@@ -44,7 +45,7 @@
             .split('{fromLabel}').join(L.from);
     }
 
-    /** Fonts for a builder: PDF and HTML use the shipped fonts, Word the Word names (installed fonts). */
+    /** Fonts for a builder: PDF and HTML use the shipped fonts, Word and PowerPoint the Word names (installed fonts). */
     /** The stored table style, only the keys setTableStyle knows (older stores may hold others). */
     function tableStyleOf(s) {
         const t = s.tableStyle || {}, d = K.config.defaults.tableStyle;
@@ -191,6 +192,7 @@
                         await K.ui.paint();
                         return configure(PdfBuilder.create(), 'pdf').addFromHtml(html).toBlob();
                     }
+                    if (kind === 'pptx') return K.slides.blob();
                     if (kind === 'html') {
                         await K.fonts.forHtml(md);
                         return configure(HtmlBuilder.create(), 'html').addFromHtml(html).toBlob();

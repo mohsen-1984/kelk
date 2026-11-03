@@ -1,6 +1,6 @@
 {
   "name": "kelk",
-  "version": "2.0.0-rc1",
+  "version": "2.0.0",
   "private": true,
   "description": "Client-side Markdown ⇄ DOCX / DOC / PDF / HTML converter, Persian / Arabic first. No build step: the app runs from index.html; this file holds the dev tooling only.",
   "license": "MIT",
@@ -11,16 +11,14 @@
   "scripts": {
     "lint": "eslint .",
     "test": "node --test \"tests/unit/*.test.js\"",
-    "format:check": "prettier --check .",
     "check:version": "node tools/check-version.js",
-    "check:commits": "node tools/check-commits.js",
     "check:i18n": "node tools/check-i18n.js",
     "test:golden": "node tests/golden/run.js",
     "test:golden:update": "node tests/golden/run.js --update",
     "test:docx": "node tests/docx-validate.js",
     "test:builders": "node tests/pdf-lab/scripts/roundtrip.js",
-    "check:links": "lychee --config lychee.toml \"**/*.md\" index.html",
-    "check:fresh": "node tools/build-icons.js && node tools/build-samples.js && node tests/pdf-lab/scripts/build-corpus-js.js && git diff --exit-code -- assets/icons.js docs/about-kelk-and-samples.js tests/pdf-lab/corpus.js",
+    "check:links": "lychee --config .github/lychee.toml \"**/*.md\" index.html",
+    "check:fresh": "node tools/build-icons.js && node tools/build-samples.js && node tests/pdf-lab/scripts/build-corpus-js.js && git diff --exit-code -- assets/icons.js docs/about-kelk-and-samples.js docs/slides-samples.js tests/pdf-lab/corpus.js",
     "check:a11y": "node tools/check-a11y.js",
     "check:size": "node tools/check-size.js"
   },
@@ -32,7 +30,6 @@
     "jsdom": "30.1.3",
     "jszip": "3.10.2",
     "pdf-lib": "1.17.1",
-    "playwright": "1.64.1",
-    "prettier": "3.9.10"
+    "playwright": "1.64.1"
   }
 }

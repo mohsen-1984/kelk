@@ -13,7 +13,7 @@
  * numbering); "new in 2.0" in docs/about-kelk-and-samples.* and TODO.md (history, stays at 2.0);
  * CHANGELOG's older headings and body; o:Version 16.00 (Word) in msOfficeWordHtmlTemplate.js,
  * MIME-Version 1.0 in WordHtmlBuilder.js; sample data ("Version 1.2" in config.js, sample tables);
- * the version lines of .claude/skills/*; third-party versions (vendor/, fonts, THIRD-PARTY-NOTICES.md).
+ * third-party versions (vendor/, fonts, THIRD-PARTY-NOTICES.md).
  */
 const fs = require('fs'), path = require('path');
 const root = path.join(__dirname, '..');
@@ -38,7 +38,7 @@ const CHECKS = [
     { file: 'CHANGELOG.md', re: /^## \[(?!Unreleased\])([^\]]+)\]/m, form: 'full', why: 'newest release heading ([Unreleased] above it is fine)' },
     { file: 'lib/BuilderBase.js', re: /BuilderBase\.version = '([^']+)'/g, form: 'full', why: 'default creator "Kelk <version>" outside the app (Node, lab)' },
     { file: 'lib/README.md', re: /`BuilderBase\.version` \(([^ ]+) now\)/g, form: 'full', why: 'the creator, documented' },
-    { file: 'README.md', re: /kelk_([0-9][^/\s)]*?)\.zip/g, form: 'release', why: 'the release download', count: 12 },
+    { file: 'README.md', re: /kelk_([0-9][^/\s)]*?)\.zip/g, form: 'release', why: 'the release download', count: 13 },
     { file: 'lib/BidiCore.js', re: HEADER, form: 'release', why: 'library header' },
     { file: 'lib/BidiView.js', re: HEADER, form: 'release', why: 'library header' },
     { file: 'lib/BidiView.js', re: /var BidiView = \{ version: '([^']+)'/g, form: 'release', why: 'BidiView.version' },

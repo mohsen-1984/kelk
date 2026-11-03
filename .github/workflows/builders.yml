@@ -19,8 +19,7 @@
 #   libxml2-utils            2.9.14+dfsg-1.3ubuntu3.10      (xmllint; libxml2 2.9.14)
 #   libreoffice-writer-nogui 4:24.2.7-0ubuntu0.24.04.7      (soffice, LibreOffice 24.2.7)
 # Ubuntu keeps only the newest version of a package in noble-updates: when a security update replaces one, the
-# install step fails with the version apt now offers (apt-cache policy in its log) — update the pin here and in
-# docs/reports/P2.3-builders-ci.md, re-run, and read the goldens' result (xmllint and LibreOffice do not touch
+# install step fails with the version apt now offers (apt-cache policy in its log) — update the pin here, re-run, and read the goldens' result (xmllint and LibreOffice do not touch
 # the snapshots).
 #
 # Triggers: every push, every pull request and by hand — the same as tooling.yml and pdf-lab.yml. A push to a

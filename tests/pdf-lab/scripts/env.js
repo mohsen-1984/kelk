@@ -62,7 +62,7 @@ function labPdfs(root) {
 // a file:// URL for a local path on any platform ('file://' + path breaks on Windows drive letters and spaces)
 const fileUrl = (f) => require('url').pathToFileURL(path.resolve(f)).href;
 
-// The held-out protocol on the lab (heldout.js, docs/HELDOUT.md): the split of the lab's PDFs by document — every PDF
+// The held-out protocol on the lab (heldout.js, tests/pdf-lab/HELDOUT.md): the split of the lab's PDFs by document — every PDF
 // whose document is held out, wherever it lies — computed once per process
 let heldCache = null;
 function heldSplit() {
@@ -77,7 +77,7 @@ function isFuzzHeld(file) {
 }
 // The guard of the lab's file-by-file tools (dbg.js, dump.js, cmp.js, lines.js, shapes.js, words.js, snapshot.js,
 // run-crash.js --show-held): given the files a tool is about to open and print, it logs every held-out one to
-// docs/reports/heldout-opened.log — fuzz:heldout once, real:<document> once per document — with the tool's name, and
+// tests/pdf-lab/heldout-opened.log — fuzz:heldout once, real:<document> once per document — with the tool's name, and
 // warns. Returns the held-out files among them. Logging is the record: the tool still runs.
 function openHeld(files, script) {
   const H = require('./heldout.js'), held = new Set(heldSplit().docs.heldout), out = [], seen = new Set();

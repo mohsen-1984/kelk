@@ -1,5 +1,5 @@
 /**
- * The held-out protocol (plan P4.3, tests/pdf-lab/scripts/heldout.js, env.js heldSplit / openHeld, docs/HELDOUT.md):
+ * The held-out protocol (plan P4.3, tests/pdf-lab/scripts/heldout.js, env.js heldSplit / openHeld, tests/pdf-lab/HELDOUT.md):
  * the split by document over the whole lab, its stability, the guard of the file-by-file tools, the opened-log line,
  * the Shamsi date, and golden.js keeping held-out goldens nameless. Names, hashes and means only — no per-file score.
  */
@@ -86,7 +86,7 @@ test('P4.3: splitLab holds out every PDF of a held-out document wherever it lies
   assert.deepEqual(s.docs.heldout, PINNED);           // the committed list, whether or not a real-producer PDF of it is there
 });
 
-test('P4.3: the split of the real lab is pinned — a document changing sides must be a visible decision (docs/HELDOUT.md)', function () {
+test('P4.3: the split of the real lab is pinned — a document changing sides must be a visible decision (tests/pdf-lab/HELDOUT.md)', function () {
   const s = env.heldSplit();
   if (!s.heldout.length) return;                       // a checkout without the lab PDFs
   assert.deepEqual(s.docs.heldout, PINNED);
@@ -138,8 +138,8 @@ test('P4.3: the Shamsi date and the opened-log line', function () {
   assert.equal(H.openedLine({ date: '1405-08-12', split: 'real:x', user: 'u' }), '1405-08-12\treal:x\tu\tgenerator ?\tseed base -\n');
 });
 
-test('P4.3: the opened log lives in the repository (docs/reports); logOpened appends to it, openedLines reads it', function () {
-  assert.equal(path.relative(path.join(__dirname, '..', '..'), H.OPENED_LOG).split(path.sep).join('/'), 'docs/reports/heldout-opened.log');
+test('P4.3: the opened log lives in the repository (tests/pdf-lab); logOpened appends to it, openedLines reads it', function () {
+  assert.equal(path.relative(path.join(__dirname, '..', '..'), H.OPENED_LOG).split(path.sep).join('/'), 'tests/pdf-lab/heldout-opened.log');
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'kelk-heldout-')), file = path.join(dir, 'reports', 'heldout-opened.log');
   const err = console.error;
   console.error = function () {};

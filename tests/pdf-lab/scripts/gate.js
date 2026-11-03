@@ -14,7 +14,7 @@
 //   out/fuzz-dev/_scores.json, fuzz-heldout  run-fuzz.js dev | heldout
 //   out/meta/_scores.json                    run-meta.js (the metamorphic net)
 //   out/golden/_scores.json                  golden.js (the golden files: golden/<name>.md typed from the page)
-//   out/real-heldout/_scores.json            run-import.js --real-heldout (one mean, docs/HELDOUT.md)
+//   out/real-heldout/_scores.json            run-import.js --real-heldout (one mean, tests/pdf-lab/HELDOUT.md)
 //
 // What fails:
 //   corpus  a file that crashes, or whose total drops more than TOL_FILE (one file is enough: the corpus
@@ -73,7 +73,7 @@ if (opt('--update') && opt('--against')) { console.error('--update with --agains
 const p1 = (x) => typeof x === 'number' ? (100 * x).toFixed(1) : '-';
 const d1 = (x) => (x >= 0 ? '+' : '') + (100 * x).toFixed(1);
 const read = (f) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { return null; } };
-// the held-out real-producer PDFs (heldout.js, docs/HELDOUT.md): never in the corpus part, file by file — one mean (realHeldout)
+// the held-out real-producer PDFs (heldout.js, tests/pdf-lab/HELDOUT.md): never in the corpus part, file by file — one mean (realHeldout)
 const heldDocs = new Set(heldSplit().docs.heldout), docOf = require('./heldout.js').docOf;
 const heldReal = { has: (n) => heldDocs.has(docOf(n)) };                // a name (with or without .pdf) of a held-out document's PDF
 const dropHeld = (o) => { if (o) Object.keys(o).filter(heldReal.has).forEach((n) => { delete o[n]; }); return o; };
@@ -315,13 +315,13 @@ const goldenHeldBase = base ? (against ? base.golden && base.golden.heldout : ba
   }
 }
 
-// ── the held-out real producers: one mean (docs/HELDOUT.md) ───────────
+// ── the held-out real producers: one mean (tests/pdf-lab/HELDOUT.md) ───────────
 // run-import.js --real-heldout writes out/real-heldout/_scores.json: the count, the crashes, the held-out documents,
 // the sorted names of the PDFs read (public, as the documents are) and the mean total and rtl column — nothing per
 // file. Fails when the lab has held-out PDFs and this run has no such result, on a crash more than the compared
 // side, or on the mean total or the rtl column's mean dropping more than TOL_MEAN; compared only when both sides read
 // the same documents and the same PDFs (another split or a PDF added is a note). The held-out log
-// (docs/reports/heldout-opened.log, committed) is named whenever it has lines.
+// (tests/pdf-lab/heldout-opened.log, committed) is named whenever it has lines.
 const labHeld = heldSplit().heldout.length;
 const realHeldout = (() => {
   const c = read(path.join(OUT, 'real-heldout', '_scores.json'));
@@ -350,7 +350,7 @@ const realHeldout = (() => {
 })();
 const H = require('./heldout.js');
 const openedN = H.openedLines().length;
-if (openedN) notes.push('held-out opened: ' + openedN + ' line(s) in ' + path.relative(process.cwd(), H.OPENED_LOG) + ' — rotate or retire, and say so in the report (docs/HELDOUT.md)');
+if (openedN) notes.push('held-out opened: ' + openedN + ' line(s) in ' + path.relative(process.cwd(), H.OPENED_LOG) + ' — rotate or retire, and say so in the report (tests/pdf-lab/HELDOUT.md)');
 
 // ── report ─────────────────────────────────────────────────────────────
 const cm = (run) => { const v = Object.entries(run.corpus || {}).filter(([n]) => !heldReal.has(n)).map(([, r]) => r.total).filter((x) => typeof x === 'number'); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : undefined; };
@@ -365,7 +365,7 @@ if (cur.golden) {
     both.length ? '  (' + p1(gt(goldenBase, both)) + ' → ' + p1(gt(cur.golden.files, both)) + ' over the ' + both.length + ' both have)' : '');
   const hc = cur.golden.heldout, hb = goldenHeldBase;
   if (hc) console.log(('  held out (' + hc.n + ')').padEnd(22), ''.padStart(6 * 7), p1(hc.mean.total).padStart(6),
-    hb && hb.n === hc.n ? '  (was ' + p1(hb.mean.total) + ', ' + d1(hc.mean.total - hb.mean.total) + ') — a mean only, docs/HELDOUT.md' : '  — a mean only, docs/HELDOUT.md');
+    hb && hb.n === hc.n ? '  (was ' + p1(hb.mean.total) + ', ' + d1(hc.mean.total - hb.mean.total) + ') — a mean only, tests/pdf-lab/HELDOUT.md' : '  — a mean only, tests/pdf-lab/HELDOUT.md');
 }
 fuzzRows.forEach(([split, b, c]) => {
   console.log(('fuzz/' + split).padEnd(22), METRICS.map((k) => p1(c[k]).padStart(6)).join(''));

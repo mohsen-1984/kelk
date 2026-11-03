@@ -2,7 +2,7 @@
 // the fallback ladder must demote, lib/pdfimport/ladder.js); report errors,
 // timeouts and slow files. Exit 1 on any error or timeout (CI); files over 25 MB are skipped, slow ones only listed.
 //   node scripts/run-crash.js [dir] [kelk root] [timeout ms] [--show-held]
-// Held-out files (fuzz/heldout, the PDFs of a held-out real document: env.js, docs/HELDOUT.md) are imported like the
+// Held-out files (fuzz/heldout, the PDFs of a held-out real document: env.js, tests/pdf-lab/HELDOUT.md) are imported like the
 // others but kept nameless: in the totals, their crashes, timeouts and slow imports as counts only, no row of theirs
 // in crash-*.json. --show-held prints and writes them by name — and logs the opening (env.js openHeld).
 const fs = require('fs'), path = require('path');
@@ -55,7 +55,7 @@ const { chromium } = env.req('playwright');
   const err = out.filter((x) => x.error), to = out.filter((x) => x.timeout);
   console.log('files', out.length + hidden.n + hidden.big, 'errors', err.length + hidden.errors, 'timeouts', to.length + hidden.timeouts,
     'total s', Math.round((out.reduce((a, x) => a + (x.ms || 0), 0) + hidden.ms) / 1000));
-  if (hidden.n || hidden.big) console.log('  of which held out (nameless, docs/HELDOUT.md): ' + (hidden.n + hidden.big) + ' files, ' + hidden.errors + ' errors, ' +
+  if (hidden.n || hidden.big) console.log('  of which held out (nameless, tests/pdf-lab/HELDOUT.md): ' + (hidden.n + hidden.big) + ' files, ' + hidden.errors + ' errors, ' +
     hidden.timeouts + ' timeouts, ' + hidden.slow + ' slow' + (hidden.big ? ', ' + hidden.big + ' skipped (big)' : '') +
     (hidden.errors || hidden.timeouts ? ' — --show-held names them, and logs the opening' : ''));
   if (err.length || to.length || hidden.errors || hidden.timeouts) process.exitCode = 1;

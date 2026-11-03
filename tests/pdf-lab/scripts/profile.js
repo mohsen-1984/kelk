@@ -94,7 +94,7 @@ const PREFIX = [[/^calc--/, { engine: 'libreoffice', app: 'Calc' }], [/^impress-
   [/^chrome-|-chr--/, { engine: 'skia', path: 'export' }],
   [/^word2024-save--/, { engine: 'word', app: 'Word' }], [/^excel2024--/, { engine: 'excel', app: 'Excel' }], [/^ppt2024--/, { engine: 'powerpoint', app: 'PowerPoint' }],
   [/^msprint-/, { engine: 'gdi', path: 'print' }], [/^edge--/, { engine: 'skia', app: 'Edge' }], [/^firefox--/, { engine: 'cairo', app: 'Firefox' }], [/^wk-|-wk--/, { engine: 'qt', app: 'wkhtmltopdf' }], [/^kelk--/, { engine: 'jspdf' }], [/^ocr-tesseract--/, { engine: 'ocr', path: 'ocr' }]];
-// the held-out real-producer documents (docs/HELDOUT.md): their PDFs are checked like every other, but never named —
+// the held-out real-producer documents (tests/pdf-lab/HELDOUT.md): their PDFs are checked like every other, but never named —
 // a failure says "a held-out real file", --all and the headings table leave them out, the tallies count them. The same list as
 // scripts/heldout.js's split (P4.3), hard-coded here until that module is on this branch; then read it from there
 const HELD_OUT_REAL = ['real-deck-fa', 'real-letter-ar', 'real-memo-fa', 'real-report-fa'];

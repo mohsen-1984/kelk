@@ -2,14 +2,14 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="utf-8">
-    <!-- Content Security Policy (docs/reports/P1.2-security.md): scripts only from the app's own files (no inline
+    <!-- Content Security Policy: scripts only from the app's own files (no inline
          script, handler or eval); inline styles (the builders' and MathJax's); images also from the web (a document may
          name a public image); workers from the app or a blob; no plugin, no <base>, no form submission. -->
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: http:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Kelk — Markdown to Word, PDF and HTML and back, right-to-left first</title>
-    <meta name="description" content="Kelk: convert Markdown (GFM) to Word DOCX, Word DOC (MHTML), PDF and standalone HTML — and Word, HTML and PDF back to Markdown — entirely client-side in your browser. Right-to-left first (Persian, Arabic, Hebrew, Urdu) and every left-to-right language; LaTeX formulas; offline, no upload, open source.">
-    <meta name="keywords" content="markdown to docx, markdown to pdf, markdown to word, markdown to html, docx to markdown, LaTeX, MathJax, Word equations, GFM, RTL, bidi, Persian, Farsi, Arabic, Hebrew, Urdu, client-side, offline">
+    <title>Kelk — Markdown to Word, PowerPoint, PDF and HTML and back, right-to-left first</title>
+    <meta name="description" content="Kelk: convert Markdown (GFM) to Word DOCX, Word DOC (MHTML), PowerPoint PPTX slides, PDF and standalone HTML — and Word, HTML and PDF back to Markdown — entirely client-side in your browser. Right-to-left first (Persian, Arabic, Hebrew, Urdu) and every left-to-right language; LaTeX formulas; offline, no upload, open source.">
+    <meta name="keywords" content="markdown to docx, markdown to pptx, markdown to powerpoint, markdown slides, markdown to pdf, markdown to word, markdown to html, docx to markdown, LaTeX, MathJax, Word equations, GFM, RTL, bidi, Persian, Farsi, Arabic, Hebrew, Urdu, client-side, offline">
     <meta name="author" content="mhn.com@gmail.com">
     <meta name="contributor" content="Anthropic Claude Opus 5.5">
     <meta name="theme-color" content="#1f6f5c">
@@ -18,21 +18,21 @@
     <!-- link previews: Open Graph (Telegram, WhatsApp, LinkedIn, Facebook …) and X / Twitter -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Kelk">
-    <meta property="og:title" content="Kelk — Markdown to Word, PDF and HTML and back, right-to-left first">
-    <meta property="og:description" content="Markdown to DOCX, DOC, PDF and HTML — and back — in your browser. Right-to-left first, LaTeX formulas as Word equations, offline, open source.">
+    <meta property="og:title" content="Kelk — Markdown to Word, PowerPoint, PDF and HTML and back, right-to-left first">
+    <meta property="og:description" content="Markdown to DOCX, DOC, PPTX slides, PDF and HTML — and back — in your browser. Right-to-left first, LaTeX formulas as Word equations, offline, open source.">
     <meta property="og:url" content="https://mohsen-1984.github.io/kelk/">
     <meta property="og:image" content="https://mohsen-1984.github.io/kelk/assets/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="Kelk — کِلک: Markdown to Word, PDF and HTML">
+    <meta property="og:image:alt" content="Kelk — کِلک: Markdown to Word, PowerPoint, PDF and HTML">
     <meta property="og:locale" content="fa_IR">
     <meta property="og:locale:alternate" content="en_US">
     <meta property="og:locale:alternate" content="ar_AR">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Kelk — Markdown to Word, PDF and HTML and back, right-to-left first">
-    <meta name="twitter:description" content="Markdown to DOCX, DOC, PDF and HTML — and back — in your browser. Right-to-left first, LaTeX formulas, offline, open source.">
+    <meta name="twitter:title" content="Kelk — Markdown to Word, PowerPoint, PDF and HTML and back, right-to-left first">
+    <meta name="twitter:description" content="Markdown to DOCX, DOC, PPTX slides, PDF and HTML — and back — in your browser. Right-to-left first, LaTeX formulas, offline, open source.">
     <meta name="twitter:image" content="https://mohsen-1984.github.io/kelk/assets/og-image.png">
-    <meta name="twitter:image:alt" content="Kelk — کِلک: Markdown to Word, PDF and HTML">
+    <meta name="twitter:image:alt" content="Kelk — کِلک: Markdown to Word, PowerPoint, PDF and HTML">
 
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231f6f5c'/%3E%3Cg transform='translate(4 4) rotate(40 12 12)'%3E%3Cpath d='M7.4 2.2h9.2v5.6c0 1.6-.7 2.8-1.5 4.1L12 21.8l-3.1-9.9c-.8-1.3-1.5-2.5-1.5-4.1z' fill='%23fff'/%3E%3Cpath d='M12 12.6v8' stroke='%231f6f5c' stroke-width='1.3' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='11.2' r='1.5' fill='%231f6f5c'/%3E%3C/g%3E%3C/svg%3E">
 
@@ -146,13 +146,21 @@
         <section class="panel preview-panel" aria-labelledby="h-preview">
             <div class="panel-head">
                 <h2 id="h-preview"><i data-lucide="eye"></i><span data-i18n="preview"></span></h2>
+                <!-- the same Markdown as a document or as slides (Kelk.slides; lib/SLIDES.md) -->
+                <div class="segmented view-toggle" role="group" data-i18n-attr="aria-label:viewToggle;title:viewToggle">
+                    <button type="button" data-view="document" aria-pressed="true"><i data-lucide="file-text"></i><span data-i18n="viewDocument"></span></button>
+                    <button type="button" data-view="slides" aria-pressed="false"><i data-lucide="presentation"></i><span data-i18n="viewSlides"></span></button>
+                </div>
                 <div class="actions">
-                    <button class="btn ghost icon" id="btn-copy-preview" type="button" data-i18n-attr="title:copy;aria-label:copy"><i data-lucide="copy"></i></button>
+                    <span class="slides-count slides-only" id="slides-count"></span>
+                    <button class="btn ghost icon slides-only" id="btn-present" type="button" data-i18n-attr="title:present;aria-label:present"><i data-lucide="monitor-play"></i></button>
+                    <button class="btn ghost icon doc-only" id="btn-copy-preview" type="button" data-i18n-attr="title:copy;aria-label:copy"><i data-lucide="copy"></i></button>
                     <button class="btn ghost icon btn-max" id="max-preview" type="button" data-max="preview" data-i18n-attr="title:maximize;aria-label:maximize"><i data-lucide="maximize-2"></i></button>
                 </div>
             </div>
             <div class="preview-scroll">
                 <article id="preview" class="doc" data-i18n-attr="data-empty:previewEmpty"></article>
+                <div id="slides" class="slides-pane" hidden data-i18n-attr="data-empty:previewEmpty"></div>
             </div>
             <div class="panel-foot export-foot">
                 <div class="namebox" data-i18n-attr="title:fileName">
@@ -162,6 +170,7 @@
                 <div class="export-bar" role="group" data-i18n-attr="aria-label:exportAs">
                     <button class="btn primary" type="button" data-export="docx" data-i18n-attr="title:docxHint"><i data-lucide="file-text"></i>DOCX</button>
                     <button class="btn soft" type="button" data-export="pdf" data-i18n-attr="title:pdfHint"><i data-lucide="file-type"></i>PDF</button>
+                    <button class="btn soft" type="button" data-export="pptx" data-i18n-attr="title:pptxHint"><i data-lucide="presentation"></i>PPTX</button>
                     <span class="sep" aria-hidden="true"></span>
                     <button class="btn" type="button" data-export="html" data-i18n-attr="title:htmlHint"><i data-lucide="code-xml"></i>HTML</button>
                     <button class="btn ghost" type="button" data-export="doc" data-i18n-attr="title:docHint"><i data-lucide="file"></i>DOC</button>
@@ -434,6 +443,73 @@
                     </div>
                 </details>
 
+                <details class="group" id="slides-group">
+                    <summary><i data-lucide="presentation"></i><span data-i18n="gSlides"></span></summary>
+                    <div class="fields">
+                        <div class="field"><span class="hint scope-hint" data-i18n="slidesScope"></span></div>
+                        <div class="field"><span class="hint" dir="auto" data-i18n="slidesHint"></span></div>
+                        <label class="field"><span data-i18n="slidesTheme"></span>
+                                <select data-setting="slides.theme">
+                                    <option value="modern-emerald" data-i18n="thModernEmerald"></option>
+                                    <option value="scholarly-blue" data-i18n="thScholarlyBlue"></option>
+                                    <option value="corporate-blue" data-i18n="thCorporateBlue"></option>
+                                    <option value="tech-dark" data-i18n="thTechDark"></option>
+                                    <option value="tech-warm" data-i18n="thTechWarm"></option>
+                                    <option value="minimal-mono" data-i18n="thMinimalMono"></option>
+                                    <option value="ocean-teal" data-i18n="thOceanTeal"></option>
+                                    <option value="sunset-coral" data-i18n="thSunsetCoral"></option>
+                                    <option value="forest-green" data-i18n="thForestGreen"></option>
+                                    <option value="royal-purple" data-i18n="thRoyalPurple"></option>
+                                </select></label>
+                        <div class="field"><span class="hint" id="slides-deck-note" hidden></span></div>
+
+                        <div class="sub-head label-row"><span data-i18n="slidesColors"></span>
+                            <button class="mini" type="button" hidden data-reset-keys="slides.primary,slides.accent" data-i18n-attr="title:colorsReset;aria-label:colorsReset"><i data-lucide="rotate-ccw"></i></button></div>
+                        <div class="row2">
+                            <label class="field color"><span data-i18n="slidesPrimary"></span><input type="color" data-setting="slides.primary"></label>
+                            <label class="field color"><span data-i18n="slidesAccent"></span><input type="color" data-setting="slides.accent"></label>
+                        </div>
+                        <div class="field"><span class="hint" data-i18n="slidesColorsHint"></span></div>
+                        <div class="row2">
+                            <label class="field"><span data-i18n="slidesTitleStyle"></span>
+                                <select data-setting="slides.titleStyle"><option value="dark" data-i18n="titleDark"></option><option value="light" data-i18n="titleLight"></option></select></label>
+                            <label class="field"><span data-i18n="slidesAspect"></span>
+                                <select data-setting="slides.aspect"><option value="16:9">16:9</option><option value="4:3">4:3</option></select></label>
+                        </div>
+                        <div class="row2">
+                            <label class="field"><span data-i18n="slidesDecoration"></span>
+                                <select data-setting="slides.decoration"><option value="auto" data-i18n="decoAuto"></option><option value="steps" data-i18n="decoSteps"></option><option value="bar" data-i18n="decoBar"></option><option value="none" data-i18n="decoNone"></option></select></label>
+                            <label class="field"><span data-i18n="slidesBullet"></span>
+                                <select data-setting="slides.bullet"><option value="•">•</option><option value="○">○</option><option value="▪">▪</option><option value="❖">❖</option><option value="➢">➢</option><option value="✓">✓</option><option value="❑">❑</option><option value="–">–</option></select></label>
+                        </div>
+                        <label class="field"><span data-i18n="slidesLogo"></span>
+                            <select data-setting="slides.logo"><option value="all" data-i18n="logoAll"></option><option value="cover" data-i18n="logoCover"></option><option value="none" data-i18n="logoNone"></option></select></label>
+                        <div class="field"><span class="hint" data-i18n="slidesLogoHint"></span></div>
+                        <div class="row2">
+                            <label class="field"><span data-i18n="slidesSize"></span>
+                                <select data-setting="slides.size"><option value="small" data-i18n="sizeSmall"></option><option value="medium" data-i18n="sizeMedium"></option><option value="large" data-i18n="sizeLarge"></option></select></label>
+                            <label class="field"><span data-i18n="slidesTimeline"></span>
+                            <select data-setting="slides.timeline"><option value="auto" data-i18n="timelineAuto"></option><option value="horizontal" data-i18n="timelineH"></option><option value="vertical" data-i18n="timelineV"></option></select></label>
+                        </div>
+                        <div class="field"><span class="label-row"><label for="f-slides-footer" data-i18n="slidesFooter"></label>
+                            <button class="mini" type="button" data-reset="slides.footer" hidden data-i18n-attr="title:resetDefault;aria-label:resetDefault"><i data-lucide="rotate-ccw"></i></button></span>
+                            <input type="text" id="f-slides-footer" dir="auto" data-setting="slides.footer"></div>
+                        <label class="check"><input type="checkbox" data-setting="slides.numbers"><span data-i18n="slidesNumbers"></span></label>
+                        <label class="check"><input type="checkbox" data-setting="slides.sectionNumbers"><span data-i18n="slidesSections"></span></label>
+                        <label class="check"><input type="checkbox" data-setting="slides.sections"><span data-i18n="slidesPptSections"></span></label>
+                        <label class="check"><input type="checkbox" data-setting="slides.notes"><span data-i18n="slidesNotes"></span></label>
+                        <label class="check"><input type="checkbox" data-setting="slides.autoLayout"><span data-i18n="slidesAuto"></span></label>
+                        <label class="check"><input type="checkbox" data-setting="slides.split"><span data-i18n="slidesSplit"></span></label>
+                        <div class="field"><span class="hint"><span data-i18n="slidesFontsHint"></span>
+                            <button type="button" class="link-btn" data-open-group="gWord" data-i18n="gWord"></button></span></div>
+                        <div class="sub-head" data-i18n="slidesPromptHead"></div>
+                        <div class="field"><span class="hint" data-i18n="slidesPromptHint"></span></div>
+                        <div class="btn-row">
+                            <button class="btn soft" id="btn-slides-prompt" type="button"><i data-lucide="sparkles"></i><span data-i18n="slidesPrompt"></span></button>
+                        </div>
+                    </div>
+                </details>
+
                 <details class="group app-group" id="app-group">
                     <summary><i data-lucide="settings-2"></i><span data-i18n="appSettings"></span></summary>
                     <div class="fields">
@@ -527,6 +603,25 @@
     </div>
 </dialog>
 
+<!-- several documents (a zip, a multi-file drop): their order, which ones, and what cannot come in (Kelk.ui.order) -->
+<dialog id="order" class="task order" aria-labelledby="order-label">
+    <div class="dlg-body">
+        <div class="task-label" id="order-label" dir="auto"></div>
+        <div class="task-detail" id="order-detail" data-i18n="orderHint"></div>
+        <ol class="order-list" id="order-list"></ol>
+        <div class="order-skip" id="order-skip" hidden>
+            <div class="order-skip-head" id="order-skip-head"></div>
+            <ul class="order-list off" id="order-skip-list"></ul>
+        </div>
+        <div class="task-actions">
+            <button class="btn ghost" id="order-sort" type="button"><i data-lucide="arrow-down-a-z"></i><span data-i18n="orderSort"></span></button>
+            <span class="order-count" id="order-count"></span>
+            <button class="btn" id="order-cancel" type="button"><i data-lucide="x"></i><span data-i18n="taskCancel"></span></button>
+            <button class="btn primary" id="order-ok" type="button"><i data-lucide="file-up"></i><span data-i18n="orderImport"></span></button>
+        </div>
+    </div>
+</dialog>
+
 <dialog id="help" aria-labelledby="help-title">
     <div class="dlg-head">
         <h2 id="help-title" data-i18n="shortcuts"></h2>
@@ -537,6 +632,8 @@
             <tr><td><kbd>Ctrl</kbd> + <kbd>S</kbd></td><td data-i18n="kMd"></td></tr>
             <tr><td><kbd>Ctrl</kbd> + <kbd>Enter</kbd></td><td data-i18n="kDocx"></td></tr>
             <tr><td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Enter</kbd></td><td data-i18n="kPdf"></td></tr>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Enter</kbd></td><td data-i18n="kPptx"></td></tr>
+            <tr><td><kbd>F5</kbd></td><td data-i18n="kPresent"></td></tr>
             <tr><td><kbd>Ctrl</kbd> + <kbd>O</kbd></td><td data-i18n="kOpen"></td></tr>
             <tr><td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>V</kbd></td><td data-i18n="kPastePlain"></td></tr>
             <tr><td><kbd>Ctrl</kbd> + <kbd>Z</kbd></td><td data-i18n="kUndo"></td></tr>
@@ -567,7 +664,9 @@
                                                                             (build/pdf.mjs, build/pdf.worker.mjs, web/wasm/
                                                                              → vendor/pdfjs/ as classic scripts,
                                                                              tools/build-pdfjs.js; loaded on first PDF import)
-       https://cdn.jsdelivr.net/npm/jszip@3.10.2/dist/jszip.min.js          (loaded on the first .zip import)
+       https://cdn.jsdelivr.net/npm/jszip@3.10.2/dist/jszip.min.js          (loaded on the first .zip import or .pptx export)
+       https://cdn.jsdelivr.net/npm/pptxgenjs@4.0.1/dist/pptxgen.min.js     (without its source-map line; loaded on the first .pptx export)
+       https://cdn.jsdelivr.net/npm/lucide@1.48.0/dist/umd/lucide.min.js    (the full set: also :name: icons on slides, loaded on the first)
        https://registry.npmjs.org/mathjax/-/mathjax-4.1.3.tgz               (→ vendor/mathjax_4.1.3: startup, core,
        https://registry.npmjs.org/@mathjax/mathjax-newcm-font/-/mathjax-newcm-font-4.1.3.tgz        input/tex + extensions,
        https://registry.npmjs.org/@mathjax/mathjax-mhchem-font-extension/-/mathjax-mhchem-font-extension-4.1.3.tgz
@@ -593,6 +692,7 @@
 <script src="lib/PdfBuilder.js"></script>
 <script src="lib/HtmlBuilder.js"></script>
 <script src="lib/PreviewBuilder.js"></script>
+<script src="lib/PptxBuilder.js"></script>
 <script src="lib/MarkdownImporter.js"></script>
 
 <!-- page -->
@@ -608,6 +708,7 @@
 <script src="scripts/preview.js"></script>
 <script src="scripts/importer.js"></script>
 <script src="scripts/exporter.js"></script>
+<script src="scripts/slides.js"></script>
 <script src="scripts/settings.js"></script>
 <script src="scripts/main.js"></script>
 </body>

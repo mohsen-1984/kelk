@@ -383,6 +383,59 @@ dialog.task .task-label { font-weight: 600; overflow-wrap: anywhere; }
 dialog.task .task-detail { color: var(--muted, #777); font-size: 12.5px; min-height: 1.4em; margin-top: 2px; }
 dialog.task progress { width: 100%; height: 8px; margin: 10px 0 12px; accent-color: var(--accent); }
 dialog.task .task-actions { display: flex; justify-content: flex-end; }
+/* the order dialog (Kelk.ui.order): the task dialog's look, with the documents to arrange */
+dialog.order { width: min(560px, calc(100vw - 32px)); }
+dialog.order .dlg-body { display: flex; flex-direction: column; max-height: calc(100vh - 48px); max-height: calc(100dvh - 48px); }
+dialog.order .task-detail { margin-bottom: 10px; line-height: 1.6; }
+.order-list {
+  list-style: none; margin: 0; padding: 0; overflow-y: auto; min-height: 0; flex: 0 1 auto;
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+}
+#order-list { flex: 1 1 auto; max-height: 52vh; }
+.order-row {
+  display: flex; align-items: center; gap: 8px; padding: 4px 6px; min-height: 40px;
+  border-bottom: 1px solid var(--line); background: var(--panel); font-size: 13px;
+}
+.order-row:last-child { border-bottom: 0; }
+.order-row.dragging { position: relative; z-index: 1; box-shadow: var(--shadow); outline: 2px solid var(--accent); outline-offset: -2px; border-radius: var(--radius-sm); }
+.order-row.unchecked .order-name, .order-row.unchecked .order-icon, .order-row.unchecked .order-meta { opacity: .45; }
+.order-row input[type="checkbox"] { margin: 0; width: 16px; height: 16px; accent-color: var(--accent); flex: none; }
+.order-grip { display: inline-flex; color: var(--muted); cursor: grab; touch-action: none; padding: 6px 0; flex: none; }
+.order-row.dragging .order-grip { cursor: grabbing; }
+.order-grip svg { width: 16px; height: 16px; }
+.order-icon, .order-row > svg { width: 20px; height: 20px; flex: none; }
+.order-name { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.35; }
+.order-name .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.order-name .dir { color: var(--muted); font-size: 11.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: ltr; text-align: start; }
+.order-meta { display: flex; align-items: center; gap: 6px; flex: none; color: var(--muted); font-size: 11.5px; }
+.order-tag {
+  font: 600 10.5px/1 var(--font-latin); letter-spacing: .03em; padding: 3px 5px; border-radius: 4px;
+  color: var(--panel); background: var(--muted); direction: ltr;
+}
+.order-row .btn.icon { width: 28px; height: 28px; }
+.order-row .btn.icon svg { width: 15px; height: 15px; }
+/* each kind its color: the icon and its tag */
+.k-md { color: var(--k-md); }      .order-tag.k-md { background: var(--k-md); color: var(--panel); }
+.k-txt { color: var(--k-txt); }    .order-tag.k-txt { background: var(--k-txt); color: var(--panel); }
+.k-html { color: var(--k-html); }  .order-tag.k-html { background: var(--k-html); color: var(--panel); }
+.k-docx { color: var(--k-docx); }  .order-tag.k-docx { background: var(--k-docx); color: var(--panel); }
+.k-pdf { color: var(--k-pdf); }    .order-tag.k-pdf { background: var(--k-pdf); color: var(--panel); }
+.k-image { color: var(--muted); }
+.k-none { color: var(--muted); }   .order-tag.k-none { background: transparent; color: var(--muted); border: 1px solid var(--line-strong); padding: 2px 4px; }
+/* the files that do not come in: apart, muted, with the reason */
+.order-skip { margin-top: 10px; display: flex; flex-direction: column; min-height: 0; }
+.order-skip-head { font-size: 12.5px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+.order-list.off { max-height: 22vh; background: var(--panel-2); }
+.order-list.off .order-row { background: transparent; min-height: 34px; color: var(--muted); }
+.order-note { font-style: italic; }
+dialog.order .task-actions { gap: 8px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+dialog.order #order-sort { margin-inline-end: auto; }
+.order-count { color: var(--muted); font-size: 12.5px; }
+@media (max-width: 480px) {
+  .order-meta .order-size { display: none; }
+  dialog.order .task-actions .btn:not(.primary) > span { display: none; }
+  dialog.order #order-sort { width: 32px; padding: 0; justify-content: center; }
+}
 dialog table { width: 100%; border-collapse: collapse; font-size: 13px; }
 dialog .dlg-head h2 { display: flex; align-items: center; gap: 8px; }
 dialog .dlg-head h2 svg { width: 18px; height: 18px; color: var(--accent); }
@@ -420,3 +473,33 @@ details.group.app-group > summary { color: var(--accent-ink); background: var(--
 .settings > .pane-head #pane-close { margin-inline-end: -8px; }
 @media (max-width: 600px) { .settings > .pane-head #pane-close { margin-inline-end: -6px; } }
 .font-pack a.btn { text-decoration: none; color: var(--accent-ink); }
+
+/* ── Document | Slides (Kelk.slides) ─────────────────────────────────── */
+.view-toggle { margin-inline-start: 10px; }
+.view-toggle button { display: inline-flex; align-items: center; gap: 5px; height: 26px; }
+.view-toggle svg { width: 14px; height: 14px; }
+.slides-only { display: none !important; }
+.view-slides .slides-only { display: inline-flex !important; }
+.view-slides .doc-only { display: none !important; }
+.slides-count { font-size: 12px; color: var(--muted); align-items: center; padding-inline-end: 4px; }
+@media (max-width: 560px) { .view-toggle button span { display: none; } }
+
+.slides-pane { padding: 18px 20px 28px; font-family: var(--font-ui); color: var(--ink); }
+.slides-pane:empty::before { content: attr(data-empty); color: var(--placeholder); }
+.slides-pane .kelk-slide-meta { color: var(--muted); }
+.slides-pane .kelk-slide-meta b { color: var(--ink); }
+.slides-pane .kelk-slide-meta .w { color: var(--warn); }
+.slides-pane .kelk-slide-notes { color: var(--muted); }
+.slides-pane .kelk-slide-notes div { color: var(--ink); }
+.slides-pane .slides-error { color: var(--danger); }
+[data-theme="dark"] .slides-pane .kelk-slide { box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 4px 18px rgba(0,0,0,.4); }
+
+/* present: one slide at a time, full screen */
+.present { position: fixed; inset: 0; z-index: 1000; background: #0d0d0d; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.present .kelk-slides { width: min(100vw, calc(100vh * 16 / 9)); }
+.present .kelk-slide-meta, .present .kelk-slide-notes { display: none; }
+.present .kelk-slide { border-radius: 0; box-shadow: none; }
+.present-count { position: fixed; bottom: 10px; inset-inline-end: 16px; color: rgba(255,255,255,.45); font: 12px var(--font-ui); }
+/* Settings → Slides: in the Slides view its heading stands out like the App group's; the doc-only scope note */
+.view-slides details.group#slides-group > summary { color: var(--accent-ink); background: var(--accent-soft); border-radius: var(--radius-sm); margin-inline: -6px; padding-inline: 8px; }
+.scope-hint { display: block; border-inline-start: 2px solid var(--accent); padding-inline-start: 8px; }

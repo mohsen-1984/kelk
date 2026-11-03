@@ -1,9 +1,9 @@
-// The lab's held-out parts and their protocol (docs/HELDOUT.md): which documents are held out, the log of held-out
+// The lab's held-out parts and their protocol (tests/pdf-lab/HELDOUT.md): which documents are held out, the log of held-out
 // files that were opened, the Shamsi date the log is written with. Pure functions, no browser, no env.js (it creates
 // LAB_OUT) — tests/unit/heldout.test.js reads them directly; env.js heldSplit() / openHeld() apply them to the lab.
 //
 //   node scripts/heldout.js                     the split: the documents on each side and their PDFs
-//   node scripts/heldout.js opened <what>       add a line to docs/reports/heldout-opened.log by hand (a held-out
+//   node scripts/heldout.js opened <what>       add a line to tests/pdf-lab/heldout-opened.log by hand (a held-out
 //                                               file was opened: <what> = real:<document> or fuzz:heldout)
 //
 // The real-producer split (plan P4.3) is by DOCUMENT, never by file: the document of a lab PDF is the part of its
@@ -16,7 +16,7 @@
 // (tests/unit/heldout.test.js checks that). The hash rule looks at the documents of pdf/real-producers/ only (the
 // corpus documents are dev). Nothing fills the held-out side from the dev documents: they were read file by file.
 // HELD_DOCS minus REAL_OPENED holds at least REAL_MIN documents (the test checks it); below that, NEW documents are
-// added (docs/HELDOUT.md). A document named in REAL_OPENED (one of its held-out files was opened) is dev from then on.
+// added (tests/pdf-lab/HELDOUT.md). A document named in REAL_OPENED (one of its held-out files was opened) is dev from then on.
 const crypto = require('crypto');
 const path = require('path');
 
@@ -26,11 +26,11 @@ const REAL_MIN = 4;
 // the held-out documents, committed 1405-08-12 (P4.3): real-deck-fa, real-memo-fa, real-report-fa by their hash,
 // real-letter-ar by P4.3's first fill to 4 — kept, as the list changes only by a new document or an opening
 const HELD_DOCS = ['real-deck-fa', 'real-letter-ar', 'real-memo-fa', 'real-report-fa'];
-// documents moved to dev because one of their held-out files was opened (docs/HELDOUT.md, "When a held-out file was
+// documents moved to dev because one of their held-out files was opened (tests/pdf-lab/HELDOUT.md, "When a held-out file was
 // opened"): add the document here, with the date, in the change that records it in the log
 const REAL_OPENED = [];
-// the log of openings: in the repository, committed with the change that opened something (docs/HELDOUT.md)
-const OPENED_LOG = path.resolve(__dirname, '..', '..', '..', 'docs', 'reports', 'heldout-opened.log');
+// the log of openings: in the repository, committed with the change that opened something (tests/pdf-lab/HELDOUT.md)
+const OPENED_LOG = path.resolve(__dirname, '..', 'heldout-opened.log');
 
 // the document of a lab PDF: 'edge--real-memo-fa.pdf' → 'real-memo-fa' (the part after the producer's '--'); null
 // for a name without '--' (no document)
@@ -82,14 +82,14 @@ function whoAmI() {
   try { const n = require('child_process').execFileSync('git', ['config', 'user.name'], { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); if (n) return n; } catch (e) { /* no git */ }
   try { return require('os').userInfo().username; } catch (e) { return '?'; }
 }
-// append a line to the opened log (default OPENED_LOG, docs/reports/heldout-opened.log) and say so on stderr
+// append a line to the opened log (default OPENED_LOG, tests/pdf-lab/heldout-opened.log) and say so on stderr
 function logOpened(o, file) {
   const fs = require('fs');
   file = file || OPENED_LOG;
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.appendFileSync(file, openedLine(Object.assign({ user: whoAmI() }, o)));
   console.error('\n*** WARNING: held-out files opened (' + o.split + ') — logged to ' + file + ': commit it with this change.\n' +
-    '*** This set now measures nothing for whoever reads them: rotate it or retire the document (docs/HELDOUT.md) and say so in the report. ***\n');
+    '*** This set now measures nothing for whoever reads them: rotate it or retire the document (tests/pdf-lab/HELDOUT.md) and say so in the report. ***\n');
   return file;
 }
 // the lines of the opened log (none when it does not exist)

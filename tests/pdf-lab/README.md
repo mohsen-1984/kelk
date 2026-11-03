@@ -155,7 +155,7 @@ them to `pdf/` with a `--<doc>` suffix to score them, or to any folder for `run-
 
 ```sh
 node scripts/run-import.js [filter]   # import pdf/*/*.pdf, score against corpus/<doc>.md, write out/ (held-out real documents left out)
-node scripts/run-import.js --real-heldout   # the PDFs of the held-out documents, wherever they lie: their mean only (docs/HELDOUT.md)
+node scripts/run-import.js --real-heldout   # the PDFs of the held-out documents, wherever they lie: their mean only (HELDOUT.md)
 node scripts/heldout.js               # the real-producer split: the documents on each side
 node scripts/roundtrip.js             # Kelk's own round trip: tests/builder-suite.html, md → PDF → md
 node scripts/math-roundtrip.js        # formulas through Kelk and back: every case of tests/math-cases.js, en and fa (76 checks)
@@ -248,8 +248,8 @@ only when the previous run read PDFs of the same generator and env.
 what you see. `heldout` is for judgement: only its means and its per-value table are read
 (`run-fuzz.js heldout` hides file names; `--show` prints them). A rule written after looking at a
 held-out file has turned that split into a second dev set, and nothing measures generalisation any more
-— then draw a new held-out split with other seeds (the rotation of [`docs/HELDOUT.md`](../../docs/HELDOUT.md):
-`--show` on held-out is logged to `docs/reports/heldout-opened.log` (committed), and `make-fuzz.js` `HELDOUT_ROTATION` moves the
+— then draw a new held-out split with other seeds (the rotation of [`HELDOUT.md`](HELDOUT.md):
+`--show` on held-out is logged to `tests/pdf-lab/heldout-opened.log` (committed), and `make-fuzz.js` `HELDOUT_ROTATION` moves the
 seed base up by 100000). A change is good when dev improves **and**
 held-out does not drop.
 
@@ -276,7 +276,7 @@ file. Still weak in both: two columns (held-out 78: tables 53, lists 69) and A5 
 or a column break inside a wrapped row. That is generator 3 on the CI runner (dev 96.0, held-out 94.6).
 
 Generator 4 (1405-08-11: the right-to-left documents, `digits`, `tracking`) draws another set; its baseline is
-built on the CI runner (`docs/reports/P2.1-rtl-fuzz.md`). On a Windows machine without wkhtmltopdf or Noto Naskh
+built on the CI runner. On a Windows machine without wkhtmltopdf or Noto Naskh
 Arabic — indicative only — dev 86.0 (ltr 92.4, rtl 78.0, `rtl` 91.0), held-out 86.8 (ltr 91.1, rtl 81.4, `rtl`
 93.0), where generator 3 there gave 95.8 / 93.9. Weak: right-to-left headings (dev 68) and quotes (67);
 `tracking: loose` (dev 75.4: ltr 80.7 against 96.2 untracked); Noto Naskh Arabic, and its fallback here.
@@ -346,7 +346,7 @@ relations**, counted per transform: under "same" the multiset of words equals th
 generator 3 (1405-08-11, 24 seeds, references 99.9): `rotate180` −83.0, `rotate90` −82.4 (the importer does not
 apply `/Rotate`), `noToUnicode` −81.0, `stamp` −32.7, `trackLoose` −12.2, `tz85` −9.2, `trackTight` −3.6, `pagebg`
 −3.3, `band` −2.7, `scale80` −1.4, `objstm` −0.7, `pageSize` −0.4, `renderMode` −0.3, `scale125` −0.2, the rest 0.0;
-"same": 133 of 199 files exact, 66 known exceptions (`docs/reports/P2.2-meta-net.md`). After P3.3 (1405-08-12):
+"same": 133 of 199 files exact, 66 known exceptions. After P3.3 (1405-08-12):
 `rotate90` and `rotate180` 0.0, every file exact (the page read in its upright frame, `_pageFrame`); `objstm` 0.0,
 every file exact (descriptors and `/ActualText` read from object streams); `stamp` 0.0, 24 of 24 (the watermark
 rule, `_watermark`); `tz85` −0.1, `trackTight` 0.0, `trackLoose` −0.8 (runs laid out again from their untracked
@@ -476,7 +476,7 @@ golden whose PDF is not in the lab is an error row, and any error row exits 1. A
 (nothing to score).
 
 **Goldens on held-out PDFs.** Five goldens are typed from PDFs of held-out real-producer documents (`scripts/heldout.js`,
-[`docs/HELDOUT.md`](../../docs/HELDOUT.md): `real-letter-ar` three times, `real-report-fa`, `real-memo-fa`). A score per
+[`HELDOUT.md`](HELDOUT.md): `real-letter-ar` three times, `real-report-fa`, `real-memo-fa`). A score per
 file would read those documents one by one, so they are read as the held-out is: `golden.js` scores them but prints
 and writes no row, no Markdown and no name with a score of them — only `heldout: { n, errors, mean: { total, rtl,
 edits } }` in `_scores.json` and one `held-out` line; a filtered run leaves them out. They stay in `golden/` (a golden
@@ -504,7 +504,7 @@ change made the importer worse:
 | corpus | a file crashes, or its total drops more than 0.5 point, or its right-to-left details (`rtl`) drop more than 0.5 point, or it is no longer scored (its `corpus/<doc>.md` missing or renamed) |
 | golden | a golden file crashes or has no PDF, or its total drops more than 0.5 point, or it is missing from an unfiltered run; the goldens on held-out real PDFs as one mean, more than 1 point (see «Golden files») |
 | fuzz `dev`, `heldout` | a PDF crashes, or the split's **mean** total drops more than 1 point, or so does a direction's (`ltr`, `rtl`) mean total or the `rtl` column's mean over the right-to-left files (a loss on the 44 right-to-left files alone barely moves the split's mean); an older baseline without them gives a note |
-| real held-out | the held-out real-producer documents (`scripts/heldout.js`, [`docs/HELDOUT.md`](../../docs/HELDOUT.md)), scored by `run-import.js --real-heldout` as one mean: a crash, or the mean total dropping more than 1 point (compared only over the same documents and count) |
+| real held-out | the held-out real-producer documents (`scripts/heldout.js`, [`HELDOUT.md`](HELDOUT.md)), scored by `run-import.js --real-heldout` as one mean: a crash, or the mean total dropping more than 1 point (compared only over the same documents and count) |
 | inline markup (`mkup`) | bold, italic, strike or inline code the importer wrote in HTML that a CommonMark parser no longer finds in its Markdown (`markup.js`: «بود**.**» stays literal asterisks) — any rise, on a corpus file or summed over a fuzz split; it should stay 0 |
 
 A metric that drops while the total holds (headings −3, tables +3) is printed as a note, not failed.
@@ -566,7 +566,7 @@ node scripts/snapshot.js ~/private-pdfs ~/snap/after --against ~/snap/before
 ```
 
 Each problem such a file shows is then rebuilt as a lab PDF of our own (`make-*.js`, like `word-print`),
-so that it is tested in public from then on. This is the held-out protocol's third, reference-free guard ([`docs/HELDOUT.md`](../../docs/HELDOUT.md)): the private files kept in `real/` (gitignored), snapshotted before and after a rule change.
+so that it is tested in public from then on. This is the held-out protocol's third, reference-free guard ([`HELDOUT.md`](HELDOUT.md)): the private files kept in `real/` (gitignored), snapshotted before and after a rule change.
 
 ## Inspection tools
 
@@ -590,7 +590,7 @@ of a page (`pdftoppm -f N -l N -r 200 -x … -y … -W … -H … -png`) settles
 
 ## Regenerating the PDFs
 
-The PDFs are ordinary git files marked `binary` (no LFS; decision of 1405-08-10, `docs/reports/P0.1-git-hygiene.md`).
+The PDFs are ordinary git files marked `binary` (no LFS).
 Every regeneration writes a whole new binary (creation dates and IDs are not pinned), and the old one stays in history
 for good — so commit a regenerated PDF only when its content changed, and pin timestamps where a producer allows it.
 

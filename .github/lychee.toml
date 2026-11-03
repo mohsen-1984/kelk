@@ -1,0 +1,55 @@
+# lychee link check (site.yml → links; locally `npm run check:links` with lychee 0.24.2 on the PATH).
+# Inputs are given on the command line: every *.md and index.html (site.yml, package.json).
+#
+# Offline by default: relative links between files and their #anchors are checked on every push and pull request;
+# external URLs only in the weekly scheduled run (and a manual run with "online" ticked), which passes --offline=false.
+# Checking every external URL on every push makes the result depend on other people's servers (rate limits, 403s
+# to bots, timeouts), and a red check nobody can fix in the change trains everyone to ignore it.
+
+no_progress = true
+format = "detailed"
+
+# relative links and their anchors (#heading) — the part that breaks when files and headings move
+offline = true
+include_fragments = "anchor-only"   # #id anchors; text fragments (#:~:text=) are not used here
+# a link to a folder is fine when the folder has a README.md or index.html (GitHub shows it)
+index_files = ["README.md", "index.html"]
+# hidden folders (.github/) are checked too
+hidden = true
+# links inside code spans and fenced blocks are examples, not links
+include_verbatim = false
+
+# online run only (ignored offline)
+timeout = 20
+max_retries = 2
+retry_wait_time = 5
+max_concurrency = 8
+accept = ["200..=299", "429"]
+
+# regular expressions on the file path; [/\\] matches either separator (Linux in CI, Windows locally)
+exclude_path = [
+  '(^|[/\\])node_modules[/\\]',
+  '(^|[/\\])\.git[/\\]',
+  '(^|[/\\])vendor[/\\]',                          # third-party files, not ours to fix
+  '(^|[/\\])tests[/\\]pdf-lab[/\\]out[/\\]',       # lab results
+  '(^|[/\\])tests[/\\]pdf-lab[/\\]corpus[/\\]',    # lab fixtures: their links are document content the lab scores, not navigation
+  '(^|[/\\])tests[/\\]golden[/\\]expected[/\\]',   # golden snapshots (P2.3): recorded builder output, e.g. a .docx read back with #bm_ links
+]
+
+# headings that start with an emoji carrying U+FE0F (⚠️, 🏗️): GitHub keeps the selector in the anchor
+# (#️-known-issues, the form the documents use and GitHub follows), lychee 0.24.2 drops it and reports a missing
+# fragment. Such a link is remapped to its file without the fragment: the anchor is not checked, the file still is
+# (a missing file is an error, as for any other link).
+remap = ['^(file://[^#]*)#%EF%B8%8F-.*$ $1']
+
+# regular expressions on the link (after it is resolved)
+exclude = [
+  # prose that mentions the scheme ("file://-capable", "from file://"), autolinked by the Markdown parser: a file URL
+  # with a host is never one of our relative links (those resolve to file:///…)
+  '^file://[^/]',
+  # the slides samples show the image frame PowerPoint gets for a picture not there yet: ![…](placeholder)
+  '/docs/placeholder$',
+  # online run: a known 404 (Known Issues: the 2.0 zip is not under releases/latest); P8.1 links the tagged release
+  # and removes this line
+  '^https://github\.com/mohsen-1984/kelk/releases/latest/download/kelk_2\.0\.zip$',
+]

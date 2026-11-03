@@ -12,7 +12,7 @@
 (function (K) {
     'use strict';
 
-    let box, clean = '', mathRun = 0, soon = 0;
+    let box, clean = '', mathRun = 0, soon = 0, docStale = false;
 
     // DOMPurify's own URI rules: http(s), mailto, tel, relative names; data: for images.
     // The document shares the page with the app: its id / name values get DOMPurify's
@@ -256,7 +256,10 @@
          * BEFORE BidiView and the code frames decorate it, so they decide
          * directions and frame code on exactly the Markdown's HTML.
          */
-        html: function () { return box ? clean : ''; },
+        html: function () {
+            if (box && docStale) this.renderDoc();      // the Slides view leaves the document undrawn until it is needed
+            return box ? clean : '';
+        },
         /** HTML of the user (the document, the custom header / footer) through the preview's sanitiser. */
         sanitize: sanitize,
 
@@ -275,9 +278,20 @@
          */
         flush: function () { if (soon) this.render(); },
 
+        /**
+         * Draw the preview of the active view. In the Slides view only the slides are drawn (Kelk.slides);
+         * the document is drawn when its HTML is asked for (an export) or the view changes back.
+         */
         render: function () {
             clearTimeout(soon); soon = 0;
             if (!box) return;
+            if (K.slides && K.slides.active()) { docStale = true; K.names.refresh(); K.slides.render(); return; }
+            this.renderDoc();
+        },
+
+        renderDoc: function () {
+            if (!box) return;
+            docStale = false;
             const md = K.editor.value();
             if (!md.trim()) {
                 // the empty pane's hint is in the interface's language: its direction, not the last document's

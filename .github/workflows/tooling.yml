@@ -1,11 +1,10 @@
 # Dev tooling on every push and pull request: ESLint (npm run lint, eslint.config.js), the single version
 # string (npm run check:version, tools/check-version.js), the interface strings (npm run check:i18n,
 # tools/check-i18n.js; since P1.4) and the app's unit tests (npm test: tests/unit, Node's test runner + jsdom;
-# since P1.1); on pull requests also the commit messages (job `commits`, tools/check-commits.js; since P3.1).
+# since P1.1).
 # A workflow of its own, not a job in pdf-lab.yml: that
 # one runs only when the lab's paths change, this one on any change, and a lint failure never hides the lab's
-# results. Prettier's format check is not here — .prettierrc encodes the style of the tree, but the tree is not
-# formatted yet (plan P0.4).
+# results. No formatter check: the tree keeps its own hand-written style.
 #
 # Same conventions as pdf-lab.yml: actions pinned to commit SHAs (the tag in the comment), read-only token,
 # every step under bash -euo pipefail with its output teed to $RUNNER_TEMP/logs/<step>.log and uploaded.
@@ -67,40 +66,5 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: tooling-logs
-          path: ${{ runner.temp }}/logs/
-          if-no-files-found: ignore
-
-  # Pull requests only (since P3.1): every commit of the PR (base..head, merge commits included) starts with
-  # "<Name>: " for a name in .claude/contributors.json and carries no Claude co-author / "Generated with" /
-  # Claude-Session line (CLAUDE.md -> Contributors and commits; tools/check-commits.js). .githooks/commit-msg
-  # applies the same rules locally, but a commit made without the hooks would reach main unchecked. A known
-  # author must name themself. GitHub's own "Update branch" merge and web uploads carry no prefix and fail:
-  # merge main into the branch locally. Merges by GitHub's button land on main without this check.
-  # Plain Node, no npm ci. The full history is fetched so both SHAs are present; they reach the script through
-  # env, never pasted into the script text.
-  commits:
-    if: ${{ github.event_name == 'pull_request' }}
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
-        with: { lfs: false, persist-credentials: false, fetch-depth: 0 }
-
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with: { node-version: 22 }
-
-      - name: Commit messages (tools/check-commits.js — base..head of the PR)
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          mkdir -p "$RUNNER_TEMP/logs"
-          node tools/check-commits.js "$BASE_SHA" "$HEAD_SHA" 2>&1 | tee "$RUNNER_TEMP/logs/check-commits.log"
-
-      - name: Logs
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: commits-logs
           path: ${{ runner.temp }}/logs/
           if-no-files-found: ignore

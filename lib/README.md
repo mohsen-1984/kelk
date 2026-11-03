@@ -1,6 +1,6 @@
 # Kelk library (`lib/`)
 
-Markdown-rendered HTML to **.docx, .doc, .pdf and .html**, and Word, HTML and PDF back to Markdown —
+Markdown-rendered HTML to **.docx, .doc, .pdf, .html and .pptx slides**, and Word, HTML and PDF back to Markdown —
 entirely in the browser, with correct direction for right-to-left languages (Persian, Arabic,
 Hebrew, Urdu, Kurdish …), for their mix with left-to-right text, and for purely left-to-right
 documents. No server, no build step; plain scripts that also load from `file://`.
@@ -11,7 +11,7 @@ nothing here depends on it.
 ## Files and load order
 
 ```text
-vendor      docx (for .docx) · jsPDF (for .pdf) · mammoth + turndown (+ gfm) (for import) · pdf.js (for .pdf import)
+vendor      docx (for .docx) · jsPDF (for .pdf) · JSZip + PptxGenJS (for .pptx) · mammoth + turndown (+ gfm) (for import) · pdf.js (for .pdf import)
 fonts       pdf-base64-ttf-fonts/pdf-font-*.js        PDF fonts (window.PdfFonts)
 lib         ImageCore.js        images: registered names, data URIs, URLs, SVG → PNG
             MathCore.js         LaTeX formulas: marked extension, MathJax 4 (local) → SVG / MathML, OMML ↔ TeX (see LATEX.md)
@@ -24,6 +24,7 @@ lib         ImageCore.js        images: registered names, data URIs, URLs, SVG �
             PdfBuilder.js       .pdf  (own layout engine on jsPDF)
             HtmlBuilder.js      .html (standalone page, fonts and images embedded)
             PreviewBuilder.js   a live preview on HtmlBuilder's logic and stylesheet (after HtmlBuilder)
+            PptxBuilder.js      .pptx slides (PptxGenJS): a slide convention on GFM, its own layout model and preview (see SLIDES.md)
             MarkdownImporter.js .docx / HTML / pasted rich text → Markdown
             PdfImporter.js      .pdf → Markdown (needs vendor/pdfjs/, after MarkdownImporter; see PDFIMPORT.md)
             pdfimport/*.js      its parts, after it: thresholds, calibration, extract, lines, regions, ladder, order, blocks (PdfImporter.PARTS); pdfimport/README.md maps their functions
@@ -106,7 +107,7 @@ language (justify; a paragraph holding a long URL or path starts instead), and t
 contents layout (after the opening H1: `<hr>`, contents, `<hr>`, an empty line).
 
 File properties: `configure({ meta: { title, author, subject, keywords, creator } })` (or `setMeta`) — PDF Info,
-the .docx core properties, HTML `<meta name="author">`; the creator is "Kelk " + `BuilderBase.version` (2.0-rc1 now) unless set, the title the
+the .docx core properties, HTML `<meta name="author">`; the creator is "Kelk " + `BuilderBase.version` (2.0 now) unless set, the title the
 header's or the first H1 when left out.
 
 ## The builders
@@ -120,10 +121,16 @@ header's or the first H1 when left out.
   numbers, a table of contents with page numbers and links (two layout passes), bookmarks.
 - **`HtmlBuilder`** — `toHtml()`, `toBlob()`, `save()`. Directions by `BidiView`, template
   styling, embedded fonts and images, `@page` print setup with page numbers where supported.
+- **`PptxBuilder`** (1.0) — `model()` (the laid-out deck), `toBlob()`, `toArrayBuffer()`, `toPptx()`
+  (the PptxGenJS presentation); static `previewHtml(model)`, `markOverflow(el)`, `markdownToHtml(md)`.
+  Each `#` / `##` is a slide; layouts (cards, steps, stats, timelines horizontal and vertical, agenda,
+  columns), native diagrams (process, cycle, pyramid, funnel, hierarchy, matrix, venn) and native charts
+  from tables; speaker notes from comments; icons; callouts. `configure({ slides: {…} })` adds the slide
+  options to the shared ones. The convention and the API: **[`SLIDES.md`](SLIDES.md)**.
 
 ## Fonts
 
-- **Word** files only *name* their fonts: they must be installed on the reader's computer.
+- **Word** and **PowerPoint** files only *name* their fonts: they must be installed on the reader's computer.
 - **PDF** fonts are embedded. Each `pdf-base64-ttf-fonts/pdf-font-*.js` adds one family to
   `window.PdfFonts` (Vazirmatn, Sahel, DejaVu Sans, DejaVu Sans Mono, Vazir Code Hack, Noto Emoji);
   `registerFonts(PdfFonts)` registers the loaded ones, and only the styles actually drawn are
@@ -338,6 +345,8 @@ to show its columns (it is cut at the other part's gutters).
 - **PDF import:** a scan needs an OCR layer; turned text, borderless two-column tables and formulas from other
   programs are not read well yet; Persian PDFs whose fonts carry broken ToUnicode maps (wkhtmltopdf) lose letters
   (`PDFIMPORT.md` §9, `TODO.md`).
+- **Slides:** no animations or transitions; equations are drawn by PowerPoint (their width may differ a little from the preview); fonts are named, not
+  embedded (`SLIDES.md` §7).
 - A DOM is required to build documents (browser, or a DOM implementation in Node).
 
 ## License

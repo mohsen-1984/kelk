@@ -15,9 +15,9 @@
 # run (!cancelled()) so the gate and the logs are there to read.
 # Held-out stays a mean: its per-file results never go into the artifact — only the console output of
 # run-fuzz.js heldout (means and per-style aggregates; it writes no per-file row or Markdown; file names only with
-# --show, never used here). Every PDF of a held-out document, in any folder (scripts/heldout.js, docs/HELDOUT.md), is left
+# --show, never used here). Every PDF of a held-out document, in any folder (scripts/heldout.js, tests/pdf-lab/HELDOUT.md), is left
 # out of the corpus run and scored by run-import.js --real-heldout, which writes one mean — gated with TOL 1 (a missing
-# result fails), never uploaded. The opened log is docs/reports/heldout-opened.log, in the checkout.
+# result fails), never uploaded. The opened log is tests/pdf-lab/heldout-opened.log, in the checkout.
 #
 # Manual run with "baseline" ticked: after head, gate.js --update writes a candidate baseline from this run,
 # starting from a copy of the committed baseline.json (parts this run lacks are kept), uploaded as the
@@ -238,7 +238,7 @@ jobs:
 
       # every lab PDF (pdf/ and its subfolders, ladder/ — the files the fallback ladder must demote) and the dev fuzz
       # split — never fuzz held-out: run-crash.js prints the names of slow or failing files (the held-out documents' PDFs
-      # nameless, as counts: docs/HELDOUT.md)
+      # nameless, as counts: tests/pdf-lab/HELDOUT.md)
       - name: Crash sweep (errors, timeouts, slow files)
         if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
         timeout-minutes: 20
