@@ -741,9 +741,10 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 9 | P4.2 report written (docs/reports/P4.2-golden-50.md): the goldens, golden.js and the gate part, the 23 / 10 / 17 split, the 45 visible goldens rescored (92.7) with the ten worst and their causes, the held-out five as one mean, review findings, the Persian goldens to check. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 16 | P4.1 review findings applied: the corpus and samples generators normalise line ends on read (CRLF gone from corpus.js and about-kelk-and-samples.js); strip-meta.js clears author, last editor, company and local paths from the Office sources and the Office Save as PDF files, page content streams checked unchanged (dev real Markdown byte-identical, held-out content hashes equal), make-real.ps1 runs it and fixes the sheets' separators; what remaking needs (Office 2024, Print to PDF, Edge, Firefox, B Nazanin, Traditional Arabic) in real-src README and Prerequisites; Testing and TODO.md brought to 188 PDFs; profile.js names no held-out document; Chromium named for chrome-- files. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 3 | P4.1 review fixes applied on the branch, unit tests and line ends checked. |
+| 1405-08-12 | 2.0-rc1 | Zarrabi | 7 | P4.1 report written (docs/reports/P4.1-real-producers.md): the 8 sources, the Office / browser paths and the 44 PDFs, metadata stripping, corpus 144 to 188 (94.6), dev real PDFs and the held-out documents as one mean, review findings, what stays open. |
 
 <!-- generated:totals -->
-**Entries: 154 · Total: 2120 min (35.33 hours) — Zarrabi 2120 min (147 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 155 · Total: 2127 min (35.45 hours) — Zarrabi 2127 min (148 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
