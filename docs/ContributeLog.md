@@ -702,9 +702,10 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 18 | P3.1 split of `regions.js`: `_layout` (216 → 22) into document signals, page lines, shapes, lexicon, body metrics, families, pitches and `_layoutPage` / `_pageFallback`; `_tableBlock` (213 → 48) into six steps; draft function map of `lib/pdfimport/`; byte-identical. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 4 | Commit-message check for pull requests: `tools/check-commits.js` (contributor prefix from `.claude/contributors.json`, no Claude attribution lines) with 4 unit tests and job `commits` in `tooling.yml`; `engines` narrowed to jsdom 30's range (Node 22.22.2+ / 24.15+ / 26+); the 5 npm advisories checked — no fix 14 days old yet (minimatch 11.0.1 from 1405-08-19). |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 26 | Answering the end-of-P2 questions (branches, advisories and engines, `pagesLinks`, the PR check, size budget, workload) and the size-budget question of P3.2 (proposed). |
+| 1405-08-12 | 2.0-rc1 | Zarrabi | 13 | P3.2 groundwork: `lib/pdfimport/thresholds.js` (registry `PdfImporter._thresholds`, `_t()` returning the default until an entry is switched to calibrated with `minSamples`, `_fire()` / `r.rules`, `r.calibration` with `debug`), `lib/pdfimport/calibration.js` (`_calibrate()` → frozen body / fonts / gaps / steps / columns / tracking / regions with sample counts), `tests/pdf-lab/scripts/rules.js` and a gate note for rules that stop firing, `_rules.json` from `run-import.js`, both files in every load list; 7 unit tests. |
 
 <!-- generated:totals -->
-**Entries: 116 · Total: 1512 min (25.20 hours) — Zarrabi 1512 min (109 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 117 · Total: 1525 min (25.42 hours) — Zarrabi 1525 min (110 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
