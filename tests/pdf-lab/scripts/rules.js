@@ -24,7 +24,8 @@ function lost(base, cur) {
 function sourceRules(kelk) {
   const lib = path.join(kelk || KELK, 'lib'), dir = path.join(lib, 'pdfimport'), names = new Set();
   const files = [path.join(lib, 'PdfImporter.js')].concat(fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => /\.js$/.test(f)).map((f) => path.join(dir, f)) : []);
-  files.forEach((f) => { for (const m of fs.readFileSync(f, 'utf8').matchAll(/_fire\(\s*'([^']+)'/g)) names.add(m[1]); });
+  // every quoted '<stage>.<rule>' literal: a name chosen by a ternary (_fire(a ? 'x.y' : 'x.z', …)) counts too
+  files.forEach((f) => { for (const m of fs.readFileSync(f, 'utf8').matchAll(/'((?:extract|lines|regions|order|blocks)\.[A-Za-z0-9]+)'/g)) names.add(m[1]); });
   return Array.from(names).sort();
 }
 

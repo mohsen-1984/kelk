@@ -4,8 +4,8 @@ The five files that carry the importer's pipeline. `lib/PdfImporter.js` is the c
 in `PdfImporter._internal`, `fromArrayBuffer`, structure tree, Kelk's own source, Markdown); each file here adds
 its methods to `PdfImporter.prototype` with `Object.assign`. Plain scripts, no build step, work from `file://`.
 
-Load order, after pdf.js and `MarkdownImporter.js`: `lib/PdfImporter.js`, then `extract`, `lines`, `regions`,
-`order`, `blocks` (`PdfImporter.PARTS`). The rules and why each is as it is: [`../PDFIMPORT.md`](../PDFIMPORT.md);
+Load order, after pdf.js and `MarkdownImporter.js`: `lib/PdfImporter.js`, then `thresholds`, `calibration`,
+`extract`, `lines`, `regions`, `order`, `blocks` (`PdfImporter.PARTS`; the app loads them on the first PDF import). The rules and why each is as it is: [`../PDFIMPORT.md`](../PDFIMPORT.md);
 the stage list is in the header of `lib/PdfImporter.js`.
 
 The tables list every method defined in a file, in pipeline order, with its callers and what it does. A step
@@ -14,6 +14,24 @@ the repairs, `_classifyFonts`, then `_layout`, then `_toHtml`.
 
 Rule: every function is at most 150 lines (ESLint `max-lines-per-function`, `eslint.config.js`). A long method is
 split into steps that take an explicit parameter object, not into closures over its locals.
+
+## thresholds.js and calibration.js — the registry, rule telemetry, the document's measures (P3.2)
+
+Loaded right after the core, before `extract.js`. Every layout literal of the five parts is an entry of
+`PdfImporter._thresholds`, defined at the top of the part that reads it with `PdfImporter._defineThresholds`.
+
+| Method | Called from | Step |
+|---|---|---|
+| `_t` | every part | A threshold by name for a ctx (a page, a line, nothing): its default, or — once its entry is switched on — the calibrated value when there are enough samples |
+| `_fire` | every part | Count a rule that changed the output, with its page (`r.rules`) |
+| `_rulesStart` | `fromArrayBuffer` | Reset the counts of an import |
+| `_rulesFinish` | `fromArrayBuffer` | Write `r.rules` and, with `debug`, `r.calibration` (the measures and every threshold as resolved) |
+| `_calibrate` | `fromArrayBuffer` | The document's measures after extraction: body, fonts, gaps, steps, columns, tracking, per page; frozen, with sample counts |
+
+Helpers that hold a long step's threshold reads in one object (so the step stays ≤ 150 lines): `_opConsts`
+(extract.js, the operator walk, once per page), `_ordBoxK`, `_ordXyK`, `_ordLeafK` (order.js: `_pbBoxBlocks`,
+`_xyTests` / `_xyRegions`, `_rowsLeaf`), `_blkBreakK` (blocks.js `_lineBreaks`); `_blkFireBreak` (blocks.js)
+counts the reasons a paragraph group was opened.
 
 ## extract.js — 1. extraction and Unicode repairs, 2. fonts (PDFIMPORT.md §4, §5)
 

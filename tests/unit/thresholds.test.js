@@ -62,3 +62,12 @@ test('P3.2: _fire counts per rule with its pages; _rulesFinish writes r.rules, a
   assert.deepEqual(d.calibration.thresholds.wordGapEm, { value: 0.45, def: 0.45, unit: 'em', from: 'def' });
   assert.equal(d.calibration.thresholds.checkboxMinPt.from, 'fixed');
 });
+
+test('P3.2: a line as ctx resolves to its page, not its list number', function () {
+  const imp = PdfImporter.create();
+  PdfImporter._defineThresholds({ zzPageProbe: { def: 1, unit: 'em', used: ['test'], on: true, calib: function (c, page) { return page; }, n: function () { return 99; } } });
+  imp._cal = { regions: {} };
+  assert.equal(imp._t('zzPageProbe', { num: 1, page: 2 }), 2);
+  assert.equal(imp._t('zzPageProbe', { p: { num: 3 } }), 3);
+  assert.equal(imp._t('zzPageProbe', { num: 4 }), 4);
+});

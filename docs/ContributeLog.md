@@ -711,9 +711,11 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 23 | P3.2 registry and telemetry in `blocks.js`: 165 thresholds (`blk…`, 5 fixed votes and shares) at 176 call sites; 94 rules (67 fire on the corpus), the paragraph-break reasons counted; byte-identical. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 10 | P3.2 parts joined: the five files' registries together (1,007 thresholds, 16 fixed; every name read is defined), seed references corrected, lint 0 errors. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 8 | PDF importer loaded on demand (the importer part of P5.1, taken forward in P3.1 because the split alone took startup to 2,006,240 bytes, over the 1,990,000 budget): `libs.pdfimport` in `scripts/config.js` loads `lib/PdfImporter.js` and its parts with `<script>` tags on the first PDF import, after pdf.js; `K.libs.need` counts a several-file library as loaded only when all its files ran and finishes a half-done load; 3 unit tests; PDF import under the CSP on `file://` and http checked. |
+| 1405-08-12 | 2.0-rc1 | Zarrabi | 25 | Review of the P3.2 diff: the full import result compared on corpus, fuzz dev, held-out and meta (0 differ); every `_t` read put back as its default and compared token by token with the base (617 hunks exact, 194 read); names against their methods, units, registry mechanics, calibration statistics against the importer's own body and leading, timing (+3–4 %), the lazy loader with two imports at once, `rules.js` and the gate note. |
+| 1405-08-12 | 2.0-rc1 | Zarrabi | 8 | P3.2 review findings applied: `rules.js` finds rule names chosen by a ternary (344 → 377), `r.rules` also on Kelk's own-source path, a line as ctx resolves to its page (not its list number) with a unit test, the registry header says extraction entries cannot calibrate, the function map lists the registry, calibration and the new helpers; calibration findings (the word-gap seed, body and leading against the importer's own) handed to P3.3. |
 
 <!-- generated:totals -->
-**Entries: 125 · Total: 1663 min (27.72 hours) — Zarrabi 1663 min (118 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 127 · Total: 1696 min (28.27 hours) — Zarrabi 1696 min (120 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
