@@ -1,3 +1,0 @@
-#!/bin/sh
-# ContributeLog up to date and one new Change History row by this contributor (CLAUDE.md -> Automation).
-exec node .claude/scripts/contributelog.mjs pre-commit

@@ -3,6 +3,45 @@
 Open work and backlog only — what is done lives in the code, `lib/README.md`, `lib/LATEX.md`,
 `lib/PDFIMPORT.md` and the release notes (`CHANGELOG.md`: 2.0, the first with the PDF import).
 
+## Next — priorities after 2.0
+
+From the review of the 2.0 tree (the CI, lab gate, security, storage, builder-bug and i18n work is done and in 2.0).
+Work in progress on the importer's structure (P3.1–P4.3) waits on the `dev/*` branches, not yet reviewed.
+
+**High (2.1)**
+
+- PDF import: a page's `/Rotate` is not applied — content set upright by `/Rotate` (Word landscape pages, upside-down
+  scans) reads as turned text (metamorphic `rotate90` / `rotate180` about −82 on every seed)
+- PDF import, right to left: RTL fuzz files score well below English ones (RTL ≈ 77–81 against LTR ≈ 92–93; tables and
+  quotes weakest, then `zwnj`); LibreOffice-path RTL files lose brackets (mirrored), lists and tables
+- PDF import: real Word / Excel / PowerPoint / Microsoft Print to PDF files in the lab instead of imitations
+  (own documents printed on Windows; closes «Producers still to test» below)
+- PDF import: one import report (per page: what was read, what may be wrong) instead of at most four toasts, and a
+  fallback (simplified layout → plain text) where the quality flags fire
+- Startup: about 2 MB of JS / CSS loads before the first paint — load the builders and the importer on first use;
+  drop the unused `vendor/lucide.min_1.48.0.js` and the duplicate highlight.js stylesheet
+- Release: a build script with an include list (two zips: the app, and the app with `tests/pdf-lab`), and GitHub Pages
+  served from that set rather than from the whole repository
+
+**Medium (2.2)**
+
+- PDF import: thresholds measured from the document (a calibration object and one registry) instead of about 400 bare
+  numbers in points; the long functions (`_pageBlocks` 910 lines, `_lines` 607, `_extractPage` 523) split along the
+  pipeline; a diagonal watermark kept out of the text; thresholds that break when a page is scaled
+- Text kept safe: images and text in IndexedDB instead of `localStorage` (≈ 5 MB), and recovery snapshots (Clear and a
+  crash can be undone after a reload)
+- Accessibility and editor: Tab no longer traps the keyboard in the editor; quieter statistics for screen readers;
+  find / replace; print stylesheet; automatic theme from the system
+- Builders: shared helpers in one place (≈ 150 lines copied between builders, ≈ 1,400 lines of parallel per-feature code)
+- Security: an inline `style` (`position: fixed`) can still overlay the preview pane; vendor files with checksums
+- Docs: `lib/PDFIMPORT.md` (155 KB) split with a table of contents; the lab described in one place
+
+**Optional, later**
+
+- A layout model as an optional download (http(s) only, never from `file://`), as a second opinion on headings and tables
+- OCR for scanned PDFs (tesseract.js, Persian / Arabic / English), on demand
+- Fifty hand-written reference Markdown files (20 fa / 10 ar / 20 en) and a held-out set that rotates
+
 ## Backlog
 
 ### Formulas

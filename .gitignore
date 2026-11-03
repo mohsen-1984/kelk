@@ -1,13 +1,11 @@
-# Claude Code: personal permissions and machine-local state
-.claude/settings.local.json
+# Claude Code: local settings and agent worktrees
+.claude/
+CLAUDE.local.md
 __pycache__/
 
 # Private real-world PDFs and other private material: never committed
 tests/pdf-lab/real/
 private/
 
-# Dev tooling installs (plan P0.4 adds package.json)
+# Dev tooling installs (package.json)
 node_modules/
-
-# Claude Code agent worktrees (local only)
-.claude/worktrees/

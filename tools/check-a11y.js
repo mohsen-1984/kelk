@@ -6,7 +6,7 @@
  *
  * - The page is served by a static http server started here (Node `http`, a random local port), as GitHub Pages
  *   serves it; the interface language and theme are the stored page settings (localStorage "kelk.ui", written
- *   before any script of the page runs — as docs/reports/P1.4/screenshots.js does).
+ *   before any script of the page runs).
  * - axe is injected with page.evaluate(<axe source>): Playwright evaluates through the DevTools protocol, which the
  *   page's Content-Security-Policy (`script-src 'self'`) does not govern, so the page is checked under its real
  *   policy. (page.addScriptTag({content}) would be an inline <script>, refused by that policy; `bypassCSP: true`

@@ -3,8 +3,7 @@
 # tools/check-i18n.js; since P1.4) and the app's unit tests (npm test: tests/unit, Node's test runner + jsdom;
 # since P1.1). A workflow of its own, not a job in pdf-lab.yml: that
 # one runs only when the lab's paths change, this one on any change, and a lint failure never hides the lab's
-# results. Prettier's format check is not here — .prettierrc encodes the style of the tree, but the tree is not
-# formatted yet (plan P0.4).
+# results. No formatter check: the tree keeps its own hand-written style.
 #
 # Same conventions as pdf-lab.yml: actions pinned to commit SHAs (the tag in the comment), read-only token,
 # every step under bash -euo pipefail with its output teed to $RUNNER_TEMP/logs/<step>.log and uploaded.
