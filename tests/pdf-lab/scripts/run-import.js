@@ -29,9 +29,10 @@ const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
   page.on('pageerror', (e) => errors.push(String(e)));
   await page.goto(fileUrl(KELK + '/tools/pdf-lab.html'));
   // (each file read where it is: a name the groups would place elsewhere is still found)
-  // the held-out real-producer documents (heldout.js): only with --real-heldout, and then only they
+  // the PDFs of the held-out documents, wherever they lie (heldout.js, env.js heldSplit): only with --real-heldout,
+  // and then only they
   const pdfs = require('./env.js').labPdfs();
-  const split = require('./heldout.js').splitRealPdfs(pdfs, (n) => require('./env.js').pdfGroup(n) === 'real-producers');
+  const split = require('./env.js').heldSplit();
   const held = new Set(split.heldout.map((x) => x.name));
   const where = {}; pdfs.forEach((x) => { if (held.has(x.name) === realHeldout) where[x.name] = x.file; });
   const files = Object.keys(where).sort().filter((f) => !filter || filter.test(f));
@@ -88,7 +89,6 @@ const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
     row.pic = +r.pic.toFixed(4);                               // text under a cropped figure (r.quality): should be 0
     row.mix = mix; row.figs = figs;                            // lines with a picture and words (should be 0); pictures
     rows.push(row);
-    if (realHeldout) process.stdout.write('.');
   }
   if (realHeldout) {
     // the mean only (a crash counts 0, as in the fuzz): the gate compares it (TOL 1), nothing else of these files is
@@ -98,12 +98,14 @@ const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
       const v = rows.map((r) => (r.error ? (k === 'total' ? 0 : undefined) : r[k])).filter((x) => typeof x === 'number');
       return v.length ? +(v.reduce((a, b) => a + b, 0) / v.length).toFixed(4) : null;
     };
-    const res = { at: new Date().toISOString(), n: rows.length, errors: errs, docs: split.docs.heldout, mean: { total: mean('total'), rtl: mean('rtl') } };
+    // files: the sorted names of the PDFs read (public, as the documents are: the gate compares like with like)
+    const res = { at: new Date().toISOString(), n: rows.length, errors: errs, docs: split.docs.heldout, files: files.slice().sort(),
+                  mean: { total: mean('total'), rtl: mean('rtl') } };
     const dir = path.join(OUT, 'real-heldout');
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(dir, '_scores.json'), JSON.stringify(res, null, 1));
     const p1 = (x) => (x === null ? '-' : (100 * x).toFixed(1));
-    console.log('\nreal-producer held-out — ' + res.n + ' PDFs of ' + res.docs.length + ' documents: mean total ' + p1(res.mean.total) +
+    console.log('real-producer held-out — ' + res.n + ' PDFs of ' + res.docs.length + ' documents: mean total ' + p1(res.mean.total) +
       (res.mean.rtl === null ? '' : ' · rtl column ' + p1(res.mean.rtl)) + (errs ? ' · ' + errs + ' crash(es)' : '') + '\n(means only — docs/HELDOUT.md)');
     if (errors.length) console.log('page errors:', errors.length);
     await browser.close();

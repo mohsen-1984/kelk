@@ -155,7 +155,7 @@ them to `pdf/` with a `--<doc>` suffix to score them, or to any folder for `run-
 
 ```sh
 node scripts/run-import.js [filter]   # import pdf/*/*.pdf, score against corpus/<doc>.md, write out/ (held-out real documents left out)
-node scripts/run-import.js --real-heldout   # the held-out real-producer documents: their mean only (docs/HELDOUT.md)
+node scripts/run-import.js --real-heldout   # the PDFs of the held-out documents, wherever they lie: their mean only (docs/HELDOUT.md)
 node scripts/heldout.js               # the real-producer split: the documents on each side
 node scripts/roundtrip.js             # Kelk's own round trip: tests/builder-suite.html, md → PDF → md
 node scripts/math-roundtrip.js        # formulas through Kelk and back: every case of tests/math-cases.js, en and fa (76 checks)
@@ -210,7 +210,7 @@ sets measure that gap.
 node scripts/make-fuzz.js dev        # 100 PDFs: fuzz/dev/      (seeds 1–100)
 node scripts/make-fuzz.js heldout    # 100 PDFs: fuzz/heldout/  (seeds HELDOUT_BASE…: 100001–100100 until the first rotation)
 node scripts/run-fuzz.js dev         # mean, per direction, scores per style value, weakest files, what moved
-node scripts/run-fuzz.js heldout     # mean, per direction and scores per style value only
+node scripts/run-fuzz.js heldout     # mean, per direction and scores per style value only (no Markdown, no per-file rows written)
 ```
 
 Each sample is one corpus document (round robin, so every document is equally present: since generator 4
@@ -249,7 +249,7 @@ what you see. `heldout` is for judgement: only its means and its per-value table
 (`run-fuzz.js heldout` hides file names; `--show` prints them). A rule written after looking at a
 held-out file has turned that split into a second dev set, and nothing measures generalisation any more
 — then draw a new held-out split with other seeds (the rotation of [`docs/HELDOUT.md`](../../docs/HELDOUT.md):
-`--show` on held-out is logged to `LAB_OUT/heldout-opened.log`, and `make-fuzz.js` `HELDOUT_ROTATION` moves the
+`--show` on held-out is logged to `docs/reports/heldout-opened.log` (committed), and `make-fuzz.js` `HELDOUT_ROTATION` moves the
 seed base up by 100000). A change is good when dev improves **and**
 held-out does not drop.
 

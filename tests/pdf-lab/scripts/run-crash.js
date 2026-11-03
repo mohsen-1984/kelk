@@ -1,21 +1,30 @@
 // Stability sweep: import every PDF under a folder (subfolders too; default: the lab's pdf/); report errors,
 // timeouts and slow files. Exit 1 on any error or timeout (CI); files over 25 MB are skipped, slow ones only listed.
-//   node scripts/run-crash.js [dir] [kelk root] [timeout ms]
+//   node scripts/run-crash.js [dir] [kelk root] [timeout ms] [--show-held]
+// Held-out files (fuzz/heldout, the PDFs of a held-out real document: env.js, docs/HELDOUT.md) are imported like the
+// others but kept nameless: in the totals, their crashes, timeouts and slow imports as counts only, no row of theirs
+// in crash-*.json. --show-held prints and writes them by name — and logs the opening (env.js openHeld).
 const fs = require('fs'), path = require('path');
 const env = require('./env.js');
 const { chromium } = env.req('playwright');
 (async () => {
-  const [dir = path.join(env.LAB, 'pdf'), root = env.KELK, tmo = '45000'] = process.argv.slice(2);
+  const argv = process.argv.slice(2), showHeld = argv.includes('--show-held');
+  const [dir = path.join(env.LAB, 'pdf'), root = env.KELK, tmo = '45000'] = argv.filter((a) => a !== '--show-held');
   const files = env.labPdfs(dir);
   if (!files.length) throw new Error('no PDFs under ' + dir);
+  const heldDocs = new Set(env.heldSplit().docs.heldout), docOf = require('./heldout.js').docOf;
+  const isHeld = (x) => env.isFuzzHeld(x.file) || heldDocs.has(docOf(x.name));
+  if (showHeld) env.openHeld(files.filter(isHeld).map((x) => x.file), 'run-crash.js --show-held');
+  const hidden = { n: 0, errors: 0, timeouts: 0, slow: 0, big: 0, ms: 0 };
   const browser = await chromium.launch();
   let page = null;
   const fresh = async () => { if (page) await page.close().catch(() => {}); page = await browser.newPage(); await page.goto(env.fileUrl(root + '/tools/pdf-lab.html')); };
   await fresh();
   const out = [];
-  for (const { name: f, file } of files) {
+  for (const x of files) {
+    const { name: f, file } = x, anon = !showHeld && isHeld(x);
     const buf = fs.readFileSync(file);
-    if (buf.length > 25e6) { out.push({ f, skip: 'big' }); continue; }
+    if (buf.length > 25e6) { if (anon) hidden.big++; else out.push({ f, skip: 'big' }); continue; }
     const t0 = Date.now();
     let timer;
     const r = await Promise.race([
@@ -29,13 +38,24 @@ const { chromium } = env.req('playwright');
     ]);
     clearTimeout(timer);
     const ms = Date.now() - t0;
-    out.push(Object.assign({ f, ms }, r));
     if (r.timeout || /evaluate:/.test(r.error || '')) await fresh();
+    if (anon) {
+      hidden.n++; hidden.ms += ms;
+      if (r.error) hidden.errors++;
+      if (r.timeout) hidden.timeouts++;
+      if (ms > 8000) hidden.slow++;
+      continue;
+    }
+    out.push(Object.assign({ f, ms }, r));
     if (r.error || r.timeout || ms > 8000) console.log(f, ms + 'ms', r.timeout ? 'TIMEOUT' : '', r.error || '', r.stack || '');
   }
   fs.writeFileSync(path.join(env.OUT, 'crash-' + path.basename(root) + '-' + path.basename(dir) + '.json'), JSON.stringify(out, null, 1));
   const err = out.filter((x) => x.error), to = out.filter((x) => x.timeout);
-  console.log('files', out.length, 'errors', err.length, 'timeouts', to.length, 'total s', Math.round(out.reduce((a, x) => a + (x.ms || 0), 0) / 1000));
-  if (err.length || to.length) process.exitCode = 1;
+  console.log('files', out.length + hidden.n + hidden.big, 'errors', err.length + hidden.errors, 'timeouts', to.length + hidden.timeouts,
+    'total s', Math.round((out.reduce((a, x) => a + (x.ms || 0), 0) + hidden.ms) / 1000));
+  if (hidden.n || hidden.big) console.log('  of which held out (nameless, docs/HELDOUT.md): ' + (hidden.n + hidden.big) + ' files, ' + hidden.errors + ' errors, ' +
+    hidden.timeouts + ' timeouts, ' + hidden.slow + ' slow' + (hidden.big ? ', ' + hidden.big + ' skipped (big)' : '') +
+    (hidden.errors || hidden.timeouts ? ' — --show-held names them, and logs the opening' : ''));
+  if (err.length || to.length || hidden.errors || hidden.timeouts) process.exitCode = 1;
   await browser.close();
 })().catch((e) => { console.error(e); process.exitCode = 1; process.exit(); });

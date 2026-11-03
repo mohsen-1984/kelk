@@ -32,6 +32,7 @@ const filter = filt ? new RegExp(filt, 'i') : null;
 const list = (d, rel) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? list(path.join(d, e.name), path.join(rel, e.name))
   : /\.pdf$/i.test(e.name) ? [path.join(rel, e.name)] : []);
 const files = list(dir, '').filter((f) => !filter || filter.test(f)).sort();
+require('./env.js').openHeld(files.map((f) => path.join(dir, f)), 'snapshot.js');   // held-out lab files given: logged (docs/HELDOUT.md)
 const key = (f) => f.replace(/\.pdf$/i, '').replace(/[\\/]/g, '__');
 const AR = /[؀-ۿ]/;
 

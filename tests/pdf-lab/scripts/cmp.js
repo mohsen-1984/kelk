@@ -4,6 +4,7 @@ const {chromium} = require('./env.js').req('playwright');
 (async () => {
   const [A, B, ...dirs] = process.argv.slice(2);
   const files = dirs.flatMap((d) => require('./env.js').labPdfs(d).map((x) => x.file));
+  require('./env.js').openHeld(files, 'cmp.js');        // held-out files opened: logged (docs/HELDOUT.md)
   const b = await chromium.launch();
   const run = async (lib, file) => {
     const page = await b.newPage();
