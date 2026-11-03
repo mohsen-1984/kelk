@@ -235,7 +235,7 @@ test('Kelk.libs.need("pdfimport") loads each file once, in order; a load that fa
   };
   await assert.rejects(K.libs.need('pdfimport'), /offline/);
   assert.equal(typeof w.PdfImporter, 'function', 'the core ran');
-  assert.equal(typeof w.PdfImporter.prototype._calibrate, 'function', 'the parts before the failure ran');
+  assert.equal(typeof w.PdfImporter.prototype._lines, 'function', 'the parts before the failure ran');
   const P = await K.libs.need('pdfimport');
   assert.equal(P, w.PdfImporter);
   const appended = function () {
