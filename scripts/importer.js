@@ -144,15 +144,16 @@
     /**
      * A PDF → { md, report, bytes }, page by page on the task's bar; Cancel stops it at the next page. report: what
      * the import could not read in full (Kelk.importReport.fromResult — shown by Kelk.ui.report once the text is
-     * in, not as toasts); bytes: a copy of the file, for "Re-import in safe mode" (pdf.js may take the buffer it
-     * reads). o.mode: PdfImporter's mode ('safe': headings and paragraphs only; default its own, 'auto').
+     * in, not as toasts); bytes: a copy of the file for "Re-import in safe mode" (pdf.js may take the buffer it
+     * reads), only with o.keepBytes (a PDF imported on its own: the one case with that button), else null.
+     * o.mode: PdfImporter's mode ('safe': headings and paragraphs only; default its own, 'auto').
      */
     async function fromPdf(file, name, t, o) {
         const mode = o && o.mode;
         await K.libs.need('pdfjs');                  // loaded on the first .pdf import
         await K.libs.need('pdfimport');              // PdfImporter and its parts, after pdf.js (as its header says)
         const set = K.store.getUi('importer'), base = name.replace(/\.[^.]+$/, '');
-        const buf = await readBuffer(file), bytes = new Uint8Array(buf.slice(0));
+        const buf = await readBuffer(file), bytes = o && o.keepBytes ? new Uint8Array(buf.slice(0)) : null;
         // the import's messages come once, at its end (K.ui.batch), and its pictures are stored once
         return K.ui.batch(async function () {
             K.images.hold();
@@ -188,6 +189,14 @@
         });
     }
 
+    /** "Re-import in safe mode" of a PDF imported on its own: the action, the only holder of the file's bytes */
+    function safeAction(bytes, name) {
+        return function () {
+            const b = bytes; bytes = null;
+            return b ? K.importer.fromFiles([new File([b], name, { type: 'application/pdf' })], { mode: 'safe' }) : undefined;
+        };
+    }
+
     K.importer = {
         /** Paste event data → Markdown, or null to let a plain-text paste happen. */
         fromPaste: function (dt) {
@@ -212,12 +221,17 @@
          * the text gives them, relative to the file that names them. The page waits in a dialog with a progress
          * bar (Kelk.ui.task): Cancel stops the import, and the text stays as it was.
          * Once the text is in, the PDFs' reports (Kelk.ui.report): the panel opens when a PDF was not read in full,
-         * and a clean import closes an older one. One PDF on its own can be re-imported in safe mode from there
-         * (its bytes kept by the panel). o.mode: the PDF importer's mode ('safe').
+         * and a clean import closes an older one. One PDF on its own can be re-imported in safe mode from there:
+         * its bytes are copied for that import only, kept while its panel is open, and let go when the panel
+         * closes, when nothing was worth a panel, and when the next import starts. o.mode: the PDF importer's mode
+         * ('safe').
          */
         fromFiles: async function (files, o) {
             files = Array.from(files || []).filter(Boolean);
             if (!files.length) return;
+            K.ui.report.release();                           // the last report's kept bytes go now
+            const keepBytes = files.length === 1 && K.config.extensions.pdf.indexOf(ext(files[0].name)) >= 0;
+            const co = Object.assign({}, o, { keepBytes: keepBytes });
             const maxMB = +K.store.getUi('importer.maxMB') || K.config.maxFileMB;
             const big = files.filter(function (f) { return f.size > maxMB * 1024 * 1024; });
             big.forEach(function (f) { K.ui.toast(K.i18n.t('tooLarge', maxMB) + ': ' + f.name, 'error'); });
@@ -241,7 +255,7 @@
                         const d = docs[i];
                         t.label(docs.length > 1 ? K.i18n.t('taskImportN', d.name, i + 1, docs.length) : K.i18n.t('taskImport', d.name));
                         t.progress(0, 0, '');
-                        const r = await convert(d.file, d.name, t, o);
+                        const r = await convert(d.file, d.name, t, co);
                         if (r == null) continue;
                         out.push({ name: d.name, md: await placeImages(r.md, d.path, pics), converted: r.converted, report: r.report, bytes: r.bytes });
                     }
@@ -264,11 +278,13 @@
             K.ui.toast(parts.length > 1 ? K.i18n.t('loadedN', parts.length) : K.i18n.t('loaded', name));
             const reports = parts.filter(function (p) { return p.report; });
             const one = parts.length === 1 && reports.length === 1 ? parts[0] : null;
+            // the bytes: held by the safe-mode action only (the panel's), not by parts, the task's promise or this
+            // function's scope (safeAction: a closure of its own — one here would share the scope with the task's)
+            const onSafe = one && one.bytes ? safeAction(one.bytes, one.name) : null;
+            parts.forEach(function (p) { p.bytes = null; });
             K.ui.report(one ? one.report : reports.map(function (p) { return { name: p.name, report: p.report }; }), {
                 name: one ? one.name : '',
-                onSafe: one && one.bytes ? function () {
-                    return K.importer.fromFiles([new File([one.bytes], one.name, { type: 'application/pdf' })], { mode: 'safe' });
-                } : null
+                onSafe: onSafe
             });
         },
 
