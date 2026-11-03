@@ -19,7 +19,7 @@ const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
   // (each file read where it is: a name the groups would place elsewhere is still found)
   const where = {}; require('./env.js').labPdfs().forEach((x) => { where[x.name] = x.file; });
   const files = Object.keys(where).sort().filter((f) => !filter || filter.test(f));
-  const rows = [];
+  const rows = [], rules = {};      // r.rules per file (lib/pdfimport/thresholds.js) → _rules.json, read by rules.js and gate.js
   for (const f of files) {
     const b64 = fs.readFileSync(where[f]).toString('base64');
     const t0 = Date.now();
@@ -31,7 +31,7 @@ const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
         const r = await PdfImporter.create({ images: 'markdown', onImage: (src, o) => 'img-' + o.page + '-' + o.index, asciiNumbers: false, persianLetters: false }).fromArrayBuffer(u.buffer);
         const q = (r.quality && r.quality.pages) || [];
         const cov = q.reduce((a, x) => [a[0] + x.covered, a[1] + x.glyphs], [0, 0]);
-        return { markdown: r.markdown, html: r.html, messages: r.messages, pic: cov[1] ? cov[0] / cov[1] : 0 };
+        return { markdown: r.markdown, html: r.html, messages: r.messages, pic: cov[1] ? cov[0] / cov[1] : 0, rules: r.rules };
       } catch (e) { return { error: e.stack || String(e) }; }
     }, b64);
     const ms = Date.now() - t0;
@@ -39,6 +39,7 @@ const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
     if (r.error) { rows.push({ name, error: r.error.split('\n')[0] }); console.log(name, 'ERROR', r.error.slice(0, 300)); continue; }
     // text wins over pictures: a Markdown line holding a picture and words is counted (mix, should be 0); the
     // pictures are taken out before scoring — the corpus Markdown has none
+    if (r.rules) rules[name] = r.rules;
     const IMG = /!\[[^\]]*\]\(img-[\d-]+\)/g;
     const lines = r.markdown.split('\n');
     const figs = lines.reduce((n, l) => n + (l.match(IMG) || []).length, 0);
@@ -77,6 +78,7 @@ const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
     console.log(r.name.padEnd(46), pct(r.recall), pct(r.order), pct(r.headings), pct(r.lists), pct(r.tables), pct(r.code), pct(r.quotes), pct(r.total), String(r.markup).padStart(4), pct(r.rtl), pct(r.pic), String(r.mix).padStart(3), String(r.figs).padStart(4), pct(r.links), r.ms + 'ms');
   });
   fs.writeFileSync(path.join(OUT, '_scores.json'), JSON.stringify(rows, null, 1));
+  fs.writeFileSync(path.join(OUT, '_rules.json'), JSON.stringify(rules, null, 1));
   if (errors.length) console.log('page errors:', errors.slice(0, 5));
   await browser.close();
   if (rows.some((r) => r.error)) process.exitCode = 1;       // a crash fails the run (scores are the gate's: gate.js)

@@ -52,6 +52,8 @@ Three decisions shape everything:
 | File | Role |
 |---|---|
 | `lib/PdfImporter.js` | the core: options, shared helpers (bidi, Arabic, font programs, provenance), the pipeline (`fromArrayBuffer`), the structure tree, Kelk's own source, Markdown |
+| `lib/pdfimport/thresholds.js` | the threshold registry (`_t`), rule telemetry (`_fire` → `r.rules`; `options.debug` → `r.calibration`) |
+| `lib/pdfimport/calibration.js` | `_calibrate`: the document's own measures (body size, leading, word / letter gaps, columns, tracking), frozen |
 | `lib/pdfimport/extract.js` | 1. extraction and Unicode repairs, 2. fonts (§4, §5) |
 | `lib/pdfimport/lines.js` | 3. lines, segments, logical order; 3.5 page furniture (§6, §6a) |
 | `lib/pdfimport/regions.js` | 4. the page driver (`_layout`), ruled tables, code boxes, figures (§7) |

@@ -26,6 +26,8 @@
 //           total and the rtl column's mean over the right-to-left files (an old baseline without them: a note). Means only — per file
 //           would read held-out files one by one, and per style value the groups are too small to
 //           tell a change from noise (fewer than 15 files in most)
+//   rules   (a note, never a failure) a rule that fired on a corpus file and no longer does on it (rules.js,
+//           out/_rules.json; the baseline keeps each file's fired rules from --update)
 //   meta    a crash; a file of a "same" transform not byte-identical to its reference outside run-meta.js KNOWN (or
 //           listed but under its floor, or crashing); a "same" file the compared side has and this run lacks;
 //           or a transform's mean total, over the seeds both runs have, dropping more than TOL_MEAN (TOL_HARD
@@ -41,6 +43,7 @@
 // part; --against (two importers on the very same PDFs) needs no such care — that is what CI uses.
 const fs = require('fs'), path = require('path');
 const { LAB, OUT, labPdfs } = require('./env.js');
+const rulesLib = require('./rules.js');
 
 const TOL_FILE = 0.005, TOL_MEAN = 0.010, TOL_HARD = 0.030;      // 0.5, 1 and 3 points of 100
 const METRICS = ['recall', 'order', 'headings', 'lists', 'tables', 'code', 'quotes', 'total'];
@@ -61,7 +64,7 @@ const read = (f) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } cat
 // one run, from its output folder, in the baseline's shape
 function load(dir) {
   const corpus = read(path.join(dir, '_scores.json'));
-  const run = { corpus: null, fuzz: {} };
+  const run = { corpus: null, fuzz: {}, rules: rulesLib.fired(dir) };
   if (corpus) {
     run.corpus = {};
     corpus.forEach((r) => {
@@ -145,6 +148,11 @@ if (base && base.corpus) {
 Object.keys(cur.corpus).forEach((n) => { if (cur.corpus[n].error && !(base && base.corpus && base.corpus[n] && base.corpus[n].error)) {
   if (!fails.some((f) => f.indexOf(n) >= 0)) fails.push('corpus: ' + n + ' crashes — ' + cur.corpus[n].error);
 } });
+
+// ── rule telemetry: a rule that fired on a corpus file and no longer does — a note ──
+const lostRules = rulesLib.lost(base && base.rules, cur.rules);
+if (lostRules.length) notes.push('rules: fired on a corpus file before, not now (scripts/rules.js --against): ' +
+  lostRules.slice(0, 10).map(([n, rs]) => n + ' ' + rs.join(', ')).join('; ') + (lostRules.length > 10 ? ' … (' + lostRules.length + ' files)' : ''));
 
 // ── the fuzz splits: means only ────────────────────────────────────────
 const fuzzRows = [], dirRows = [];
@@ -298,6 +306,8 @@ if (opt('--update')) {
   const out = { written: new Date().toISOString(), note: 'scripts/gate.js --update; the fuzz means hold only for their env',
                 corpus: partial ? Object.assign({}, old.corpus || {}, cur.corpus) : cur.corpus, fuzz: {} };
   Object.keys(cur.fuzz).forEach((s) => { out.fuzz[s] = Object.assign({}, cur.fuzz[s]); delete out.fuzz[s].files; });
+  // each corpus file's fired rules (a run without _rules.json keeps the old ones)
+  if (cur.rules) out.rules = partial ? Object.assign({}, old.rules || {}, cur.rules) : cur.rules; else if (old.rules) out.rules = old.rules;
   // parts this run lacks (no wkhtmltopdf / qpdf here) stay as they were
   const kept = [];
   ['dev', 'heldout'].forEach((s) => { if (!out.fuzz[s] && old.fuzz && old.fuzz[s]) { out.fuzz[s] = old.fuzz[s]; kept.push('fuzz/' + s); } });

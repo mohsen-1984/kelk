@@ -136,7 +136,8 @@
             pdfjs: { src: ['vendor/pdfjs/pdf_6.4.299.js', 'vendor/pdfjs/pdf.worker_6.4.299.js'], global: 'pdfjsLib' },
             // the PDF importer: its core, then its parts in PdfImporter.PARTS order (tests/unit/app.test.js checks it)
             pdfimport: {
-                src: ['lib/PdfImporter.js', 'lib/pdfimport/extract.js', 'lib/pdfimport/lines.js', 'lib/pdfimport/regions.js',
+                src: ['lib/PdfImporter.js', 'lib/pdfimport/thresholds.js', 'lib/pdfimport/calibration.js',
+                    'lib/pdfimport/extract.js', 'lib/pdfimport/lines.js', 'lib/pdfimport/regions.js',
                     'lib/pdfimport/order.js', 'lib/pdfimport/blocks.js'],
                 global: 'PdfImporter'
             },
