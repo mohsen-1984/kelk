@@ -111,6 +111,7 @@
             K.ui.layout(K.store.getUi('layout'));
             K.settings.showLogo();
             K.settings.fontPack();
+            K.ui.report.refresh();                           // an open import report, in the new language
             if (showingSample) await loadSample(false); else K.preview.render();
         };
         langButtons();

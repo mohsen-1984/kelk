@@ -121,8 +121,8 @@
         }).replace(/\n{3,}$/, '\n');
     }
 
-    /** One document → { md, converted }; null when its kind is not known. */
-    async function convert(file, name, t) {
+    /** One document → { md, converted } (a PDF: and report, bytes); null when its kind is not known. */
+    async function convert(file, name, t, o) {
         const e = ext(name), X = K.config.extensions;
         if (X.markdown.indexOf(e) >= 0) return { md: await takeDataImages(await readText(file)), converted: false };
         if (X.html.indexOf(e) >= 0) return { md: importer().fromHtml(await readText(file)).markdown, converted: true };
@@ -132,44 +132,35 @@
             if (r.messages && r.messages.length) console.info('mammoth:', r.messages);
             return { md: r.markdown, converted: true };
         }
-        if (X.pdf.indexOf(e) >= 0) return { md: await fromPdf(file, name, t), converted: true };
+        if (X.pdf.indexOf(e) >= 0) return Object.assign({ converted: true }, await fromPdf(file, name, t, o));
         K.ui.toast(K.i18n.t('unsupported', e || name), 'error');
         return null;
     }
 
-    /**
-     * PdfImporter's notes (r.notes) → a toast: its message key, written in full (tools/check-i18n.js counts a
-     * computed pdf_ key as used only where it is written out), its type, and whether it names pages (pages: the
-     * importer's self-diagnosis, r.quality.flags; pageFailed: r.failedPages). An unknown note is not shown.
-     */
-    const PDF_NOTES = {
-        noText: { key: 'pdf_noText', type: 'warn' },
-        figureFailed: { key: 'pdf_figureFailed', type: 'warn' },
-        pageLimit: { key: 'pdf_pageLimit', type: 'warn' },
-        printNoLinks: { key: 'pdf_printNoLinks', type: 'info' },
-        ocrLayer: { key: 'pdf_ocrLayer', type: 'info' },
-        pageFailed: { key: 'pdf_pageFailed', type: 'warn' },
-        lostGlyphs: { key: 'pdf_lostGlyphs', type: 'warn', pages: true },
-        suspectSpaces: { key: 'pdf_suspectSpaces', type: 'warn', pages: true },
-        textInPictures: { key: 'pdf_textInPictures', type: 'warn', pages: true }
-    };
     /** PdfImporter's errors with a message of their own (err.code); others show the error's text. */
     const PDF_ERRORS = { password: 'pdf_password', invalid: 'pdf_invalid' };
     const own = function (o, k) { return Object.prototype.hasOwnProperty.call(o, k); };
 
-    /** A PDF → Markdown, page by page on the task's bar; Cancel stops it at the next page. */
-    async function fromPdf(file, name, t) {
+    /**
+     * A PDF → { md, report, bytes }, page by page on the task's bar; Cancel stops it at the next page. report: what
+     * the import could not read in full (Kelk.importReport.fromResult — shown by Kelk.ui.report once the text is
+     * in, not as toasts); bytes: a copy of the file, for "Re-import in safe mode" (pdf.js may take the buffer it
+     * reads). o.mode: PdfImporter's mode ('safe': headings and paragraphs only; default its own, 'auto').
+     */
+    async function fromPdf(file, name, t, o) {
+        const mode = o && o.mode;
         await K.libs.need('pdfjs');                  // loaded on the first .pdf import
         await K.libs.need('pdfimport');              // PdfImporter and its parts, after pdf.js (as its header says)
-        const o = K.store.getUi('importer'), base = name.replace(/\.[^.]+$/, '');
+        const set = K.store.getUi('importer'), base = name.replace(/\.[^.]+$/, '');
+        const buf = await readBuffer(file), bytes = new Uint8Array(buf.slice(0));
         // the import's messages come once, at its end (K.ui.batch), and its pictures are stored once
         return K.ui.batch(async function () {
             K.images.hold();
             try {
-                const r = await PdfImporter.create({
-                    images: o.images === 'drop' ? 'drop' : 'markdown',
-                    asciiNumbers: o.asciiNumbers !== false, persianLetters: o.persianLetters !== false,
-                    markdownImporter: { nestedTables: o.nestedTables, images: o.images, labels: labels() },
+                const opts = {
+                    images: set.images === 'drop' ? 'drop' : 'markdown',
+                    asciiNumbers: set.asciiNumbers !== false, persianLetters: set.persianLetters !== false,
+                    markdownImporter: { nestedTables: set.nestedTables, images: set.images, labels: labels() },
                     wasmBase: 'vendor/pdfjs/wasm/',
                     loadScript: K.ui.loadScript,
                     signal: t.signal,
@@ -187,17 +178,12 @@
                             return await K.images.add(new File([blob], base + '-p' + at.page + '-' + at.index + '.png', { type: 'image/png' }));
                         } catch (err) { return uri; }
                     }
-                }).fromArrayBuffer(await readBuffer(file), {
-                    onProgress: function (i, n) { t.progress(i, n, K.i18n.t('taskPage', i, n)); }
-                });
-                (r.notes || []).forEach(function (n) {
-                    if (!own(PDF_NOTES, n)) return;
-                    const note = PDF_NOTES[n];
-                    const pages = n === 'pageFailed' ? r.failedPages : note.pages ? r.quality && r.quality.flags[n] : null;
-                    K.ui.toast(K.i18n.t(note.key, pages ? K.ui.pageList(pages) : ''), note.type);
-                });
+                };
+                const hooks = { onProgress: function (i, n) { t.progress(i, n, K.i18n.t('taskPage', i, n)); } };
+                if (mode) opts.mode = hooks.mode = mode;
+                const r = await PdfImporter.create(opts).fromArrayBuffer(buf, hooks);
                 if (r.messages && r.messages.length) console.info('PdfImporter:', r.messages);
-                return r.markdown;
+                return { md: r.markdown, report: K.importReport.fromResult(r), bytes: bytes };
             } finally { K.images.flush(); }
         });
     }
@@ -225,8 +211,11 @@
          * first one) and its md, txt, html, docx and pdf files imported; its images are registered under the paths
          * the text gives them, relative to the file that names them. The page waits in a dialog with a progress
          * bar (Kelk.ui.task): Cancel stops the import, and the text stays as it was.
+         * Once the text is in, the PDFs' reports (Kelk.ui.report): the panel opens when a PDF was not read in full,
+         * and a clean import closes an older one. One PDF on its own can be re-imported in safe mode from there
+         * (its bytes kept by the panel). o.mode: the PDF importer's mode ('safe').
          */
-        fromFiles: async function (files) {
+        fromFiles: async function (files, o) {
             files = Array.from(files || []).filter(Boolean);
             if (!files.length) return;
             const maxMB = +K.store.getUi('importer.maxMB') || K.config.maxFileMB;
@@ -252,9 +241,9 @@
                         const d = docs[i];
                         t.label(docs.length > 1 ? K.i18n.t('taskImportN', d.name, i + 1, docs.length) : K.i18n.t('taskImport', d.name));
                         t.progress(0, 0, '');
-                        const r = await convert(d.file, d.name, t);
+                        const r = await convert(d.file, d.name, t, o);
                         if (r == null) continue;
-                        out.push({ name: d.name, md: await placeImages(r.md, d.path, pics), converted: r.converted });
+                        out.push({ name: d.name, md: await placeImages(r.md, d.path, pics), converted: r.converted, report: r.report, bytes: r.bytes });
                     }
                     return out;
                 });
@@ -273,6 +262,14 @@
             K.editor.set(md, name);
             K.editor.markConverted(parts.some(function (p) { return p.converted; }));
             K.ui.toast(parts.length > 1 ? K.i18n.t('loadedN', parts.length) : K.i18n.t('loaded', name));
+            const reports = parts.filter(function (p) { return p.report; });
+            const one = parts.length === 1 && reports.length === 1 ? parts[0] : null;
+            K.ui.report(one ? one.report : reports.map(function (p) { return { name: p.name, report: p.report }; }), {
+                name: one ? one.name : '',
+                onSafe: one && one.bytes ? function () {
+                    return K.importer.fromFiles([new File([one.bytes], one.name, { type: 'application/pdf' })], { mode: 'safe' });
+                } : null
+            });
         },
 
         /**
