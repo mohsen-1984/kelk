@@ -1,6 +1,10 @@
 // Import every pdf/*.pdf with Kelk's PdfImporter (tools/pdf-lab.html in Chromium, from file://),
 // write out/<name>.md, and score it against corpus/<doc>.md when the file name says which (…--<doc>.pdf).
 //   node scripts/run-import.js [filter] [--mode auto|safe|full]
+//   node scripts/run-import.js --real-heldout   the held-out real-producer documents (heldout.js, docs/HELDOUT.md):
+//                                               their mean only, to out/real-heldout/_scores.json — no file name, no
+//                                               per-file score and no Markdown is printed or written
+// The held-out real-producer PDFs are left out of the normal run (and so of the corpus gate, file by file).
 // --mode: the importer's options.mode (lib/pdfimport/ladder.js; default auto). Run safe mode into a LAB_OUT of its own —
 // its scores are not the gate's (plan P3.4: safe mode on the corpus keeps words and order ≥ 70); the means are printed.
 const { pdfPath, fileUrl } = require('./env.js');
@@ -15,14 +19,21 @@ const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
   const args = process.argv.slice(2), mi = args.indexOf('--mode');
   const mode = mi >= 0 ? args.splice(mi, 2)[1] : 'auto';
   if (!/^(auto|safe|full)$/.test(mode)) throw new Error('--mode: auto, safe or full');
-  const filter = args[0] ? new RegExp(args[0]) : null;
+  const realHeldout = args.includes('--real-heldout');
+  const arg = args.find((a) => !a.startsWith('--'));
+  if (realHeldout && arg) { console.error('--real-heldout takes no filter: its files are read as one mean'); process.exit(2); }
+  const filter = arg ? new RegExp(arg) : null;
   const browser = await chromium.launch();
   const page = await browser.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(String(e)));
   await page.goto(fileUrl(KELK + '/tools/pdf-lab.html'));
   // (each file read where it is: a name the groups would place elsewhere is still found)
-  const where = {}; require('./env.js').labPdfs().forEach((x) => { where[x.name] = x.file; });
+  // the held-out real-producer documents (heldout.js): only with --real-heldout, and then only they
+  const pdfs = require('./env.js').labPdfs();
+  const split = require('./heldout.js').splitRealPdfs(pdfs, (n) => require('./env.js').pdfGroup(n) === 'real-producers');
+  const held = new Set(split.heldout.map((x) => x.name));
+  const where = {}; pdfs.forEach((x) => { if (held.has(x.name) === realHeldout) where[x.name] = x.file; });
   const files = Object.keys(where).sort().filter((f) => !filter || filter.test(f));
   const rows = [], rules = {};      // r.rules per file (lib/pdfimport/thresholds.js) → _rules.json, read by rules.js and gate.js
   for (const f of files) {
@@ -41,7 +52,7 @@ const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
     }, { b64, mode });
     const ms = Date.now() - t0;
     const name = f.replace(/\.pdf$/, '');
-    if (r.error) { rows.push({ name, error: r.error.split('\n')[0] }); console.log(name, 'ERROR', r.error.slice(0, 300)); continue; }
+    if (r.error) { rows.push({ name, error: r.error.split('\n')[0] }); if (!realHeldout) console.log(name, 'ERROR', r.error.slice(0, 300)); continue; }
     // text wins over pictures: a Markdown line holding a picture and words is counted (mix, should be 0); the
     // pictures are taken out before scoring — the corpus Markdown has none
     if (r.rules) rules[name] = r.rules;
@@ -50,7 +61,7 @@ const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
     const figs = lines.reduce((n, l) => n + (l.match(IMG) || []).length, 0);
     const mix = lines.filter((l) => /!\[[^\]]*\]\(img-/.test(l) && l.replace(IMG, '').replace(/^[\s>|*+-]*(\d+[.)])?/, '').replace(/[\s|]/g, '') !== '').length;
     const md = r.markdown.replace(IMG, '').replace(/\n[ \t]*\n([ \t]*\n)+/g, '\n\n');
-    fs.writeFileSync(path.join(OUT, name + '.md'), r.markdown); fs.writeFileSync(path.join(OUT, name + '.html'), r.html || '');
+    if (!realHeldout) { fs.writeFileSync(path.join(OUT, name + '.md'), r.markdown); fs.writeFileSync(path.join(OUT, name + '.html'), r.html || ''); }
     const m = name.match(/--([\w-]+)$/);
     const src = m && path.join(LAB, 'corpus', m[1] + '.md');
     const row = { name, ms };
@@ -77,6 +88,27 @@ const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
     row.pic = +r.pic.toFixed(4);                               // text under a cropped figure (r.quality): should be 0
     row.mix = mix; row.figs = figs;                            // lines with a picture and words (should be 0); pictures
     rows.push(row);
+    if (realHeldout) process.stdout.write('.');
+  }
+  if (realHeldout) {
+    // the mean only (a crash counts 0, as in the fuzz): the gate compares it (TOL 1), nothing else of these files is
+    // kept — a per-file score read once makes its document a dev document (docs/HELDOUT.md)
+    const errs = rows.filter((r) => r.error).length;
+    const mean = (k) => {
+      const v = rows.map((r) => (r.error ? (k === 'total' ? 0 : undefined) : r[k])).filter((x) => typeof x === 'number');
+      return v.length ? +(v.reduce((a, b) => a + b, 0) / v.length).toFixed(4) : null;
+    };
+    const res = { at: new Date().toISOString(), n: rows.length, errors: errs, docs: split.docs.heldout, mean: { total: mean('total'), rtl: mean('rtl') } };
+    const dir = path.join(OUT, 'real-heldout');
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, '_scores.json'), JSON.stringify(res, null, 1));
+    const p1 = (x) => (x === null ? '-' : (100 * x).toFixed(1));
+    console.log('\nreal-producer held-out — ' + res.n + ' PDFs of ' + res.docs.length + ' documents: mean total ' + p1(res.mean.total) +
+      (res.mean.rtl === null ? '' : ' · rtl column ' + p1(res.mean.rtl)) + (errs ? ' · ' + errs + ' crash(es)' : '') + '\n(means only — docs/HELDOUT.md)');
+    if (errors.length) console.log('page errors:', errors.length);
+    await browser.close();
+    if (errs) process.exitCode = 1;
+    return;
   }
   const pct = (x) => x === undefined ? '  -  ' : (100 * x).toFixed(1).padStart(5);
   console.log('name'.padEnd(46), 'words', 'order', ' head', ' list', ' tabl', ' code', 'quote', 'total', 'mkup', '  rtl', '  pic', 'mix', 'figs', ' lnk');

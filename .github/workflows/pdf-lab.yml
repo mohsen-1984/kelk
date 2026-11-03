@@ -5,7 +5,8 @@
 # run), or when the base importer leaves no corpus results, head is compared with baseline.json: its corpus
 # part always, its fuzz and meta parts only if the env matches — the run's summary says which comparison it made.
 # The golden files (tests/pdf-lab/golden/, golden.js) are head's, imported by both importers: compared file by file,
-# as the corpus, against base's results or baseline.json's golden section.
+# as the corpus, against base's results or baseline.json's golden section — those on a held-out real-producer PDF
+# (scripts/heldout.js) as one mean only, never a row.
 #
 # Failures are never hidden. Every step runs under bash -euo pipefail and tees its output to
 # $RUNNER_TEMP/logs/<step>.log, uploaded with the results. The base importer's steps may fail (an old
@@ -13,7 +14,9 @@
 # results for are named in the summary and left uncompared. Head's steps fail the job; the later steps still
 # run (!cancelled()) so the gate and the logs are there to read.
 # Held-out stays a mean: its per-file results never go into the artifact — only the console output of
-# run-fuzz.js heldout (means and per-style aggregates; file names only with --show, never used here).
+# run-fuzz.js heldout (means and per-style aggregates; file names only with --show, never used here). The held-out
+# real-producer documents (scripts/heldout.js, docs/HELDOUT.md) are left out of the corpus run and scored by
+# run-import.js --real-heldout, which writes one mean — gated with TOL 1, never uploaded.
 #
 # Manual run with "baseline" ticked: after head, gate.js --update writes a candidate baseline from this run,
 # starting from a copy of the committed baseline.json (parts this run lacks are kept), uploaded as the
@@ -149,6 +152,13 @@ jobs:
         env: { KELK: '${{ github.workspace }}/base', LAB_OUT: '${{ runner.temp }}/base' }
         run: node tests/pdf-lab/scripts/golden.js 2>&1 | tee "$RUNNER_TEMP/logs/base-golden.log"
 
+      - name: Base importer, real held-out (mean only)
+        id: base_real_heldout
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' && steps.base_checkout.outcome == 'success' }}
+        continue-on-error: true
+        env: { KELK: '${{ github.workspace }}/base', LAB_OUT: '${{ runner.temp }}/base' }
+        run: node tests/pdf-lab/scripts/run-import.js --real-heldout 2>&1 | tee "$RUNNER_TEMP/logs/base-real-heldout.log"
+
       - name: Base importer, fuzz dev
         id: base_dev
         if: ${{ !cancelled() && steps.tools.outcome == 'success' && steps.base_checkout.outcome == 'success' && steps.make_dev.outcome == 'success' }}
@@ -181,6 +191,11 @@ jobs:
         if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
         env: { LAB_OUT: '${{ runner.temp }}/head' }
         run: node tests/pdf-lab/scripts/golden.js 2>&1 | tee "$RUNNER_TEMP/logs/head-golden.log"
+
+      - name: Head importer, real held-out (mean only)
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
+        env: { LAB_OUT: '${{ runner.temp }}/head' }
+        run: node tests/pdf-lab/scripts/run-import.js --real-heldout 2>&1 | tee "$RUNNER_TEMP/logs/head-real-heldout.log"
 
       - name: Head importer, fuzz dev
         if: ${{ !cancelled() && steps.make_dev.outcome == 'success' }}
@@ -245,6 +260,7 @@ jobs:
           BASE_DEV: ${{ steps.base_dev.outcome }}
           BASE_HELDOUT: ${{ steps.base_heldout.outcome }}
           BASE_META: ${{ steps.base_meta.outcome }}
+          BASE_REAL_HELDOUT: ${{ steps.base_real_heldout.outcome }}
         run: |
           base="$RUNNER_TEMP/base" log="$RUNNER_TEMP/logs/gate.log" sum="$GITHUB_STEP_SUMMARY"
           has() { [ -f "$base/$1" ] && echo 'results' || echo 'no results'; }
@@ -261,6 +277,7 @@ jobs:
               echo "| fuzz/dev | ${BASE_DEV:-skipped} | $(has fuzz-dev/_scores.json) |"
               echo "| fuzz/heldout | ${BASE_HELDOUT:-skipped} | $(has fuzz-heldout/_scores.json) |"
               echo "| meta | ${BASE_META:-skipped} | $(has meta/_scores.json) |"
+              echo "| real held-out | ${BASE_REAL_HELDOUT:-skipped} | $(has real-heldout/_scores.json) |"
               echo
               echo 'A part with no base results is printed for head but not compared.'
             } >> "$sum"
@@ -271,7 +288,7 @@ jobs:
             else why="the base importer (\`$BASE_SHA\`) left no corpus results (its run-import.js step: ${BASE_CORPUS:-skipped})"; fi
             {
               echo "**Fallback: head against baseline.json** — $why."
-              echo 'Corpus and golden files compared file by file; fuzz and meta only where the baseline env matches this runner (else noted, not compared).'
+              echo 'Corpus and golden files compared file by file (held-out real PDFs as means); fuzz and meta only where the baseline env matches this runner (else noted, not compared).'
             } >> "$sum"
             echo "::warning title=pdf-lab gate::compared with baseline.json, not the base importer — $why"
             node tests/pdf-lab/scripts/gate.js 2>&1 | tee "$log" || rc=$?
