@@ -153,18 +153,25 @@ counts the reasons a paragraph group was opened.
 ## ladder.js — 4.9 each page's confidence and the fallback ladder (PDFIMPORT.md §7a)
 
 Pure: `PdfImporter._ladder.conf` (`ladderConf`: a page's signs → 0–1) and `.decide` (`ladderDecide`: signs, conf,
-mode → { mode, why }), tested in `tests/unit/ladder.test.js`.
+mode → { mode, why }), `.tcVisual` (an item's characters in drawing order: pdf.js's bidi run again), `.tcMarker` (a
+list number at a line's end), `.tcBrackets` (brackets named logically, renamed as drawn), tested in
+`tests/unit/ladder.test.js`.
 
 | Method | Called from | Step |
 |---|---|---|
-| `_ladMode` | `_ladder`, `_pageLines`, `fromArrayBuffer`, `_ladReport` | the import's mode: `hooks.mode`, else `options.mode` ('auto' / 'safe' / 'full') |
+| `_ladMode` | `_ladder`, `_pageLines`, `fromArrayBuffer`, `_ladReport` | the import's mode: a valid `hooks.mode`, else `options.mode` ('auto' / 'safe' / 'full') |
 | `_ladK` | `_ladder` | the thresholds `ladderConf` and `ladderDecide` read |
 | `_ladder` | `_layoutPage` | one page: its signs, confidence and mode; its blocks in that mode, a rung down when one gives nothing, the note |
 | ↳ `_ladSignals` | `_ladder` | the page's signs: `_pageQuality`'s counts and flags, guessed glyphs, the tree's agreement (`_treeVote`), ambiguous gaps, word-gap samples, the largest picture |
 | ↳ `_ladFlatten` | `_ladder` | simplified from the laid-out blocks: tables' rows, lists' items, quotes' blocks as paragraphs |
 | ↳ `_ladSimpleBlocks` | `_ladder` | simplified from the lines (the layout failed): rows top down, paragraphs by size and gap, large short lines headings |
-| ↳ `_ladTextContent` | `_ladder` | textContent: pdf.js's `getTextContent()` in lines (by the letters' direction) and paragraphs (by the gap) |
-| ↳ `_ladOcr` | `_ladder` | ocr: the page's pictures, or the page rendered whole (`_crop`) |
+| ↳ `_ladTextContent` | `_ladder` | textContent: pdf.js's text read as glyphs — each line's direction (letters, a list number, its edge), paragraphs by gap and size, headings |
+| ↳ ↳ `_ladTcLines` | `_ladTextContent`, `_ladTcNeighbours` | the page's items in drawing order (`tcVisual`) spread as glyphs, a line a baseline; ZWNJs Chrome's items show; brackets as drawn (`tcBrackets`); cached on the page |
+| ↳ ↳ `_ladTcNeighbours` | `_ladTextContent` | the lines of the pages around (two before, two after), for the furniture |
+| ↳ ↳ `_ladTcFurniture` | `_ladTextContent` | running heads and feet repeated on those pages, a lone page number: out |
+| ↳ ↳ `_ladTcJoin` | `_ladTextContent` | one paragraph's lines in logical order (`_joinLines`, «می» always read), a «76%» item's sign after it |
+| ↳ `_ladTcBetter`, `_ladInk` | `_ladder` | lost glyphs: pdf.js's text only where it lost demonstrably fewer characters |
+| ↳ `_ladOcr` | `_ladder` | ocr: the page's pictures, or the page rendered whole (`_crop`; the render released) |
 | `_ladReport` | `fromArrayBuffer` | `r.pages` and `r.report` (summary, demoted pages and why, flags and notes with their pages) |
 
 ## order.js — 4. reading order: the page's blocks (`_pageBlocks`), XY-cut, borderless tables (PDFIMPORT.md §8.1, §8.3)
