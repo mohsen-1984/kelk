@@ -336,7 +336,14 @@ relations**, counted per transform: under "same" the multiset of words equals th
 generator 3 (1405-08-11, 24 seeds, references 99.9): `rotate180` −83.0, `rotate90` −82.4 (the importer does not
 apply `/Rotate`), `noToUnicode` −81.0, `stamp` −32.7, `trackLoose` −12.2, `tz85` −9.2, `trackTight` −3.6, `pagebg`
 −3.3, `band` −2.7, `scale80` −1.4, `objstm` −0.7, `pageSize` −0.4, `renderMode` −0.3, `scale125` −0.2, the rest 0.0;
-"same": 133 of 199 files exact, 66 known exceptions (`docs/reports/P2.2-meta-net.md`).
+"same": 133 of 199 files exact, 66 known exceptions (`docs/reports/P2.2-meta-net.md`). After P3.3 (1405-08-12):
+`rotate90` and `rotate180` 0.0, every file exact (the page read in its upright frame, `_pageFrame`); `objstm` 0.0,
+every file exact (descriptors and `/ActualText` read from object streams); `stamp` 0.0, 24 of 24 (the watermark
+rule, `_watermark`); `tz85` −0.1, `trackTight` 0.0, `trackLoose` −0.8 (runs laid out again from their untracked
+widths when their gaps follow the drift — calibration.js `drift`, lines.js `untrack`: a rule that fires on the
+synthetic transforms only — no real producer leaves those gaps: `lines.untracked` fires on no corpus file); `noToUnicode` −46.1
+(fonts with no ToUnicode named by their programs, `_gsubByCode`); "same": 185 of 199 files exact, 14 known
+exceptions.
 
 **In the gate**, each transform is compared on its own with a baseline entry of the same `v` and the same env
 for what it depends on (pdf-lib; qpdf and its package version; Chromium and the platform), over the seeds both
@@ -350,7 +357,8 @@ invariant; scale80 −1.0, scale125 −0.3; objstm −4.6 (`/ActualText` inside 
 Persian Word file −55); pagebg −3.4, band −2.6 (a deck −35); **tz85 −13.5, trackTight −5.7, trackLoose −16.2**
 (set where each run stands, these three open gaps no real producer leaves for the producers that place every
 run by its own position — LibreOffice, pandoc —; their losses are largely the transform's: kept as regression
-guards; the real-producer measure is the fuzz generator's `tracking` dimension, generator 4); noToUnicode 14.7. The gate holds each
+guards; the real-producer measure is the fuzz generator's `tracking` dimension, generator 4 — P3.3's untracked
+layout repairs them and fires on these transforms only); noToUnicode 14.7 (P3.3: see above). The gate holds each
 transform's mean (−1 point; −3 for `noToUnicode`); CI makes the PDFs once and runs both importers on them.
 
 ## Coverage: `features.js`
