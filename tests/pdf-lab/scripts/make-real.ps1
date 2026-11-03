@@ -1,4 +1,4 @@
-# The real-producer corpus (plan P4.1): our own CC0 documents made by Microsoft Word, Excel and PowerPoint
+# The real-producer corpus: our own CC0 documents made by Microsoft Word, Excel and PowerPoint
 # themselves (COM), then turned into PDFs by those programs, as people do it on Windows:
 #   word2024-save--<doc>.pdf   Word "Save as PDF" (Document.ExportAsFixedFormat, structure tags on: the dialog's default)
 #   msprint-word--<doc>.pdf   Word printing to "Microsoft Print to PDF" (PrintOut with PrintToFile and a file name)

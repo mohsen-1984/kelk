@@ -1,4 +1,4 @@
-// Clears the personal metadata Office writes into the real-producer corpus (plan P4.1), so the committed files carry no
+// Clears the personal metadata Office writes into the real-producer corpus, so the committed files carry no
 // user name and no local folder:
 //   .docx / .xlsx / .pptx   docProps/core.xml dc:creator and cp:lastModifiedBy, docProps/app.xml Manager and Company
 //                           (emptied), and xl/workbook.xml's x15ac:absPath (the folder the workbook was saved in: removed)

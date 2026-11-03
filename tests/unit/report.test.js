@@ -1,5 +1,5 @@
 /**
- * The PDF import report (plan P3.5): Kelk.importReport.fromResult (PdfImporter's result → the P3.4 contract, with
+ * The PDF import report: Kelk.importReport.fromResult (PdfImporter's result → the import report contract, with
  * or without r.report), the panel Kelk.ui.report (a row for every code, in fa / en / ar; its buttons; the focus),
  * and the import that opens it instead of toasts.
  */
@@ -22,7 +22,7 @@ const SAMPLE_PAGES = SAMPLE.pages.map(function (p) {
  * Every r.notes code the importer can emit: each `_note('code'` of lib/ (*.js), and the codes of the two calls that
  * compute theirs — the quality flags (PdfImporter#_qualityNotes, its TEXT table) and the ladder's page notes
  * (ladder.js, its NOTE table). Another computed `_note(` fails here, to be taught to this function. Plus codes a
- * pending importer change adds (watermarkDropped: P3.3).
+ * pending importer change adds (watermarkDropped).
  */
 function libNoteCodes() {
   const files = [];

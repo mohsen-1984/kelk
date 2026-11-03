@@ -1,4 +1,4 @@
-// ESLint flat config (plan P0.4). `npm run lint` = `eslint .`; the goal is 0 errors with every real-bug rule on.
+// ESLint flat config. `npm run lint` = `eslint .`; the goal is 0 errors with every real-bug rule on.
 //
 // Kelk ships plain browser scripts loaded in order by index.html (no modules, no build step); they share globals.
 // Each group below gets the environment it actually runs in, and the cross-file globals are listed explicitly:
@@ -152,7 +152,7 @@ module.exports = [
     languageOptions: { ecmaVersion: 2022, sourceType: 'commonjs', globals: { ...globals.node } },
   },
   {
-    // tests/docx-validate.js and tests/golden/ (P2.3): Node scripts driving tests/builder-suite.html with Playwright,
+    // tests/docx-validate.js and tests/golden/: Node scripts driving tests/builder-suite.html with Playwright,
     // like the lab's
     files: ['tests/pdf-lab/scripts/**/*.js', 'tests/docx-validate.js', 'tests/golden/**/*.js', 'tests/run-slides-suite.js'],
     languageOptions: {

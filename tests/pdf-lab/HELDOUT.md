@@ -12,7 +12,7 @@ an opening is recorded, how the sets are rotated, and what every report checks.
 | # | Set | Where | How it is read | Gate |
 |---|---|---|---|---|
 | 1 | **Fuzz held-out**: 100 style-fuzzed PDFs, seeds `HELDOUT_BASE`… | `tests/pdf-lab/scripts/make-fuzz.js heldout` → `fuzz/heldout/` | `run-fuzz.js heldout`: the mean, per direction, per style value — no file names; no Markdown and no per-file row written (`fuzz-heldout/_scores.json` holds the summary alone) | `gate.js` fuzz part: mean, ltr / rtl means and the `rtl` column, TOL 1 |
-| 2 | **Real-producer held-out**: every lab PDF of a held-out document (P4.1's documents, `HELD_DOCS`), in whatever folder | `tests/pdf-lab/scripts/heldout.js` (the split) | `run-import.js --real-heldout`: one mean (total and `rtl` column), the count and the file names | `gate.js` `realHeldout` part: mean total and `rtl` column, TOL 1; a missing result fails |
+| 2 | **Real-producer held-out**: every lab PDF of a held-out document (the real-producer documents, `HELD_DOCS`), in whatever folder | `tests/pdf-lab/scripts/heldout.js` (the split) | `run-import.js --real-heldout`: one mean (total and `rtl` column), the count and the file names | `gate.js` `realHeldout` part: mean total and `rtl` column, TOL 1; a missing result fails |
 | 3 | **Private real files**: a user's PDFs, never committed | `tests/pdf-lab/real/` (gitignored) or any folder outside the repository | `snapshot.js` before and after a change, `--against` the earlier snapshot | none (reference-free, read by the owner) |
 
 The dev sets — the corpus (`pdf/` without the held-out real documents), the fuzz `dev` split, the metamorphic
@@ -53,14 +53,14 @@ it only with a side that read the same documents and the same file names; it **f
 PDFs and the run has no such result, and `--update` refuses a result older than the corpus run's `_scores.json`.
 CI runs it for the base and the head importer (`.github/workflows/pdf-lab.yml`) and never uploads it.
 
-Five of the P4.2 goldens (`tests/pdf-lab/golden/`) are typed from held-out real PDFs (`real-letter-ar` ×3,
+Five of the goldens (`tests/pdf-lab/golden/`) are typed from held-out real PDFs (`real-letter-ar` ×3,
 `real-report-fa`, `real-memo-fa`). They stay — a golden is typed by a person, and moving them would mean typing
 others — but are read as the held-out is: `golden.js` scores them and writes only their mean (`heldout` in
 `golden/_scores.json`; no row, no Markdown), and `gate.js` compares that mean (TOL 1, `baseline.json`
 `goldenHeldout`); a filtered `golden.js` run leaves them out.
 
-The split counts from 1405-08-12. Per-file scores of these documents printed before that (P4.1's own runs, and
-P4.2's golden runs for the five goldens above) were read before any rule was written from them (P4.1 and P4.2
+The split counts from 1405-08-12. Per-file scores of these documents printed before that (the first runs of the real-producer
+corpus and of the five goldens above) were read before any rule was written from them (those steps
 changed no importer code); a rule written later from such a number moves its document to dev (below).
 
 ## Who may open what
@@ -86,7 +86,7 @@ opens nothing. **Logged by hand** (they read whole folders, or open files the gu
 Markdown or HTML left in an old `LAB_OUT` — `node tests/pdf-lab/scripts/heldout.js opened real:<document>` or
 `… opened fuzz:heldout`.
 
-**Old `LAB_OUT` folders.** Runs from before P4.3 (and `run-fuzz.js heldout` runs before this protocol's fix) wrote
+**Old `LAB_OUT` folders.** Runs from before this protocol (and `run-fuzz.js heldout` runs before this protocol's fix) wrote
 the Markdown, HTML and per-file rows of held-out files into `LAB_OUT` (`<name>.md` of the held-out documents' PDFs,
 `fuzz-heldout/*.md`, `fuzz-heldout/_scores.json` rows). Delete those folders (or at least their held-out files)
 before working in them again; reading one is an opening.

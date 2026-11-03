@@ -1,7 +1,7 @@
 /**
  * PdfBuilder's Arabic-script shaping (lib/PdfBuilder.js, PdfBuilder._shaping): the presentation-form table
  * against Unicode, U+0649 in its four positions, and the joining letters that have no presentation form
- * (plan P1.3, bug B1). Code points are written as numbers: the file stays readable without RTL text.
+ * (bug B1). Code points are written as numbers: the file stays readable without RTL text.
  */
 'use strict';
 

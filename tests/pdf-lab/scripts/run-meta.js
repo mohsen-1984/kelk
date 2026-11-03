@@ -27,8 +27,8 @@ const META = path.resolve(process.env.LAB_META || path.join(LAB, 'meta'));
 // Known exceptions to the "same" assertion: transform → seed → [total measured when listed (points of 100), Δ from
 // the reference, reason]. The floor is that total − FLOOR_TOL. Measured with qpdf 11.9.0, pdf-lib 1.17.1, Playwright
 // 1.56.1's Chromium (1405-08-11). Each is an importer finding (the transform was checked to be right first: cropbox and
-// renderMode render pixel for pixel as their seed); P3.3 works through them. (rotate90 / rotate180, listed on every
-// seed until the importer read a page through its /Rotate, read exactly since P3.3.)
+// renderMode render pixel for pixel as their seed); the importer works through them. (rotate90 / rotate180, listed on every
+// seed until the importer read a page through its /Rotate, read exactly.)
 const FLOOR_TOL = 1.0;
 const SLUG = 'a one-page document: the slug\'s job and plate lines, outside the CropBox, are read as text (several pages drop them as repeated furniture; nothing drops text outside the visible box)';
 const KNOWN = {
@@ -170,7 +170,7 @@ const sameWords = (a, b) => a.size === b.size && [...a].every(([w, n]) => b.get(
   stale.forEach((r) => console.log('  ✓ ' + r.transform + ' ' + r.seed + ' reads exactly now — take it off KNOWN in run-meta.js'));
   unexpected.forEach((r) => console.log('  ✗ ' + r.transform + ' ' + r.seed + ' — ' + r.why + (r.error ? ': ' + r.error : ': total ' + pct(r.total) + ', Δ ' + sgn(r.delta) + (r.words ? ', the same words' : ', words differ'))));
 
-  // ── the order to work through them in (P3.3): the largest loss first ──
+  // ── the order to work through them in: the largest loss first ──
   const order = Object.entries(summary).filter(([, s]) => s.delta < -0.0005).sort((a, b) => a[1].delta - b[1].delta);
   if (order.length) console.log('\nby loss: ' + order.map(([t, s]) => t + ' ' + pct(s.delta)).join(' · '));
 

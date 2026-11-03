@@ -1,5 +1,5 @@
 /**
- * The interface languages (plan P1.4): the Arabic interface writes Arabic words and dates into what it makes,
+ * The interface languages: the Arabic interface writes Arabic words and dates into what it makes,
  * the strings once hard-coded in scripts/ follow the language, scripts/boot.js sets <html lang dir> and the
  * theme before the first paint, and tools/check-i18n.js reports missing / unused keys by its exit code.
  */
@@ -249,7 +249,7 @@ test('check-i18n: exit 1 for a key the page uses that no language has; 2 when th
   }
 });
 
-// ---- review findings (P1.4 review) ----------------------------------------------------------------------------
+// ---- review findings ----------------------------------------------------------------------------
 
 test('boot.js: a storage that throws on access is a first visit, and the page still gets lang/dir/theme', function () {
   const r = boot({ 'kelk.ui': ui({ lang: 'en' }) }, ['ar-EG'], null, true);

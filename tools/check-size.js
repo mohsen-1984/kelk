@@ -1,5 +1,5 @@
 /**
- * Startup size budget of the app page (plan P2.4; the budget is lowered in P5.1, lazy-loading).
+ * Startup size budget of the app page (lowered once the builders load on demand).
  *
  *   node tools/check-size.js [--budget <bytes>] [--root <dir>]        (npm run check:size)
  *
@@ -8,7 +8,7 @@
  * or deferred ones too), plus any stylesheet those pull in with @import. Measured as the size of each file on disk
  * (the repository's LF checkout = the bytes GitHub Pages serves, before HTTP compression). MB = 1,000,000 bytes.
  * Not counted: what loads later on demand (Kelk.libs.need: pdf.js, the PDF importer — lib/PdfImporter.js and
- * lib/pdfimport/*.js, on demand since P3.2 —, MathJax, docx, mammoth, JSZip, the PDF fonts),
+ * lib/pdfimport/*.js, on demand —, MathJax, docx, mammoth, JSZip, the PDF fonts),
  * the web fonts the stylesheets name (@font-face is fetched only when text uses it), images, inline <script> /
  * <style> (none: the Content-Security-Policy refuses inline scripts) and index.html itself.
  * This is the definition behind the plan's "≈1.93 MB JS/CSS parsed at startup" (§2.2): measured this way the

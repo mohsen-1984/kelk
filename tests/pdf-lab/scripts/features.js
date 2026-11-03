@@ -46,7 +46,7 @@ const list = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.
     });
   });
   // the application (r.profile.app, else its engine) × the text's direction (script=): an empty cell is a producer the
-  // lab has no file of in that direction (plan P4.1: none for Word, Excel, PowerPoint × rtl, ltr)
+  // lab has no file of in that direction (none for Word, Excel, PowerPoint × rtl, ltr)
   const appNames = [...new Set([...apps.keys()].map((k) => k.split('\t')[0]))].sort(), dirs = ['rtl', 'mixed', 'ltr'];
   console.log('\nthe applications × the text\'s direction, pdf/ (files)\n\n  ' + ''.padEnd(30) + dirs.map((s) => s.padStart(7)).join(''));
   appNames.forEach((a) => console.log('  ' + a.slice(0, 29).padEnd(30) + dirs.map((s) => String(apps.get(a + '\t' + s) || '·').padStart(7)).join('')));

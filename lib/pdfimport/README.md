@@ -15,7 +15,7 @@ the repairs, `_classifyFonts`, then `_layout` (each page through the ladder), th
 Rule: every function is at most 150 lines (ESLint `max-lines-per-function`, `eslint.config.js`). A long method is
 split into steps that take an explicit parameter object, not into closures over its locals.
 
-## thresholds.js and calibration.js — the registry, rule telemetry, the document's measures (P3.2)
+## thresholds.js and calibration.js — the registry, rule telemetry, the document's measures
 
 Loaded right after the core, before `extract.js`. Every layout literal of the five parts is an entry of
 `PdfImporter._thresholds`, defined at the top of the part that reads it with `PdfImporter._defineThresholds`.

@@ -1,5 +1,5 @@
 /**
- * The preview pane's accessibility additions (plan P2.4, scripts/preview.js a11y()): task checkboxes named in
+ * The preview pane's accessibility additions (scripts/preview.js a11y()): task checkboxes named in
  * tight and loose lists, a tab stop only on a code block that really overflows, and none of it in what the
  * builders get (Kelk.preview.html) or in Copy (Kelk.preview.copyAll).
  */

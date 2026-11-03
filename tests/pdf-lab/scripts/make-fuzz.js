@@ -29,7 +29,7 @@ const GENERATOR = 4;
 // held-out baseline is rebuilt (the rotation is part of the manifest's env, so the old means are never compared
 // with the new set's). Never back to an earlier block: those files were seen.
 // Rotation history (Solar Hijri date · base · why):
-//   0  (from the start)  100001  the first held-out block, generators 1–4; its rotation clock starts 1405-08-12 (P4.3)
+//   0  (from the start)  100001  the first held-out block, generators 1–4; its rotation clock starts 1405-08-12
 const HELDOUT_ROTATION = 0;
 const HELDOUT_BASE = 100001 + 100000 * HELDOUT_ROTATION;
 const SPLITS = { dev: { base: 1, count: 100 }, heldout: { base: HELDOUT_BASE, count: 100 } };

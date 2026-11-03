@@ -54,7 +54,7 @@ const TRANSFORMS = {
   trackTight:  { kind: 'near', via: 'qpdf', v: 1, what: 'letters set 0.04 em closer (Tc: InDesign tracking, a tight print)' },
   trackLoose:  { kind: 'near', via: 'qpdf', v: 1, what: 'letters set 0.08 em apart (Tc: letter-spaced type)' },
   noToUnicode: { kind: 'hard', via: 'qpdf', v: 1, what: 'every /ToUnicode map removed (the repairs must read the fonts)' },
-  // generator 3 (P2.2)
+  // generator 3
   rotate180:   { kind: 'same', via: 'pdf-lib', v: 2, what: 'the content drawn upside down (cm), /Rotate 180 turning it upright again (a page scanned upside down)' },
   cropbox:     { kind: 'same', via: 'pdf-lib', v: 2, what: 'a print proof: MediaBox grown by a 36 pt bleed (origin negative), CropBox and TrimBox the old visible page; crop marks and a job line in the slug, outside the CropBox, to drop' },
   hfInject:    { kind: 'same', via: 'pdf-lib', v: 1, what: 'a running head and «Page n of N» stamped in the margins, marked /Artifact /Pagination (Acrobat\'s Header & Footer): page furniture to drop' },

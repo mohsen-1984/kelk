@@ -1,5 +1,5 @@
 /**
- * A page turned by /Rotate is read in its upright frame (plan P3.3, lib/pdfimport/extract.js _pageFrame /
+ * A page turned by /Rotate is read in its upright frame (lib/pdfimport/extract.js _pageFrame /
  * _pageViewport): on a mock page whose getViewport is pdf.js's PageViewport arithmetic.
  */
 'use strict';

@@ -1,6 +1,6 @@
 /**
  * The app under its Content Security Policy in Chromium (Playwright from `npm ci`), from file:// and from
- * http://localhost (a static server standing in for GitHub Pages) — plan P1.2. Not part of `npm test`
+ * http://localhost (a static server standing in for GitHub Pages). Not part of `npm test`
  * (it needs a browser):   node tests/unit/csp-browser.js [out folder] [file|http|both]
  * Per origin: the page loads with no CSP violation; an injected inline script is refused (the policy is in
  * force); hostile Markdown leaves the app intact; MathJax draws a formula; PDF, DOCX, DOC, HTML and MD
@@ -229,7 +229,7 @@ async function run(label, url) {
   // let them compile ('wasm-unsafe-eval'), or scanned PDFs lose their pictures (no pure-JS fallback is shipped)
   r.steps.wasm = await page.evaluate(async function () {
     const out = {};
-    await window.Kelk.libs.need('pdfimport'); // on demand since P3.2 (the PDF import above loaded it already)
+    await window.Kelk.libs.need('pdfimport'); // on demand (the PDF import above loaded it already)
     const F = new window.PdfImporter()._binaryDataFactory();
     for (const name of ['openjpeg.wasm', 'jbig2.wasm']) {
       try {

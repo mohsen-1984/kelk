@@ -1,4 +1,4 @@
-// Rule telemetry (plan P3.2): which layout rules fired on which PDF, and which never fire.
+// Rule telemetry: which layout rules fired on which PDF, and which never fire.
 //
 //   node scripts/rules.js                   per PDF of this run (out/_rules.json): the rules that fired (× count, pages)
 //   node scripts/rules.js --against DIR     … and the rules that fired on a file in DIR (another run's LAB_OUT) but not now

@@ -1,5 +1,5 @@
 /**
- * The page confidence and the fallback ladder's decision (plan P3.4, lib/pdfimport/ladder.js): both pure.
+ * The page confidence and the fallback ladder's decision (lib/pdfimport/ladder.js): both pure.
  */
 'use strict';
 
@@ -15,13 +15,13 @@ L.names.forEach(function (n) { K[n] = PdfImporter._thresholds[n].def; });
 // a clean page: many glyphs and words, nothing lost or glued, enough samples
 const clean = function (o) { return Object.assign({ glyphs: 1000, lost: 0, words: 150, glued: 0, covered: 0, guessed: 0, treeVotes: 0, treeAgree: 0, gaps: 150, ambig: 0, samples: 100, flags: [], picShare: 0 }, o || {}); };
 
-test('P3.4: the thresholds the ladder reads are registered, fixed', function () {
+test('the thresholds the ladder reads are registered, fixed', function () {
   L.names.forEach(function (n) { assert.ok(PdfImporter._thresholds[n], n); assert.equal(PdfImporter._thresholds[n].fixed, true, n); });
   assert.equal(K.pageConfSimplified, 0.45);
   assert.equal(K.ladLostTextContent, 0.2);
 });
 
-test('P3.4: ladderConf — 1 for a clean page, each sign lowers it by at most its weight, clamped to 0–1', function () {
+test('ladderConf — 1 for a clean page, each sign lowers it by at most its weight, clamped to 0–1', function () {
   assert.equal(L.conf(clean(), K), 1);
   assert.equal(L.conf({}, K), 1);                                   // no text, no signs
   // lost glyphs: in full at a fifth of the page, half of that half the weight
@@ -40,7 +40,7 @@ test('P3.4: ladderConf — 1 for a clean page, each sign lowers it by at most it
   assert.equal(L.conf(clean({ lost: 1000, glued: 150, covered: 1000, guessed: 1000, treeVotes: 9, treeAgree: 0, ambig: 150, samples: 0 }), K), 0);
 });
 
-test('P3.4: ladderDecide — full, simplified, textContent, ocr, and the failures', function () {
+test('ladderDecide — full, simplified, textContent, ocr, and the failures', function () {
   const D = function (s, mode) { return L.decide(s, L.conf(s, K), mode || 'auto', K); };
   assert.deepEqual(D(clean()), { mode: 'full', why: [] });
   assert.deepEqual(D(clean(), 'safe'), { mode: 'simplified', why: ['safeMode'] });
@@ -56,7 +56,7 @@ test('P3.4: ladderDecide — full, simplified, textContent, ocr, and the failure
   assert.deepEqual(D({ glyphs: 0, picShare: 0.95 }), { mode: 'ocr', why: ['noText'] });
   assert.deepEqual(D({ glyphs: 0, picShare: 0.95 }, 'safe'), { mode: 'ocr', why: ['noText'] });
   assert.equal(D({ glyphs: 0, picShare: 0 }).mode, 'full');
-  // a caption or a page number under the picture is text: no OCR (P3.4 review M2)
+  // a caption or a page number under the picture is text: no OCR
   assert.equal(D({ glyphs: 8, picShare: 0.95, words: 2 }).mode, 'full');
   assert.equal(D({ glyphs: 2, picShare: 0.95, words: 1 }).mode, 'full');
   // failures go a rung down in auto and safe; 'full' never demotes (the caller's last resort, as before the ladder)
@@ -66,7 +66,7 @@ test('P3.4: ladderDecide — full, simplified, textContent, ocr, and the failure
   assert.deepEqual(D(clean({ failed: 'layout', lost: 900, flags: ['lostGlyphs', 'suspectSpaces'] }), 'full'), { mode: 'full', why: [] });
 });
 
-// ── P3.4 review: the textContent rung, the report ──────────────────────────────────────────────
+// ── the textContent rung, the report ──────────────────────────────────────────────
 ['calibration', 'extract', 'lines', 'regions', 'order', 'blocks'].forEach(function (p) { require('../../lib/pdfimport/' + p + '.js'); });
 const ITEMS = require('./ladder-tc-items.js');
 
@@ -96,14 +96,14 @@ const rung = async function (items) {
   return imp._ladTextContent(pl);
 };
 
-test('P3.4 review: tcVisual — pdf.js\'s reordering of an item, run again, gives the drawn order back', function () {
+test('tcVisual — pdf.js\'s reordering of an item, run again, gives the drawn order back', function () {
   assert.equal(L.tcVisual('12-05-2024', 'ltr'), '12-05-2024');                     // nothing right to left: as it was
   assert.equal(L.tcVisual('زارش', 'rtl'), 'شراز');                                  // as drawn, left to right
   // a Latin run in a right-to-left item keeps its order; the brackets come back as drawn (pdf.js does not mirror)
   assert.equal(L.tcVisual('دیسک )NAS( در', 'rtl'), 'رد (NAS) کسید');
 });
 
-test('P3.4 review: tcMarker and tcBrackets', function () {
+test('tcMarker and tcBrackets', function () {
   const G = function (s) { return Array.from(s).map(function (c) { return c === ' ' ? { ch: ' ', space: true } : { ch: c }; }); };
   assert.equal(L.tcMarker(G('Google Chrome اب .1')), 'right');
   assert.equal(L.tcMarker(G('1. Item one')), 'left');
@@ -112,7 +112,7 @@ test('P3.4 review: tcMarker and tcBrackets', function () {
   assert.equal(L.tcBrackets(G('x )NAS( y (ok)')).map(function (g) { return g.ch; }).join(''), 'x (NAS) y (ok)');
 });
 
-test('P3.4 review H1: the textContent rung reads right-to-left lines in logical order (the review\'s cases, Chrome)', async function () {
+test('the textContent rung reads right-to-left lines in logical order (the review\'s cases, Chrome)', async function () {
   const out = await rung(ITEMS.MIXED), t = out.map(text);
   assert.equal(out[0].type, 'heading');
   assert.equal(t[0], 'گزارش سال 1403');                                             // not «3041»
@@ -125,13 +125,13 @@ test('P3.4 review H1: the textContent rung reads right-to-left lines in logical 
   out.forEach(function (b) { assert.equal(b.textContent, true); });
 });
 
-test('P3.4 review H1: mirrored brackets and guillemets the right way round', async function () {
+test('mirrored brackets and guillemets the right way round', async function () {
   const t = (await rung(ITEMS.ARTICLE)).map(text).join('\n');
   assert.ok(t.indexOf('(NAS)') > 0, t);
   assert.ok(t.indexOf('«کامل»') > 0, t);
 });
 
-test('P3.4 review H1: running heads, feet and page numbers go — repeated on the pages around, or a lone number', async function () {
+test('running heads, feet and page numbers go — repeated on the pages around, or a lone number', async function () {
   const page = function (n) {
     return [['Backup notes 10/21/26, 1:04 PM', 'ltr', 28.8, 822.6, 6, 80], ['Body text of page ' + n + ' that stays.', 'ltr', 72, 700, 12, 200],
       ['file:///tmp/a.html ' + n + '/2', 'ltr', 28.8, 16.4, 6, 90]];
@@ -145,7 +145,7 @@ test('P3.4 review H1: running heads, feet and page numbers go — repeated on th
   assert.deepEqual((await one._ladTextContent(pl)).map(text), ['Head of a letter', 'Body text.']);
 });
 
-test('P3.4 review M5, L2, L5: the report — failed pages, an unknown confidence, a Kelk source', function () {
+test('the report — failed pages, an unknown confidence, a Kelk source', function () {
   const rep = function (mode, recs, notes, kelk) {
     const imp = PdfImporter.create({ mode: mode });
     imp._pageModes = recs; imp.notes = notes || []; imp._notePages = {};
@@ -168,14 +168,14 @@ test('P3.4 review M5, L2, L5: the report — failed pages, an unknown confidence
   assert.equal(k.report.summary.full, 3);
 });
 
-test('P3.4 review L1: only a valid hooks.mode overrides options.mode', function () {
+test('only a valid hooks.mode overrides options.mode', function () {
   const imp = PdfImporter.create({ mode: 'safe' });
   imp._runMode = 'Safe'; assert.equal(imp._ladMode(), 'safe');
   imp._runMode = 'full'; assert.equal(imp._ladMode(), 'full');
   imp._runMode = undefined; assert.equal(imp._ladMode(), 'safe');
 });
 
-test('P3.4 review M1: pdf.js\'s text taken for lost glyphs only where it lost demonstrably fewer', function () {
+test('pdf.js\'s text taken for lost glyphs only where it lost demonstrably fewer', function () {
   const imp = PdfImporter.create();
   const blk = function (s) { return [{ type: 'p', glyphs: Array.from(s).map(function (c) { return c === ' ' ? { ch: ' ', space: true } : { ch: c }; }) }]; };
   const sig = { glyphs: 100, lost: 25 };

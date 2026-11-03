@@ -1,5 +1,5 @@
 /**
- * lib/BidiView.js (plan P2.4, found by tools/check-a11y.js): isolating a Latin link at the end of a right-to-left
+ * lib/BidiView.js (found by tools/check-a11y.js): isolating a Latin link at the end of a right-to-left
  * sentence left an empty <a href> shell beside the isolate — a link with no name (axe link-name).
  */
 'use strict';

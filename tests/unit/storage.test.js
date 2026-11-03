@@ -1,7 +1,7 @@
 /**
  * Kelk.store (scripts/storage.js): the export profile is stored as its differences from the defaults with a
  * schemaVersion, and one migrate() serves the stored profile, a settings file and Undo — so a fresh profile
- * has no migration side effects (plan P1.1).
+ * has no migration side effects.
  */
 'use strict';
 

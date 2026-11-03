@@ -1,5 +1,5 @@
 /**
- * The held-out protocol (plan P4.3, tests/pdf-lab/scripts/heldout.js, env.js heldSplit / openHeld, tests/pdf-lab/HELDOUT.md):
+ * The held-out protocol (tests/pdf-lab/scripts/heldout.js, env.js heldSplit / openHeld, tests/pdf-lab/HELDOUT.md):
  * the split by document over the whole lab, its stability, the guard of the file-by-file tools, the opened-log line,
  * the Shamsi date, and golden.js keeping held-out goldens nameless. Names, hashes and means only — no per-file score.
  */
@@ -17,13 +17,13 @@ const H = require('../pdf-lab/scripts/heldout.js');
 const env = require('../pdf-lab/scripts/env.js');
 
 const PINNED = ['real-deck-fa', 'real-letter-ar', 'real-memo-fa', 'real-report-fa'];
-// the 13 documents of P4.1's real-producer PDFs
+// the 13 documents of the real-producer PDFs
 const DOCS = ['real-deck-en', 'real-deck-fa', 'real-letter-ar', 'real-memo-fa', 'real-readme-en', 'real-report-fa', 'real-sheet-borders-fa',
   'real-sheet-plain-fa', 'word-rich', 'word-tables', 'xl-border-black', 'xl-border-none', 'xl-border-white'];
 // names whose hash falls below (or above) the share, found deterministically
 const named = (below, n) => { const out = []; for (let i = 0; out.length < n; i++) { const d = 'new-doc-' + i; if ((H.docHash(d) < H.REAL_SHARE) === below) out.push(d); } return out; };
 
-test('P4.3: docOf takes the document after the producer; a name without -- is no document', function () {
+test('docOf takes the document after the producer; a name without -- is no document', function () {
   assert.equal(H.docOf('edge--real-memo-fa.pdf'), 'real-memo-fa');
   assert.equal(H.docOf('msprint-word--word-rich'), 'word-rich');
   assert.equal(H.docOf(path.join('pdf', 'real-producers', 'word2024-save--real-report-fa.PDF')), 'real-report-fa');
@@ -32,20 +32,20 @@ test('P4.3: docOf takes the document after the producer; a name without -- is no
   assert.equal(H.docOf('real-memo-fa'), null);
 });
 
-test('P4.3: docHash is fixed, in [0, 1), and changes with the salt', function () {
+test('docHash is fixed, in [0, 1), and changes with the salt', function () {
   const h = H.docHash('real-memo-fa');
   assert.equal(h, H.docHash('real-memo-fa'));
   assert.ok(h >= 0 && h < 1);
   assert.notEqual(H.docHash('real-memo-fa', 'other-salt'), h);
 });
 
-test('P4.3: the held-out documents are committed (HELD_DOCS), at least REAL_MIN of them stay held out', function () {
+test('the held-out documents are committed (HELD_DOCS), at least REAL_MIN of them stay held out', function () {
   assert.deepEqual(H.HELD_DOCS.slice().sort(), PINNED);
   assert.ok(H.HELD_DOCS.filter((d) => !H.REAL_OPENED.includes(d)).length >= H.REAL_MIN);
   assert.deepEqual(H.HELD_DOCS.filter((d) => H.REAL_OPENED.includes(d)), [], 'an opened document is taken out of HELD_DOCS');
 });
 
-test('P4.3: the split is by document, deterministic, independent of order and duplicates', function () {
+test('the split is by document, deterministic, independent of order and duplicates', function () {
   const a = H.splitDocs(DOCS), b = H.splitDocs(DOCS.slice().reverse().concat(DOCS, [null]));
   assert.deepEqual(a, b);
   assert.deepEqual(a.heldout, PINNED);
@@ -53,7 +53,7 @@ test('P4.3: the split is by document, deterministic, independent of order and du
   DOCS.filter((d) => H.docHash(d) < H.REAL_SHARE).forEach((d) => assert.ok(a.heldout.includes(d), d));
 });
 
-test('P4.3: adding documents never moves a held one, nor a dev one — below or above the threshold', function () {
+test('adding documents never moves a held one, nor a dev one — below or above the threshold', function () {
   const before = H.splitDocs(DOCS);
   const below = named(true, 6), above = named(false, 6);
   const after = H.splitDocs(DOCS.concat(below, above));
@@ -65,7 +65,7 @@ test('P4.3: adding documents never moves a held one, nor a dev one — below or 
   assert.deepEqual(H.splitDocs(DOCS.concat(below), { share: 0 }).heldout, PINNED);
 });
 
-test('P4.3: an opened document moves to dev; no dev document is moved in to refill the held-out side', function () {
+test('an opened document moves to dev; no dev document is moved in to refill the held-out side', function () {
   const s = H.splitDocs(DOCS, { opened: ['real-memo-fa'], held: PINNED.filter((d) => d !== 'real-memo-fa') });
   assert.ok(s.dev.includes('real-memo-fa'));
   assert.deepEqual(s.heldout, PINNED.filter((d) => d !== 'real-memo-fa'));
@@ -76,7 +76,7 @@ test('P4.3: an opened document moves to dev; no dev document is moved in to refi
   assert.deepEqual(H.splitDocs(DOCS.concat([nu]), { opened: ['real-memo-fa'] }).heldout, PINNED.filter((d) => d !== 'real-memo-fa').concat([nu]).sort());
 });
 
-test('P4.3: splitLab holds out every PDF of a held-out document wherever it lies; names without -- are not documents', function () {
+test('splitLab holds out every PDF of a held-out document wherever it lies; names without -- are not documents', function () {
   const pdfs = [['real-producers', 'edge--real-memo-fa.pdf'], ['real-producers', 'chrome--word-rich.pdf'], ['rtl', 'kelk--real-memo-fa.pdf'],
     ['producers', 'word16-x--real-letter-ar.pdf'], ['en', 'real-memo-fa.pdf'], ['en', 'chrome--article.pdf']]
     .map(([g, n]) => ({ name: n, file: path.join('/lab', g, n) }));
@@ -86,7 +86,7 @@ test('P4.3: splitLab holds out every PDF of a held-out document wherever it lies
   assert.deepEqual(s.docs.heldout, PINNED);           // the committed list, whether or not a real-producer PDF of it is there
 });
 
-test('P4.3: the split of the real lab is pinned — a document changing sides must be a visible decision (tests/pdf-lab/HELDOUT.md)', function () {
+test('the split of the real lab is pinned — a document changing sides must be a visible decision (tests/pdf-lab/HELDOUT.md)', function () {
   const s = env.heldSplit();
   if (!s.heldout.length) return;                       // a checkout without the lab PDFs
   assert.deepEqual(s.docs.heldout, PINNED);
@@ -99,7 +99,7 @@ test('P4.3: the split of the real lab is pinned — a document changing sides mu
   assert.deepEqual(s.docs.dev, DOCS.filter((d) => !PINNED.includes(d)));
 });
 
-test('P4.3: openHeld logs a held-out fuzz file once and each held-out document once, and lets the rest pass', function () {
+test('openHeld logs a held-out fuzz file once and each held-out document once, and lets the rest pass', function () {
   const logged = [], orig = H.logOpened;
   H.logOpened = (o) => { logged.push(o.split); };
   try {
@@ -117,7 +117,7 @@ test('P4.3: openHeld logs a held-out fuzz file once and each held-out document o
   } finally { H.logOpened = orig; }
 });
 
-test('P4.3: golden.js hides held-out goldens (no row, no name in output or _scores.json)', function () {
+test('golden.js hides held-out goldens (no row, no name in output or _scores.json)', function () {
   const G = require('../pdf-lab/scripts/golden.js');
   const struct = { edits: 1, headings: { missing: 0, extra: 0, changed: 0 }, tables: { missing: 0, extra: 0, changed: 0 }, lists: { missing: 0, extra: 1, changed: 0 } };
   const rows = [{ name: 'chrome--word-rich', ms: 5, total: 0.9, recall: 0.9, struct }];
@@ -130,15 +130,15 @@ test('P4.3: golden.js hides held-out goldens (no row, no name in output or _scor
   assert.deepEqual(out.heldout, { n: 2, errors: 1, mean: { total: 0.4, rtl: 0.7, edits: 1 } });
 });
 
-test('P4.3: the Shamsi date and the opened-log line', function () {
+test('the Shamsi date and the opened-log line', function () {
   assert.equal(H.shamsi(new Date('2026-11-03T12:00:00Z')), '1405-08-12');
   assert.equal(H.shamsi(new Date('2026-03-21T12:00:00Z')), '1405-01-01');
-  assert.equal(H.openedLine({ date: '1405-08-12', split: 'fuzz:heldout', user: 'Zarrabi', generator: 4, base: 100001 }),
-    '1405-08-12\tfuzz:heldout\tZarrabi\tgenerator 4\tseed base 100001\n');
+  assert.equal(H.openedLine({ date: '1405-08-12', split: 'fuzz:heldout', user: 'a', generator: 4, base: 100001 }),
+    '1405-08-12\tfuzz:heldout\ta\tgenerator 4\tseed base 100001\n');
   assert.equal(H.openedLine({ date: '1405-08-12', split: 'real:x', user: 'u' }), '1405-08-12\treal:x\tu\tgenerator ?\tseed base -\n');
 });
 
-test('P4.3: the opened log lives in the repository (tests/pdf-lab); logOpened appends to it, openedLines reads it', function () {
+test('the opened log lives in the repository (tests/pdf-lab); logOpened appends to it, openedLines reads it', function () {
   assert.equal(path.relative(path.join(__dirname, '..', '..'), H.OPENED_LOG).split(path.sep).join('/'), 'tests/pdf-lab/heldout-opened.log');
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'kelk-heldout-')), file = path.join(dir, 'reports', 'heldout-opened.log');
   const err = console.error;

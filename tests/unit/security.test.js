@@ -1,5 +1,5 @@
 /**
- * Security hardening (plan P1.2): hostile Markdown in the preview leaves the app intact (DOMPurify with
+ * Security hardening: hostile Markdown in the preview leaves the app intact (DOMPurify with
  * SANITIZE_NAMED_PROPS and no <style> / form controls), the custom header / footer HTML is sanitised, and
  * HtmlBuilder.toHtml writes no on* handler, script or javascript: URL (B4). The CSP itself is checked in a
  * browser: jsdom does not enforce it.
@@ -208,7 +208,7 @@ test('HtmlBuilder.toHtml writes no on* handler, script or javascript: URL (B4)',
   w.close();
 });
 
-test('after the prefix, <a name> anchors, image maps and <area> links still work (review of P1.2)', async function () {
+test('after the prefix, <a name> anchors, image maps and <area> links still work', async function () {
   const { window: w } = await appWindow(OPENED);
   setText(
     w,
@@ -222,7 +222,7 @@ test('after the prefix, <a name> anchors, image maps and <area> links still work
   w.close();
 });
 
-test('DOCX bookmarks: ids alike in their first 24 characters stay distinct (review of P1.2)', async function () {
+test('DOCX bookmarks: ids alike in their first 24 characters stay distinct', async function () {
   const { window: w } = await appWindow(OPENED);
   const bm = w.DocxBuilder._bookmarkName;
   const a = bm('user-content-introduction-to-the-topic-a'),
@@ -233,7 +233,7 @@ test('DOCX bookmarks: ids alike in their first 24 characters stay distinct (revi
   w.close();
 });
 
-test('HtmlBuilder.defang removes SVG animation and XML / script data: URLs (review of P1.2)', async function () {
+test('HtmlBuilder.defang removes SVG animation and XML / script data: URLs', async function () {
   const { window: w } = await appWindow(OPENED);
   const box = w.document.createElement('div');
   box.innerHTML =

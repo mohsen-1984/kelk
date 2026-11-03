@@ -1,4 +1,4 @@
-# The builders (DOCX, DOC, PDF, HTML) and the Markdown importer on every push and pull request (plan P2.3):
+# The builders (DOCX, DOC, PDF, HTML) and the Markdown importer on every push and pull request:
 #   1. the builder suite headless (tests/pdf-lab/scripts/roundtrip.js: every corpus case through the four builders,
 #      preview parity, the PDF round trip; red cells outside its KNOWN list fail)
 #   2. DOCX validation (tests/docx-validate.js: package checks, every XML part against the ECMA-376 Transitional

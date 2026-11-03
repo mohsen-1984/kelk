@@ -1,7 +1,7 @@
 /**
  * The app in jsdom (index.html with all its scripts): an export right after a keystroke contains it
  * (Kelk.preview.flush), the last keystrokes are saved when the page hides, and a second tab follows what
- * another tab saved instead of writing back what it showed before (the storage event) — plan P1.1.
+ * another tab saved instead of writing back what it showed before (the storage event).
  */
 'use strict';
 
@@ -174,7 +174,7 @@ test('a settings file from before schemaVersion, through the Settings pane, is m
   w.close();
 });
 
-// The PDF importer is not part of the startup (plan P3.2 / P5.1): Kelk.libs.need('pdfimport') loads
+// The PDF importer is not part of the startup: Kelk.libs.need('pdfimport') loads
 // lib/PdfImporter.js and lib/pdfimport/*.js, in order, on the first PDF import.
 
 test('the PDF importer is not loaded at startup; its loader lists the core and PdfImporter.PARTS in order', async function () {

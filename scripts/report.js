@@ -1,8 +1,8 @@
 /**
- * The PDF import report (plan P3.5): what an import could not read in full, in a panel beside the text
+ * The PDF import report: what an import could not read in full, in a panel beside the text
  * instead of a row of toasts that vanish.
  *
- *   Kelk.importReport.fromResult(r)   PdfImporter's result → the report of the P3.4 contract (pure):
+ *   Kelk.importReport.fromResult(r)   PdfImporter's result → the report (pure):
  *       { mode, summary: { pages, full, simplified, textContent, ocr, failed, conf },
  *         pages: [{ page, mode, conf, why: [] }]   (pages not read 'full' only; a page that could not be read —
  *                                                  the contract's failed: true — has the mode 'failed'),
@@ -100,7 +100,7 @@
             const summary = { pages: +s.pages || 0, full: +s.full || 0, simplified: +s.simplified || 0, textContent: +s.textContent || 0, ocr: +s.ocr || 0, failed: +s.failed || 0, conf: confOf(s.conf) };
             return { mode: rep.mode || 'auto', summary: summary, pages: pages, flags: flags, notes: noteList(rep.notes, flags, failed) };
         }
-        // before P3.4: the fields the importer has always given
+        // from before the fallback ladder: the fields the importer has always given
         const flags = flagList(r.quality && r.quality.flags);
         const per = Array.isArray(r.pages) ? r.pages.filter(function (p) { return p && p.page; }) : null;
         const summary = { pages: 0, full: 0, simplified: 0, textContent: 0, ocr: 0, failed: failed.length, conf: null };
