@@ -9,7 +9,8 @@
 //         ('textContent') and the second simplified, with no 'pageFailed'; in 'full' mode both are 'pageFailed' as
 //         before the ladder; an AbortSignal must stop it with err.code 'aborted'
 // ladder: the files of tests/pdf-lab/ladder/ (scripts/make-ladder.js) given in the mode each must be demoted to —
-//         a scan with no text 'ocr', glued words with lost glyphs 'simplified', a quarter of them lost 'textContent'
+//         a scan with no text 'ocr', glued words with lost glyphs 'simplified', a quarter of them lost 'simplified' too
+//         (pdf.js's text, the glyphs' source, loses the same: taken only where it loses demonstrably fewer)
 const fs = require('fs');
 const path = require('path');
 const { lab, req, LAB } = require('./env.js');
@@ -54,7 +55,7 @@ const { lab, req, LAB } = require('./env.js');
   console.log('faults (mode full)', brief(ff));
   console.log('abort   ', JSON.stringify(a));
   // the ladder's own files: every page in the mode named (tests/pdf-lab/ladder/, made by scripts/make-ladder.js)
-  const LADDER = { 'scan--article.pdf': 'ocr', 't3-glued--lost.pdf': 'simplified', 't3-glued--lost25.pdf': 'textContent' };
+  const LADDER = { 'scan--article.pdf': 'ocr', 't3-glued--lost.pdf': 'simplified', 't3-glued--lost25.pdf': 'simplified' };
   const lad = {};
   for (const n of Object.keys(LADDER)) {
     const file = path.join(LAB, 'ladder', n);

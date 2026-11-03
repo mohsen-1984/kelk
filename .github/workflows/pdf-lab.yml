@@ -236,15 +236,17 @@ jobs:
         timeout-minutes: 10
         run: node tests/pdf-lab/scripts/math-roundtrip.js 2>&1 | tee "$RUNNER_TEMP/logs/math-roundtrip.log"
 
-      # every lab PDF (pdf/ and its subfolders) and the dev fuzz split — never fuzz held-out: run-crash.js prints the
-      # names of slow or failing files (the held-out documents' PDFs nameless, as counts: docs/HELDOUT.md)
+      # every lab PDF (pdf/ and its subfolders, ladder/ — the files the fallback ladder must demote) and the dev fuzz
+      # split — never fuzz held-out: run-crash.js prints the names of slow or failing files (the held-out documents' PDFs
+      # nameless, as counts: docs/HELDOUT.md)
       - name: Crash sweep (errors, timeouts, slow files)
         if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
         timeout-minutes: 20
         env: { LAB_OUT: '${{ runner.temp }}/logs' }
         run: |
-          rc=0   # both sweeps run even when the first finds a crash
+          rc=0   # every sweep runs even when an earlier one finds a crash
           node tests/pdf-lab/scripts/run-crash.js tests/pdf-lab/pdf "$GITHUB_WORKSPACE" 30000 2>&1 | tee "$RUNNER_TEMP/logs/crash.log" || rc=$?
+          node tests/pdf-lab/scripts/run-crash.js tests/pdf-lab/ladder "$GITHUB_WORKSPACE" 30000 2>&1 | tee -a "$RUNNER_TEMP/logs/crash.log" || rc=$?
           if [ -d tests/pdf-lab/fuzz/dev ]; then node tests/pdf-lab/scripts/run-crash.js tests/pdf-lab/fuzz/dev "$GITHUB_WORKSPACE" 30000 2>&1 | tee -a "$RUNNER_TEMP/logs/crash.log" || rc=$?; fi
           exit "$rc"
 
