@@ -29,12 +29,16 @@ split into steps that take an explicit parameter object, not into closures over 
 | `_fontPrograms` | `_outlineJoins`, `_gsubPrograms` | the embedded TrueType programs by font name, read once |
 | `_outlineJoins` | `fromArrayBuffer` | forms by outline: which side of a glyph an Arabic letter's joining stroke reaches |
 | `_gsubRepair` | `fromArrayBuffer` | ligature glyphs with no Unicode, read from the embedded font's own GSUB table |
+| ↳ `_gsubByCode` | `_gsubRepair` | step 0: composite fonts with no ToUnicode (every code read as itself) |
+| ↳ `_gsubNamed` | `_gsubPrograms` | step 1: the programs a font's name finds (a `#20` in the descriptor's name decoded) |
+| ↳ `_gsubByWidth` | `_gsubPrograms` | step 1: of several programs, the one whose advances are the font's widths (fonts with no ToUnicode) |
 | ↳ `_gsubPrograms` | `_gsubRepair` | step 1: each font's program read for its cmap, GSUB and outlines |
 | ↳ `_gsubBogus` | `_gsubRepair` | step 2: fonts whose ToUnicode disagrees with their own cmap |
 | ↳ `_gsubColour` | `_gsubRepair` | step 3: colour emoji drawn as their layers |
 | ↳ `_gsubDigits` | `_gsubRepair` | step 4: each font's digit systems in its ToUnicode |
 | ↳ `_gsubArTrust` | `_gsubRepair` | step 5: fonts whose cmap is trusted over their ToUnicode on Arabic letters |
 | ↳ `_gsubGlyph` | `_gsubRepair` | step 6: one glyph's repairs from its font's own tables, in order |
+| ↳ `_gsubByCodeGlyph` | `_gsubGlyph` | step 6a: a glyph of a font with no ToUnicode, named by its program (ligature, form's base, cmap; its space) |
 | ↳ `_gsubLost` | `_gsubRepair` | step 7: a guess nothing confirmed, in a script the document does not use, becomes U+FFFD |
 | `_extractPage` | `fromArrayBuffer` | 1. one page: glyphs, paths, images, links from pdf.js's operator list (the operator walk below) |
 | ↳ `_pageFrame` | `_extractPage` | a page turned by /Rotate: its upright frame (the walk's first CTM, the links, the page box) |

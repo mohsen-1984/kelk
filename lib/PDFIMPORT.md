@@ -373,6 +373,18 @@ What stays unknown after the repairs is **dropped**: a stray Latin Extended lett
    too (`_rawObjStms`): the font programs themselves are streams and never inside them, but the descriptors that name
    them are, and a file that packed them found no program — every repair that reads one was skipped (a Persian list's
    brackets came back «)…(», a ZWNJ was lost; the metamorphic `objstm` transform: the Persian Word file −50 → 0).
+   **A composite font with no ToUnicode at all** (`_gsubByCode`: every code read as the character of its own number,
+   three codes at least and no more than one in fifty read otherwise; an Identity CID → glyph map) is named glyph by
+   glyph from its program (`_gsubByCodeGlyph`): a ligature by its letters, a form by the glyph it replaces, then the
+   cmap's character, the cmap's space a space where it has room — every glyph, not only the codes marked unmapped or
+   guessed (a code under 0x100 read as itself is no character either: a Chrome subset's "Quarterly" came in as
+   «4XDUWHUO», every word gap «�»). Of several programs under its name, the one whose advances are the font's
+   widths on every code it draws (`_gsubByWidth`; two that name the glyphs otherwise are no choice): such a font
+   has no text to agree with — Chrome writes one subset per run, Kelk one Vazirmatn per weight. A descriptor's name
+   with `#20` in it (Kelk's `/Vazir#20Code#20Hack`) is decoded to find its program. The metamorphic `noToUnicode`
+   transform: −81.0 → −46.1, 11 of 24 seeds exact (Chrome's TrueType subsets, Kelk, Word, PowerPoint, iText,
+   Acrobat); what stays lost has no Unicode anywhere in the file — Chrome's Type 3 fonts (glyphs named `/g300`),
+   LibreOffice's and Prince's subsets (symbol and Macintosh cmaps only, `post` 3), wkhtmltopdf's (no cmap).
    **A guessed glyph** (a CID read as the character of the same number) is resolved through the font's own
    names, in order:
    - its cmap, through the GSUB substitutions back to a base glyph (a swash form → its letter);
