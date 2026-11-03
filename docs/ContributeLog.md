@@ -57,7 +57,7 @@ documentation is [`lib/README.md`](../lib/README.md), with [`lib/LATEX.md`](../l
 |---|---|---|
 | **A current browser** | Chrome, Edge or Firefox | All the app needs. MathJax and PDF.js are wrapped to load from `file://`. |
 | **Git** | any | `mohsen-1984/Kelk`, branch `main`. Text files are LF everywhere (`.gitattributes`); a working tree cloned before P0.1 needs one refresh on a clean tree: `git rm -r --cached -q . && git reset -q --hard`. |
-| Node.js | 22.22.2+ / 24.15+ / 26+ for the dev tooling (`engines` in `package.json` since P3.1: jsdom 30 is the narrowest of the dev dependencies, ESLint 10 needs 20.19+ / 22.13+ / 24+); 18+ for the lab alone (CI uses 22) | Only for the dev tooling, the unit tests, the PDF lab and `tools/*.js`. Since P0.4 `package.json` pins the dev tools (Playwright, pdf-lib, ESLint, Prettier, JSZip; jsdom since P1.1); `npm ci` at the root installs them. |
+| Node.js | 22.22.2+ / 24.15+ / 26+ for the dev tooling (`engines` in `package.json` since P3.1: jsdom 30 is the narrowest of the dev dependencies, ESLint 10 needs 20.19+ / 22.13+ / 24+); 20+ for the lab alone (Playwright 1.64; CI uses 22) | Only for the dev tooling, the unit tests, the PDF lab and `tools/*.js`. Since P0.4 `package.json` pins the dev tools (Playwright, pdf-lib, ESLint, Prettier, JSZip; jsdom since P1.1); `npm ci` at the root installs them. |
 | Playwright | 1.64.1 (the lockfile pin since P3.1; Chromium 156.0.8078.4, build 1248) + `pdf-lib` 1.17.1 | `npm ci` at the root installs it (or install it outside the repository and point `NODE_TOOLS` at its `node_modules`); then `npx playwright install chromium`. Where `cdn.playwright.dev` refuses the download (HTTP 403 "not available in your location"), take the same build from Google's Chrome-for-Testing host and unpack it into Playwright's cache: `https://storage.googleapis.com/chrome-for-testing-public/<version>/win64/chrome-win64.zip` → `%LOCALAPPDATA%\ms-playwright\chromium-<build>\` and `…/chrome-headless-shell-win64.zip` → `…\chromium_headless_shell-<build>\`, plus an empty `INSTALLATION_COMPLETE` file in each (version and build are the ones `npx playwright install` prints). A failed `playwright install` also deletes the browsers no installed Playwright uses. |
 | Lab generators | LibreOffice (`soffice`), wkhtmltopdf, pandoc, Python 3 with openpyxl, python-pptx, fontTools, DejaVu fonts, qpdf, poppler-utils | Only to **remake** lab PDFs; importing and scoring need Node + Playwright only. |
 | Python 3 | 3.10+, optional | `tools/build_pdf_fonts.py` (PDF fonts) and the Claude Code `ui-visual-check` skill (with Chrome or Edge). |
@@ -112,7 +112,7 @@ The lab (`tests/pdf-lab/`) imports every lab PDF with `lib/PdfImporter.js` in he
 # once, at the repository root (package.json pins the versions; node_modules/ is git-ignored)
 npm ci && npx playwright install chromium
 # or, as before, in a folder outside the repository, then NODE_TOOLS as below
-npm install playwright@1.56.1 pdf-lib@1.17.1 && npx playwright install chromium
+npm install playwright@1.64.1 pdf-lib@1.17.1 && npx playwright install chromium
 export NODE_TOOLS=/path/to/that/folder/node_modules
 export LAB_OUT=/path/outside/the/repo/lab-out     # results stay out of the working tree
 
@@ -135,8 +135,8 @@ stop it, delete `%LOCALAPPDATA%/ms-playwright/__dirlock`, unzip the downloaded
 `ms-playwright/chromium_headless_shell-<build>` with Windows `tar -xf`, and create the empty marker files
 `INSTALLATION_COMPLETE` and `DEPENDENCIES_VALIDATED` there. The headless shell is all the lab needs.
 P0.3 made the harness itself platform-neutral (1405-08-10); since P0.4 (1405-08-11) `package.json` pins Playwright
-1.56.1 and the scripts find the root `node_modules` without `NODE_TOOLS`. The browser download itself is unchanged, so
-the workaround above still applies when `npx playwright install` stalls.
+(1.56.1, 1.64.1 since P3.1) and the scripts find the root `node_modules` without `NODE_TOOLS`. The browser download itself is unchanged, so
+the workaround above still applies when `npx playwright install` stalls (and the Chrome-for-Testing download in Prerequisites when the CDN refuses it).
 
 ---
 
@@ -711,9 +711,11 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 29 | P3.2 registry and telemetry in `order.js`: 377 thresholds (`ord…`, 5 fixed rendering levels) at 400 call sites, three long steps reading theirs through one object each; 109 rules (82 fire on the corpus); byte-identical. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 23 | P3.2 registry and telemetry in `blocks.js`: 165 thresholds (`blk…`, 5 fixed votes and shares) at 176 call sites; 94 rules (67 fire on the corpus), the paragraph-break reasons counted; byte-identical. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 10 | P3.2 parts joined: the five files' registries together (1,007 thresholds, 16 fixed; every name read is defined), seed references corrected, lint 0 errors. |
+| 1405-08-12 | 2.0-rc1 | Zarrabi | 15 | Review of the P3.1 diff: the full import result (Markdown with pictures, HTML, notes, profile) compared on 604 files with pictures on and on 244 with other options — 0 differ; return / continue / break and `async` call sites, `this` and shared state per moved step, lint results old against new; the commit check, the Playwright upgrade and the documents read against the code. |
+| 1405-08-12 | 2.0-rc1 | Zarrabi | 12 | P3.1 review findings applied: the commit check also requires a known author to use their own name (as the commit-msg hook does) with a unit test, GitHub's "Update branch" merges documented as refused; the old Playwright version left in the setup notes and `builders.yml` updated, Node 20+ for the lab; two `\u` escapes in `regions.js` restored; five HTML golden snapshots rewritten for Chromium 156 (`border: none` now serialised as `medium` / `currentcolor`, same rendering). |
 
 <!-- generated:totals -->
-**Entries: 125 · Total: 1663 min (27.72 hours) — Zarrabi 1663 min (118 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 127 · Total: 1690 min (28.17 hours) — Zarrabi 1690 min (120 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---

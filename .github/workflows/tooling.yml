@@ -73,7 +73,9 @@ jobs:
   # Pull requests only (since P3.1): every commit of the PR (base..head, merge commits included) starts with
   # "<Name>: " for a name in .claude/contributors.json and carries no Claude co-author / "Generated with" /
   # Claude-Session line (CLAUDE.md -> Contributors and commits; tools/check-commits.js). .githooks/commit-msg
-  # applies the same rules locally, but a commit made without the hooks would reach main unchecked.
+  # applies the same rules locally, but a commit made without the hooks would reach main unchecked. A known
+  # author must name themself. GitHub's own "Update branch" merge and web uploads carry no prefix and fail:
+  # merge main into the branch locally. Merges by GitHub's button land on main without this check.
   # Plain Node, no npm ci. The full history is fetched so both SHAs are present; they reach the script through
   # env, never pasted into the script text.
   commits:
