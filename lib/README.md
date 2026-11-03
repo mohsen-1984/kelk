@@ -26,7 +26,7 @@ lib         ImageCore.js        images: registered names, data URIs, URLs, SVG �
             PreviewBuilder.js   a live preview on HtmlBuilder's logic and stylesheet (after HtmlBuilder)
             MarkdownImporter.js .docx / HTML / pasted rich text → Markdown
             PdfImporter.js      .pdf → Markdown (needs vendor/pdfjs/, after MarkdownImporter; see PDFIMPORT.md)
-            pdfimport/*.js      its parts, after it: thresholds, calibration, extract, lines, regions, order, blocks
+            pdfimport/*.js      its parts, after it: thresholds, calibration, extract, lines, regions, order, blocks (PdfImporter.PARTS); pdfimport/README.md maps their functions
 ```
 
 Load them in that order with plain `<script>` tags. In Node the files `require` each other
