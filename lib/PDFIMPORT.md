@@ -289,6 +289,14 @@ the font's widths times the size; for **Type3 fonts** the unit is the font's own
 the form's matrix (`paintFormXObjectBegin`) on top of the CTM: Chromium's PDF of Kelk pages came out at
 half the coordinates without it.
 
+**Page space is the page as a viewer shows it.** A page turned by `/Rotate` (Word's landscape page: portrait paper,
+the content turned a quarter by `cm`, `/Rotate 90`; a page scanned upside down, `/Rotate 180`) is read in its
+upright frame — user space through pdf.js's viewport, y up again, at the page's own origin (`_pageFrame`): the
+operator walk starts with that frame as its CTM, the link rectangles and the page box go through it, and a page
+rendered for a figure's crop or an OCR layer's ink maps upright points back (`_pageViewport`). Read in user space,
+a quarter-turned page came out in columns of single letters and an upside-down one with every line reversed (meta
+`rotate90` / `rotate180`: 0/24 → 24/24 byte-identical to their seeds). A page with no `/Rotate` is read as it is.
+
 Spaces: a glyph is a space only when it maps to one (`code 32` is reused for other glyphs in subset
 fonts — LibreOffice's "2": "20 square meters" became "0 square meters", which looks like a lost digit,
 not a space problem); wkhtmltopdf draws a tab as the space glyph; Chrome / Skia map a ZWNJ to
@@ -346,8 +354,10 @@ What stays unknown after the repairs is **dropped**: a stray Latin Extended lett
    the page's raw content stream (`_rawIdx`, `_rawStream`, inflated with `DecompressionStream`), pairs
    the n-th `BDC` of the stream with the n-th `beginMarkedContentProps` of the operator list, and gives
    the text to the glyphs it covers. Chrome uses it for list numbers and the minus / dash signs of
-   variable fonts. Not read from object streams, other filters or encrypted files; when the BDC counts
-   differ, nothing is changed.
+   variable fonts. A page dictionary packed in an object stream (qpdf, Word for Microsoft 365) is found there
+   (`_rawObjStms`): it was looked for among the plain objects only, and its ActualText went unread — list numbers
+   restarted at 1, a dash and a mark were lost (the metamorphic `objstm` transform: Chrome's tagged files −14.6 and
+   −3.0 → 0). Not read from other filters or encrypted files; when the BDC counts differ, nothing is changed.
 2. **GSUB ligatures** (`_gsubRepair`): the embedded TrueType / OpenType font is read (cmap, post, GSUB, and
    for some rules glyf), a ligature glyph is traced back to its letters ("ﬁ" → "fi") — found through the
    FontDescriptor's `/FontName` → `/FontFile2` (pdf.js's font ids do not say which file). **One name can stand
@@ -363,6 +373,22 @@ What stays unknown after the repairs is **dropped**: a stray Latin Extended lett
    too (`_rawObjStms`): the font programs themselves are streams and never inside them, but the descriptors that name
    them are, and a file that packed them found no program — every repair that reads one was skipped (a Persian list's
    brackets came back «)…(», a ZWNJ was lost; the metamorphic `objstm` transform: the Persian Word file −50 → 0).
+   **A composite font with no ToUnicode at all** (`_gsubByCode`: every code read as the character of its own number,
+   three codes at least and no more than one in fifty read otherwise; its codes its glyph ids — `_cidGlyphIds`, per
+   font from its own CIDFont dictionary, packed or not: Identity or no map, or a CIDToGIDMap stream that maps every
+   code it draws to itself; a font whose CIDs are the Unicode values, mapped to glyphs by a stream, is read by no
+   program at all — its codes as glyph ids had turned a correct «Quarterly Report» into «nì~êíÉêäó oÉéçêí», and
+   packed by qpdf the file-wide test before it saw no map: «nì~êíÉêäó=…») is named glyph by
+   glyph from its program (`_gsubByCodeGlyph`): a ligature by its letters, a form by the glyph it replaces, then the
+   cmap's character, the cmap's space a space where it has room — every glyph, not only the codes marked unmapped or
+   guessed (a code under 0x100 read as itself is no character either: a Chrome subset's "Quarterly" came in as
+   «4XDUWHUO», every word gap «�»). Of several programs under its name, the one whose advances are the font's
+   widths on every code it draws (`_gsubByWidth`; two that name the glyphs otherwise are no choice): such a font
+   has no text to agree with — Chrome writes one subset per run, Kelk one Vazirmatn per weight. A descriptor's name
+   with `#20` in it (Kelk's `/Vazir#20Code#20Hack`) is decoded to find its program. The metamorphic `noToUnicode`
+   transform: −81.0 → −46.1, 11 of 24 seeds exact (Chrome's TrueType subsets, Kelk, Word, PowerPoint, iText,
+   Acrobat); what stays lost has no Unicode anywhere in the file — Chrome's Type 3 fonts (glyphs named `/g300`),
+   LibreOffice's and Prince's subsets (symbol and Macintosh cmaps only, `post` 3), wkhtmltopdf's (no cmap).
    **A guessed glyph** (a CID read as the character of the same number) is resolved through the font's own
    names, in order:
    - its cmap, through the GSUB substitutions back to a base glyph (a swash form → its letter);
@@ -474,6 +500,18 @@ What stays unknown after the repairs is **dropped**: a stray Latin Extended lett
 - **Text too small to read** — under 2 pt, on a page whose text is of a reading size (a median of 6 pt or
   more) — goes: a Word letterhead's 1-pt code in its logo, a printer's stamp. A page drawn small is left
   alone.
+- **A watermark drawn as text** goes (`_watermark`, rule `extract.watermarkDropped`): a run of glyphs turned
+  off the axes (more than 15° from 0 / 90 / 180 / 270), at least 1.5 × the page's upright body size, spanning
+  40 % of the page's shorter side, and faint against what is behind it: a *neutral grey* (channels within 0.08
+  of each other) shown at 60 % opacity or less, or light (every channel 0.7 or more, #b3b3b3 and lighter), with
+  not half of its letters over a picture or a dark fill (luminance under 0.6) drawn before them. A page keeps its
+  text: one with fewer than 20 upright body glyphs (a poster whose only words are on the diagonal) is left as it
+  is. All are asked — what a designer sets on the diagonal is content: a white title on a dark band, a coloured
+  heading at half opacity, a pastel line, a mid-grey (#999) chart label, a table's turned header or a side label
+  (on an axis), a turned caption of the body's size, a black diagonal title, light grey upright text stay. What
+  is dropped is told: note `watermarkDropped` in `r.notes`, its message naming the words and pages (the page
+  record's `.watermark`). The metamorphic `stamp` (pdf-lib's diagonal «CONFIDENTIAL DRAFT», #999 at 30 %) read
+  its letters into the lines and blocks they fell across (−32.7).
 
 ### Numbers in right-to-left text
 
@@ -746,6 +784,22 @@ a jump of 0.07 em or more to three or more gaps of 0.1 em or more (under 1.2 em)
 between the two. A few ZWNJ gaps in a word are no such line; the ZWNJ-from-a-gap rule does not apply on it.
 Four real letters from Prince: recall 45–77 → 91–94. `chrome-positioned` (`make-positioned.js`) is the lab's.
 
+**Runs placed from their untracked widths** (P3.3). A producer that moves each word to its place by `Td` and then
+condenses (`Tz`) or tracks (`Tc`) the text — a tool applied after layout; the metamorphic `tz85` / `trackTight` /
+`trackLoose` — leaves words that overlap or stand apart by their drift: «DesigningResilient», lines cut as columns.
+`_calibrate` reads it (`tracking.drift`, per page `regions[p].drift`): at each place one run (one operator, or
+operators drawn each at the last one's advance) ends and the next starts on its baseline, the gap is regressed on the
+run's drift (how much longer its `Tz` / `Tc` made it); a slope under −0.5 over eight samples or more means the gaps
+follow the drift. Then `_glyphRows` lays the runs out again untracked (step / Tz − Tc, width / Tz) before any gap
+rule reads them — the page's own reading with thirty samples or more, else the document's. Invisible text (an OCR
+layer stretched by `Tz` to the scan's words) gives no samples. Net: tz85 −9.2 → −0.1, trackTight −3.6 → 0.0,
+trackLoose −12.2 → −0.8; corpus and fuzz unchanged (no file there has such runs).
+
+**A justified line that draws its spaces.** Chrome draws a justified line's spaces at their own width and moves the
+words apart; in a narrow column of letter-spaced type four gaps of 1.9 em were cut as columns. When every wide gap
+of a line holds a drawn space, equal gaps (±15 %, three or more) are a justified line's (`justGap`); a table's gaps
+vary with its cells' text.
+
 **A line that draws no space on a page that does** — two text boxes of one slide, one drawn with its spaces and
 one without — has words apart by gaps only: two gaps over 0.14 em on it, and the line is read as one that draws
 none (its gaps were ZWNJs: «مرور‌کارهای‌هفته»). And on a page that draws its spaces, a gap as wide as its font's own
@@ -932,7 +986,15 @@ the column) — the **left edge only when fewer than eight lines start there** (
 have unequal margins; mirroring the left one made every line look indented), and **the right edge only
 when fewer than eight right-to-left lines start there** (a Word letterhead's caption at the far left,
 mirrored, pulled the right edge 37 pt out: every flush-right line of a Persian memo looked indented, and
-its numbered clauses became nested quotes).
+its numbered clauses became nested quotes). And the right edge is mirrored only **from a left edge that two lines
+or more show, or one left-to-right line starting there** (`regColMirrorSrcLines`): a slide's one right-to-left line
+drawn past the page's left edge gave no left margin — the right edge stayed — but scaled to 80 % (the metamorphic
+`scale80`) it gave one, and the right edge mirrored from it set every right-to-left line in: the slide's paragraphs
+read as quotes (P3.3). The left edge is mirrored from any right edge, one line's too: a short document's single line
+or caption is all that shows its margin — required twice, «متن فارسی با setDirection.» alone in a left-to-right
+document became the whole column and read backwards, and a borderless table under a one-line caption had its
+columns merged (the builder round trip, P3.3 fix); one English line at the left margin, likewise, gives the right
+edge (a right-to-left list item ending short of it split a tight list).
 
 - **Running heads, feet, side panels, page numbers**: gone before this step (§6a) — the edges above are
   measured without them (a side panel's lines had counted in the text column's right edge).
@@ -1407,7 +1469,9 @@ the document's long lines do not start at their start edge themselves: LibreOffi
 page's every line at the left — `_startFlush`, the share of long lines at their start edge, under 0.6.)
 
 By size: three lines at most, larger than the body by 0.4 pt and bold, or 1.4 × the body size at least;
-levels by distinct size, largest first. A bold line at body size, short, not ending in ":" or "." is a **minor heading** below the real ones — not
+levels by distinct size, largest first. A bold line at body size (within 0.6 pt, measured on the sizes as drawn — the median of the line's letters against the
+body's unrounded size, `_metrics.bodyExact` —, not their half points: an iText circular's bold caption 1.2 pt under its
+9.6-pt body, scaled to 80 %, rounded to 9 against 9.5 and read as a heading, P3.3), short, not ending in ":" or "." is a **minor heading** below the real ones — not
 a piece of a line cut at two cell gaps or more (`rowCell`, lines.js: a borderless table's bold header row, round 26);
 a short line at body size **in a heading font family** — one that larger headings use, that the body
 does not, and that few body-size lines use — is a heading too, one level below the bold ones
