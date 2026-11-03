@@ -13,7 +13,7 @@
 # token, every step under bash -euo pipefail with its output teed to $RUNNER_TEMP/logs/<step>.log and uploaded with
 # the actual snapshots; all checks run even when another fails (!cancelled()), and each fails the job.
 #
-# Pinned tools. npm ci installs package-lock.json's versions (Playwright 1.56.1 → Chromium 141, jszip, jsdom);
+# Pinned tools. npm ci installs package-lock.json's versions (Playwright 1.64.1 → Chromium 156, jszip, jsdom);
 # Playwright's Chromium is cached on the lockfile's version. The apt packages are pinned to exact ubuntu-24.04
 # (noble-updates) versions, checked after the install:
 #   libxml2-utils            2.9.14+dfsg-1.3ubuntu3.10      (xmllint; libxml2 2.9.14)

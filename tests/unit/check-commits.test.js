@@ -57,3 +57,18 @@ test('checkMessage: Claude attribution lines fail (the lines .githooks/commit-ms
   // both rules at once: two problems
   assert.equal(checkMessage('change\n\nCo-authored-by: Claude <noreply@anthropic.com>', NAMES).length, 2);
 });
+
+test('checkMessage / contributorOf: a known author must use their own name; an unknown author only a listed one', function () {
+  const { contributorOf } = require('../../tools/check-commits.js');
+  const list = [
+    { name: 'Zarrabi', emails: ['a@x'], names: ['Ali Zarrabi'] },
+    { name: 'Hasan Nejad', emails: ['m@x'], names: ['mohsen-1984'] }
+  ];
+  assert.equal(contributorOf({ email: 'M@X', name: 'whoever' }, list), 'Hasan Nejad');
+  assert.equal(contributorOf({ email: 'other@x', name: 'Ali Zarrabi' }, list), 'Zarrabi');
+  assert.equal(contributorOf({ email: 'noreply@github.com', name: 'GitHub' }, list), null);
+  assert.equal(checkMessage('Zarrabi: change', NAMES, 'Hasan Nejad').length, 1);
+  assert.match(checkMessage('Zarrabi: change', NAMES, 'Hasan Nejad')[0], /another contributor/);
+  assert.deepEqual(checkMessage('Hasan Nejad: change', NAMES, 'Hasan Nejad'), []);
+  assert.deepEqual(checkMessage('Zarrabi: change', NAMES, null), []);
+});
