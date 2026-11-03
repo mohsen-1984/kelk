@@ -9,13 +9,16 @@ seconds, so it can be run after every change. The why of the importer is in
 ```text
 corpus/    the sources: Markdown documents and the office files (.docx, .xlsx, .csv, .pptx) — each with
            the Markdown it should come back as
-pdf/       the PDFs made from them: <producer>--<doc>.pdf (144 files), in five folders by what they test:
+pdf/       the PDFs made from them: <producer>--<doc>.pdf (188 files), in six folders by what they test:
              en/         the English corpus through every producer we run (60)
              rtl/        the right-to-left corpus through the same producers (30)
              office/     the office files — sheets, a deck, Word documents — through LibreOffice (13)
              pages/      one document a layout problem: web layouts, layers, forms, templates, pictures, a letterhead (24)
              producers/  producers we cannot run here, imitated glyph by glyph: Word, PowerPoint, Prince,
                          iText, Acrobat, Adobe PDF Library (17)
+             real-producers/  the real programs on Windows (make-real.ps1, make-real.js): Word, Excel, PowerPoint
+                         2024 "Save as PDF", Microsoft Print to PDF, Edge, Chrome, Firefox — our own CC0 documents
+                         (corpus/real-*, sources in corpus/real-src/) and the lab's Word and Excel files (44)
            A file's folder follows from its name (scripts/env.js: pdfGroup); generators write through
            pdfPath(name) and the runners walk every folder (labPdfs), so names stay unique across folders
            and a filter matches as before
