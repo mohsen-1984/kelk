@@ -735,9 +735,10 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 48 | P3.4 review findings applied: the textContent rung reads right-to-left text in logical order (pdf.js's per-item reordering undone, then the importer's own bidi through _joinLines; brackets, percent signs and dates as drawn; ZWNJ restored from measured Chrome evidence; list numbers and headings; running heads, feet and lone page numbers dropped by comparison with neighbour pages); lost glyphs give simplified, pdf.js text taken only when demonstrably better; OCR only for pages with no text; the rung's text counted for noText; failed pages marked failed in r.pages (mode failed in full mode); only a valid hooks.mode overrides; conf null when the signals throw; the OCR canvas released; Kelk-source reports with empty notes; run-crash.js sweeps ladder/ (also in CI); forced textContent on the RTL files words 80.9 to 85.5; auto mode byte-identical on corpus, fuzz and meta; unit tests on real pdf.js items. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 8 | P3.4 review fixes applied on the branch after the P3.3 merge (the watermark note and the rung's text count joined in PdfImporter.js); auto mode compared byte for byte with P3.3 on corpus, fuzz dev and meta (no file differs), stress run and unit tests. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 8 | P3.4 report written (docs/reports/P3.4-ladder.md): the confidence, the rungs and modes, the logical-order textContent rung, the lab (byte-identical auto mode, no page demoted, safe mode, forced textContent, stress), the reviewer's right-to-left cases before and after, review findings, what stays open. |
+| 1405-08-12 | 2.0-rc1 | Zarrabi | 1 | P3.5 report: the screenshots link points at a file (the link check refuses a folder). |
 
 <!-- generated:totals -->
-**Entries: 149 · Total: 2097 min (34.95 hours) — Zarrabi 2097 min (142 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 150 · Total: 2098 min (34.97 hours) — Zarrabi 2098 min (143 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
