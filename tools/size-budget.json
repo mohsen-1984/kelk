@@ -1,4 +1,4 @@
 {
-  "_about": "Startup JS + CSS budget of index.html in bytes, checked by tools/check-size.js (definition in its header). Set 1405-08-11 at the measured 1,985,290 bytes of the P1.2-P2.4 stack (after the review fixes) rounded up to the next 5 kB. Above the plan's 1.93 MB: that figure (1,932,621 bytes) was measured at commit 585b0fb; P1.1-P1.4 and P2.4's accessibility fixes added 52,669 bytes since (storage migrate, CSP, scripts/boot.js, i18n strings and checks, builder and importer fixes). P5.1 (lazy-load builders and importer) lowers it to the plan's startup JS <= 0.6 MB.",
-  "maxBytes": 1990000
+  "_about": "Startup JS + CSS budget of index.html in bytes, checked by tools/check-size.js (definition in its header). Set for 2.0 at the measured 2,227,617 bytes rounded up to the next 5 kB: 1,985,290 bytes after the P1.2-P2.4 work, plus the PowerPoint output (lib/PptxBuilder.js, scripts/slides.js, their styles and strings) and the file-order dialog. Lazy-loading the builders and the importer (TODO.md, High) lowers it.",
+  "maxBytes": 2230000
 }

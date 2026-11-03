@@ -47,6 +47,8 @@ exclude = [
   # prose that mentions the scheme ("file://-capable", "from file://"), autolinked by the Markdown parser: a file URL
   # with a host is never one of our relative links (those resolve to file:///…)
   '^file://[^/]',
+  # the slides samples show the image frame PowerPoint gets for a picture not there yet: ![…](placeholder)
+  '/docs/placeholder$',
   # online run: a known 404 (Known Issues: the 2.0 zip is not under releases/latest); P8.1 links the tagged release
   # and removes this line
   '^https://github\.com/mohsen-1984/kelk/releases/latest/download/kelk_2\.0\.zip$',
