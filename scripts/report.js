@@ -4,18 +4,22 @@
  *
  *   Kelk.importReport.fromResult(r)   PdfImporter's result → the report of the P3.4 contract (pure):
  *       { mode, summary: { pages, full, simplified, textContent, ocr, failed, conf },
- *         pages: [{ page, mode, conf, why: [] }]   (pages not read 'full' only),
+ *         pages: [{ page, mode, conf, why: [] }]   (pages not read 'full' only; a page that could not be read —
+ *                                                  the contract's failed: true — has the mode 'failed'),
  *         flags: [{ code, pages }], notes: [{ code, pages? }] }
  *     r.report when the importer gives one (normalised: lists always there, a flag never repeated as a
  *     note); otherwise built from the older fields — r.pages (per-page mode / conf), r.quality.flags, r.notes,
  *     r.failedPages.
- *   Kelk.importReport.worth(rep)      something to tell: a page not 'full', a flag, a note (kelkSource alone is
- *                                     not news: the embedded Markdown was used as it is).
+ *   Kelk.importReport.worth(rep)      something to tell: a page not 'full', a flag, a note that is not quiet
+ *                                     (kelkSource, kelkMath, monoBody alone are not news: the import went as it
+ *                                     should).
  *   Kelk.importReport.text(entries)   the report as plain text (Copy report).
  *   Kelk.ui.report(rep | [{ name, report }] | null, { name, onSafe })
  *     shows #import-report (or hides it: null, or nothing worth telling). The focus moves into the panel and
- *     goes back where it was when it closes (its ×, Escape). onSafe: the "Re-import in safe mode" button's
- *     action (no button without it, nor for a report that already ran in safe mode). No live region of its
+ *     goes back where it was when it closes (its ×, Escape, or a clean import that closes it). onSafe: the
+ *     "Re-import in safe mode" button's action, its explanation shown under it (no button without it, nor for a
+ *     report that already ran in safe mode). Kelk.ui.report.release(): a new import starts — onSafe (and the
+ *     file bytes it holds) goes. No live region of its
  *     own: the focus move announces the panel once (its name), the import's own toast says it loaded.
  * Every code has its key here, written in full (tools/check-i18n.js: DYNAMIC prefixes pdf_ and rep_).
  */
@@ -24,9 +28,15 @@
 
     const own = function (o, k) { return o != null && Object.prototype.hasOwnProperty.call(o, k); };
     const MODES = ['full', 'simplified', 'textContent', 'ocr'];
+    /** the panel's own mode of a page that could not be read (the contract: failed: true, mode 'simplified') */
+    const FAILED = 'failed';
     /** the quality flags (r.quality.flags): also in r.notes, shown once, as a flag */
     const FLAGS = { lostGlyphs: 'pdf_lostGlyphs', suspectSpaces: 'pdf_suspectSpaces', textInPictures: 'pdf_textInPictures' };
-    /** r.notes codes: their key, and warn (something is missing) or info (worth knowing) */
+    /**
+     * r.notes codes (every `_note('code'` of lib/ — tests/unit/report.test.js greps them): their key, and warn
+     * (something is missing), info (worth knowing) or quiet (listed with the rest, but no reason on its own to open
+     * the panel: the import went as it should).
+     */
     const NOTES = {
         noText: { key: 'pdf_noText', warn: true },
         pageLimit: { key: 'pdf_pageLimit', warn: true },
@@ -35,11 +45,14 @@
         ocrNeeded: { key: 'pdf_ocrNeeded', warn: true },
         printNoLinks: { key: 'pdf_printNoLinks' },
         ocrLayer: { key: 'pdf_ocrLayer' },
-        kelkSource: { key: 'pdf_kelkSource' },
+        watermarkDropped: { key: 'pdf_watermarkDropped' },
+        kelkSource: { key: 'pdf_kelkSource', quiet: true },
+        kelkMath: { key: 'pdf_kelkMath', quiet: true },
+        monoBody: { key: 'pdf_monoBody', quiet: true },
         pageSimplified: { key: 'pdf_pageSimplified' },
         pageTextOnly: { key: 'pdf_pageTextOnly' }
     };
-    const MODE_KEYS = { full: 'rep_mode_full', simplified: 'rep_mode_simplified', textContent: 'rep_mode_textContent', ocr: 'rep_mode_ocr' };
+    const MODE_KEYS = { full: 'rep_mode_full', simplified: 'rep_mode_simplified', textContent: 'rep_mode_textContent', ocr: 'rep_mode_ocr', failed: 'rep_mode_failed' };
     const WHY_KEYS = {
         lowConf: 'rep_why_lowConf', suspectSpaces: 'rep_why_suspectSpaces', lostGlyphs: 'rep_why_lostGlyphs',
         layoutFailed: 'rep_why_layoutFailed', extractFailed: 'rep_why_extractFailed', noText: 'rep_why_noText',
@@ -81,8 +94,8 @@
         if (r.report && typeof r.report === 'object') {
             const rep = r.report, s = rep.summary || {};
             const flags = flagList(rep.flags);
-            const pages = (Array.isArray(rep.pages) ? rep.pages : []).filter(function (p) { return p && p.mode !== 'full'; }).map(function (p) {
-                return { page: p.page, mode: String(p.mode || ''), conf: confOf(p.conf), why: (Array.isArray(p.why) ? p.why : []).map(String) };
+            const pages = (Array.isArray(rep.pages) ? rep.pages : []).filter(function (p) { return p && (p.mode !== 'full' || p.failed); }).map(function (p) {
+                return { page: p.page, mode: p.failed ? FAILED : String(p.mode || ''), conf: confOf(p.conf), why: (Array.isArray(p.why) ? p.why : []).map(String) };
             });
             const summary = { pages: +s.pages || 0, full: +s.full || 0, simplified: +s.simplified || 0, textContent: +s.textContent || 0, ocr: +s.ocr || 0, failed: +s.failed || 0, conf: confOf(s.conf) };
             return { mode: rep.mode || 'auto', summary: summary, pages: pages, flags: flags, notes: noteList(rep.notes, flags, failed) };
@@ -96,7 +109,10 @@
             per.forEach(function (p) { if (MODES.indexOf(p.mode) >= 0) summary[p.mode]++; });
             summary.pages = per.length + failed.filter(function (n) { return !per.some(function (p) { return p.page === n; }); }).length;
             summary.conf = mean(per.map(function (p) { return p.conf; }));
-            pages = per.filter(function (p) { return p.mode && p.mode !== 'full'; }).map(function (p) { return { page: p.page, mode: String(p.mode), conf: confOf(p.conf), why: [] }; });
+            const lost = function (p) { return failed.indexOf(p.page) >= 0; };
+            pages = per.filter(function (p) { return p.mode && (p.mode !== 'full' || lost(p)); }).map(function (p) {
+                return { page: p.page, mode: lost(p) ? FAILED : String(p.mode), conf: confOf(p.conf), why: [] };
+            });
         } else if (r.source !== 'kelk') {
             const read = ((r.quality && r.quality.pages) || []).map(function (q) { return q.page; });
             summary.pages = pageNums(read.concat(failed)).length;
@@ -105,8 +121,10 @@
         return { mode: 'full', summary: summary, pages: pages, flags: flags, notes: noteList(r.notes, flags, failed) };
     }
 
+    /** a note that opens the panel: a known one that is not quiet, or a code without words yet (shown as it is) */
+    const loud = function (n) { return !own(NOTES, n.code) || !NOTES[n.code].quiet; };
     function worth(rep) {
-        return !!rep && (rep.pages.length > 0 || rep.flags.length > 0 || rep.notes.some(function (n) { return n.code !== 'kelkSource'; }));
+        return !!rep && (rep.pages.length > 0 || rep.flags.length > 0 || rep.notes.some(loud));
     }
 
     // ---- the words ---------------------------------------------------------------------------------------------
@@ -116,6 +134,8 @@
     // otherwise read its digits as Arabic numbers and put the % on their left ("%78" in a sentence, "41%" in a cell)
     const pct = function (c) { return c === null || c === undefined ? '—' : '⁦' + Math.round(c * 100) + '%⁩'; };
     const modeName = function (m) { return own(MODE_KEYS, m) ? t(MODE_KEYS[m]) : m; };
+    /** a page's mode as shown: the contract's failed page (mode 'simplified', failed: true) is 'failed' */
+    const pageMode = function (p) { return p.failed ? FAILED : p.mode; };
     const whyName = function (w) { return own(WHY_KEYS, w) ? t(WHY_KEYS[w]) : w; };
     const list = function (ps) { return K.ui.pageList(ps, 12); };
 
@@ -138,7 +158,7 @@
         const s = rep.summary, parts = [];
         MODES.forEach(function (m) { if (s[m]) parts.push(modeName(m) + ' ' + s[m]); });
         if (s.failed) parts.push(t('rep_failed') + ' ' + s.failed);
-        let out = s.pages ? t('rep_summary', s.pages) + (parts.length ? ' — ' + parts.join(sep()) : '') : '';
+        let out = s.pages ? (s.pages === 1 ? t('rep_summary1') : t('rep_summary', s.pages)) + (parts.length ? ' — ' + parts.join(sep()) : '') : '';
         if (s.conf !== null) out += (out ? ' · ' : '') + t('rep_conf', pct(s.conf));
         return out;
     }
@@ -165,7 +185,7 @@
             if (rep.pages.length) {
                 lines.push('', t('rep_pagesHead'));
                 rep.pages.forEach(function (p) {
-                    lines.push('- ' + t('rep_colPage') + ' ' + p.page + ': ' + modeName(p.mode) + ', ' + pct(p.conf) +
+                    lines.push('- ' + t('rep_colPage') + ' ' + p.page + ': ' + modeName(pageMode(p)) + sep() + pct(p.conf) +
                         (p.why.length ? ' — ' + p.why.map(whyName).join(sep()) : ''));
                 });
             }
@@ -173,7 +193,7 @@
         return lines.join('\n').replace(/[⁦-⁩]/g, '') + '\n';        // plain text: no bidi isolates
     }
 
-    K.importReport = { fromResult: fromResult, worth: worth, text: text, FLAGS: FLAGS, NOTES: NOTES, MODES: MODES, WHY: WHY_KEYS };
+    K.importReport = { fromResult: fromResult, worth: worth, text: text, FLAGS: FLAGS, NOTES: NOTES, MODES: MODES, MODE_KEYS: MODE_KEYS, WHY: WHY_KEYS };
 
     // ---- the panel ---------------------------------------------------------------------------------------------
     const state = { entries: [], o: {}, back: null };
@@ -211,16 +231,18 @@
                 const tb = tbl.appendChild(el('tbody'));
                 rep.pages.forEach(function (p) {
                     const tr = tb.appendChild(el('tr'));
-                    tr.setAttribute('data-mode', p.mode);
+                    tr.setAttribute('data-mode', pageMode(p));
                     tr.appendChild(el('th', 'num', String(p.page))).scope = 'row';
-                    tr.appendChild(el('td', 'mode', modeName(p.mode)));
+                    tr.appendChild(el('td', 'mode', modeName(pageMode(p))));
                     tr.appendChild(el('td', 'num', pct(p.conf)));
                     tr.appendChild(el('td', 'why', p.why.map(whyName).join(sep())));
                 });
             }
         });
-        const safe = K.$('#report-safe');
-        if (safe) safe.hidden = !state.o.onSafe || state.entries.every(function (e) { return e.report.mode === 'safe'; });
+        const safe = K.$('#report-safe'), hint = K.$('#report-safe-hint');
+        const noSafe = !state.o.onSafe || state.entries.every(function (e) { return e.report.mode === 'safe'; });
+        if (safe) safe.hidden = noSafe;
+        if (hint) hint.hidden = noSafe;
         const name = K.$('#import-report-name');
         if (name) name.textContent = state.entries.length === 1 ? state.entries[0].name : '';
     }
@@ -230,7 +252,7 @@
         if (!box || box.hidden) return;
         const inside = box.contains(document.activeElement);
         box.hidden = true;
-        state.entries = []; state.o = {};                   // the kept file bytes go with it
+        state.entries = []; state.o = {};                   // the kept file bytes go with it (onSafe holds them)
         const back = state.back; state.back = null;
         if (restore !== false && inside) {
             const to = back && back.isConnected && !back.disabled && !back.closest('[hidden]') ? back : K.$('#editor');
@@ -242,7 +264,8 @@
         const entries = rep ? entriesOf(rep, o) : [];
         const box = K.$('#import-report');
         if (!box) return false;
-        if (!entries.length) { close(false); return false; }
+        // nothing to tell: an open panel closes (the focus, when it was inside, back where it was before it opened)
+        if (!entries.length) { close(); return false; }
         const was = !box.hidden;
         state.entries = entries; state.o = o || {};
         if (!was || !box.contains(document.activeElement)) {
@@ -255,6 +278,17 @@
         return true;
     }
     report.close = close;
+    /**
+     * A new import starts: the file kept for "Re-import in safe mode" goes now (not only when its report is
+     * replaced), and the button with it; the report on screen stays until the new one comes.
+     */
+    report.release = function () {
+        if (!state.o.onSafe) return;
+        state.o = Object.assign({}, state.o, { onSafe: null });
+        const safe = K.$('#report-safe'), box = K.$('#import-report');
+        if (safe && box && document.activeElement === safe) box.focus();
+        render();
+    };
     /** the language changed: the panel's words again */
     report.refresh = function () { if (state.entries.length) render(); };
     report.text = function () { return text(state.entries); };
