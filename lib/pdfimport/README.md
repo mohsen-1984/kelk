@@ -37,6 +37,8 @@ split into steps that take an explicit parameter object, not into closures over 
 | ↳ `_gsubGlyph` | `_gsubRepair` | step 6: one glyph's repairs from its font's own tables, in order |
 | ↳ `_gsubLost` | `_gsubRepair` | step 7: a guess nothing confirmed, in a script the document does not use, becomes U+FFFD |
 | `_extractPage` | `fromArrayBuffer` | 1. one page: glyphs, paths, images, links from pdf.js's operator list (the operator walk below) |
+| ↳ `_pageFrame` | `_extractPage` | a page turned by /Rotate: its upright frame (the walk's first CTM, the links, the page box) |
+| `_pageViewport` | `_crop`, `_ocrInk` | a render's viewport that takes the page's upright coordinates |
 | ↳ `_opState` | `_extractPage` | the walk's state: what the page draws, graphics and text state, marked content, font tests |
 | ↳ `_opMarked` | `_extractPage` | marked-content operators (BDC / BMC / EMC) |
 | ↳ `_opText` | `_extractPage` | text operators: text state and position, shown strings |

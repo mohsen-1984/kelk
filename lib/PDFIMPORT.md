@@ -289,6 +289,14 @@ the font's widths times the size; for **Type3 fonts** the unit is the font's own
 the form's matrix (`paintFormXObjectBegin`) on top of the CTM: Chromium's PDF of Kelk pages came out at
 half the coordinates without it.
 
+**Page space is the page as a viewer shows it.** A page turned by `/Rotate` (Word's landscape page: portrait paper,
+the content turned a quarter by `cm`, `/Rotate 90`; a page scanned upside down, `/Rotate 180`) is read in its
+upright frame — user space through pdf.js's viewport, y up again, at the page's own origin (`_pageFrame`): the
+operator walk starts with that frame as its CTM, the link rectangles and the page box go through it, and a page
+rendered for a figure's crop or an OCR layer's ink maps upright points back (`_pageViewport`). Read in user space,
+a quarter-turned page came out in columns of single letters and an upside-down one with every line reversed (meta
+`rotate90` / `rotate180`: 0/24 → 24/24 byte-identical to their seeds). A page with no `/Rotate` is read as it is.
+
 Spaces: a glyph is a space only when it maps to one (`code 32` is reused for other glyphs in subset
 fonts — LibreOffice's "2": "20 square meters" became "0 square meters", which looks like a lost digit,
 not a space problem); wkhtmltopdf draws a tab as the space glyph; Chrome / Skia map a ZWNJ to

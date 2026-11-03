@@ -26,12 +26,10 @@ const META = path.resolve(process.env.LAB_META || path.join(LAB, 'meta'));
 
 // Known exceptions to the "same" assertion: transform → seed → [total measured when listed (points of 100), Δ from
 // the reference, reason]. The floor is that total − FLOOR_TOL. Measured with qpdf 11.9.0, pdf-lib 1.17.1, Playwright
-// 1.56.1's Chromium (1405-08-11). Each is an importer finding (the transform was checked to be right first: rotate90,
-// cropbox and renderMode render pixel for pixel as their seed, rotate180 within a few pixels of anti-aliasing);
-// P3.3 works through them.
+// 1.56.1's Chromium (1405-08-11). Each is an importer finding (the transform was checked to be right first: cropbox and
+// renderMode render pixel for pixel as their seed); P3.3 works through them. (rotate90 / rotate180, listed on every
+// seed until the importer read a page through its /Rotate, read exactly since P3.3.)
 const FLOOR_TOL = 1.0;
-// the same finding on every seed of a transform
-const ROTATED = 'the importer reads user space and does not apply /Rotate: content turned by its matrix and turned upright by /Rotate reads turned (90: letters in columns, a table of single letters; 180: every line reversed)';
 const SLUG = 'a one-page document: the slug\'s job and plate lines, outside the CropBox, are read as text (several pages drop them as repeated furniture; nothing drops text outside the visible box)';
 const KNOWN = {
   scale80: {
@@ -45,60 +43,8 @@ const KNOWN = {
   scale125: {
     'wk-github--readme': [95.0, -5.0, "as scale80: the drawn check boxes at 1.25 × their size are not recognised"]
   },
-  rotate90: {
-    'chrome-github-bg--article': [2.8, -97.2, ROTATED],
-    'chrome-plain-hf--report': [21.8, -78.3, ROTATED],
-    'chrome-tagged--features': [17.8, -82.2, ROTATED],
-    'chrome-layout--layout-columns': [18.3, -81.7, ROTATED],
-    'chrome-template--template': [21.3, -78.7, ROTATED],
-    'chrome-web-rtl--web-rtl': [24.4, -75.6, ROTATED],
-    'wk-github--readme': [3.9, -96.1, ROTATED],
-    'lohtml--article': [2.9, -97.1, ROTATED],
-    'kelkdocx-lo--report': [21.4, -78.6, ROTATED],
-    'pandoc-lo--article': [2.9, -97.1, ROTATED],
-    'lowriter--word-tables': [20.1, -79.9, ROTATED],
-    'calc--xl-sales': [21.5, -78.5, ROTATED],
-    'impress--deck': [21.1, -76.5, ROTATED],
-    'kelk--article': [3.0, -97.0, ROTATED],
-    'word-print--word-rtl': [20.2, -79.8, ROTATED],
-    'chrome-rtl-tagged--ar-article': [16.3, -83.7, ROTATED],
-    'chrome-rtl-github-bg--fa-report': [20.8, -79.2, ROTATED],
-    'kelk--fa-report': [20.7, -79.3, ROTATED],
-    'word-memo--memo-fa': [22.6, -77.4, ROTATED],
-    'pptx-rtl--slides-rtl': [21.5, -78.5, ROTATED],
-    'prince-shapes--shapes-fa': [28.4, -71.6, ROTATED],
-    'itext-word--circular-fa': [24.3, -75.7, ROTATED],
-    'acrobat-word--booklet-fa': [21.8, -78.2, ROTATED],
-    'chrome-fa-links--fa-links': [19.4, -80.6, ROTATED]
-  },
   untag: {
     'chrome-rtl-tagged--ar-article': [100.0, 0.0, "one page: without the structure tree, Chrome's printed header and footer have no evidence left (no repetition) and stay as text"]
-  },
-  rotate180: {
-    'chrome-github-bg--article': [4.5, -95.5, ROTATED],
-    'chrome-plain-hf--report': [21.3, -78.7, ROTATED],
-    'chrome-tagged--features': [17.0, -83.0, ROTATED],
-    'chrome-layout--layout-columns': [21.9, -78.1, ROTATED],
-    'chrome-template--template': [16.2, -83.8, ROTATED],
-    'chrome-web-rtl--web-rtl': [19.5, -80.5, ROTATED],
-    'wk-github--readme': [3.1, -96.9, ROTATED],
-    'lohtml--article': [2.6, -97.4, ROTATED],
-    'kelkdocx-lo--report': [22.5, -77.5, ROTATED],
-    'pandoc-lo--article': [1.9, -98.1, ROTATED],
-    'lowriter--word-tables': [19.6, -80.4, ROTATED],
-    'calc--xl-sales': [20.5, -79.5, ROTATED],
-    'impress--deck': [21.1, -76.5, ROTATED],
-    'kelk--article': [4.4, -95.6, ROTATED],
-    'word-print--word-rtl': [16.9, -83.1, ROTATED],
-    'chrome-rtl-tagged--ar-article': [16.5, -83.5, ROTATED],
-    'chrome-rtl-github-bg--fa-report': [22.4, -77.6, ROTATED],
-    'kelk--fa-report': [22.8, -77.2, ROTATED],
-    'word-memo--memo-fa': [16.7, -83.3, ROTATED],
-    'pptx-rtl--slides-rtl': [22.2, -77.8, ROTATED],
-    'prince-shapes--shapes-fa': [27.8, -72.2, ROTATED],
-    'itext-word--circular-fa': [23.4, -76.6, ROTATED],
-    'acrobat-word--booklet-fa': [22.3, -77.7, ROTATED],
-    'chrome-fa-links--fa-links': [17.9, -82.1, ROTATED]
   },
   cropbox: {
     'chrome-layout--layout-columns': [100.0, 0.0, SLUG],
