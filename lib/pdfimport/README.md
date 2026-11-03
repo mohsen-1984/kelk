@@ -51,6 +51,7 @@ split into steps that take an explicit parameter object, not into closures over 
 | ↳ `_codeRepair` | `_extractPage` | after the walk: a code mapped to U+FFFD in a font that maps ASCII to itself |
 | ↳ `_dashedRules` | `_extractPage` | after the walk: a dashed or dotted border drawn dash by dash becomes one rule |
 | ↳ `_tinyText` | `_extractPage` | after the walk: text too small to read |
+| ↳ `_watermark` | `_extractPage` | after the walk: a watermark drawn as text (turned off the axes, large, faint, across the page) |
 | `_formsByOrder` | `fromArrayBuffer` | glyphs with no Unicode (ligatures, small capitals, Arabic forms): by order of the codes in a row |
 | ↳ `_formsRuns` | `_formsByOrder` | step 1: a letter's codes in a row whose widths agree with the forms' order |
 | ↳ `_formsPlaces` | `_formsByPlace`, `_formsByOutline` | where each code of a font stands (allows a back join, a forward one) |

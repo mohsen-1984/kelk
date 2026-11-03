@@ -711,9 +711,11 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 23 | P3.2 registry and telemetry in `blocks.js`: 165 thresholds (`blk…`, 5 fixed votes and shares) at 176 call sites; 94 rules (67 fire on the corpus), the paragraph-break reasons counted; byte-identical. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 10 | P3.2 parts joined: the five files' registries together (1,007 thresholds, 16 fixed; every name read is defined), seed references corrected, lint 0 errors. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 8 | PDF importer loaded on demand (the importer part of P5.1, taken forward in P3.1 because the split alone took startup to 2,006,240 bytes, over the 1,990,000 budget): `libs.pdfimport` in `scripts/config.js` loads `lib/PdfImporter.js` and its parts with `<script>` tags on the first PDF import, after pdf.js; `K.libs.need` counts a several-file library as loaded only when all its files ran and finishes a half-done load; 3 unit tests; PDF import under the CSP on `file://` and http checked. |
+| 1405-08-12 | 2.0-rc1 | Zarrabi | 15 | P3.3 `/ActualText` of pages whose dictionary sits in an object stream: `_pageMarkedTexts` falls back to `_rawObjStms()`; list numbers, a dash and a lost mark come back; meta `objstm` 22/24 → 24/24 exact (its two `KNOWN` entries removed); corpus and fuzz byte-identical. |
+| 1405-08-12 | 2.0-rc1 | Zarrabi | 25 | P3.3 diagonal watermark: `extract.js _watermark` drops a run turned off the axes, ≥ 1.5 × the body, faint (opacity ≤ 0.6 or light grey) and spanning ≥ 40 % of the page; turned angle and alpha recorded per glyph; 6 thresholds; unit tests; meta `stamp` 0/24 → 24/24 exact (−32.7 → 0.0); corpus and fuzz byte-identical. |
 
 <!-- generated:totals -->
-**Entries: 125 · Total: 1663 min (27.72 hours) — Zarrabi 1663 min (118 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 127 · Total: 1703 min (28.38 hours) — Zarrabi 1703 min (120 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---

@@ -346,8 +346,10 @@ What stays unknown after the repairs is **dropped**: a stray Latin Extended lett
    the page's raw content stream (`_rawIdx`, `_rawStream`, inflated with `DecompressionStream`), pairs
    the n-th `BDC` of the stream with the n-th `beginMarkedContentProps` of the operator list, and gives
    the text to the glyphs it covers. Chrome uses it for list numbers and the minus / dash signs of
-   variable fonts. Not read from object streams, other filters or encrypted files; when the BDC counts
-   differ, nothing is changed.
+   variable fonts. A page dictionary packed in an object stream (qpdf, Word for Microsoft 365) is found there
+   (`_rawObjStms`): it was looked for among the plain objects only, and its ActualText went unread — list numbers
+   restarted at 1, a dash and a mark were lost (the metamorphic `objstm` transform: Chrome's tagged files −14.6 and
+   −3.0 → 0). Not read from other filters or encrypted files; when the BDC counts differ, nothing is changed.
 2. **GSUB ligatures** (`_gsubRepair`): the embedded TrueType / OpenType font is read (cmap, post, GSUB, and
    for some rules glyf), a ligature glyph is traced back to its letters ("ﬁ" → "fi") — found through the
    FontDescriptor's `/FontName` → `/FontFile2` (pdf.js's font ids do not say which file). **One name can stand
@@ -474,6 +476,12 @@ What stays unknown after the repairs is **dropped**: a stray Latin Extended lett
 - **Text too small to read** — under 2 pt, on a page whose text is of a reading size (a median of 6 pt or
   more) — goes: a Word letterhead's 1-pt code in its logo, a printer's stamp. A page drawn small is left
   alone.
+- **A watermark drawn as text** goes (`_watermark`, rule `extract.watermarkDropped`): a run of glyphs turned
+  off the axes (more than 15° from 0 / 90 / 180 / 270), at least 1.5 × the page's upright body size (30 pt on a
+  page without one), faint — shown at 60 % opacity or less, or in a light grey — and spanning 40 % of the page's
+  shorter side. All four are asked: a table's turned header or a side label (on an axis), a turned caption of
+  the body's size, a black diagonal title and light grey upright text stay. The metamorphic `stamp` (pdf-lib's
+  diagonal «CONFIDENTIAL DRAFT» at 30 %) read its letters into the lines and blocks they fell across (−32.7).
 
 ### Numbers in right-to-left text
 
