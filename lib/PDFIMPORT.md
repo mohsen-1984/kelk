@@ -986,10 +986,15 @@ the column) — the **left edge only when fewer than eight lines start there** (
 have unequal margins; mirroring the left one made every line look indented), and **the right edge only
 when fewer than eight right-to-left lines start there** (a Word letterhead's caption at the far left,
 mirrored, pulled the right edge 37 pt out: every flush-right line of a Persian memo looked indented, and
-its numbered clauses became nested quotes). And a margin is mirrored only **from a side that two lines or more
-show** (`regColMirrorSrcLines`): a slide's one line drawn past the page's left edge gave no left margin — the
-right edge stayed — but scaled to 80 % (the metamorphic `scale80`) it gave one, and the right edge mirrored from
-it set every right-to-left line in: the slide's paragraphs read as quotes (P3.3).
+its numbered clauses became nested quotes). And the right edge is mirrored only **from a left edge that two lines
+or more show, or one left-to-right line starting there** (`regColMirrorSrcLines`): a slide's one right-to-left line
+drawn past the page's left edge gave no left margin — the right edge stayed — but scaled to 80 % (the metamorphic
+`scale80`) it gave one, and the right edge mirrored from it set every right-to-left line in: the slide's paragraphs
+read as quotes (P3.3). The left edge is mirrored from any right edge, one line's too: a short document's single line
+or caption is all that shows its margin — required twice, «متن فارسی با setDirection.» alone in a left-to-right
+document became the whole column and read backwards, and a borderless table under a one-line caption had its
+columns merged (the builder round trip, P3.3 fix); one English line at the left margin, likewise, gives the right
+edge (a right-to-left list item ending short of it split a tight list).
 
 - **Running heads, feet, side panels, page numbers**: gone before this step (§6a) — the edges above are
   measured without them (a side panel's lines had counted in the text column's right edge).
