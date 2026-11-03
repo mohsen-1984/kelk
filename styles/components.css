@@ -67,8 +67,23 @@
 .report-head h3 svg, .report-head h3 i { width: 16px; height: 16px; color: var(--warn); flex: none; }
 .report-name { flex: 1; min-width: 0; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .report-head .btn { flex: none; margin-inline-start: auto; }
-/* low enough that the text below keeps its minimum height and the editor's foot stays on screen (800 px high: 192) */
-.report-body { max-height: clamp(96px, 24vh, 220px); overflow: auto; display: grid; gap: 8px; align-content: start; }
+/* tall enough for the summary, a few findings and three page rows on a desktop screen (800 px high: 308), the
+   text below it shorter while the report is open (still on screen with the editor's foot); one column (phones):
+   the page scrolls, a share of the screen. Shadows at an edge where more content is (scroll-shadow: the covers
+   move with the content, the shadows stay with the box) */
+.report-body {
+  max-height: clamp(120px, calc(100vh - 492px), 380px); overflow: auto; display: grid; gap: 8px; align-content: start;
+  background:
+    linear-gradient(var(--panel-2) 30%, transparent) top / 100% 28px no-repeat local,
+    linear-gradient(transparent, var(--panel-2) 70%) bottom / 100% 28px no-repeat local,
+    radial-gradient(farthest-side at 50% 0, color-mix(in srgb, var(--ink) 28%, transparent), transparent) top / 100% 10px no-repeat scroll,
+    radial-gradient(farthest-side at 50% 100%, color-mix(in srgb, var(--ink) 28%, transparent), transparent) bottom / 100% 10px no-repeat scroll;
+  background-color: var(--panel-2);
+}
+.editor-body:has(> .import-report:not([hidden])) .editor-wrap { min-height: 110px; }
+@media (max-width: 900px) {
+  .report-body { max-height: clamp(140px, 40vh, 340px); }
+}
 .report-entry { display: grid; gap: 6px; }
 .report-entry + .report-entry { border-top: 1px dashed var(--line); padding-top: 8px; }
 .report-file, .report-sub { margin: 0; font-size: 12.5px; font-weight: 700; color: var(--accent-ink); }
@@ -83,7 +98,9 @@
 .report-findings { margin: 0; padding-inline-start: 18px; display: grid; gap: 3px; }
 .report-findings li.warn::marker { color: var(--warn); }
 .report-findings li.info::marker { color: var(--accent); }
-.report-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.report-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+/* what the safe-mode button does: visible beside the buttons (the button's description, aria-describedby) */
+.report-safe-hint { flex: 1 1 240px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
 .editor-wrap { position: relative; flex: 1; min-height: 240px; display: flex; }
 .stack .editor-wrap { min-height: 90px; }
 .stack .preview-scroll { min-height: 100px; }
