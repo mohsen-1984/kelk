@@ -1,10 +1,12 @@
 // Import and score the fuzzed PDFs of one split (made by make-fuzz.js), then read the scores per style value.
 //   node scripts/run-fuzz.js [split] [--show]
 // dev:     everything — the mean, the scores per style value, the weakest files by name.
-// heldout: aggregates only (the mean and the scores per style value); file names and their Markdown
-//          stay unread unless --show is given. Looking at a held-out file to write a rule turns it into dev.
-//          --show on held-out appends a line (date, split, user, generator, seed base) to LAB_OUT/heldout-opened.log
-//          and warns: the split must then be rotated (docs/HELDOUT.md), and every report checks that log.
+// heldout: aggregates only (the mean and the scores per style value). The per-file results stay in memory: no
+//          Markdown is written and _scores.json holds the summary alone (the means the gate compares), no row — so
+//          nothing in LAB_OUT names a held-out file next to its score. Looking at a held-out file to write a rule
+//          turns it into dev. --show prints the file names and per-file totals and writes the Markdown and rows as
+//          dev does; it first appends a line (date, split, user, generator, seed base) to
+//          docs/reports/heldout-opened.log and warns: the split must then be rotated (docs/HELDOUT.md).
 // Each run is compared with the previous one of the same split (_scores.prev.json): what moved — only when both read
 // PDFs of the same generator and env (else a note).
 const fs = require('fs'), path = require('path');
@@ -32,7 +34,7 @@ const mean = (rows, k) => { const v = rows.map((r) => r[k]).filter((x) => typeof
   const manifest = JSON.parse(fs.readFileSync(path.join(dir, 'manifest.json'), 'utf8'));
   // a held-out split opened: written down before anything is printed (docs/HELDOUT.md)
   if (show && split !== 'dev') {
-    require('./heldout.js').logOpened(OUT, { split: 'fuzz:' + split, generator: (manifest.env || {}).generator,
+    require('./heldout.js').logOpened({ split: 'fuzz:' + split + ' (run-fuzz.js --show)', generator: (manifest.env || {}).generator,
       base: manifest.base !== undefined ? manifest.base : manifest.samples.length ? Math.min(...manifest.samples.map((s) => s.seed)) : null });
   }
   const outDir = res; fs.mkdirSync(outDir, { recursive: true });
@@ -51,7 +53,7 @@ const mean = (rows, k) => { const v = rows.map((r) => r[k]).filter((x) => typeof
     const row = { name: s.name, seed: s.seed, style: s, ms: Date.now() - t0 };   // the style apart: its `code` is not the score's
     if (r.error) { row.error = r.error.split('\n')[0]; row.total = 0; }
     else {
-      fs.writeFileSync(path.join(outDir, s.name + '.md'), r.markdown);
+      if (show) fs.writeFileSync(path.join(outDir, s.name + '.md'), r.markdown);     // (held-out: in memory only)
       // case folded: a style may set headings in capitals (text-transform), which no PDF can undo
       // the source as printed: <name>.md beside the PDF when make-fuzz.js rewrote its digits, else corpus/<doc>.md
       const src = s.source ? path.join(dir, s.source) : path.join(LAB, 'corpus', s.doc + '.md');
@@ -65,7 +67,8 @@ const mean = (rows, k) => { const v = rows.map((r) => r[k]).filter((x) => typeof
 
   const scoresPath = path.join(res, '_scores.json'), prevPath = path.join(res, '_scores.prev.json');
   const last = fs.existsSync(scoresPath) ? JSON.parse(fs.readFileSync(scoresPath, 'utf8')) : null;
-  if (last) fs.writeFileSync(prevPath, JSON.stringify(last, null, 1));
+  // (held-out without --show: an older run's rows are not carried on either)
+  if (last) fs.writeFileSync(prevPath, JSON.stringify(show ? last : { summary: last.summary }, null, 1));
   // the previous run is compared only when it read the same PDFs (the same generator and env): another set's means
   // and files say nothing about a change of the importer
   const prev = last && JSON.stringify(last.summary.env || null) === JSON.stringify(manifest.env || null) ? last : null;
@@ -83,7 +86,8 @@ const mean = (rows, k) => { const v = rows.map((r) => r[k]).filter((x) => typeof
   });
   // inline markup the Markdown lost, summed over the split (should be 0), and in how many files
   summary.markup = rows.reduce((a, r) => a + (r.markup || 0), 0); summary.markupFiles = rows.filter((r) => r.markup).length;
-  fs.writeFileSync(scoresPath, JSON.stringify({ summary, rows }, null, 1));
+  // held-out without --show: the summary alone — no row names a file next to its score
+  fs.writeFileSync(scoresPath, JSON.stringify(show ? { summary, rows } : { summary }, null, 1));
 
   // the mean, and its change since the last run
   console.log(('fuzz/' + split + ' — ' + rows.length + ' PDFs').padEnd(30), METRICS.map((k) => SHORT[k].padStart(5)).join(' '));
@@ -117,7 +121,7 @@ const mean = (rows, k) => { const v = rows.map((r) => r[k]).filter((x) => typeof
     rows.slice().sort((a, b) => a.total - b.total).slice(0, 12).forEach((r) =>
       console.log(r.name.padEnd(30), METRICS.map((k) => pct(r[k])).join(' '), r.error ? 'ERROR ' + r.error : ''));
     if (prev) {
-      const old = new Map(prev.rows.map((r) => [r.name, r]));
+      const old = new Map((prev.rows || []).map((r) => [r.name, r]));
       const moved = rows.filter((r) => old.has(r.name) && Math.abs(r.total - old.get(r.name).total) > 0.001);
       if (moved.length) {
         console.log('\nfiles whose total moved');

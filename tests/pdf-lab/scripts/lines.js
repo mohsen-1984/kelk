@@ -1,6 +1,7 @@
 // node lines.js file.pdf ymin ymax → lines given to the XY-cut (all pages), with flags
 const fs = require('fs');
 const {chromium} = require('./env.js').req('playwright');
+require('./env.js').openHeld([process.argv[2]], 'lines.js');     // a held-out file opened: logged (docs/HELDOUT.md)
 (async () => {
   const b = await chromium.launch(); const page = await b.newPage();
   await page.goto(require('./env.js').lab);

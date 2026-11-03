@@ -24,7 +24,7 @@ const LAB = path.join(__dirname, '..'), FUZZ = require('./env.js').FUZZ, fileUrl
 // 4: + the right-to-left documents (4 of 9: dir rtl, Persian / Arabic body fonts, digits), tracking (letter-spacing)
 const GENERATOR = 4;
 // The held-out split's first seed. It rotates (docs/HELDOUT.md, "Rotation"): every 6 months, or as soon as a held-out
-// file was opened (run-fuzz.js heldout --show, logged in LAB_OUT/heldout-opened.log) — then it moves up by 100000
+// file was opened (run-fuzz.js heldout --show, logged in docs/reports/heldout-opened.log) — then it moves up by 100000
 // (the next unused block: 200001, 300001, …), HELDOUT_ROTATION goes up by one, a row is added below, and the gate's
 // held-out baseline is rebuilt (the rotation is part of the manifest's env, so the old means are never compared
 // with the new set's). Never back to an earlier block: those files were seen.
