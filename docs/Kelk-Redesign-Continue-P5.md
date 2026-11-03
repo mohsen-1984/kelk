@@ -16,15 +16,27 @@ Paste everything between the lines into a new Claude Code session opened at the 
 Continue the Kelk redesign plan (`.claude/plans/Kelk-Redesign.md`) with **Phase P5** (app and libraries):
 P5.1 → P5.2 → P5.3 → P5.4 → P5.5, as written in plan §6 P5, each with its acceptance criteria.
 
-**Where things stand (1405-08-12):** P0–P2 are approved and merged into `main`. **P3.1–P4.3** ran as one stacked
-batch (`redesign/P3.1` from `main` → `P3.2` → … → `P4.3`), draft PRs #15–#17 and #19–#23, each based on the branch
-below it; **merged only after the owner's written confirmation**, in stack order with merge commits after each one's
-green checks (as PRs #8–#14 were). Read first: `CLAUDE.md`, `docs/ContributeLog.md`, the plan (§4 process rules, §5
-tracker, §6 P5, the dependencies paragraph), this file (Part B is the state of every check, Part C the open items),
+**First, before anything else — ask the owner this question (AskUserQuestion, multi-select) and record the answers
+(Known Issues, the prerequisites, the plan) before P5.1:** "Small open points from P4 — which do you confirm as they
+are? (Unchecked ones stay open.)"
+- **Persian goldens OK** — `word-memo` «باسمه‌تعالی» half-space, `word-plan`'s run-together title, the wkhtmltopdf
+  clipped fragments «نده» / «حتاج» left out, unlabelled letter heads, the sidebar menu left out (P4.2 acceptance:
+  the owner checks the Persian goldens).
+- **B Nazanin source** — the prerequisites name it as the free "B" family (Borna Rayaneh), installed per user.
+- **mode `'failed'` kept** — in full mode an unreadable page has `mode: 'failed'` (beyond the contract's four modes);
+  the panel shows "not read".
+- **Close PR #18** — "Kelk 2.0" is open and not part of the P3–P4 stack.
+
+**Where things stand (1405-08-12):** P0–P4 are approved and merged into `main`. **P3.1–P4.3** ran as one stacked
+batch (`redesign/P3.1` from `main` → … → `P4.3`), approved by the owner on 1405-08-12 (P3.3 accepted as done with no
+entry switched to calibrated; the owner's 26 minutes confirmed) and merged as PRs #15–#17, #19–#23 in stack order
+with merge commits. Read first: `CLAUDE.md`, `docs/ContributeLog.md`, the plan (§4 process rules, §5 tracker, §6
+P5, the dependencies paragraph), this file (Part B is the state of every check, Part C the open items),
 `docs/HELDOUT.md` and the eight P3–P4 reports in `docs/reports/` (format to follow).
 
-**First, before P5.1:** if the PRs are not merged yet, ask whether they are approved; settle the owner items of
-Part C that need an answer (they are questions, not tasks).
+**Then, as P5.1's first commit:** a Change History row recording the merge (`git log --merges --first-parent main`
+gives the eight merge commits and their shas) and the merge commits in the plan's tracker rows P3.1–P4.3; delete
+`wip/P4.2-goldens` and any `redesign/P3.*` / `P4.*` branch still on the remote.
 
 **P5 notes from P3–P4:**
 - P5.1: the PDF importer already loads on demand (`libs.pdfimport` in `scripts/config.js`, P3.1); what is left is the
@@ -106,21 +118,11 @@ end-of-P2 questions) — to confirm.
 
 ## Part C — Open items
 
-**For the owner (questions):**
-1. Approve P3.1–P4.3 and the merge of PRs #15–#17, #19–#23 into `main`.
-2. P3.3's scope: the plan's literal migrations were measured and rejected (none paid); no registry entry is switched
-   to calibrated. Does P3.3 stand as done this way?
-3. The Persian goldens (P4.2 acceptance): `word-memo` «باسمه‌تعالی» half-space, `word-plan`'s run-together title,
-   the wkhtmltopdf clipped fragments «نده» / «حتاج» (left out), unlabelled letter heads, the sidebar menu left out.
-4. B Nazanin's source in the prerequisites is given as the free "B" family (Borna Rayaneh) — confirm.
-5. The person's minutes for P3–P4 (≈ 26 proposed).
-6. PR #18 "Kelk 2.0" is open and not part of this stack — keep, close or rebase?
-7. In full mode a page that could not be read has `mode: 'failed'` (beyond the contract's four modes; the panel shows
-   it as "not read") — keep?
+**For the owner (questions):** P3–P4 approved and merged, P3.3's scope accepted and the owner's 26 minutes confirmed
+(1405-08-12); the four small points are the question at the top of Part A.
 
 **Tasks:**
 - From 1405-08-19: `"overrides": { "minimatch": "11.0.1" }` (npm advisories, Known Issues).
-- Delete `wip/P4.2-goldens` once P4.2 is merged (its content is in P4.2).
 - The textContent rung on wkhtmltopdf / Word files (one glyph per pdf.js item, no drawn spaces); `pagebg` −3.4,
   `band` −2.7, `noToUnicode` −46.1; the goldens' worst cases (LibreOffice HTML RTL lists and tables, bordered form
   boxes) — Known Issues.
