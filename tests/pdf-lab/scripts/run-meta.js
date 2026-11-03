@@ -36,9 +36,7 @@ const KNOWN = {
     'wk-github--readme': [95.0, -5.0, "the task list's drawn check boxes are no longer recognised at 0.8 × their size («[x]» lost): an absolute size"],
     'word-print--word-rtl': [100.0, 0.0, "the footer «صفحه 1 از 2» and its rule, moved inwards with the content, fall outside the 12 % band: kept as text"],
     'chrome-rtl-tagged--ar-article': [100.0, 0.0, "Chrome's printed header and footer (title, date, «1/1»), moved inwards, leave the band the tree rule looks in: kept as text"],
-    'word-memo--memo-fa': [99.5, -0.5, "the memo's field block (پیوست / فوریت) read in another order: label and value swapped across lines"],
-    'pptx-rtl--slides-rtl': [80.0, -20.0, "a slide's body paragraphs read as nested quotes: an indent threshold in points"],
-    'itext-word--circular-fa': [91.7, -8.3, "a bold caption («نمودار- مراحل اجرای طرح») read as a heading: a size threshold in points"]
+    'word-memo--memo-fa': [99.5, -0.5, "the memo's field block (پیوست / فوریت) read in another order: label and value swapped across lines"]
   },
   scale125: {
     'wk-github--readme': [95.0, -5.0, "as scale80: the drawn check boxes at 1.25 × their size are not recognised"]

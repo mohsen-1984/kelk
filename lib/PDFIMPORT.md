@@ -960,7 +960,10 @@ the column) — the **left edge only when fewer than eight lines start there** (
 have unequal margins; mirroring the left one made every line look indented), and **the right edge only
 when fewer than eight right-to-left lines start there** (a Word letterhead's caption at the far left,
 mirrored, pulled the right edge 37 pt out: every flush-right line of a Persian memo looked indented, and
-its numbered clauses became nested quotes).
+its numbered clauses became nested quotes). And a margin is mirrored only **from a side that two lines or more
+show** (`regColMirrorSrcLines`): a slide's one line drawn past the page's left edge gave no left margin — the
+right edge stayed — but scaled to 80 % (the metamorphic `scale80`) it gave one, and the right edge mirrored from
+it set every right-to-left line in: the slide's paragraphs read as quotes (P3.3).
 
 - **Running heads, feet, side panels, page numbers**: gone before this step (§6a) — the edges above are
   measured without them (a side panel's lines had counted in the text column's right edge).
@@ -1435,7 +1438,9 @@ the document's long lines do not start at their start edge themselves: LibreOffi
 page's every line at the left — `_startFlush`, the share of long lines at their start edge, under 0.6.)
 
 By size: three lines at most, larger than the body by 0.4 pt and bold, or 1.4 × the body size at least;
-levels by distinct size, largest first. A bold line at body size, short, not ending in ":" or "." is a **minor heading** below the real ones — not
+levels by distinct size, largest first. A bold line at body size (within 0.6 pt, measured on the sizes as drawn — the median of the line's letters against the
+body's unrounded size, `_metrics.bodyExact` —, not their half points: an iText circular's bold caption 1.2 pt under its
+9.6-pt body, scaled to 80 %, rounded to 9 against 9.5 and read as a heading, P3.3), short, not ending in ":" or "." is a **minor heading** below the real ones — not
 a piece of a line cut at two cell gaps or more (`rowCell`, lines.js: a borderless table's bold header row, round 26);
 a short line at body size **in a heading font family** — one that larger headings use, that the body
 does not, and that few body-size lines use — is a heading too, one level below the bold ones
