@@ -1,6 +1,6 @@
 {
- "written": "2026-11-02T05:11:51.921Z",
- "note": "scripts/gate.js --update; the fuzz means hold only for their env. Corpus as written 2026-11-02T05:11Z; fuzz (generator 4, P2.1) from the CI runner, pdf-lab run 41507779260 (baseline ticked), 2026-11-02T19:17Z; meta (generator 3 of the net, P2.2: 24 seeds x 20 transforms) from the CI runner, pdf-lab run 41509321814 (baseline ticked), 2026-11-02T19:29Z",
+ "written": "2026-11-03T07:10:57.009Z",
+ "note": "scripts/gate.js --update; the fuzz means hold only for their env",
  "corpus": {
   "acrobat-word--booklet-fa": {
    "error": null,
@@ -715,8 +715,8 @@
    "lists": 1,
    "tables": 1,
    "code": 1,
-   "quotes": 0,
-   "total": 0.8462,
+   "quotes": 1,
+   "total": 0.989,
    "rtl": 1,
    "zwnj": 1,
    "yehKaf": 1,
@@ -772,8 +772,8 @@
    "lists": 1,
    "tables": 1,
    "code": 0,
-   "quotes": 0,
-   "total": 0.7121,
+   "quotes": 1,
+   "total": 0.8549,
    "rtl": 1,
    "zwnj": 1,
    "yehKaf": 1,
@@ -792,8 +792,8 @@
    "lists": 1,
    "tables": 1,
    "code": 1,
-   "quotes": 0,
-   "total": 0.8462,
+   "quotes": 1,
+   "total": 0.989,
    "rtl": 1,
    "zwnj": 1,
    "yehKaf": 1,
@@ -864,13 +864,13 @@
    "pic": 0,
    "mix": 0,
    "recall": 1,
-   "order": 0.9714,
+   "order": 1,
    "headings": 1,
    "lists": 1,
    "tables": 1,
    "code": 1,
-   "quotes": 0,
-   "total": 0.8531,
+   "quotes": 1,
+   "total": 1,
    "rtl": 1,
    "zwnj": 1,
    "yehKaf": 1,
@@ -1100,8 +1100,8 @@
    "lists": 1,
    "tables": 1,
    "code": 1,
-   "quotes": 0,
-   "total": 0.8571,
+   "quotes": 1,
+   "total": 1,
    "rtl": 1,
    "zwnj": 1,
    "yehKaf": 1,
@@ -2113,7 +2113,7 @@
    "errors": 0,
    "env": {
     "generator": 4,
-    "chromium": "141.0.7390.37",
+    "chromium": "156.0.8078.4",
     "wkhtmltopdf": "wkhtmltopdf 0.12.6",
     "fonts": {
      "liberation-serif": "LiberationSerif-Regular.ttf",
@@ -2133,19 +2133,19 @@
     }
    },
    "mean": {
-    "recall": 0.9327,
-    "order": 0.9133,
+    "recall": 0.9328,
+    "order": 0.9136,
     "headings": 0.9089,
-    "lists": 0.8107,
-    "tables": 0.7641,
-    "code": 0.883,
+    "lists": 0.8095,
+    "tables": 0.7542,
+    "code": 0.8858,
     "quotes": 0.7184,
-    "total": 0.8598,
-    "rtl": 0.85,
+    "total": 0.8591,
+    "rtl": 0.8494,
     "zwnj": 0.8189,
-    "yehKaf": 0.8333,
-    "digits": 0.9224,
-    "brackets": 0.8171
+    "yehKaf": 0.834,
+    "digits": 0.9209,
+    "brackets": 0.8155
    },
    "byDir": {
     "ltr": {
@@ -2164,19 +2164,19 @@
     "rtl": {
      "n": 44,
      "mean": {
-      "recall": 0.8563,
-      "order": 0.8357,
+      "recall": 0.8565,
+      "order": 0.8363,
       "headings": 0.8159,
-      "lists": 0.7228,
-      "tables": 0.6431,
-      "code": 0.8626,
+      "lists": 0.7204,
+      "tables": 0.6231,
+      "code": 0.8689,
       "quotes": 0.6061,
-      "total": 0.7711,
-      "rtl": 0.85,
+      "total": 0.7693,
+      "rtl": 0.8494,
       "zwnj": 0.8189,
-      "yehKaf": 0.8333,
-      "digits": 0.9224,
-      "brackets": 0.8171
+      "yehKaf": 0.834,
+      "digits": 0.9209,
+      "brackets": 0.8155
      }
     }
    },
@@ -2187,7 +2187,7 @@
    "errors": 0,
    "env": {
     "generator": 4,
-    "chromium": "141.0.7390.37",
+    "chromium": "156.0.8078.4",
     "wkhtmltopdf": "wkhtmltopdf 0.12.6",
     "fonts": {
      "liberation-serif": "LiberationSerif-Regular.ttf",
@@ -2211,10 +2211,10 @@
     "order": 0.9301,
     "headings": 0.9176,
     "lists": 0.8316,
-    "tables": 0.7693,
+    "tables": 0.7683,
     "code": 0.8856,
     "quotes": 0.7091,
-    "total": 0.8691,
+    "total": 0.8689,
     "rtl": 0.8577,
     "zwnj": 0.7576,
     "yehKaf": 0.8684,
@@ -2242,10 +2242,10 @@
       "order": 0.8767,
       "headings": 0.836,
       "lists": 0.7217,
-      "tables": 0.743,
+      "tables": 0.7409,
       "code": 0.921,
       "quotes": 0.6061,
-      "total": 0.8059,
+      "total": 0.8055,
       "rtl": 0.8577,
       "zwnj": 0.7576,
       "yehKaf": 0.8684,
@@ -2263,7 +2263,7 @@
    "qpdf": "qpdf version 11.9.0",
    "qpdfPkg": "11.9.0-1.1build1",
    "pdfLib": "1.17.1",
-   "chromium": "141.0.7390.37",
+   "chromium": "156.0.8078.4",
    "platform": "linux"
   },
   "transforms": {
@@ -2412,17 +2412,17 @@
     "relation": {
      "words≠": 24
     },
-    "total": 0.17470416666666666,
+    "total": 0.1746958333333333,
     "delta": -0.8243,
     "files": {
      "chrome-github-bg--article": 0.0276,
      "chrome-plain-hf--report": 0.2175,
-     "chrome-tagged--features": 0.1776,
+     "chrome-tagged--features": 0.1771,
      "chrome-layout--layout-columns": 0.1829,
      "chrome-template--template": 0.2134,
      "chrome-web-rtl--web-rtl": 0.244,
      "wk-github--readme": 0.0392,
-     "lohtml--article": 0.0291,
+     "lohtml--article": 0.0294,
      "kelkdocx-lo--report": 0.2136,
      "pandoc-lo--article": 0.0294,
      "lowriter--word-tables": 0.2011,
@@ -3248,7 +3248,7 @@
     "via": "chromium",
     "v": 1,
     "env": {
-     "chromium": "141.0.7390.37",
+     "chromium": "156.0.8078.4",
      "platform": "linux"
     },
     "n": 5,
@@ -3278,15 +3278,15 @@
     "via": "chromium",
     "v": 1,
     "env": {
-     "chromium": "141.0.7390.37",
+     "chromium": "156.0.8078.4",
      "platform": "linux"
     },
     "n": 5,
-    "same": 4,
+    "same": 3,
     "errors": 0,
     "unexpected": 0,
     "relation": {
-     "blocks±>1": 0
+     "blocks±>1": 1
     },
     "total": 1,
     "delta": 0,
@@ -3300,8 +3300,7 @@
     "exact": [
      "chrome-github-bg--article",
      "chrome-plain-hf--report",
-     "chrome-tagged--features",
-     "chrome-rtl-tagged--ar-article"
+     "chrome-tagged--features"
     ]
    },
    "pageSize": {
@@ -3309,7 +3308,7 @@
     "via": "chromium",
     "v": 1,
     "env": {
-     "chromium": "141.0.7390.37",
+     "chromium": "156.0.8078.4",
      "platform": "linux"
     },
     "n": 5,
