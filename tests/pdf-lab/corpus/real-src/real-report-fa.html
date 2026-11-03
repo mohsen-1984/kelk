@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>گزارش ماهانهٔ سرویس‌های ابری</title>
+<style>
+body{font-family:Tahoma, sans-serif;font-size:14px;line-height:1.6;color:#111;max-width:46em;margin:0 auto}
+    h1{font-size:1.6em;color:#1f3864} h2{font-size:1.25em;color:#2f5496}
+    table{border-collapse:collapse;margin:.6em 0} th,td{padding:3px 10px;text-align:start;vertical-align:top}
+    th,td{border:1px solid #444} th{background:#d9e1f2}
+</style>
+</head>
+<body>
+<h1>گزارش ماهانهٔ سرویس‌های ابری</h1>
+<p>مهر ۱۴۰۵ — واحد زیرساخت</p>
+<h2>خلاصه</h2>
+<p>در مهرماه میانگین دسترس‌پذیری سرویس‌ها به 99.95 درصد رسید که از هدف SLA (یعنی 99.9 درصد) بالاتر است. دو رخداد مهم ثبت شد: کندی پایگاه داده PostgreSQL در روز ۹ مهر و قطعی کوتاه CDN در روز ۲۳ مهر. هزینهٔ ماهانه نسبت به شهریور ۴ درصد کاهش یافت.</p>
+<h2>شاخص‌های اصلی</h2>
+<table>
+<thead>
+<tr>
+<th>سرویس</th>
+<th>دسترس‌پذیری</th>
+<th>زمان پاسخ (ms)</th>
+<th>هزینه (میلیون ریال)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>درگاه وب (Web Portal)</td>
+<td>99.98%</td>
+<td>182</td>
+<td>410</td>
+</tr>
+<tr>
+<td>رابط برنامه‌نویسی (API)</td>
+<td>99.95%</td>
+<td>96</td>
+<td>655</td>
+</tr>
+<tr>
+<td>پایگاه داده</td>
+<td>99.91%</td>
+<td>14</td>
+<td>820</td>
+</tr>
+<tr>
+<td>ذخیره‌سازی اشیا (Object Storage)</td>
+<td>100%</td>
+<td>41</td>
+<td>238</td>
+</tr>
+</tbody></table>
+<h2>رخدادها</h2>
+<ol>
+<li>کندی PostgreSQL: یک پرس‌وجوی بدون ایندکس در گزارش‌گیری شبانه، بار پردازنده را به 95 درصد رساند. ایندکس لازم ساخته شد و زمان اجرای گزارش از ۴۰ دقیقه به ۳ دقیقه رسید.</li>
+<li>قطعی CDN: گواهی TLS یکی از گره‌های لبه منقضی شده بود. تمدید خودکار گواهی‌ها با ابزار certbot برای همهٔ گره‌ها فعال شد.</li>
+</ol>
+<h2>برنامهٔ آبان‌ماه</h2>
+<ul>
+<li>مهاجرت سرویس صف از RabbitMQ 3.12 به نسخهٔ 4.0</li>
+<li>افزودن هشدار برای گواهی‌هایی که کمتر از ۱۴ روز اعتبار دارند</li>
+<li>بازبینی هزینه‌ها با تیم مالی و حذف ماشین‌های بی‌استفاده</li>
+</ul>
+<h2>مقایسهٔ هزینه‌ها</h2>
+<table>
+<thead>
+<tr>
+<th>ماه</th>
+<th>محاسبه</th>
+<th>ذخیره‌سازی</th>
+<th>شبکه</th>
+<th>جمع</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>شهریور</td>
+<td>1,240</td>
+<td>310</td>
+<td>216</td>
+<td>1,766</td>
+</tr>
+<tr>
+<td>مهر</td>
+<td>1,178</td>
+<td>305</td>
+<td>212</td>
+<td>1,695</td>
+</tr>
+</tbody></table>
+<p>تهیه‌کننده: گروه عملیات (Ops Team)</p>
+</body>
+</html>
