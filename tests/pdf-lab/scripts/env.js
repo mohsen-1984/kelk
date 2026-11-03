@@ -26,7 +26,7 @@ function importerFiles(where) {
   let core = path.resolve(where);
   if (fs.statSync(core).isDirectory()) core = fs.existsSync(path.join(core, 'lib', 'PdfImporter.js')) ? path.join(core, 'lib', 'PdfImporter.js') : path.join(core, 'PdfImporter.js');
   const dir = path.join(path.dirname(core), 'pdfimport');
-  const parts = ['extract', 'lines', 'regions', 'order', 'blocks'].map((p) => path.join(dir, p + '.js')).filter((f) => fs.existsSync(f));
+  const parts = ['thresholds', 'calibration', 'extract', 'lines', 'regions', 'ladder', 'order', 'blocks'].map((p) => path.join(dir, p + '.js')).filter((f) => fs.existsSync(f));
   return [core].concat(parts);
 }
 
@@ -37,7 +37,10 @@ function importerFiles(where) {
 //   office/     the office files (sheets, a deck, Word documents) through LibreOffice
 //   pages/      single documents made for one layout problem (web layouts, layers, forms, templates, pictures, cards)
 //   producers/  producers we cannot run here, imitated glyph by glyph (Word, PowerPoint, Prince, iText, Acrobat, Adobe PDF Library)
+//   real-producers/  the real programs on Windows: Word, Excel, PowerPoint 2024 (Save as PDF), Microsoft Print to PDF, Edge,
+//               Chromium (chrome--: Playwright's own build, not a desktop Chrome), Firefox — our own documents (corpus/real-*) and the lab's office files (make-real.ps1, make-real.js)
 const PDF_GROUPS = [
+  ['real-producers', /^(word2024-save|msprint-(word|excel|ppt)|excel2024|ppt2024|edge|chrome|firefox)--/],
   ['producers', /^(word\d*-|pptx-|prince-|itext-|acrobat-|pdflib-)/],
   ['office', /^(calc--|impress--|lowriter--word-)/],
   ['pages', /^(chrome-(layout|layers|template|web-rtl|headtable|positioned|float-tagged|pictures|card|fa-links|form|letterhead)--|wk-pictures--|lowriter--merged)/],
@@ -58,4 +61,45 @@ function labPdfs(root) {
 }
 // a file:// URL for a local path on any platform ('file://' + path breaks on Windows drive letters and spaces)
 const fileUrl = (f) => require('url').pathToFileURL(path.resolve(f)).href;
-module.exports = { pdfPath, pdfGroup, labPdfs, importerFiles, fileUrl, KELK, LAB, OUT, FUZZ, ORIG: process.env.KELK_ORIG || null, req, lab: fileUrl(path.join(KELK, 'tools', 'pdf-lab.html')) };
+
+// The held-out protocol on the lab (heldout.js, tests/pdf-lab/HELDOUT.md): the split of the lab's PDFs by document — every PDF
+// whose document is held out, wherever it lies — computed once per process
+let heldCache = null;
+function heldSplit() {
+  if (!heldCache) heldCache = require('./heldout.js').splitLab(labPdfs(), (n) => pdfGroup(n) === 'real-producers');
+  return heldCache;
+}
+// a fuzz held-out file: under FUZZ/heldout, a …/fuzz/heldout/ folder elsewhere (LAB_FUZZ), or run-fuzz.js's fuzz-heldout/
+function isFuzzHeld(file) {
+  const f = path.resolve(file), inside = (d) => { const r = path.relative(d, f); return r && !r.startsWith('..') && !path.isAbsolute(r); };
+  const parts = f.split(/[\\/]+/);
+  return inside(path.join(FUZZ, 'heldout')) || parts.some((p, i) => (p === 'heldout' && parts[i - 1] === 'fuzz') || p === 'fuzz-heldout');
+}
+// The guard of the lab's file-by-file tools (dbg.js, dump.js, cmp.js, lines.js, shapes.js, words.js, snapshot.js,
+// run-crash.js --show-held): given the files a tool is about to open and print, it logs every held-out one to
+// tests/pdf-lab/heldout-opened.log — fuzz:heldout once, real:<document> once per document — with the tool's name, and
+// warns. Returns the held-out files among them. Logging is the record: the tool still runs.
+function openHeld(files, script) {
+  const H = require('./heldout.js'), held = new Set(heldSplit().docs.heldout), out = [], seen = new Set();
+  (files || []).filter((f) => f).forEach((f) => {
+    const doc = /\.(pdf|md|html)$/i.test(f) ? H.docOf(f.replace(/\.(md|html)$/i, '')) : null;
+    let split = null;
+    if (isFuzzHeld(f)) split = 'fuzz:heldout';
+    else if (doc && held.has(doc)) split = 'real:' + doc;
+    if (!split) return;
+    out.push(f);
+    if (seen.has(split)) return;
+    seen.add(split);
+    const o = { split: split + ' (' + (script || path.basename(process.argv[1] || '?')) + ')' };
+    if (split === 'fuzz:heldout') {
+      try {
+        const m = JSON.parse(require('fs').readFileSync(path.join(FUZZ, 'heldout', 'manifest.json'), 'utf8'));
+        o.generator = (m.env || {}).generator;
+        o.base = m.base !== undefined ? m.base : m.samples.length ? Math.min(...m.samples.map((s) => s.seed)) : null;
+      } catch (e) { /* no manifest: generator and seed base unknown */ }
+    }
+    H.logOpened(o);
+  });
+  return out;
+}
+module.exports = { pdfPath, pdfGroup, labPdfs, heldSplit, isFuzzHeld, openHeld, importerFiles, fileUrl, KELK, LAB, OUT, FUZZ, ORIG: process.env.KELK_ORIG || null, req, lab: fileUrl(path.join(KELK, 'tools', 'pdf-lab.html')) };

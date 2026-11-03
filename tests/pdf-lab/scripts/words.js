@@ -3,6 +3,7 @@ const fs = require('fs');
 const { chromium } = require('./env.js').req('playwright');
 (async () => {
   const [file, pg, yt, yb] = process.argv.slice(2);
+  require('./env.js').openHeld([file], 'words.js');     // a held-out file opened: logged (tests/pdf-lab/HELDOUT.md)
   const browser = await chromium.launch(); const page = await browser.newPage();
   await page.goto(require('./env.js').lab);
   const out = await page.evaluate(async ([b64, pg, yt, yb]) => {

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>Field Notes Sync</title>
+<style>
+body{font-family:"Segoe UI", Arial, sans-serif;font-size:15px;line-height:1.6;color:#111;max-width:46em;margin:0 auto}
+    h1{font-size:1.6em;color:#1f3864} h2{font-size:1.25em;color:#2f5496}
+    table{border-collapse:collapse;margin:.6em 0} th,td{padding:3px 10px;text-align:start;vertical-align:top}
+    th,td{border:1px solid #444} th{background:#d9e1f2}
+</style>
+</head>
+<body>
+<h1>Field Notes Sync</h1>
+<p>A small desktop tool that copies field survey notes from a tablet to the office archive and checks that nothing was lost on the way.</p>
+<h2>Requirements</h2>
+<ul>
+<li>Windows 10 or 11, or any Linux with Python 3.11</li>
+<li>About 200 MB of free disk space for the local cache</li>
+<li>Network access to the archive share</li>
+</ul>
+<h2>Installation</h2>
+<ol>
+<li>Download the latest release and unpack it into a folder of your choice.</li>
+<li>Copy the file settings.example.ini to settings.ini and enter the address of the archive share.</li>
+<li>Run the setup once as an administrator so that the background service is registered.</li>
+</ol>
+<h2>Daily use</h2>
+<p>Connect the tablet with its cable and wait until the tray icon turns green. The tool then copies every new note, compares the checksums of both copies and writes a short line into the sync log. Notes that fail the check are kept on the tablet and shown in red, so they can be copied again later.</p>
+<h2>Settings</h2>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>archive_path</td>
+<td>(none)</td>
+<td>The folder on the share that receives the notes</td>
+</tr>
+<tr>
+<td>keep_days</td>
+<td>30</td>
+<td>How long copied notes stay on the tablet</td>
+</tr>
+<tr>
+<td>verify</td>
+<td>yes</td>
+<td>Compare checksums after every copy</td>
+</tr>
+<tr>
+<td>log_level</td>
+<td>info</td>
+<td>How much detail the sync log records</td>
+</tr>
+</tbody></table>
+<h2>Known limits</h2>
+<p>Very large photo attachments, over 2 GB each, are skipped and listed in the log. The tool does not merge two notes edited on different tablets; the newer copy wins and the older one is kept with a .old suffix.</p>
+<h2>Licence</h2>
+<p>The text of this readme is released into the public domain (CC0 1.0).</p>
+</body>
+</html>

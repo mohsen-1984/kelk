@@ -9,18 +9,22 @@ seconds, so it can be run after every change. The why of the importer is in
 ```text
 corpus/    the sources: Markdown documents and the office files (.docx, .xlsx, .csv, .pptx) — each with
            the Markdown it should come back as
-pdf/       the PDFs made from them: <producer>--<doc>.pdf (144 files), in five folders by what they test:
+pdf/       the PDFs made from them: <producer>--<doc>.pdf (188 files), in six folders by what they test:
              en/         the English corpus through every producer we run (60)
              rtl/        the right-to-left corpus through the same producers (30)
              office/     the office files — sheets, a deck, Word documents — through LibreOffice (13)
              pages/      one document a layout problem: web layouts, layers, forms, templates, pictures, a letterhead (24)
              producers/  producers we cannot run here, imitated glyph by glyph: Word, PowerPoint, Prince,
                          iText, Acrobat, Adobe PDF Library (17)
+             real-producers/  the real programs on Windows (make-real.ps1, make-real.js): Word, Excel, PowerPoint
+                         2024 "Save as PDF", Microsoft Print to PDF, Edge, Chromium (chrome--: Playwright's, not a desktop Chrome), Firefox — our own CC0 documents
+                         (corpus/real-*, sources in corpus/real-src/) and the lab's Word and Excel files (44)
            A file's folder follows from its name (scripts/env.js: pdfGroup); generators write through
            pdfPath(name) and the runners walk every folder (labPdfs), so names stay unique across folders
            and a filter matches as before
+golden/    golden files: <name>.md typed by hand from the pages of the lab PDF <name>.pdf (scripts/golden.js)
 scripts/   generators, the importer runs, the scorer, inspection tools
-out/       (made when run) the imported Markdown / HTML and _scores.json
+out/       (made when run) the imported Markdown / HTML and _scores.json (golden files: out/golden/)
 fuzz/      (made when run) style-fuzzed PDFs: dev/ and heldout/, each with its manifest.json (and the sources
            whose digits a style rewrote, <name>.md)
            (their results go to out/fuzz-dev/, out/fuzz-heldout/)
@@ -150,12 +154,16 @@ them to `pdf/` with a `--<doc>` suffix to score them, or to any folder for `run-
 ## Running it
 
 ```sh
-node scripts/run-import.js [filter]   # import pdf/*/*.pdf, score against corpus/<doc>.md, write out/
+node scripts/run-import.js [filter]   # import pdf/*/*.pdf, score against corpus/<doc>.md, write out/ (held-out real documents left out)
+node scripts/run-import.js --real-heldout   # the PDFs of the held-out documents, wherever they lie: their mean only (HELDOUT.md)
+node scripts/heldout.js               # the real-producer split: the documents on each side
 node scripts/roundtrip.js             # Kelk's own round trip: tests/builder-suite.html, md → PDF → md
 node scripts/math-roundtrip.js        # formulas through Kelk and back: every case of tests/math-cases.js, en and fa (76 checks)
 DIR=folder node scripts/run-real.js   # any PDFs: words found (recall) and their order, against pdftotext
-node scripts/run-crash.js [folder]    # stability: every PDF under a folder (default pdf/, subfolders too); exit 1 on an error or timeout
-node scripts/run-stress.js big.pdf small.pdf   # a long file (thread held < 1 s), injected faults, an abort
+node scripts/run-crash.js [folder]    # stability: every PDF under a folder (default pdf/ and ladder/, subfolders too); exit 1 on an error or timeout
+node scripts/run-stress.js big.pdf small.pdf   # a long file (thread held < 1 s), injected faults (the ladder's rungs), an abort, ladder/*.pdf demoted
+node scripts/make-ladder.js                    # ladder/: PDFs the fallback ladder must demote (a scan, glued Type 3 words) — not corpus files
+node scripts/run-import.js --mode safe         # the corpus in safe mode (its own LAB_OUT): means of words and order ≥ 70
 node scripts/cmp.js A B dir…             # two versions of the importer (a Kelk folder or its lib/PdfImporter.js): what changed
 node scripts/snapshot.js pdfs/ snap/ [--against older/]   # a regression set of real (private) PDFs: Markdown + signals, compared
 node scripts/writeout.js                 # the import settings that write the text out (digits, ٬ ٫ ٪ ،, ي/ك): checks of _writeOut
@@ -200,9 +208,9 @@ sets measure that gap.
 
 ```sh
 node scripts/make-fuzz.js dev        # 100 PDFs: fuzz/dev/      (seeds 1–100)
-node scripts/make-fuzz.js heldout    # 100 PDFs: fuzz/heldout/  (seeds 100001–100100)
+node scripts/make-fuzz.js heldout    # 100 PDFs: fuzz/heldout/  (seeds HELDOUT_BASE…: 100001–100100 until the first rotation)
 node scripts/run-fuzz.js dev         # mean, per direction, scores per style value, weakest files, what moved
-node scripts/run-fuzz.js heldout     # mean, per direction and scores per style value only
+node scripts/run-fuzz.js heldout     # mean, per direction and scores per style value only (no Markdown, no per-file rows written)
 ```
 
 Each sample is one corpus document (round robin, so every document is equally present: since generator 4
@@ -240,7 +248,9 @@ only when the previous run read PDFs of the same generator and env.
 what you see. `heldout` is for judgement: only its means and its per-value table are read
 (`run-fuzz.js heldout` hides file names; `--show` prints them). A rule written after looking at a
 held-out file has turned that split into a second dev set, and nothing measures generalisation any more
-— then draw a new held-out split with other seeds. A change is good when dev improves **and**
+— then draw a new held-out split with other seeds (the rotation of [`HELDOUT.md`](HELDOUT.md):
+`--show` on held-out is logged to `tests/pdf-lab/heldout-opened.log` (committed), and `make-fuzz.js` `HELDOUT_ROTATION` moves the
+seed base up by 100000). A change is good when dev improves **and**
 held-out does not drop.
 
 **Reading the table.** Per dimension, the weakest value comes first: that is where to look next (in
@@ -336,7 +346,14 @@ relations**, counted per transform: under "same" the multiset of words equals th
 generator 3 (1405-08-11, 24 seeds, references 99.9): `rotate180` −83.0, `rotate90` −82.4 (the importer does not
 apply `/Rotate`), `noToUnicode` −81.0, `stamp` −32.7, `trackLoose` −12.2, `tz85` −9.2, `trackTight` −3.6, `pagebg`
 −3.3, `band` −2.7, `scale80` −1.4, `objstm` −0.7, `pageSize` −0.4, `renderMode` −0.3, `scale125` −0.2, the rest 0.0;
-"same": 133 of 199 files exact, 66 known exceptions.
+"same": 133 of 199 files exact, 66 known exceptions. After P3.3 (1405-08-12):
+`rotate90` and `rotate180` 0.0, every file exact (the page read in its upright frame, `_pageFrame`); `objstm` 0.0,
+every file exact (descriptors and `/ActualText` read from object streams); `stamp` 0.0, 24 of 24 (the watermark
+rule, `_watermark`); `tz85` −0.1, `trackTight` 0.0, `trackLoose` −0.8 (runs laid out again from their untracked
+widths when their gaps follow the drift — calibration.js `drift`, lines.js `untrack`: a rule that fires on the
+synthetic transforms only — no real producer leaves those gaps: `lines.untracked` fires on no corpus file); `noToUnicode` −46.1
+(fonts with no ToUnicode named by their programs, `_gsubByCode`); "same": 185 of 199 files exact, 14 known
+exceptions.
 
 **In the gate**, each transform is compared on its own with a baseline entry of the same `v` and the same env
 for what it depends on (pdf-lib; qpdf and its package version; Chromium and the platform), over the seeds both
@@ -350,7 +367,8 @@ invariant; scale80 −1.0, scale125 −0.3; objstm −4.6 (`/ActualText` inside 
 Persian Word file −55); pagebg −3.4, band −2.6 (a deck −35); **tz85 −13.5, trackTight −5.7, trackLoose −16.2**
 (set where each run stands, these three open gaps no real producer leaves for the producers that place every
 run by its own position — LibreOffice, pandoc —; their losses are largely the transform's: kept as regression
-guards; the real-producer measure is the fuzz generator's `tracking` dimension, generator 4); noToUnicode 14.7. The gate holds each
+guards; the real-producer measure is the fuzz generator's `tracking` dimension, generator 4 — P3.3's untracked
+layout repairs them and fires on these transforms only); noToUnicode 14.7 (P3.3: see above). The gate holds each
 transform's mean (−1 point; −3 for `noToUnicode`); CI makes the PDFs once and runs both importers on them.
 
 ## Coverage: `features.js`
@@ -389,6 +407,93 @@ producer, and the trees' headings against the source's (Chrome tagged 100, Libre
 fuzz files of dev 99.5 — the importer's own headings on those: 93.3). That is the trust
 weight of the next step (TODO: the structure tree as a prior).
 
+## Golden files
+
+A corpus reference (`corpus/<doc>.md`) is the *source* of a document: every producer's PDF of it is scored
+against the same text, so a producer that drops a heading level, draws a list as plain paragraphs or loses a line
+is scored against what it never printed. A golden file is the other reference: `golden/<name>.md` is what a careful
+person types from the pages of one lab PDF, `<name>.pdf` (found anywhere under `pdf/`) — its text, the heading
+hierarchy as it looks, lists and their nesting, tables with their real rows and columns, quotes, code; running heads,
+feet, page numbers and decorations left out, as the corpus does. 50 of them, across the producer families: 23
+Persian, 10 Arabic, 17 English (the plan's 20 / 10 / 20 counted by producer: three of the English-side producer
+families — Prince's letter table, the PowerPoint-in-Arial deck and the web receipt card — exist in the lab only
+with Persian documents, so their goldens are Persian).
+
+**The rule.** A golden is written from the page, **never from the importer's output** — not started from `out/`,
+not corrected after a look at a run, or it would hold the importer's mistakes as right. The source reference may be
+copied for the exact characters (Persian and Arabic typed from a picture go wrong), but the page decides structure
+and text. The owner checks the Persian ones.
+
+**What a golden holds** — the decisions the 50 share:
+
+- *What the page shows, not what the PDF holds.* Text clipped off the page (outside the crop box, under a frame's
+  edge, cut by a cell) is not in a golden, even when the text layer still holds it; nor is invisible text.
+- *Running heads and feet.* A letter's head block printed on every page (the office, the number, date and time
+  fields) is kept **once, at its first appearance** — it carries the letter's fields; other running heads and feet
+  (a document title in the margin, an address or «page n» in the foot, a header table) are left out
+  (`itext-word--circular-fa`, `word-memo--memo-fa`, `chrome-letterhead--letter-ltr`, `prince-letter--prince-table`).
+- *Site chrome.* A web page's banner (the site's name), its navigation (a sidebar or menu of topics) and the
+  browser's print header and footer (date, title, address, «1/1») are left out as running heads are; the golden
+  holds the page's main content (`chrome-layout--layout-sidebar`: the «Topics» sidebar is navigation, not content).
+- *Headings as they look.* The largest text is the top heading and the rest follow by relative size and weight
+  (`itext-word--circular-fa`: the office's name `#`, the circular's title `##`); blocks drawn alike take one role
+  (`chrome-form--form-fa`: the four identical grey title bands are four `##` headings, the goods table's included).
+- *Tables as drawn.* A bordered box of «label: value» pairs is a GFM table with the page's rows and columns, one pair
+  to a cell, a row with fewer pairs padded with empty cells and a full-width remark in the first cell of its row
+  (`chrome-form--form-fa`: 3 × 3 for each box); a note merged over a table's last row goes after the table, as
+  the corpus writes it.
+- *List markers.* The glyph a producer draws for a bullet («•», Word's Courier «o», «▪», «✓») is the list's sign, not
+  its text: a golden writes the corpus convention — `-` and `1.` items outside tables, `• ` items joined by
+  `<br>` inside a cell (`word-cells--cells-fa`, drawn with «o») — whatever the glyph.
+- *Paragraphs.* Lines set closer than the paragraphs around them are one paragraph, even when the source broke them
+  (`acrobat-word--booklet-fa`: the quote is one paragraph of two lines).
+
+`scripts/golden.js` imports each PDF as `run-import.js` does (the same options, pictures out before scoring), scores
+it with `score.js` against its golden, and compares the structure (`scripts/structdiff.js`) — three sequences, each
+aligned with the fewest edits:
+
+| Part | Sequence | An edit |
+|---|---|---|
+| heading tree | the heading levels, in order | a heading missing, extra, or at another level |
+| table shapes | rows × columns of each table (the header row counted), in order | a table missing, extra, or of another shape |
+| list nesting | the depth of each list item, in order | an item missing, extra, or at another depth |
+
+Headings, tables and lists inside quotes and list items count. The diff compares **shapes only, not text**: a
+heading of the right level with the wrong words, or a table of the right shape with wrong cells, is no edit (the
+words are `score.js`'s); and a numbered and a bulleted item count alike (a depth, not a kind). A structure cell
+prints as `12/13 −1 +2 ~0`: the golden's count / the import's, then missing, extra, changed.
+
+```sh
+node scripts/golden.js [filter]            # every golden/*.md (filter: a regexp on the name)
+node scripts/golden.js --dir other/        # another folder of goldens (trying the tool, a draft) — never written to the baseline
+```
+
+It writes `out/golden/<name>.md` (the importer's Markdown, pictures as `![](img-<page>-<n>)`) and
+`out/golden/_scores.json`: `{ dir, lab, filter, n, errors, mean, rows }`, each row `{ name, ms, recall, order,
+headings, lists, tables, code, quotes, total, rtl…, extra, struct: { headings, tables, lists: { want, got, missing,
+extra, changed }, edits } }`; `mean` holds each metric's mean over the files that have it and the edits per file. A
+golden whose PDF is not in the lab is an error row, and any error row exits 1. A missing `golden/` folder is no error
+(nothing to score).
+
+**Goldens on held-out PDFs.** Five goldens are typed from PDFs of held-out real-producer documents (`scripts/heldout.js`,
+[`HELDOUT.md`](HELDOUT.md): `real-letter-ar` three times, `real-report-fa`, `real-memo-fa`). A score per
+file would read those documents one by one, so they are read as the held-out is: `golden.js` scores them but prints
+and writes no row, no Markdown and no name with a score of them — only `heldout: { n, errors, mean: { total, rtl,
+edits } }` in `_scores.json` and one `held-out` line; a filtered run leaves them out. They stay in `golden/` (a golden
+is typed by a person; moving them would mean typing others) and are gated as a mean (below).
+
+**In the gate**, as the corpus, file by file: a golden file fails when it crashes (or lost its PDF), or its total
+drops more than **0.5 point** (`TOL_GOLDEN`) against the compared side (`baseline.json`'s `golden` section, or
+`--against DIR`'s `golden/_scores.json`), or a golden file of the compared side is missing from an unfiltered run
+of the lab's own `golden/` (as a corpus file no longer scored: deleting a golden on purpose takes a new baseline). A
+new golden file, one missing from a filtered or `--dir` run, one metric down while the total holds, and a structure
+diff that grew are notes. The comparison is `scripts/gate-golden.js` (pure; `tests/unit/gate-golden.test.js`). `--update` writes the `golden` section only from a run of the lab's own
+`golden/` holding every golden file (a filtered run is refused as the corpus is, `--partial` merges its files; a
+`--dir` run is refused); a run without `golden.js` keeps the old section. The held-out goldens are one mean
+(`baseline.json` `goldenHeldout`, `--against`'s `golden/_scores.json` `heldout`): a crash, or the mean total dropping
+more than **1 point** over as many files, fails; `--update` writes it from an unfiltered run, else keeps the old one.
+In CI both importers import head's goldens.
+
 ## The gate
 
 `scripts/gate.js` reads the results of the runs (it runs nothing) and fails — exit code 1 — when a
@@ -397,7 +502,9 @@ change made the importer worse:
 | What | Fails when |
 |---|---|
 | corpus | a file crashes, or its total drops more than 0.5 point, or its right-to-left details (`rtl`) drop more than 0.5 point, or it is no longer scored (its `corpus/<doc>.md` missing or renamed) |
+| golden | a golden file crashes or has no PDF, or its total drops more than 0.5 point, or it is missing from an unfiltered run; the goldens on held-out real PDFs as one mean, more than 1 point (see «Golden files») |
 | fuzz `dev`, `heldout` | a PDF crashes, or the split's **mean** total drops more than 1 point, or so does a direction's (`ltr`, `rtl`) mean total or the `rtl` column's mean over the right-to-left files (a loss on the 44 right-to-left files alone barely moves the split's mean); an older baseline without them gives a note |
+| real held-out | the held-out real-producer documents (`scripts/heldout.js`, [`HELDOUT.md`](HELDOUT.md)), scored by `run-import.js --real-heldout` as one mean: a crash, or the mean total dropping more than 1 point (compared only over the same documents and count) |
 | inline markup (`mkup`) | bold, italic, strike or inline code the importer wrote in HTML that a CommonMark parser no longer finds in its Markdown (`markup.js`: «بود**.**» stays literal asterisks) — any rise, on a corpus file or summed over a fuzz split; it should stay 0 |
 
 A metric that drops while the total holds (headings −3, tables +3) is printed as a note, not failed.
@@ -405,7 +512,7 @@ The fuzz splits are gated on their means only: per file would read held-out file
 groups per style value are too small (fewer than 15 files in most) to tell a change from noise.
 
 ```sh
-node scripts/run-import.js && node scripts/run-fuzz.js dev && node scripts/run-fuzz.js heldout && node scripts/run-meta.js
+node scripts/run-import.js && node scripts/run-import.js --real-heldout && node scripts/golden.js && node scripts/run-fuzz.js dev && node scripts/run-fuzz.js heldout && node scripts/run-meta.js
 node scripts/gate.js                       # against baseline.json
 node scripts/gate.js --update              # this run becomes the baseline (refused if the gate fails)
 node scripts/gate.js --update --partial    # a filtered run: its files merged into the baseline, the others kept
@@ -459,7 +566,7 @@ node scripts/snapshot.js ~/private-pdfs ~/snap/after --against ~/snap/before
 ```
 
 Each problem such a file shows is then rebuilt as a lab PDF of our own (`make-*.js`, like `word-print`),
-so that it is tested in public from then on.
+so that it is tested in public from then on. This is the held-out protocol's third, reference-free guard ([`HELDOUT.md`](HELDOUT.md)): the private files kept in `real/` (gitignored), snapshotted before and after a rule change.
 
 ## Inspection tools
 

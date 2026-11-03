@@ -13,7 +13,10 @@
  *   would work too, but would check a page that is not the one users get.)
  * - Rules: the WCAG 2.0 and 2.1 level A and AA tags (wcag2a, wcag2aa, wcag21a, wcag21aa). Scanned per run: the
  *   whole page with the settings pane open and every settings group (<details>) expanded — including the sample
- *   document in the preview — then each <dialog id> opened on its own (its nodes printed as "[#id] selector").
+ *   document in the preview — then each <dialog id> opened on its own (its nodes printed as "[#id] selector"),
+ *   then the PDF import report panel (#import-report, plan P3.5) opened by Kelk.ui.report with tools/report-sample.js
+ *   (every page mode, why, flag and note code); the run fails when the panel does not open, does not take the
+ *   focus, or lacks a row for a page or a code of the sample.
  * - Prints every violation per run: impact, rule id, the target selector of each node.
  * - Exit 1 when a violation of impact `serious` or `critical` is not in tools/a11y-allow.json. Each allow-list
  *   entry: { "rule": <axe rule id>, "selector": <a CSS selector the failing element matches — tested in the page
@@ -38,6 +41,8 @@ const { chromium } = require(path.join(MODULES, 'playwright'));
 const AXE_SOURCE = fs.readFileSync(path.join(MODULES, 'axe-core', 'axe.min.js'), 'utf8');
 const AXE_VERSION = require(path.join(MODULES, 'axe-core', 'package.json')).version;
 const ALLOW_FILE = path.join(__dirname, 'a11y-allow.json');
+const REPORT_SAMPLE = require('./report-sample.js');
+const REPORT = 'import-report';
 
 const LANGS = ['fa', 'en', 'ar'];
 const THEMES = ['light', 'dark'];
@@ -162,15 +167,37 @@ async function check(browser, url, lang, theme, allow) {
         });
     });
     const violations = [];
-    for (const scope of [null].concat(dialogs)) {
+    for (const scope of [null].concat(dialogs, [REPORT])) {
         const found = await page.evaluate(
             function (a) {
-                const d = a.scope ? document.getElementById(a.scope) : null;
+                // the import report: opened as an import opens it (Kelk.ui.report), what it shows recorded
+                const panel = a.scope === a.report ? document.getElementById(a.report) : null;
+                const d = a.scope && !panel ? document.getElementById(a.scope) : null;
                 if (d) d.showModal();
+                if (panel) {
+                    window.Kelk.ui.report(a.sample, { name: 'sample.pdf', onSafe: function () {} });
+                    window.__reportState = {
+                        open: !panel.hidden,
+                        focused: document.activeElement === panel,
+                        rows: panel.querySelectorAll('.report-pages tbody tr').length,
+                        missing: a.sample.flags
+                            .concat(a.sample.notes)
+                            .map(function (f) {
+                                return f.code;
+                            })
+                            .filter(function (c) {
+                                return !panel.querySelector('.report-findings [data-code="' + c + '"]');
+                            })
+                    };
+                }
                 return axe
-                    .run(d || document, { runOnly: { type: 'tag', values: a.tags }, resultTypes: ['violations'] })
+                    .run(d || panel || document, {
+                        runOnly: { type: 'tag', values: a.tags },
+                        resultTypes: ['violations']
+                    })
                     .then(function (r) {
                         if (d) d.close();
+                        if (panel) panel.hidden = true; // its nodes stay for the allow-list's matches below
                         return r.violations.map(function (v) {
                             return {
                                 rule: v.id,
@@ -204,10 +231,13 @@ async function check(browser, url, lang, theme, allow) {
                         });
                     });
             },
-            { scope: scope, tags: TAGS, allow: allow }
+            { scope: scope, tags: TAGS, allow: allow, report: REPORT, sample: REPORT_SAMPLE }
         );
         violations.push.apply(violations, found);
     }
+    state.report = await page.evaluate(function () {
+        return window.__reportState || null;
+    });
     await ctx.close();
     return { lang: lang, theme: theme, state: state, errors: errors, violations: violations };
 }
@@ -299,6 +329,16 @@ async function check(browser, url, lang, theme, allow) {
                             MIN_PREVIEW.formulas +
                             ')'
                     );
+                const rp = s.report;
+                if (!rp || !rp.open) bad.push('the import report panel did not open');
+                else {
+                    if (!rp.focused) bad.push('the import report panel did not take the focus');
+                    if (rp.rows !== REPORT_SAMPLE.pages.length)
+                        bad.push(
+                            'the import report shows ' + rp.rows + ' page rows, not ' + REPORT_SAMPLE.pages.length
+                        );
+                    if (rp.missing.length) bad.push('the import report has no row for ' + rp.missing.join(', '));
+                }
                 r.errors.forEach(function (e) {
                     bad.push('page error: ' + e);
                 });

@@ -138,6 +138,9 @@ module.exports = [
   { files: ['lib/msOfficeWordHtmlTemplate.js'], languageOptions: { globals: { createMsoTemplate: 'off' } } },
   { files: ['tests/test-corpus.js'], languageOptions: { globals: { CORPUS: 'off' } } },
 
+  // The importer's stages stay split into one function per step (map in lib/pdfimport/README.md).
+  { files: ['lib/pdfimport/**/*.js'], rules: { 'max-lines-per-function': ['error', { max: 150 }] } },
+
   // ---- Node CommonJS: build tools, PDF-lab scripts, this file ---------------------------------------------------
   // The lab scripts also pass callbacks to Playwright's page.evaluate()/waitForFunction(), which run inside Kelk's
   // page; those callbacks read the page's globals, so Kelk's globals and window/document are readonly there too.

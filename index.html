@@ -109,6 +109,20 @@
                     <i data-lucide="lightbulb"></i><span data-i18n="sampleNote"></span>
                     <button class="btn soft danger" id="sample-note-clear" type="button"><i data-lucide="eraser"></i><span data-i18n="clear"></span></button>
                 </div>
+                <!-- what a PDF import could not read in full (Kelk.ui.report, scripts/report.js) -->
+                <section class="import-report" id="import-report" role="region" aria-labelledby="import-report-title" tabindex="-1" hidden>
+                    <div class="report-head">
+                        <h3 id="import-report-title"><i data-lucide="file-text"></i><span data-i18n="rep_title"></span></h3>
+                        <span class="report-name" id="import-report-name" dir="auto"></span>
+                        <button class="btn ghost icon" id="import-report-close" type="button" data-i18n-attr="title:rep_close;aria-label:rep_close"><i data-lucide="x"></i></button>
+                    </div>
+                    <div class="report-body" id="import-report-body" role="group" aria-labelledby="import-report-title" tabindex="0"></div>
+                    <div class="report-actions">
+                        <button class="btn soft" id="report-safe" type="button" aria-describedby="report-safe-hint" hidden><i data-lucide="rotate-ccw"></i><span data-i18n="rep_safe"></span></button>
+                        <button class="btn" id="report-copy" type="button"><i data-lucide="copy"></i><span data-i18n="rep_copy"></span></button>
+                        <p class="report-safe-hint" id="report-safe-hint" data-i18n="rep_safeHint" hidden></p>
+                    </div>
+                </section>
                 <div class="editor-wrap">
                     <textarea id="editor" dir="auto" spellcheck="false" data-i18n-attr="placeholder:editorPlaceholder;aria-label:editor"></textarea>
                     <div class="dropzone-overlay"><span data-i18n="dropHere"></span></div>
@@ -665,7 +679,8 @@
 <script src="vendor/turndown/turndown_7.2.4.js"></script>
 <script src="vendor/turndown/turndown-plugin-gfm_1.0.2.js"></script>
 
-<!-- library (standalone; the PDF fonts load on first PDF export) -->
+<!-- library (standalone; the PDF fonts load on first PDF export; lib/PdfImporter.js and lib/pdfimport/*.js on
+     the first PDF import: Kelk.libs.need('pdfimport'), scripts/config.js) -->
 <script src="lib/ImageCore.js"></script>
 <script src="lib/MathCore.js"></script>
 <script src="lib/BidiCore.js"></script>
@@ -679,18 +694,13 @@
 <script src="lib/PreviewBuilder.js"></script>
 <script src="lib/PptxBuilder.js"></script>
 <script src="lib/MarkdownImporter.js"></script>
-<script src="lib/PdfImporter.js"></script>
-<script src="lib/pdfimport/extract.js"></script>
-<script src="lib/pdfimport/lines.js"></script>
-<script src="lib/pdfimport/regions.js"></script>
-<script src="lib/pdfimport/order.js"></script>
-<script src="lib/pdfimport/blocks.js"></script>
 
 <!-- page -->
 <script src="scripts/config.js"></script>
 <script src="scripts/i18n.js"></script>
 <script src="scripts/storage.js"></script>
 <script src="scripts/ui.js"></script>
+<script src="scripts/report.js"></script>
 <script src="scripts/fonts-loader.js"></script>
 <script src="scripts/names.js"></script>
 <script src="scripts/images.js"></script>
