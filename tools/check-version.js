@@ -38,7 +38,7 @@ const CHECKS = [
     { file: 'CHANGELOG.md', re: /^## \[(?!Unreleased\])([^\]]+)\]/m, form: 'full', why: 'newest release heading ([Unreleased] above it is fine)' },
     { file: 'lib/BuilderBase.js', re: /BuilderBase\.version = '([^']+)'/g, form: 'full', why: 'default creator "Kelk <version>" outside the app (Node, lab)' },
     { file: 'lib/README.md', re: /`BuilderBase\.version` \(([^ ]+) now\)/g, form: 'full', why: 'the creator, documented' },
-    { file: 'README.md', re: /kelk_([0-9][^/\s)]*?)\.zip/g, form: 'release', why: 'the release download', count: 12 },
+    { file: 'README.md', re: /kelk_([0-9][^/\s)]*?)\.zip/g, form: 'release', why: 'the release download', count: 13 },
     { file: 'lib/BidiCore.js', re: HEADER, form: 'release', why: 'library header' },
     { file: 'lib/BidiView.js', re: HEADER, form: 'release', why: 'library header' },
     { file: 'lib/BidiView.js', re: /var BidiView = \{ version: '([^']+)'/g, form: 'release', why: 'BidiView.version' },
