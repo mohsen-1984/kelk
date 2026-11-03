@@ -774,6 +774,22 @@ a jump of 0.07 em or more to three or more gaps of 0.1 em or more (under 1.2 em)
 between the two. A few ZWNJ gaps in a word are no such line; the ZWNJ-from-a-gap rule does not apply on it.
 Four real letters from Prince: recall 45–77 → 91–94. `chrome-positioned` (`make-positioned.js`) is the lab's.
 
+**Runs placed from their untracked widths** (P3.3). A producer that moves each word to its place by `Td` and then
+condenses (`Tz`) or tracks (`Tc`) the text — a tool applied after layout; the metamorphic `tz85` / `trackTight` /
+`trackLoose` — leaves words that overlap or stand apart by their drift: «DesigningResilient», lines cut as columns.
+`_calibrate` reads it (`tracking.drift`, per page `regions[p].drift`): at each place one run (one operator, or
+operators drawn each at the last one's advance) ends and the next starts on its baseline, the gap is regressed on the
+run's drift (how much longer its `Tz` / `Tc` made it); a slope under −0.5 over eight samples or more means the gaps
+follow the drift. Then `_glyphRows` lays the runs out again untracked (step / Tz − Tc, width / Tz) before any gap
+rule reads them — the page's own reading with thirty samples or more, else the document's. Invisible text (an OCR
+layer stretched by `Tz` to the scan's words) gives no samples. Net: tz85 −9.2 → −0.1, trackTight −3.6 → 0.0,
+trackLoose −12.2 → −0.8; corpus and fuzz unchanged (no file there has such runs).
+
+**A justified line that draws its spaces.** Chrome draws a justified line's spaces at their own width and moves the
+words apart; in a narrow column of letter-spaced type four gaps of 1.9 em were cut as columns. When every wide gap
+of a line holds a drawn space, equal gaps (±15 %, three or more) are a justified line's (`justGap`); a table's gaps
+vary with its cells' text.
+
 **A line that draws no space on a page that does** — two text boxes of one slide, one drawn with its spaces and
 one without — has words apart by gaps only: two gaps over 0.14 em on it, and the line is read as one that draws
 none (its gaps were ZWNJs: «مرور‌کارهای‌هفته»). And on a page that draws its spaces, a gap as wide as its font's own

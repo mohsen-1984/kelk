@@ -94,3 +94,80 @@ test('P3.2: an empty document calibrates to defaults with n = 0', function () {
   assert.equal(c.gaps.n, 0);
   assert.equal(c.steps.leading, null);
 });
+
+test('P3.3: the word-gap midpoint (wordGapBareEm, off) needs bimodal gaps with both peaks known; wordGapEm has none', function () {
+  const mid = PdfImporter._thresholds.wordGapBareEm.calib;
+  assert.ok(Math.abs(mid({ gaps: { letterEm: 0.08, wordEm: 0.36, bimodal: true, n: 50 } }) - 0.22) < 1e-9);
+  assert.ok(Number.isNaN(mid({ gaps: { letterEm: null, wordEm: 0.3, bimodal: true, n: 50 } })), 'a null letter gap is no 0');
+  assert.ok(Number.isNaN(mid({ gaps: { letterEm: 0.08, wordEm: 0.36, bimodal: false, n: 50 } })), 'not bimodal');
+  assert.equal(PdfImporter._thresholds.wordGapEm.calib, undefined);
+  const imp = PdfImporter.create();
+  assert.equal(imp._t('wordGapBareEm', { cal: { gaps: { letterEm: 0.08, wordEm: 0.36, bimodal: true, n: 50 } }, p: { num: 1 } }), 0.14, 'not switched on');
+});
+
+// P3.3: words placed one by one (one operator each, seq), each at its untracked place, their letters then set with
+// Tc (track, em) and / or Tz (hs): the drawn advance is (w + Tc)·Tz
+function placedWords(track, hs, rtl) {
+  const glyphs = [], words = [5, 3, 6, 4, 2, 7];
+  let seq = 0;
+  for (let l = 0; l < 6; l++) {
+    const y = 700 - 14 * l, runs = [];
+    let x = 72;
+    words.forEach(function (n) {
+      seq++;
+      const at = x, run = [];
+      for (let i = 0; i < n; i++) {
+        run.push({ ch: 'a', x: at + i * (W + track * SIZE) * hs, y: y, w: W * hs, size: SIZE, font: 'F1', space: false, seq: seq,
+                   hs: hs === 1 ? undefined : hs, track: track || undefined });
+      }
+      runs.push(run);
+      x += n * W + 3;            // the untracked layout: a 3 pt gap between words
+    });
+    (rtl ? runs.reverse() : runs).forEach(function (r) { r.forEach(function (g) { glyphs.push(g); }); });   // rtl: drawn right to left
+  }
+  return glyphs;
+}
+
+test('P3.3: untrack lays a run out again without its Tz and Tc; untracked glyphs stay where they are', function () {
+  const { untrack } = PdfImporter._calibrationInternal;
+  const gs = placedWords(0.08, 0.85, false), U = untrack(gs);
+  assert.equal(U.start[0], 0);
+  assert.equal(U.start[4], 0);
+  assert.equal(U.start[5], 5, 'a new operator not at the advance: a new run');
+  for (let i = 0; i < 5; i++) {
+    assert.ok(Math.abs(U.x[i] - (72 + i * W)) < 1e-9, 'x ' + i);
+    assert.ok(Math.abs(U.w[i] - W) < 1e-9);
+  }
+  const plain = placedWords(0, 1, false), P = untrack(plain);
+  plain.forEach(function (g, i) { assert.equal(P.x[i], g.x); assert.equal(P.w[i], g.w); });
+  // (two operators, the second drawn where the first one's advance left off: one run)
+  const chain = [{ x: 10, y: 0, w: 5, size: 10, seq: 1, track: 0.1 }, { x: 16, y: 0, w: 5, size: 10, seq: 2, track: 0.1 }];
+  assert.equal(untrack(chain).start[1], 0);
+  assert.ok(Math.abs(untrack(chain).x[1] - 15) < 1e-9);
+});
+
+test('P3.3: words placed from their untracked widths show as drift (Tc, Tz, right to left); a tracked layout does not', function () {
+  const pg = function (glyphs) { return [{ num: 1, glyphs: glyphs, fonts: {} }]; };
+  const cases = { loose: placedWords(0.08, 1), tight: placedWords(-0.04, 1), tz: placedWords(0, 0.85), rtl: placedWords(0.08, 1, true) };
+  Object.keys(cases).forEach(function (k) {
+    const c = PdfImporter.prototype._calibrate(pg(cases[k]), {});
+    assert.equal(c.tracking.drift.on, true, k + ' ' + JSON.stringify(c.tracking.drift));
+    assert.ok(c.tracking.drift.slope < -0.9, k);
+    assert.equal(c.regions[1].drift.on, true);
+  });
+  // the same words laid out tracked (each word placed after the last one's drawn advance): no drift
+  const gs = [];
+  let seq = 0;
+  for (let l = 0; l < 6; l++) {
+    let x = 72;
+    [5, 3, 6, 4, 2, 7].forEach(function (n) {
+      seq++;
+      for (let i = 0; i < n; i++) { gs.push({ ch: 'a', x: x, y: 700 - 14 * l, w: W, size: SIZE, font: 'F1', space: false, seq: seq, track: 0.08 }); x += W + 0.8; }
+      x += 3;
+    });
+  }
+  const c = PdfImporter.prototype._calibrate(pg(gs), {});
+  assert.equal(c.tracking.drift.on, false, JSON.stringify(c.tracking.drift));
+  // nothing tracked: no samples
+  assert.equal(PdfImporter.prototype._calibrate(pg(placedWords(0, 1)), {}).tracking.drift.n, 0);
+});
