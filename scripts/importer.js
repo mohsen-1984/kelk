@@ -1,7 +1,8 @@
 /**
  * Kelk.importer — the ONE way content enters the editor from outside:
  *   .md / .txt        as is (images it carries as data URIs go back to the image store)
- *   .zip              its documents, in name order, and its images (JSZip, loaded on the first .zip)
+ *   .zip              its documents, in the order chosen (Kelk.ui.order; name order by default),
+ *                     and its images (JSZip, loaded on the first .zip)
  *   .html / .htm      MarkdownImporter.fromHtml
  *   .docx             MarkdownImporter.fromDocx (mammoth)
  *   .pdf              PdfImporter (PDF.js, loaded on the first .pdf) → HTML → MarkdownImporter
@@ -48,8 +49,8 @@
         }).join('\n\n') + '\n';
     }
 
-    /** A zip's documents (into docs) and images (into pics, by their path). */
-    async function unzip(file, docs, pics, t, maxMB) {
+    /** A zip's documents (into docs), its images (into pics, by their path) and what cannot come in (into skipped). */
+    async function unzip(file, docs, pics, skipped, t, maxMB) {
         t.label(K.i18n.t('taskZip', file.name));
         await K.libs.need('jszip');                  // loaded on the first .zip
         const zip = await JSZip.loadAsync(await readBuffer(file));
@@ -60,12 +61,14 @@
             if (t.signal.aborted) return;
             const x = ext(e.name), base = e.name.split('/').pop();
             const size = e._data && e._data.uncompressedSize;
-            if (size > maxMB * 1024 * 1024) { K.ui.toast(K.i18n.t('tooLarge', maxMB) + ': ' + e.name, 'error'); continue; }
-            if (/^\.(png|jpe?g|gif|webp|svg|bmp)$/.test(x)) {
+            const image = /^\.(png|jpe?g|gif|webp|svg|bmp)$/.test(x);
+            if (!image && known.indexOf(x) < 0) { skipped.push({ name: base, path: e.name, size: size, reason: 'type' }); continue; }
+            if (size > maxMB * 1024 * 1024) { skipped.push({ name: base, path: e.name, size: size, reason: 'size' }); continue; }
+            if (image) {
                 const type = x === '.svg' ? 'image/svg+xml' : 'image/' + x.slice(1).replace('jpg', 'jpeg');
                 pics[e.name] = new File([await e.async('blob')], base, { type: type });
-            } else if (known.indexOf(x) >= 0) {
-                docs.push({ name: base, path: e.name, file: new File([await e.async('blob')], base) });
+            } else {
+                docs.push({ name: base, path: e.name, size: size, file: new File([await e.async('blob')], base) });
             }
         }
     }
@@ -196,7 +199,8 @@
 
         /**
          * Files from the picker or a drop — one or many, a .zip among them — into the editor as ONE document:
-         * in name order (numbers in numeric order: «2» before «10»), each after the separator of Settings → App
+         * in name order (numbers in numeric order: «2» before «10») unless the order dialog (Kelk.ui.order —
+         * shown for several documents, or when files were left out) changes it, each after the separator of Settings → App
          * (its name and a rule — the default —, a rule, or a blank line). A zip is opened (JSZip, loaded on the
          * first one) and its md, txt, html, docx and pdf files imported; its images are registered under the paths
          * the text gives them, relative to the file that names them. The page waits in a dialog with a progress
@@ -210,19 +214,45 @@
             big.forEach(function (f) { K.ui.toast(K.i18n.t('tooLarge', maxMB) + ': ' + f.name, 'error'); });
             files = files.filter(function (f) { return big.indexOf(f) < 0; });
             if (!files.length) return;
+            const X = K.config.extensions, known = [].concat(X.markdown, X.html, X.docx, X.pdf);
             const first = files.length === 1 ? files[0].name : files.map(function (f) { return f.name; }).sort(byName)[0];
-            let parts;
+            const zipped = files.some(function (f) { return ext(f.name) === '.zip'; });
+            const fail = function (err) {
+                if (err && err.code === 'aborted') { K.ui.toast(K.i18n.t('cancelled')); return; }
+                console.error(err);
+                if (err && (err.code === 'password' || err.code === 'invalid')) K.ui.toast(K.i18n.t('pdf_' + err.code), 'error');
+                else K.ui.toast(K.i18n.t('failed', err && err.message || ''), 'error');
+            };
+            // 1. the documents, the images and what cannot come in — a zip opened in place
+            let set;
             try {
-                parts = await K.ui.task(K.i18n.t(files.length === 1 && ext(first) !== '.zip' ? 'taskImport' : 'taskZip', first), async function (t) {
-                    // the documents and the images, a zip opened in place
-                    const docs = [], pics = {};
+                set = await K.ui.task(K.i18n.t(files.length === 1 && !zipped ? 'taskImport' : 'taskZip', first), async function (t) {
+                    const docs = [], pics = {}, skipped = [];
                     for (const f of files) {
-                        if (ext(f.name) === '.zip') await unzip(f, docs, pics, t, maxMB);
+                        if (ext(f.name) === '.zip') await unzip(f, docs, pics, skipped, t, maxMB);
                         else if (K.images.isImage(f)) continue;
-                        else docs.push({ name: f.name, path: f.name, file: f });
+                        else if (files.length > 1 && known.indexOf(ext(f.name)) < 0) skipped.push({ name: f.name, path: f.name, size: f.size, reason: 'type' });
+                        else docs.push({ name: f.name, path: f.name, size: f.size, file: f });
                     }
                     docs.sort(function (x, y) { return byName(x.path, y.path); });
-                    if (!docs.length) { K.ui.toast(K.i18n.t('zipEmpty'), 'warn'); return null; }
+                    skipped.sort(function (x, y) { return byName(x.path, y.path); });
+                    return { docs: docs, pics: pics, skipped: skipped };
+                });
+            } catch (err) { fail(err); return; }
+            let docs = set.docs;
+            if (!docs.length) { K.ui.toast(K.i18n.t('zipEmpty'), 'warn'); return; }
+            // 2. several documents, or files left out: their order and which of them (Kelk.ui.order)
+            if (docs.length > 1 || set.skipped.length) {
+                docs = await K.ui.order({
+                    title: K.i18n.t('orderTitle', files.length === 1 ? files[0].name : first),
+                    docs: docs, skipped: set.skipped, images: Object.keys(set.pics).length, maxMB: maxMB
+                });
+                if (!docs) return;                           // Cancel: the text stays as it was
+            }
+            // 3. each document → Markdown, in that order
+            let parts;
+            try {
+                parts = await K.ui.task(K.i18n.t('taskImport', docs[0].name), async function (t) {
                     const out = [];
                     for (let i = 0; i < docs.length; i++) {
                         const d = docs[i];
@@ -230,20 +260,14 @@
                         t.progress(0, 0, '');
                         const r = await convert(d.file, d.name, t);
                         if (r == null) continue;
-                        out.push({ name: d.name, md: await placeImages(r.md, d.path, pics), converted: r.converted });
+                        out.push({ name: d.name, md: await placeImages(r.md, d.path, set.pics), converted: r.converted });
                     }
                     return out;
                 });
-            } catch (err) {
-                if (err && err.code === 'aborted') { K.ui.toast(K.i18n.t('cancelled')); return; }
-                console.error(err);
-                if (err && (err.code === 'password' || err.code === 'invalid')) K.ui.toast(K.i18n.t('pdf_' + err.code), 'error');
-                else K.ui.toast(K.i18n.t('failed', err && err.message || ''), 'error');
-                return;
-            }
+            } catch (err) { fail(err); return; }
             if (!parts || !parts.length) return;
             const md = parts.length === 1 ? parts[0].md : join(parts);
-            // the name: the file's (one), the zip's (one zip), else the first file's in name order
+            // the name: the file's (one), the zip's (one zip), else the first file's in the order chosen
             const name = files.length === 1 ? files[0].name : parts[0].name;
             K.names.setSource(name);
             K.editor.set(md, name);

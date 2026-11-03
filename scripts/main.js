@@ -16,21 +16,48 @@
         const note = K.$('#sample-note');
         if (!note) return;
         const text = K.editor.value();
-        let all = window.KelkSamples;
-        if (!all && text.trim() && K.store.getUi('sampleLang')) {
-            try { await K.ui.loadScript(K.config.sample); all = window.KelkSamples; } catch (e) { all = null; }
-        }
-        const isSample = !!all && !!text.trim() && Object.keys(all).some(function (k) { return all[k] && text === all[k].markdown; });
+        const which = text.trim() ? await sampleOf(text) : null;
         if (text !== K.editor.value()) return;              // edited meanwhile: the next call decides
-        note.hidden = !isSample;
+        note.hidden = !which;
+        if (which) {                                        // a sample on screen: its file name names the exports
+            const all = which.set === 'slides' ? window.KelkSlideSamples : window.KelkSamples;
+            if (all && all[which.lang]) K.names.adopt(all[which.lang].name);
+        }
+        const label = note.querySelector('[data-i18n]');
+        if (label) { label.setAttribute('data-i18n', which && which.set === 'slides' ? 'sampleNoteSlides' : 'sampleNote'); label.textContent = K.i18n.t(label.getAttribute('data-i18n')); }
     }
 
-    /** Load the about/guide/sample document of the interface language (a script, so file:// works). */
-    async function loadSample() {                    // no confirm: the text before it is one Undo away
+    /**
+     * Which sample is this text — { set: 'about' | 'slides', lang } or null. The samples scripts load
+     * when the text could be one (a remembered sample language, or the scripts already in).
+     */
+    async function sampleOf(text) {
+        if (!text || !text.trim()) return null;
+        const sets = [['about', K.config.sample, 'KelkSamples'], ['slides', K.config.slidesSample, 'KelkSlideSamples']];
+        for (let i = 0; i < sets.length; i++) {
+            let all = window[sets[i][2]];
+            if (!all && K.store.getUi('sampleLang')) {
+                try { await K.ui.loadScript(sets[i][1]); all = window[sets[i][2]]; } catch (e) { all = null; }
+            }
+            if (!all) continue;
+            const sl = K.store.getUi('sampleLang');
+            if (sl && all[sl] && all[sl].markdown === text) return { set: sets[i][0], lang: sl };
+            const k = Object.keys(all).find(function (x) { return all[x] && all[x].markdown === text; });
+            if (k) return { set: sets[i][0], lang: k };
+        }
+        return null;
+    }
+
+    /**
+     * Load the sample of the interface language (a script, so file:// works): in the Slides view the
+     * slides sample (AI literacy), otherwise the about/guide/sample document.
+     */
+    async function loadSample(_, set) {                 // no confirm: the text before it is one Undo away
         try {
-            await K.ui.loadScript(K.config.sample);
-            // the document of the interface language (about Kelk + guide + samples)
-            const all = window.KelkSamples || {};
+            const slides = set ? set === 'slides' : K.slides.active();
+            await K.ui.loadScript(slides ? K.config.slidesSample : K.config.sample);
+            // the document of the interface language (about Kelk + guide + samples, or the slides)
+            const all = (slides ? window.KelkSlideSamples : window.KelkSamples) || {};
             const lang = all[K.i18n.lang] ? K.i18n.lang : (all.en ? 'en' : 'fa');
             const doc = all[lang];
             K.names.newDocument(doc.name, lang);    // remembered: this text IS the sample of `lang`; its file name names the exports
@@ -42,6 +69,9 @@
             K.ui.toast(K.i18n.t('failed', e.message), 'error');
         }
     }
+
+    /** For Kelk.slides: which sample is on screen, and loading the other one when the view changes. */
+    K.samples = { of: sampleOf, load: function (set) { return loadSample(false, set); } };
 
     /**
      * First visit: the language from the browser's locale. Any Persian entry
@@ -74,6 +104,7 @@
         K.preview.init();
         K.names.init();
         K.settings.init();
+        K.slides.init();
 
         const repo = K.$('#repo-link');
         if (repo) { if (K.config.repoUrl) repo.href = K.config.repoUrl; else repo.hidden = true; }
@@ -107,16 +138,12 @@
         };
         const doSwitchLang = async function (next) {
             if (next === K.i18n.lang) return;
-            let showingSample = false;
+            let showingSample = null;
             const text = K.editor.value();
             if (text.trim()) {
                 try {
-                    await K.ui.loadScript(K.config.sample);      // cached after the first time
-                    const all = window.KelkSamples || {};
-                    const sl = K.store.getUi('sampleLang');
-                    // the remembered sample first; any sample otherwise (text saved before this was tracked)
-                    showingSample = !!(sl && all[sl] && text === all[sl].markdown) ||
-                        Object.keys(all).some(function (k) { return text === all[k].markdown; });
+                    await Promise.all([K.ui.loadScript(K.config.sample), K.ui.loadScript(K.config.slidesSample)]);   // cached after the first time
+                    showingSample = await sampleOf(text);
                 } catch (e) { /* no samples: keep the text */ }
             }
             K.store.setUi('lang', next);
@@ -125,7 +152,7 @@
             K.ui.layout(K.store.getUi('layout'));
             K.settings.showLogo();
             K.settings.fontPack();
-            if (showingSample) await loadSample(false); else K.preview.render();
+            if (showingSample) await loadSample(false, showingSample.set); else K.preview.render();
         };
         langButtons();
 
@@ -210,7 +237,9 @@
         // the sample hint follows the text: typed, or replaced (sample, import, clear, undo, redo)
         on('#editor', 'kelk:replaced', function () { sampleNote(); });
         on('#editor', 'input', function () { sampleNote(); });
-        sampleNote();
+        // a text without a file name after a reload may still be a sample (one an older version stored): look
+        (K.store.getUi('sourceName') || !K.editor.value().trim() ? Promise.resolve()
+            : Promise.all([K.ui.loadScript(K.config.sample), K.ui.loadScript(K.config.slidesSample)]).catch(function () {})).then(sampleNote);
 
         // preview / export
         on('#btn-copy-preview', 'click', function () { K.preview.copyAll(); });
@@ -218,6 +247,11 @@
             const text = K.editor.value();
             if (!text || !navigator.clipboard || !navigator.clipboard.writeText) return;
             navigator.clipboard.writeText(text).then(function () { K.ui.toast(K.i18n.t('copied')); },
+                function (e) { K.ui.toast(K.i18n.t('failed', e && e.message || ''), 'error'); });
+        });
+        on('#btn-slides-prompt', 'click', function () {          // Settings → Slides: the convention as a prompt for AI models
+            if (!navigator.clipboard || !navigator.clipboard.writeText) return;
+            navigator.clipboard.writeText(K.slides.prompt).then(function () { K.ui.toast(K.i18n.t('promptCopied')); },
                 function (e) { K.ui.toast(K.i18n.t('failed', e && e.message || ''), 'error'); });
         });
         K.$$('[data-export]').forEach(function (b) {
@@ -229,7 +263,9 @@
         document.addEventListener('keydown', function (e) {
             const mod = e.ctrlKey || e.metaKey, k = e.key.toLowerCase();
             if (mod && !e.shiftKey && !e.altKey && k === 's') { e.preventDefault(); exp('md'); }
+            else if (mod && e.altKey && e.key === 'Enter') { e.preventDefault(); exp('pptx'); }
             else if (mod && e.key === 'Enter') { e.preventDefault(); exp(e.shiftKey ? 'pdf' : 'docx'); }
+            else if (e.key === 'F5' && K.slides.active() && !document.querySelector('.present')) { e.preventDefault(); K.slides.present(); }
             else if (mod && !e.shiftKey && k === 'o') { e.preventDefault(); K.$('#file-import').click(); }
             else if (mod && e.key === ',') { e.preventDefault(); togglePane(); }
             else if (e.key === 'F1') { e.preventDefault(); K.ui.help(false); K.ui.dialog('#guide', true); }

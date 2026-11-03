@@ -130,6 +130,18 @@
             user = null;
             if (K.store.get('document.title') != null) K.store.set('document.title', null);
             K.store.setUi('sampleLang', sampleLang || null);
+            K.store.setUi('deckOverrides', null);              // Settings picked over the old deck's own values: not for this one
+            this.refresh();
+        },
+
+        /**
+         * The text on screen is a known file (a sample restored after a reload, an older session's text):
+         * its name names the exports, as when it was loaded — without resetting a typed name or title.
+         */
+        adopt: function (fileName) {
+            if (!fileName || source) return;
+            source = String(fileName).replace(/\.[^.]+$/, '');
+            K.store.setUi('sourceName', String(fileName));
             this.refresh();
         },
 

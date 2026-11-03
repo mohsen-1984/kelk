@@ -277,6 +277,16 @@ mixed-direction lists and tables)
   `build/pdf.min.mjs` and `build/pdf.worker.min.mjs` with `tools/build-pdfjs.js`, then switch `scripts/config.js`
 - Encrypted PDFs with a user password: a message only (`password` option exists, no prompt in the page)
 
+### Slides (`lib/PptxBuilder.js`; convention: `lib/SLIDES.md`; tests: `tests/slides-suite.html`)
+
+- Equations (`a14:m`) checked in more PowerPoint versions (Mac, the web) and with \text{…} in Persian
+- Transitions and simple builds (one bullet at a time): written into the slide XML after PptxGenJS
+- Speaker notes with formatting (bold, lists), and notes per callout
+- Pictures as backgrounds (`slide: image=…`, a dark veil under the title)
+- More chart options: axis titles, a secondary axis, scatter with numeric X
+- Import: .pptx → Markdown in the same convention (titles, lists, tables, notes)
+- The slide preview drawn with the Word fonts when installed (now: the page's fonts)
+
 ### Other
 
 - Arabic texts (interface and about document) to be read by a native speaker

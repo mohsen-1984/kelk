@@ -7,7 +7,10 @@
  */
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..');
-const EXTRA = ['sun', 'moon', 'columns-2', 'rows-2', 'copy', 'check', 'maximize-2', 'minimize-2'];
+const EXTRA = ['sun', 'moon', 'columns-2', 'rows-2', 'copy', 'check', 'maximize-2', 'minimize-2',
+    // the order dialog (Kelk.ui.order): the kinds of file, the handle, the arrows
+    'file', 'file-pen-line', 'file-text', 'file-code', 'file-type', 'file-badge', 'file-image', 'file-x',
+    'grip-vertical', 'arrow-up', 'arrow-down'];
 
 const sandbox = { window: {}, self: {}, globalThis: {} };
 sandbox.globalThis = sandbox;

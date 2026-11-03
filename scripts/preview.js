@@ -12,7 +12,7 @@
 (function (K) {
     'use strict';
 
-    let box, clean = '', mathRun = 0;
+    let box, clean = '', mathRun = 0, docStale = false;
 
     // DOMPurify's own URI rules: http(s), mailto, tel, relative names; data: for images
     const PURIFY = { ADD_ATTR: ['target', 'dir', 'align'] };
@@ -139,19 +139,34 @@
          * BEFORE BidiView and the code frames decorate it, so they decide
          * directions and frame code on exactly the Markdown's HTML.
          */
-        html: function () { return box ? clean : ''; },
+        html: function () {
+            if (box && docStale) this.renderDoc();      // the Slides view leaves the document undrawn until it is needed
+            return box ? clean : '';
+        },
 
         /** Document direction the preview decided ('rtl' | 'ltr'). */
         dir: function () { return (box && box.getAttribute('dir')) || 'rtl'; },
 
+        /**
+         * Draw the preview of the active view. In the Slides view only the slides are drawn (Kelk.slides);
+         * the document is drawn when its HTML is asked for (an export) or the view changes back.
+         */
         render: function () {
             if (!box) return;
+            if (K.slides && K.slides.active()) { docStale = true; K.names.refresh(); K.slides.render(); return; }
+            this.renderDoc();
+        },
+
+        renderDoc: function () {
+            if (!box) return;
+            docStale = false;
             const md = K.editor.value();
             if (!md.trim()) {
                 // the empty pane's hint is in the interface's language: its direction, not the last document's
                 box.innerHTML = ''; clean = '';
                 box.setAttribute('dir', K.i18n.lang === 'en' ? 'ltr' : 'rtl');
-                K.names.refresh(); return;
+                K.names.refresh();
+                return;
             }
             // Settings → Text → line breaks: a single new line is a line break (as chat apps show a model's
             // answer) — on by default; off: GFM's soft break, the lines of a paragraph run together

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kelk — slides tests</title>
+<style>
+  @font-face { font-family: 'Vazirmatn'; src: url('../assets/fonts/rastikerdar/webfonts/Vazirmatn[wght].woff2') format('woff2'); font-weight: 100 900; }
+  body { font: 14px/1.5 system-ui, 'Segoe UI', sans-serif; margin: 24px; color: #1c1b1a; background: #f7f6f3; }
+  h1 { font-size: 20px; margin: 0 0 4px; } p.sub { margin: 0 0 14px; color: #666; max-width: 900px; }
+  .bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+  button { font: inherit; padding: 6px 14px; border: 1px solid #c9c4ba; border-radius: 6px; background: #fff; cursor: pointer; }
+  button.primary { background: #1f6f5c; color: #fff; border-color: #1f6f5c; }
+  table { border-collapse: collapse; background: #fff; width: 100%; }
+  th, td { border: 1px solid #e0dcd4; padding: 4px 8px; text-align: left; vertical-align: top; }
+  th { background: #efece6; } td.ok { color: #1f6f5c; } td.err { color: #b00020; }
+  td a { color: inherit; } .sum { font-weight: 600; } code { background: #efece6; padding: 0 4px; border-radius: 3px; }
+  #stage { position: absolute; left: -10000px; top: 0; width: 960px; }
+  details summary { cursor: pointer; }
+</style>
+</head>
+<body>
+<h1>Kelk — slides tests</h1>
+<p class="sub">Every case of <code>tests/slides-corpus.js</code> and the three slides samples (<code>docs/slides-sample.*.md</code>) through
+  <code>PptxBuilder</code>: the layout each slide takes, speaker notes, warnings, direction; the preview drawn and checked for text
+  that overflows its box; the .pptx written and read back with JSZip — slides, title placeholders, native charts, notes slides,
+  hidden slides, right-to-left paragraphs and the text the case names. Each row: the checks that failed, or ✓, and the .pptx.</p>
+<div class="bar">
+  <button class="primary" id="run" type="button">Run all</button>
+  <span class="sum" id="sum"></span>
+</div>
+<table id="out"><thead><tr><th>case</th><th>slides</th><th>layouts</th><th>model</th><th>preview</th><th>.pptx</th></tr></thead><tbody></tbody></table>
+<div id="stage"></div>
+
+<script src="../vendor/marked.umd.min_18.0.14.js"></script>
+<script src="../vendor/purify.min_3.4.16.js"></script>
+<script src="../vendor/highlight.js/highlight.min_11.12.0.js"></script>
+<script src="../vendor/jszip.min_3.10.2.js"></script>
+<script src="../vendor/pptxgen.min_4.0.1.js"></script>
+<script src="../vendor/lucide.min_1.48.0.js"></script>
+<script src="../lib/ImageCore.js"></script>
+<script src="../lib/MathCore.js"></script>
+<script src="../lib/BidiCore.js"></script>
+<script src="../lib/BuilderBase.js"></script>
+<script src="../lib/PptxBuilder.js"></script>
+<script src="slides-corpus.js"></script>
+<script src="../docs/slides-samples.js"></script>
+<script>
+'use strict';
+MathCore.configure({ mathjax: '../vendor/mathjax_4.1.3/' });
+marked.use(MathCore.markedExtension());
+document.head.insertAdjacentHTML('beforeend', '<style>' + PptxBuilder.previewCss() + '</style>');
+
+const pascal = function (n) { return n.split('-').map(function (p) { return p[0].toUpperCase() + p.slice(1); }).join(''); };
+const ICONS = function (name) {
+    const node = lucide.icons[pascal(name)];
+    return node ? node.map(function (n) { return '<' + n[0] + Object.keys(n[1]).map(function (k) { return ' ' + k + '="' + n[1][k] + '"'; }).join('') + '/>'; }).join('') : null;
+};
+const FONTS = { bidi: 'Vazirmatn', latin: 'Vazirmatn', code: 'Consolas' };
+
+/** One case: model, preview, .pptx → { problems: [], model, blob }. */
+async function runCase(c) {
+    const problems = [];
+    const r = PptxBuilder.markdownToHtml(c.md);
+    const box = document.createElement('div');
+    box.innerHTML = DOMPurify.sanitize(r.html, { ADD_ATTR: ['target', 'dir', 'align', 'data-kelk-comment'] });
+    box.querySelectorAll('pre code').forEach(function (code) { try { hljs.highlightElement(code); } catch (e) { /* none */ } });
+    const cfg = Object.assign({ fonts: FONTS }, c.config || {});
+    cfg.slides = Object.assign({ icons: ICONS }, cfg.slides || {});
+    const b = PptxBuilder.create().configure(cfg).addFromHtml(box.innerHTML).setDeck(r.meta);
+    const model = await b.model();
+    const E = c.expect || {};
+    const layouts = model.slides.map(function (s) { return s.layout; });
+    const warns = [].concat.apply([], model.slides.map(function (s) { return s.warn.map(function (w) { return w.code; }); }));
+    if (E.slides != null && model.slides.length !== E.slides) problems.push('slides ' + model.slides.length + ' ≠ ' + E.slides);
+    Object.keys(E.layouts || {}).forEach(function (i) {
+        const got = layouts[i] || '—', want = E.layouts[i];
+        if (got !== want && got.split(' ')[0] !== want) problems.push('slide ' + (+i + 1) + ': ' + got + ' ≠ ' + want);
+    });
+    if (E.notes != null) { const n = model.slides.filter(function (s) { return s.notes; }).length; if (n !== E.notes) problems.push('notes ' + n + ' ≠ ' + E.notes); }
+    (E.warn || []).forEach(function (w) { if (warns.indexOf(w) < 0) problems.push('no warning ' + w); });
+    if (E.noWarn && warns.length) problems.push('warnings: ' + Array.from(new Set(warns)).join(', '));
+    if (E.dir && model.dir !== E.dir) problems.push('dir ' + model.dir);
+    if (E.aspect && model.aspect !== E.aspect) problems.push('aspect ' + model.aspect);
+
+    // preview: drawn, then checked for overflowing text
+    const stage = document.getElementById('stage');
+    stage.innerHTML = PptxBuilder.previewHtml(model, {});
+    await document.fonts.ready;
+    const over = PptxBuilder.markOverflow(stage);
+    const preview = over.length ? 'overflow: ' + over.map(function (i) { return i + 1; }).join(', ') : '✓';
+
+    // .pptx, read back
+    const blob = await b.toBlob(model);
+    const buf = await blob.arrayBuffer();
+    const zip = await JSZip.loadAsync(buf);
+    const files = Object.keys(zip.files);
+    const slideFiles = files.filter(function (f) { return /^ppt\/slides\/slide\d+\.xml$/.test(f); })
+        .sort(function (a, b) { return +a.match(/\d+/)[0] - +b.match(/\d+/)[0]; });
+    const xml = await Promise.all(slideFiles.map(function (f) { return zip.file(f).async('string'); }));
+    const all = xml.join('\n');
+    const pp = [];
+    if (slideFiles.length !== model.slides.length) pp.push('slides in file ' + slideFiles.length);
+    const charts = files.filter(function (f) { return /^ppt\/charts\/chart\d+\.xml$/.test(f); }).length;
+    if (E.charts != null && charts !== E.charts) pp.push('charts ' + charts + ' ≠ ' + E.charts);
+    const notesFiles = files.filter(function (f) { return /^ppt\/notesSlides\/notesSlide\d+\.xml$/.test(f); });
+    if (notesFiles.length < model.slides.filter(function (s) { return s.notes; }).length) pp.push('notes slides ' + notesFiles.length);
+    const hidden = xml.filter(function (x) { return /<p:sld[^>]*show="0"/.test(x); }).length;
+    if (E.hidden != null && hidden !== E.hidden) pp.push('hidden ' + hidden + ' ≠ ' + E.hidden);
+    const decode = function (s) { return s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&'); };
+    const textOf = decode((all.match(/<a:t>[^<]*<\/a:t>/g) || []).map(function (t) { return t.slice(5, -6); }).join(''));
+    (E.text || []).forEach(function (t) { if (textOf.indexOf(t) < 0 && all.indexOf(t) < 0) pp.push('text “' + t + '” missing'); });
+    (E.titles || []).forEach(function (t, i) {
+        const x = xml[i] || '';
+        const m = /<p:sp>(?:(?!<\/p:sp>)[\s\S])*?<p:ph[^>]*type="title"[\s\S]*?<\/p:sp>/.exec(x);
+        const got = m ? decode((m[0].match(/<a:t>[^<]*<\/a:t>/g) || []).map(function (s) { return s.slice(5, -6); }).join('')) : '';
+        if (got !== t) pp.push('title ' + (i + 1) + ' “' + got + '”');
+    });
+    (E.runs || []).forEach(function (r) { if (all.indexOf('<a:t>' + r + '</a:t>') < 0) pp.push('no run “' + r + '”'); });
+    if (E.notesRtl) {
+        const nx = await Promise.all(notesFiles.map(function (f) { return zip.file(f).async('string'); }));
+        if (!nx.some(function (x) { return /<a:pPr algn="r" rtl="1"\/>/.test(x); })) pp.push('notes not right to left');
+    }
+    if (model.dir === 'rtl' && /[\u0600-\u06FF]/.test(textOf) && !/rtl="1"/.test(all)) pp.push('no right-to-left paragraph');
+    // one pPr per paragraph (PptxGenJS writes one per run; PptxBuilder keeps the first)
+    const twoPpr = (all.match(/<a:p>[\s\S]*?<\/a:p>/g) || []).filter(function (p) { return (p.match(/<a:pPr\b/g) || []).length > 1; }).length;
+    if (twoPpr) pp.push(twoPpr + ' paragraphs with two pPr');
+    (E.xml || []).forEach(function (re) { if (!new RegExp(re).test(all)) pp.push('no XML /' + re + '/'); });
+    if (E.eqs != null) { const n = (all.match(/<a14:m>/g) || []).length; if (n !== E.eqs) pp.push('equations ' + n + ' ≠ ' + E.eqs); }
+    if (E.sections != null) {
+        const pres = await zip.file('ppt/presentation.xml').async('string');
+        const n = (pres.match(/<p14:section /g) || []).length;
+        if (n !== E.sections) pp.push('sections ' + n + ' ≠ ' + E.sections);
+    }
+    return { problems: problems, pp: pp, model: model, layouts: layouts, preview: preview, over: over, blob: blob, size: buf.byteLength };
+}
+
+async function runAll() {
+    const tb = document.querySelector('#out tbody');
+    tb.innerHTML = '';
+    const cases = SLIDES_CORPUS.slice();
+    Object.keys(window.KelkSlideSamples || {}).forEach(function (l) {
+        cases.push({ name: 'sample-' + l, md: KelkSlideSamples[l].markdown, expect: { slides: 33, notes: 28, noWarn: true, charts: 2, eqs: 3, sections: 6, xml: ['<p:pic>'], dir: l === 'en' ? 'ltr' : 'rtl' }, sample: true });
+    });
+    let ok = 0, fail = 0;
+    const t0 = performance.now();
+    await Promise.all([document.fonts.load('400 16px Vazirmatn'), document.fonts.load('700 16px Vazirmatn')]).catch(function () {});
+    for (const c of cases) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td>' + c.name + '</td><td colspan="5">…</td>';
+        tb.appendChild(tr);
+        try {
+            const r = await runCase(c);
+            const good = !r.problems.length && !r.pp.length && (!r.over.length || c.allowOverflow);
+            good ? ok++ : fail++;
+            const url = URL.createObjectURL(r.blob);
+            tr.innerHTML = '<td>' + c.name + '</td><td>' + r.model.slides.length + '</td>' +
+                '<td><details><summary>' + r.layouts.length + '</summary>' + r.layouts.map(function (l, i) { return (i + 1) + ' ' + l; }).join('<br>') + '</details></td>' +
+                '<td class="' + (r.problems.length ? 'err' : 'ok') + '">' + (r.problems.join('<br>') || '✓') + '</td>' +
+                '<td class="' + (r.over.length ? 'err' : 'ok') + '">' + r.preview + '</td>' +
+                '<td class="' + (r.pp.length ? 'err' : 'ok') + '"><a download="' + c.name + '.pptx" href="' + url + '">' + Math.round(r.size / 1024) + ' KB</a> ' + (r.pp.join('<br>') || '✓') + '</td>';
+        } catch (e) {
+            fail++;
+            console.error(e);
+            tr.innerHTML = '<td>' + c.name + '</td><td colspan="5" class="err">' + (e && e.message || e) + '</td>';
+        }
+    }
+    document.getElementById('sum').textContent = ok + ' passed, ' + fail + ' failed — ' + Math.round(performance.now() - t0) + ' ms';
+    window.SLIDES_RESULT = { ok: ok, fail: fail };
+    return window.SLIDES_RESULT;
+}
+document.getElementById('run').addEventListener('click', runAll);
+if (/[?&]run\b/.test(location.search)) runAll();
+</script>
+</body>
+</html>

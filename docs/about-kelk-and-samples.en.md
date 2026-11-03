@@ -107,6 +107,7 @@ Kelk supports **GitHub Flavored Markdown** in full ([GFM spec](https://github.gi
 | **DOC** (MHTML) | a completely free header/footer | must be installed | Microsoft Word only |
 | **HTML** | a standalone page for the web or an archive | inside the file | opens offline |
 | **MD** | the text itself, to edit later or give a model | — | the MD button in the text panel |
+| **PPTX** | a talk: slides you can edit, with speaker notes | must be installed | the Slides view shows it first |
 
 - **PDF** comes from Kelk's own layout engine: Arabic-script shaping, diacritics, a table of contents with page numbers, and fonts embedded in the file. To simply send a document, PDF is the easiest.
 - **DOCX** is a standard Word document. If the document will be edited, DOCX is the better choice.
@@ -123,11 +124,30 @@ Kelk supports **GitHub Flavored Markdown** in full ([GFM spec](https://github.gi
 | **docx** | headings, lists, tables, images, and Word equations as LaTeX |
 | **html**, and text pasted from Word or the web | the page's structure as Markdown; KaTeX, MathJax and Wikipedia formulas as LaTeX |
 | **pdf** | the document's text and structure (section 1.4); formulas of Kelk's own PDFs as LaTeX |
-| **several files**, or a **zip** | one document, the files in name order with the separator of the app settings between them; a zip's images are found too |
+| **several files**, or a **zip** | one document, with the separator of the app settings between the files; first a window lists them with their kind, in name order: drag them into another order or leave some out — files that cannot be converted are listed apart. A zip's images are found too |
 
 The MD button saves the text with its images (inside the file), and importing it again brings them back.
 
 > 💡 **How to:** two import settings in the app settings are for PDF text, both on: digits as Latin (ASCII), and Arabic ي and ك as Persian ی and ک in a Persian document. Turn them off to keep the file's own characters.
+
+### 3.1 Slides (PowerPoint)
+
+The same Markdown can also become a **PowerPoint deck**. Press **Slides** above the preview to see the text as slides, then export with **PPTX**. The first `#` is the title slide, a later `#` is a section slide, and every `##` is a slide. A `<!-- … -->` comment holds the speaker notes, and GitHub alerts (`> [!NOTE]`) become callouts. The layout follows the content: labeled items (`- **Label** — detail`) turn into cards, steps, stats or a timeline, and a table after `<!-- chart: column -->` becomes a real chart. `<!-- layout: … -->` picks a layout by name, including diagrams such as process, cycle, pyramid, hierarchy, matrix and Venn.
+
+```markdown
+## Our year
+<!-- layout: timeline horizontal highlight=3 -->
+
+- **Spring** — planning
+- **Summer** — building
+- **Autumn** — launch
+
+<!-- Say here what the audience should remember. -->
+```
+
+Everything in the .pptx stays editable: text, diagrams as PowerPoint shapes, charts with Edit Data. LaTeX formulas (`$$…$$` and `$…$`) become PowerPoint's own equations, as in Word, editable in its equation editor. Each `#` also starts a PowerPoint section, a picture under the first `#` (an SVG logo, say) stands over the title, and `presenter:` in the front matter adds “Presenter: …”. `logo:` puts a logo on the cover and in every slide's header (else the document's logo), `tagline:` a brand line on the cover, `classification:` a badge («Internal») on every slide and `contact:` a line on the closing slide. The bullet (• ❖ ✓ …) and the mark beside titles (steps, bar, none) are settings; what a deck's own front matter sets is that deck's default, shown in Settings; what you pick there replaces it for that deck only. The file is named after the file on screen (`slides-sample.en.pptx`). Right-to-left decks are mirrored. The whole convention is in `lib/SLIDES.md`, and Settings → Slides copies it as a prompt for AI models.
+
+> 💡 **How to:** in the Slides view the sample button opens a 33-slide deck on AI literacy that uses every layout, chart and diagram. **Present** (F5) shows it full screen.
 
 ---
 
@@ -142,6 +162,7 @@ The MD button saves the text with its images (inside the file), and importing it
 - **Code and quotes:** the code font is Vazir Code, made for code with Persian and Arabic in it, which keeps the columns aligned. The *Code* group also changes the colors of code blocks (background, language bar, frame), and the *Quotes* group the quote box (bar color and width, fill, text color).
 - **Formulas:** SVG or MathML in the preview and HTML; editable Word equations or pictures in Word.
 - **Arabic:** Vazirmatn, the default font, covers Arabic too; Arabic fonts such as Cairo, Amiri or Noto Naskh Arabic can be prepared for the PDF (see *For developers*), and in Word any installed Arabic font works.
+- **Slides:** theme, two colors, light or dark title slides, 16:9 or 4:3, text size, timeline direction, footer, slide numbers and speaker notes. Like Word, PowerPoint names its fonts — the *Word* group's fonts.
 
 > 💡 **How to:** this document has numbered headings — turn on "Table of contents" in the Document section of Settings and export a PDF.
 
@@ -466,6 +487,7 @@ const blob = await PdfBuilder.create()
 
 - **Fonts:** the PDF is not limited to the fonts that come with Kelk — for text, emoji, code or any other role, any font can be prepared with `tools/build_pdf_fonts.py`, as long as its owner's license allows it. Web fonts for the HTML output are added the same way (one base64 file).
 - **PDF import:** `PdfImporter` (with `lib/pdfimport/`) turns a PDF back into Markdown, on pdf.js, from `file://`; every rule and its limits are in `lib/PDFIMPORT.md`, its lab in `tests/pdf-lab/`.
+- **Slides:** `PptxBuilder` (on PptxGenJS) makes the .pptx from the same HTML. It lays each slide out once, so its preview and the file match. The convention and its API are in `lib/SLIDES.md`.
 - **Details:** load order, every builder's API and more in `lib/README.md`.
 
 ---
@@ -473,6 +495,7 @@ const blob = await PdfBuilder.create()
 ## 8. What to check
 
 - **Formulas:** the formulas of 6.5 look as in the preview in all four outputs — inline ones on the baseline, display ones centered, sharp when zoomed in Word (.docx).
+- **Slides:** the slides sample (Slides view → sample) as PPTX. Check the title placeholders in the outline view, Edit Data on the two charts, the equations (double-click), the sections in Slide Sorter, the speaker notes, and the right-to-left decks mirrored (fa, ar).
 - **Direction:** mixed paragraphs, numbers and brackets, nested Persian and English lists, tables and quotes look in all four outputs as in the preview.
 - **Word:** the styles (Heading, Quote, List Paragraph, TOC) appear in the style gallery, and the table of contents stays right-to-left in right-to-left documents after "Update entire table".
 - **PDF:** text can be selected and searched in Acrobat, diacritics sit on their letters, and the table of contents links work.

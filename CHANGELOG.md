@@ -4,6 +4,85 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+## [2.0-rc2] — release candidate (the date of 2.0 at its release)
+
+The second release candidate of 2.0 adds a fifth output, **PowerPoint**. The Markdown on screen
+becomes an editable .pptx deck, in the browser and offline. Every `##` is a slide, and the slide's
+layout follows its content. The library gets `PptxBuilder` 1.0; the convention it reads is in
+`lib/SLIDES.md`.
+
+### Added — slides
+
+- **Document | Slides** above the preview shows the same text as slides, with each slide's layout and
+  warnings and its speaker notes. **PPTX** sits in the export bar (Ctrl+Alt+Enter); **Present** (F5)
+  shows the slides full screen.
+- **The convention:** the first `#` is the title slide, later `#`s are numbered section slides and the
+  last one is the closing slide. Every `##` is a slide, a `<!-- … -->` comment holds its speaker notes,
+  `> [!NOTE]` and the other GitHub alerts are callouts, and front matter sets the title, footer,
+  direction, theme and size.
+- **Layouts from the content:** cards, steps, stats, statement, quote, columns, a picture beside a list,
+  and an agenda made from the sections. `<!-- layout: … -->` chooses one by name, and **timelines** are
+  horizontal or vertical, with one date highlighted.
+- **Diagrams as PowerPoint shapes:** process (chevrons), cycle, pyramid, funnel, hierarchy (from a
+  nested list), matrix and Venn. All of them stay editable.
+- **Native charts from tables:** `<!-- chart: column -->` before a table makes a column, bar, line,
+  area, pie, doughnut or radar chart (stacked, percent, labels). Edit Data opens the chart's sheet.
+- **Icons:** any Lucide name (`:rocket:`) or an emoji before an item's label.
+- **Right to left:** the slides are mirrored and each paragraph takes its direction from BidiCore.
+  Persian and Arabic text and English text each get their own font and language. Table columns and
+  chart categories start on the right.
+- **Text that fits:** text is measured and shrunk down to 70%. A long list or table continues on the
+  next slide, and the preview marks any text that still overflows.
+- Titles go into real title placeholders, so the outline view and accessibility tools work. Code stays
+  colored and editable under its language label (as in Word and PDF), and pictures keep their size.
+- **Formulas are PowerPoint's own equations** (OMML), display and inline, editable in PowerPoint's
+  equation editor as in the Word output. Programs that do not read them show the formula's picture.
+- **Sections:** each `#` also starts a PowerPoint section, so the slide sorter groups the slides.
+- **The deck's identity:** `logo:` puts a logo on the title, section and closing slides and at the end of
+  every title row, like a letterhead; without one, the document's logo (Header and footer) is used.
+  `tagline:` adds a brand line to the title and closing slides, `classification:` a badge («Internal»,
+  «محرمانه») on every slide, `contact:` a line on the closing slide. Settings → Slides: logo on every slide,
+  the cover only, or none.
+- **Bullets and title marks:** the list bullet (• ○ ▪ ❖ ➢ ✓ ❑ –) and the mark beside titles (steps, bar,
+  none — each theme has its own) are settings, or `bullet:` and `decoration:` in the front matter.
+- **A deck's front matter is its default, and Settings override it:** a `theme:` (or colors, bullet, title
+  mark, aspect, footer) written into the deck shows in Settings → Slides as the deck's value; picking
+  another one there changes this deck at once, for this document only — the settings kept for other decks
+  stay as they were. A note under the theme lists what the deck brings and what was changed, with a link
+  back to the deck's own values; another document starts from its own front matter again.
+- A `statement` directive on a slide with a chart no longer drops the chart: the layout follows the
+  content, with a warning.
+- **Title slide:** a picture under the first `#` (an SVG logo too) stands over the title, and
+  `presenter:` in the front matter adds “Presenter: …” in the deck's language.
+- **Ten themes** with general names: Modern Emerald, Scholarly Blue, Corporate Blue, Tech Dark (dark
+  slides), Tech Warm, Minimal Mono, Ocean Teal, Sunset Coral, Forest Green and Royal Purple. Text on every
+  fill is white or black according to the fill's luminance.
+- **Right to left in PowerPoint:** each run is split by script, decided over the whole paragraph. Spaces,
+  «», brackets and dashes take the side they belong to (`(ML)`, `فارسی — English`, `فارسی - 2024`), and
+  digits stay Latin. Every run states its direction (`a:rtl`) and every paragraph keeps one set of
+  paragraph properties. Speaker notes are right to left, line by line, in the deck's fonts; the theme's
+  complex-script font is the bidi font, so charts are no longer drawn in Times New Roman. A list mixing
+  Persian and English items keeps the deck's direction.
+- **Settings → Slides** comes after the Word group. Its heading stands out in the Slides view, and a note
+  says which other settings reach the slides. It sets the theme, two colors, light or dark title slides,
+  16:9 or 4:3, text size, timeline direction, footer, slide and section numbers, PowerPoint sections, speaker notes,
+  automatic layouts, and long slides split. A button copies the convention as a prompt for AI models,
+  with its rules for nesting.
+- **A light preview:** the first two slides are drawn at once and the rest as they scroll into view. In
+  the Slides view the hidden document is drawn only when an export needs it. Pictures and icons are
+  read once.
+- **Slides sample:** “AI literacy” (generative, general-purpose AI) in fa, en and ar, 33 slides that use
+  every layout, both charts, every diagram, Lucide icons and emoji, an SVG logo and a presenter, code,
+  display and inline formulas, a quote, callouts and speaker notes. It opens with the sample button in the Slides view. A sample written for the other
+  view is swapped when the view changes, with a toast; Undo brings the text back.
+- **Word fonts in PowerPoint:** the Word fonts set in Settings (complex scripts and Latin) are the deck's
+  fonts too — they were read from the wrong place and the deck stayed in Vazirmatn. The slides preview
+  redraws when they change.
+- **File names:** the exports take the name of the file on screen — an imported file or the sample
+  (`slides-sample.fa.pptx`), also after a reload of a text an older version stored.
+- Tests: `tests/slides-suite.html` runs the cases of `tests/slides-corpus.js` and the samples, then reads
+  each .pptx back. `tests/run-slides-suite.js` runs the suite headless.
+
 ## [2.0-rc1] — release candidate (the date of 2.0 at its release)
 
 The third release, and the first that reads **PDF**: a PDF becomes Markdown again, in the browser, offline. Built
@@ -42,6 +121,9 @@ layer. How it works and its limits: `lib/PDFIMPORT.md`.
   in numeric order), each after a separator chosen in Settings (its name and a rule, a rule, or a blank line). A
   zip's md, txt, html, docx and pdf files are imported, and its images found by the paths the text gives them
   (JSZip, loaded on the first zip).
+- **The order of several files:** before they are imported, a window lists them with the icon of their kind (md,
+  txt, html, docx, pdf), in name order — drag them or move them with the arrows, leave some out; files that cannot
+  be converted, or are too large, are listed apart with the reason.
 - **A progress dialog** while a file is imported or made: the page waits, a PDF shows its pages going by, and
   Cancel stops it.
 - **The MD file keeps its images:** pictures the text names (dropped, pasted, or from a PDF) go into the file as
@@ -73,6 +155,8 @@ layer. How it works and its limits: `lib/PDFIMPORT.md`.
   shook and lagged).
 - The empty preview's hint takes the interface's direction, not the last document's.
 - .doc export no longer has the page try to load its picture parts (`document_files/…` errors in the console).
+- Markdown import: a `|` in a table cell is escaped (`\|`); it had split the cell, and the table was no table.
+- Dark theme: scrollbars and form controls in their dark version (they were white).
 
 ### Documentation and tests
 

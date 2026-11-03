@@ -96,6 +96,11 @@
             if (s.text && s.text.lineHeight === '110%') s.text.lineHeight = '';
             s._lh = 1; changed = true;
         }
+        // Slides themes got general names in 2.0-rc2 (kelk → modern-emerald …)
+        if (s.slides && s.slides.theme) {
+            const old = { kelk: 'modern-emerald', pasargad: 'scholarly-blue', ocean: 'ocean-teal', graphite: 'minimal-mono' }[s.slides.theme];
+            if (old) { s.slides.theme = old; changed = true; }
+        }
         if (changed) raw.set('settings', JSON.stringify(s));
     })();
 

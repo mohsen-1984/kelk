@@ -76,7 +76,18 @@
   --table-head: #e2efd9;
   --toast-bg: #114b3e;
   --toast-ink: #ffffff;
+  /* scrollbars: the browser's own, in the theme's colors (color-scheme) and a thumb that fits the panels */
+  --scroll-thumb: #cdc8bf;
+  --scroll-thumb-hover: #aaa498;
+  --scroll-track: transparent;
+  /* the kinds of file in the order dialog (Kelk.ui.order) */
+  --k-md: #1f6f5c;
+  --k-txt: #6b6862;
+  --k-html: #c2410c;
+  --k-docx: #2b579a;
+  --k-pdf: #b42318;
 
+  color-scheme: light;
   --radius: 10px;
   --radius-sm: 6px;
   --shadow: 0 1px 2px rgba(28, 27, 26, .04), 0 4px 16px rgba(28, 27, 26, .05);
@@ -106,5 +117,14 @@
   --table-head: #24382c;
   --toast-bg: #4db396;
   --toast-ink: #0f1416;
+  --scroll-thumb: #464c53;
+  --scroll-thumb-hover: #5d646c;
+  --scroll-track: transparent;
+  --k-md: #4db396;
+  --k-txt: #9a958c;
+  --k-html: #fb923c;
+  --k-docx: #7aa7e6;
+  --k-pdf: #f97066;
+  color-scheme: dark;            /* the browser's own parts — scrollbars, form controls — in their dark version */
   --shadow: 0 1px 2px rgba(0, 0, 0, .25), 0 4px 16px rgba(0, 0, 0, .3);
 }
