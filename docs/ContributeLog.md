@@ -735,9 +735,11 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 8 | Review of the P3.5 diff: the app driven over `file://` with real PDF imports (clean files, notes, the ladder files, several files, a zip), the panel against the real `r.report`, safe re-import and undo, Copy, focus and Escape, language and theme switches, axe with a real report, the heap after closing the panel, the strings against every note code the importer emits. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 20 | P3.5 review findings applied: strings for `kelkMath`, `monoBody` and `watermarkDropped`, informational codes never open the panel alone, the test derives every code from the importer's `_note(` calls; the PDF bytes kept only for a single-PDF import and released on close (three retainers — the task promise, the dialog handlers, the result — removed; heap checked); a page not read at all shown as "not read"; focus returned when the panel closes itself; the panel shows its findings and rows at desktop sizes with scroll shadows; plural, list separator and a visible safe-mode hint; screenshots redone. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 14 | P3.3 report `docs/reports/P3.3-metamorphic-order.md`: the six batches with their causes and nets, the plan's literal migrations measured and rejected, the lab before and after per transform, the review findings and their verdicts, the open items. |
+| 1405-08-12 | 2.0-rc1 | Zarrabi | 7 | P4.2 review findings applied: chrome-form--form-fa's four grey bars as alike headings and its bordered label/value boxes as GFM tables; itext-word--circular-fa's top heading and the letter head block kept once (rule in the lab README); booklet quote as one paragraph; README: shape-only structure diff, the 23 fa / 10 ar / 17 en split, clipped text, list-marker and site-navigation conventions; gate: a golden missing from an unfiltered run fails (gate-golden.js, compareGolden) with unit tests; visible golden mean 92.7 (two importer misses now caught). |
+| 1405-08-12 | 2.0-rc1 | Zarrabi | 3 | P4.2 review fixes applied on the branch, unit tests run. |
 
 <!-- generated:totals -->
-**Entries: 149 · Total: 2082 min (34.70 hours) — Zarrabi 2082 min (142 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 151 · Total: 2092 min (34.87 hours) — Zarrabi 2092 min (144 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
