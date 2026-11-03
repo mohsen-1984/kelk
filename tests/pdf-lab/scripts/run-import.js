@@ -1,6 +1,8 @@
 // Import every pdf/*.pdf with Kelk's PdfImporter (tools/pdf-lab.html in Chromium, from file://),
 // write out/<name>.md, and score it against corpus/<doc>.md when the file name says which (…--<doc>.pdf).
-//   node scripts/run-import.js [filter]
+//   node scripts/run-import.js [filter] [--mode auto|safe|full]
+// --mode: the importer's options.mode (lib/pdfimport/ladder.js; default auto). Run safe mode into a LAB_OUT of its own —
+// its scores are not the gate's (plan P3.4: safe mode on the corpus keeps words and order ≥ 70); the means are printed.
 const { pdfPath, fileUrl } = require('./env.js');
 const fs = require('fs'), path = require('path');
 const { chromium } = require('./env.js').req('playwright');
@@ -10,7 +12,10 @@ const LAB = path.join(__dirname, '..');
 const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
 
 (async () => {
-  const filter = process.argv[2] ? new RegExp(process.argv[2]) : null;
+  const args = process.argv.slice(2), mi = args.indexOf('--mode');
+  const mode = mi >= 0 ? args.splice(mi, 2)[1] : 'auto';
+  if (!/^(auto|safe|full)$/.test(mode)) throw new Error('--mode: auto, safe or full');
+  const filter = args[0] ? new RegExp(args[0]) : null;
   const browser = await chromium.launch();
   const page = await browser.newPage();
   const errors = [];
@@ -23,17 +28,17 @@ const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
   for (const f of files) {
     const b64 = fs.readFileSync(where[f]).toString('base64');
     const t0 = Date.now();
-    const r = await page.evaluate(async (b64) => {
+    const r = await page.evaluate(async ({ b64, mode }) => {
       const bin = atob(b64), u = new Uint8Array(bin.length);
       for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
       try {
         // pictures kept, each as a short name (the crops themselves are not scored, where they land is)
-        const r = await PdfImporter.create({ images: 'markdown', onImage: (src, o) => 'img-' + o.page + '-' + o.index, asciiNumbers: false, persianLetters: false }).fromArrayBuffer(u.buffer);
+        const r = await PdfImporter.create({ images: 'markdown', onImage: (src, o) => 'img-' + o.page + '-' + o.index, asciiNumbers: false, persianLetters: false, mode }).fromArrayBuffer(u.buffer);
         const q = (r.quality && r.quality.pages) || [];
         const cov = q.reduce((a, x) => [a[0] + x.covered, a[1] + x.glyphs], [0, 0]);
-        return { markdown: r.markdown, html: r.html, messages: r.messages, pic: cov[1] ? cov[0] / cov[1] : 0, rules: r.rules };
+        return { markdown: r.markdown, html: r.html, messages: r.messages, pic: cov[1] ? cov[0] / cov[1] : 0, rules: r.rules, ladder: r.report && r.report.summary };
       } catch (e) { return { error: e.stack || String(e) }; }
-    }, b64);
+    }, { b64, mode });
     const ms = Date.now() - t0;
     const name = f.replace(/\.pdf$/, '');
     if (r.error) { rows.push({ name, error: r.error.split('\n')[0] }); console.log(name, 'ERROR', r.error.slice(0, 300)); continue; }
@@ -49,6 +54,8 @@ const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
     const m = name.match(/--([\w-]+)$/);
     const src = m && path.join(LAB, 'corpus', m[1] + '.md');
     const row = { name, ms };
+    // pages not given in full by the ladder (lib/pdfimport/ladder.js): none on the corpus in auto mode
+    if (r.ladder && r.ladder.full < r.ladder.pages) row.demoted = r.ladder.pages - r.ladder.full;
     if (src && fs.existsSync(src)) {
       const want = fs.readFileSync(src, 'utf8');
       Object.assign(row, score(want, md));
@@ -77,6 +84,10 @@ const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
     if (r.error) return console.log(r.name.padEnd(46), 'ERROR', r.error);
     console.log(r.name.padEnd(46), pct(r.recall), pct(r.order), pct(r.headings), pct(r.lists), pct(r.tables), pct(r.code), pct(r.quotes), pct(r.total), String(r.markup).padStart(4), pct(r.rtl), pct(r.pic), String(r.mix).padStart(3), String(r.figs).padStart(4), pct(r.links), r.ms + 'ms');
   });
+  const ok = rows.filter((r) => !r.error && r.recall !== undefined), mean = (k) => ok.length ? (100 * ok.reduce((s, r) => s + (r[k] || 0), 0) / ok.length).toFixed(1) : '-';
+  const dem = rows.filter((r) => r.demoted);
+  console.log('\nmode ' + mode + ': ' + ok.length + ' scored, means words ' + mean('recall') + ' order ' + mean('order') + ' total ' + mean('total') +
+    ' · files with pages not in full: ' + dem.length + (dem.length ? ' (' + dem.slice(0, 8).map((r) => r.name + ' ' + r.demoted).join(', ') + (dem.length > 8 ? ' …' : '') + ')' : ''));
   fs.writeFileSync(path.join(OUT, '_scores.json'), JSON.stringify(rows, null, 1));
   fs.writeFileSync(path.join(OUT, '_rules.json'), JSON.stringify(rules, null, 1));
   if (errors.length) console.log('page errors:', errors.slice(0, 5));

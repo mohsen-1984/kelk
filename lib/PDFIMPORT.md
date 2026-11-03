@@ -57,6 +57,7 @@ Three decisions shape everything:
 | `lib/pdfimport/extract.js` | 1. extraction and Unicode repairs, 2. fonts (§4, §5) |
 | `lib/pdfimport/lines.js` | 3. lines, segments, logical order; 3.5 page furniture (§6, §6a) |
 | `lib/pdfimport/regions.js` | 4. the page driver (`_layout`), ruled tables, code boxes, figures (§7) |
+| `lib/pdfimport/ladder.js` | 4.9 each page's confidence and the fallback ladder (§7a) |
 | `lib/pdfimport/order.js` | 4. reading order: XY-cut, rows of borderless tables (§8.1, §8.3) |
 | `lib/pdfimport/blocks.js` | 5. blocks, structure-tree votes, joined across pages; 6. HTML (§8.2–§8.6, §9) |
 | `lib/MarkdownImporter.js` | HTML → Markdown (turndown + GFM), shared with Word and paste import |
@@ -245,7 +246,7 @@ page's layout, `_pageQuality()` measures three cheap signs on the page's lines a
 each flag also becomes a note (`notes`, translated by the page with its pages listed). The thresholds were
 set on the lab (no flag on its 106 PDFs but the one that is glued) and on a user's real files: the four
 Prince letters with lost spaces, a PowerPoint export whose text lay 89 % under its pictures. It measures,
-it does not repair: what to do about a flagged page is the layout's work (TODO).
+it does not repair: what is done with a flagged page is the fallback ladder's (§7a).
 
 ## 3. A PDF made by Kelk
 
@@ -1204,6 +1205,37 @@ or more) alone in its row, or a short label (40 or fewer) and such a text, follo
 when a line's words run across that edge (`crossed`): Chrome breaks a merged cell's bottom border at every column,
 which `ruleBreak` had read as cells. Lab: `chrome-form--form`, `--form-fa`
 (`make-form.js`); a Persian Aspose.Words invoice read its values as headings and its pairs column by column.
+
+## 7a. Confidence and the fallback ladder
+
+After a page is laid out and diagnosed (§2d), `_ladder` (`lib/pdfimport/ladder.js`) gives it a **confidence**
+`conf` (0–1) and decides the **mode** its blocks are given in. The confidence is one minus weighted signs
+(`ladderConf`, pure): lost glyphs (U+FFFD, in full at 20 % of the page; weight 0.5), glued words (at 25 %; 0.3),
+text under a cropped picture (0.1), glyphs whose letter a repair guessed (telemetry; 0.15), blocks the trusted
+structure tree disagrees with (`_treeVote`, from 3 votes; 0.15), gaps between a letter gap and a word gap
+(0.1–0.18 em with no space glyph: segment ambiguity; 0.1) and a document with fewer than 20 word-gap samples
+(calibration falls back to the defaults; 0.05). The decision (`ladderDecide`, pure), in order:
+
+| Mode | When | What the page gets |
+|---|---|---|
+| `ocr` | 10 glyphs or fewer over a picture covering half the page or more | its pictures (the scan) and the note `ocrNeeded`; conf 0 — the hook for an OCR runtime (plan P7) |
+| `textContent` | 20 % or more of its glyphs lost (`ladLostTextContent`); its extraction or its lines failed | pdf.js's own text (`getTextContent()`): items on a baseline a line, ordered by the line's letter majority, Arabic presentation forms to letters, paragraphs by the line gap; note `pageTextOnly` |
+| `simplified` | `suspectSpaces` and `lostGlyphs` together; conf under `pageConfSimplified` (0.45); its layout failed; `safe` mode | headings and paragraphs only: a table's rows, a list's items and a quote's blocks become paragraphs (`_ladFlatten`); after a failed layout, the lines by size and gap (`_ladSimpleBlocks`); note `pageSimplified` (not in safe mode) |
+| `full` | otherwise | the layout as it is |
+
+A rung that gives nothing goes a rung down; the last resort is `_pageFallback` (the lines as plain paragraphs,
+`pageFailed`, `r.failedPages`). `options.mode` (or `hooks.mode` of `fromArrayBuffer`, which wins): `auto`
+(default), `safe` (every page at least simplified — the app's "safe mode"), `full` (never demoted: the importer
+as before the ladder, failures as `pageFailed`). `r.pages` = `[{ page, mode, conf }]`; `r.report` = `{ mode,
+summary: { pages, full, simplified, textContent, ocr, failed, conf }, pages: [{ page, mode, conf, why }] (the pages not
+in full; `why`: `lowConf`, `suspectSpaces`, `lostGlyphs`, `layoutFailed`, `extractFailed`, `noText`, `safeMode`;
+a page given by the last resort has `mode: 'simplified', failed: true`), flags: [{ code, pages }], notes: [{ code, pages? }] }`.
+
+The thresholds are fixed (votes, not geometry) and set on the lab: no page of the corpus (282 pages), fuzz dev or the
+metamorphic net is demoted (lowest conf: corpus 0.92, dev 0.90, meta 0.655 — a noToUnicode page with glued words);
+safe mode on the corpus keeps words 97.8 and order 97.5 (`run-import.js --mode safe`). Lab: `tests/pdf-lab/ladder/`
+(`make-ladder.js`: a scan with no text → `ocr`; glued Type 3 words with one glyph in twelve lost → `simplified`,
+one in four → `textContent`) and the injected faults of `run-stress.js`.
 
 ## 8. Reading order and blocks
 

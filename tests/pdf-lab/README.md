@@ -155,7 +155,9 @@ node scripts/roundtrip.js             # Kelk's own round trip: tests/builder-sui
 node scripts/math-roundtrip.js        # formulas through Kelk and back: every case of tests/math-cases.js, en and fa (76 checks)
 DIR=folder node scripts/run-real.js   # any PDFs: words found (recall) and their order, against pdftotext
 node scripts/run-crash.js [folder]    # stability: every PDF under a folder (default pdf/, subfolders too); exit 1 on an error or timeout
-node scripts/run-stress.js big.pdf small.pdf   # a long file (thread held < 1 s), injected faults, an abort
+node scripts/run-stress.js big.pdf small.pdf   # a long file (thread held < 1 s), injected faults (the ladder's rungs), an abort, ladder/*.pdf demoted
+node scripts/make-ladder.js                    # ladder/: PDFs the fallback ladder must demote (a scan, glued Type 3 words) — not corpus files
+node scripts/run-import.js --mode safe         # the corpus in safe mode (its own LAB_OUT): means of words and order ≥ 70
 node scripts/cmp.js A B dir…             # two versions of the importer (a Kelk folder or its lib/PdfImporter.js): what changed
 node scripts/snapshot.js pdfs/ snap/ [--against older/]   # a regression set of real (private) PDFs: Markdown + signals, compared
 node scripts/writeout.js                 # the import settings that write the text out (digits, ٬ ٫ ٪ ،, ي/ك): checks of _writeOut
