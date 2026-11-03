@@ -143,9 +143,15 @@
 
     const owns0 = function (m, k) { return m[k] != null && m[k] !== ''; };
 
+    // the interface's text of each PptxBuilder warning (its code with _ for -); a code without one keeps the builder's English
+    const WARN_KEYS = [
+        'sw_overflow', 'sw_directive', 'sw_layout', 'sw_chart_type', 'sw_chart_table', 'sw_chart_data',
+        'sw_bullets', 'sw_alerts', 'sw_title_blocks', 'sw_stats', 'sw_image', 'sw_icon', 'sw_list_block',
+        'sw_math_inline', 'sw_layout_content'
+    ];
     function warnText(w) {
         const key = 'sw_' + w.code.replace(/-/g, '_');
-        const t = K.i18n.t(key, w.arg == null ? '' : w.arg);
+        const t = WARN_KEYS.indexOf(key) >= 0 ? K.i18n.t(key, w.arg == null ? '' : w.arg) : '';
         return t && t !== key ? t : (PptxBuilder.WARNINGS[w.code] || w.code).replace('{0}', w.arg == null ? '' : w.arg);
     }
 

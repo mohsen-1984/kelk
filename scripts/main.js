@@ -24,7 +24,7 @@
             if (all && all[which.lang]) K.names.adopt(all[which.lang].name);
         }
         const label = note.querySelector('[data-i18n]');
-        if (label) { label.setAttribute('data-i18n', which && which.set === 'slides' ? 'sampleNoteSlides' : 'sampleNote'); label.textContent = K.i18n.t(label.getAttribute('data-i18n')); }
+        if (label) { const slides = !!which && which.set === 'slides'; label.setAttribute('data-i18n', slides ? 'sampleNoteSlides' : 'sampleNote'); label.textContent = K.i18n.t(slides ? 'sampleNoteSlides' : 'sampleNote'); }
     }
 
     /**

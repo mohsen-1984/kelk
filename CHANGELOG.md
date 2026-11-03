@@ -4,14 +4,19 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
-## [2.0-rc2] — release candidate (the date of 2.0 at its release)
+## [2.0] — 2026-11-03
 
-The second release candidate of 2.0 adds a fifth output, **PowerPoint**. The Markdown on screen
-becomes an editable .pptx deck, in the browser and offline. Every `##` is a slide, and the slide's
-layout follows its content. The library gets `PptxBuilder` 1.0; the convention it reads is in
-`lib/SLIDES.md`.
+The third release. Kelk reads **PDF** — a PDF becomes Markdown again — and writes a fifth output, **PowerPoint**:
+the Markdown on screen becomes an editable .pptx deck. Both in the browser, offline. The libraries in `lib/` are
+2.0; the new `PdfImporter` and `PptxBuilder` are 1.0 (the slide convention: `lib/SLIDES.md`).
 
-### Added — slides
+PDF import, where it stands: a lab of 144 PDFs from 49 producer variants reads at 96.2 on average; style-fuzzed PDFs
+in English at 93.0 (held out 91.9) and in Persian and Arabic at 77.1 (held out 80.6) — right-to-left PDFs from other
+programs are the weaker side. Also weak: Persian PDFs from wkhtmltopdf and LibreOffice's HTML import, borderless
+two-column tables, turned text and turned pages, formulas from other programs; a scan needs an OCR layer. How it
+works and its limits: `lib/PDFIMPORT.md`.
+
+### Added — slides (PowerPoint)
 
 - **Document | Slides** above the preview shows the same text as slides, with each slide's layout and
   warnings and its speaker notes. **PPTX** sits in the export bar (Ctrl+Alt+Enter); **Present** (F5)
@@ -80,19 +85,6 @@ layout follows its content. The library gets `PptxBuilder` 1.0; the convention i
   redraws when they change.
 - **File names:** the exports take the name of the file on screen — an imported file or the sample
   (`slides-sample.fa.pptx`), also after a reload of a text an older version stored.
-- Tests: `tests/slides-suite.html` runs the cases of `tests/slides-corpus.js` and the samples, then reads
-  each .pptx back. `tests/run-slides-suite.js` runs the suite headless.
-
-## [2.0-rc1] — release candidate (the date of 2.0 at its release)
-
-The third release, and the first that reads **PDF**: a PDF becomes Markdown again, in the browser, offline. Built
-for documents as people make them in Persian, Arabic and English. Formulas in Kelk's own PDFs come back as their
-LaTeX. The libraries in `lib/` are 2.0; the new `PdfImporter` is 1.0.
-
-Where it stands: a lab of 144 PDFs from 49 producer variants reads at 95.7 on average (114 files at 99 or more),
-style-fuzzed PDFs at 96.0 (94.6 on a held-out set). Weaker: Persian PDFs from wkhtmltopdf and from LibreOffice's
-HTML import (51–71), borderless two-column tables, turned text, formulas from other programs; a scan needs an OCR
-layer. How it works and its limits: `lib/PDFIMPORT.md`.
 
 ### Added — PDF import
 
@@ -158,17 +150,39 @@ layer. How it works and its limits: `lib/PDFIMPORT.md`.
 - Markdown import: a `|` in a table cell is escaped (`\|`); it had split the cell, and the table was no table.
 - Dark theme: scrollbars and form controls in their dark version (they were white).
 
+### Quality and security
+
+- **Safer preview and exports:** a Content Security Policy for the page; Markdown can no longer take over the app's
+  own elements or restyle it (ids prefixed, `<style>`, forms and inputs removed); the custom header and footer HTML is
+  sanitized; the HTML export strips scripts, `on…` handlers and embedded pages.
+- **Settings keep what you chose:** the stored profile holds only what differs from the defaults, with a schema
+  version — old migrations no longer overwrite a choice made on purpose; two tabs no longer undo each other's text
+  and images.
+- **An export right after typing** has the last keystroke in it (the preview's pending render is drawn first).
+- PDF output: ى (U+0649) joins with its proper initial and medial forms (it was drawn as a Cyrillic mark); letters
+  without presentation forms join their neighbors; a table row taller than a page no longer runs off it; one table
+  of named colors for every builder; a download's link is kept long enough for every browser.
+- PDF import: nested Persian quotes come back as quotes (they were lost in every producer).
+- Arabic interface: Arabic words and dates in the documents it makes (they were Persian); the interface language and
+  theme are set before the first paint (no flash of the wrong language).
+- Accessibility: code colors with enough contrast in both themes, named task checkboxes, scrolling code blocks and wide
+  formulas reachable by keyboard.
+
 ### Documentation and tests
 
 - `lib/PDFIMPORT.md`: how the importer works, a field guide to the producers, what a PDF itself loses.
-- `tests/pdf-lab/`: the import lab (Node + Playwright) — corpus, generators, scorer, style fuzzing, a metamorphic
-  net, a gate against regressions (also in CI), the formula round trip.
+- `tests/pdf-lab/`: the import lab (Node + Playwright) — corpus, generators, scorer, style fuzzing in English, Persian
+  and Arabic, a metamorphic net of 20 transforms × 24 seeds, a gate against regressions with all 144 files.
+- Continuous integration on GitHub (`.github/workflows/`): the lab and its gate, the four builders against golden
+  snapshots, every .docx checked against the OOXML schemas and opened by LibreOffice, unit tests, lint, links,
+  accessibility (axe) in fa / en / ar, a startup size budget, generated files kept fresh, one version string.
 - `tests/pdf-import-suite.html` (was `import-suite.html`): PDFs you pick, scored in the browser, offline.
+- `tests/slides-suite.html` runs the slide cases and samples and reads each .pptx back.
 
 ### Third-party
 
 - Added: PDF.js 6.4.299 (Apache-2.0) with its OpenJPEG and JBIG2 decoders (BSD), wrapped as classic scripts by
-  `tools/build-pdfjs.js` so it runs from `file://`; JSZip 3.10.2 (MIT, for .zip import).
+  `tools/build-pdfjs.js` so it runs from `file://`; JSZip 3.10.2 (MIT, for .zip import); PptxGenJS 4.0.1 (MIT, for .pptx).
 
 ## [1.5] — 2026-10-03
 

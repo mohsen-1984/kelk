@@ -43,8 +43,8 @@
 <!-- ===== docProps/core.xml ===== -->
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <cp:coreProperties [5 xmlns declarations sha256 b63ed098059a]>
-  <dc:creator>Kelk 2.0-rc1</dc:creator>
-  <cp:lastModifiedBy>Kelk 2.0-rc1</cp:lastModifiedBy>
+  <dc:creator>Kelk 2.0</dc:creator>
+  <cp:lastModifiedBy>Kelk 2.0</cp:lastModifiedBy>
   <cp:revision>1</cp:revision>
   <dcterms:created xsi:type="dcterms:W3CDTF">[date]</dcterms:created>
   <dcterms:modified xsi:type="dcterms:W3CDTF">[date]</dcterms:modified>
