@@ -4,7 +4,7 @@ Kelk test suites and corpora.  Open the `.html` pages from `file://` (or a local
 
 | File | What it does |
 |---|---|
-| **index.html** | Start page: links to the four test pages below. |
+| **index.html** | Start page: links to the five test pages below. |
 | **builder-suite.html** | Main test runner for the **builders** (DocxBuilder, WordHtmlBuilder, PdfBuilder, HtmlBuilder). Runs every case from `test-corpus.js` and the `about-kelk-and-samples` documents through all four output formats, checks direction consistency (BidiView vs BidiCore) and preview/export parity (PreviewBuilder vs HtmlBuilder), and does a PDF round-trip (PdfBuilder → PdfImporter → word comparison). Loads all library scripts and vendor dependencies inline. |
 | **test-corpus.js** | Builder test corpus — `var CORPUS = [...]`: each entry is a markdown document (with optional `setup`, `cells`) that exercises a specific feature (RTL, tables, lists, code, quotes, styles, edge cases). Used by `builder-suite.html` (and through it by `pdf-lab/scripts/roundtrip.js`). |
 | **pdf-import-suite.html** | Test runner for the **PDF importer** (PdfImporter) only — the .docx / .html / rich-paste importer (MarkdownImporter) is exercised by `builder-suite.html` and `math-file.html`. Accepts user-selected PDF files (e.g. from `pdf-lab/pdf/`), imports each, and scores the recovered Markdown against the matching corpus document when the file name ends with `--<doc>.pdf` — offline, from `file://` (the corpus comes from `pdf-lab/corpus.js`). Shows producer detection, tagged/language metadata, and per-structure scores. |
@@ -12,6 +12,9 @@ Kelk test suites and corpora.  Open the `.html` pages from `file://` (or a local
 | **math-cases.js** | LaTeX formula test vectors — `window.MATH_CASES = [...]`: each entry is `[group, name, tex, display]`. Used by `math-file.html` and `math-modes.html`. |
 | **math-file.html** | Renders every `math-cases.js` formula through MathCore → marked → PdfBuilder/HtmlBuilder and shows the result. |
 | **pdf-lab/** | The PDF import lab: a corpus, the PDFs 49 producer variants made of it, the scorer and inspection tools (Node + Playwright). See [`pdf-lab/README.md`](pdf-lab/README.md). |
+| **slides-suite.html** | Test runner for **PptxBuilder** (.pptx slides): every case of `slides-corpus.js` and the three slides samples (`docs/slides-samples.js`) — the layout each slide takes, notes, warnings, direction; the preview drawn and checked for overflowing text; the .pptx read back with JSZip (slides, title placeholders, native charts, notes slides, hidden slides, right-to-left paragraphs, the named text). `?run` runs it on load. |
+| **slides-corpus.js** | Slides test corpus — `var SLIDES_CORPUS = [...]`: Markdown decks with their expectations (layouts, notes, warnings, charts, hidden slides, text). |
+| **run-slides-suite.js** | Runs `slides-suite.html` headless (Node + Playwright): `node tests/run-slides-suite.js` prints every case and exits 1 on a failure. |
 | **math-modes.html** | Side-by-side comparison of MathCore rendering in inline vs display mode for every formula case. |
 
 ## Relationships
@@ -23,6 +26,9 @@ builder-suite.html ─── loads ──→ test-corpus.js
 
 pdf-import-suite.html ─── loads ──→ pdf-import-corpus.js, pdf-lab/corpus.js
                       ─── uses  ──→ PdfImporter (+ MarkdownImporter for its Markdown)
+
+slides-suite.html  ─── loads ──→ slides-corpus.js, slides-samples.js (docs/)
+                   ─── uses  ──→ PptxBuilder (+ JSZip to read the .pptx back)
 
 math-file.html     ─── loads ──→ math-cases.js
 math-modes.html    ─── loads ──→ math-cases.js

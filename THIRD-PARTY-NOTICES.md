@@ -10,12 +10,13 @@ unchanged unless noted; each keeps its own license.
 | marked | 18.0.14 | MIT | `vendor/marked.umd.min_18.0.14.js` | https://github.com/markedjs/marked |
 | DOMPurify | 3.4.16 | Apache-2.0 or MPL-2.0 | `vendor/purify.min_3.4.16.js` | https://github.com/cure53/DOMPurify |
 | highlight.js | 11.12.0 (theme 11.11.1) | BSD-3-Clause | `vendor/highlight.js/` | https://github.com/highlightjs/highlight.js |
-| Lucide | 1.48.0 | ISC | `vendor/lucide.min_1.48.0.js`; subset in `assets/icons.js` | https://lucide.dev |
+| Lucide | 1.48.0 | ISC | `vendor/lucide.min_1.48.0.js` (also the `:name:` icons of slides); subset in `assets/icons.js` | https://lucide.dev |
 | Turndown | 7.2.4 | MIT | `vendor/turndown/turndown_7.2.4.js` | https://github.com/mixmark-io/turndown |
 | turndown-plugin-gfm | 1.0.2 | MIT | `vendor/turndown/turndown-plugin-gfm_1.0.2.js` | https://github.com/mixmark-io/turndown-plugin-gfm |
 | mammoth | 1.12.3 | BSD-2-Clause | `vendor/mammoth.browser.min_1.12.3.js` | https://github.com/mwilliamson/mammoth.js |
 | docx | 9.7.1 | MIT | `vendor/docx.index.iife.min_9.7.1.js` | https://github.com/dolanmiu/docx |
 | jsPDF | 4.2.1 | MIT | `vendor/jspdf.umd.min_4.2.1.js` | https://github.com/parallax/jsPDF |
+| PptxGenJS (the minified build without its source-map line) | 4.0.1 | MIT | `vendor/pptxgen.min_4.0.1.js` | https://github.com/gitbrent/PptxGenJS |
 | JSZip (with pako) | 3.10.2 | MIT (dual MIT / GPLv3; used under MIT) | `vendor/jszip.min_3.10.2.js` | https://github.com/Stuk/jszip |
 | PDF.js (pdfjs-dist; wrapped as classic scripts by `tools/build-pdfjs.js`, code unchanged) | 6.4.299 | Apache-2.0 | `vendor/pdfjs/` (`LICENSE` there) | https://github.com/mozilla/pdf.js |
 | OpenJPEG and PDFium JBIG2 decoders (WebAssembly builds shipped with PDF.js; base64) | PDF.js 6.4.299 | BSD-2-Clause (OpenJPEG), BSD-3-Clause (PDFium); PDF.js glue Apache-2.0 | `vendor/pdfjs/wasm/` (`LICENSE_*` there) | https://github.com/mozilla/pdf.js |

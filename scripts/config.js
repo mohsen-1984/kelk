@@ -8,7 +8,7 @@
     'use strict';
 
     K.config = {
-        version: '2.0-rc1',             // release candidate; '2.0' at the release
+        version: '2.0-rc2',             // release candidate; '2.0' at the release
         repoUrl: 'https://github.com/mohsen-1984/kelk',   // the footer link (hidden when empty)
         storagePrefix: 'kelk.',
         maxFileMB: 20,                  // the default of Settings → App → Largest file to import (ui.importer.maxMB)
@@ -27,6 +27,7 @@
             previewWordFont: false,     // preview with the Word fonts when installed
             sampleSeen: false,
             sampleLang: null,           // the about/sample document on screen (its language), if any
+            view: 'document',           // the preview: document | slides (Kelk.slides)
             sourceName: null,           // the imported (or sample) file's name: the exports' default name, kept across reloads
             importer: { richPaste: true, nestedTables: 'extract', images: 'markdown', asciiNumbers: true, persianLetters: true,
                         maxMB: '20', separator: 'name' }   // largest file to import (MB); between files: name | rule | none
@@ -62,7 +63,12 @@
             code: { showLanguage: true, rtlFont: 'code', font: 'Vazir Code Hack', wordFont: 'Consolas', size: 10,
                     bg: '#FCFCFC', headerBg: '#E7F1EE', border: '#D4D0C8' },   // colors: box, language bar (its text follows), frame (0.75pt)
             quote: { border: '#1F6F5C', width: '3.5pt', bg: '#F6F9F8', text: '#4A4A4A' },   // the bar beside a quote, the box's fill, its text
-            math: { html: 'svg', word: 'native' }   // formulas: HTML svg | mathml; .docx native (Word equations) | image
+            math: { html: 'svg', word: 'native' },  // formulas: HTML svg | mathml; .docx native (Word equations) | image
+            // PowerPoint (lib/PptxBuilder): theme, colors ('' → the theme's), title slides, size, body text, timelines;
+            // footer null → the document's title; the rest: slide numbers, speaker notes, automatic layouts, long slides split
+            slides: { theme: 'modern-emerald', primary: '', accent: '', titleStyle: 'dark', aspect: '16:9', size: 'medium', timeline: 'auto',
+                      footer: null, numbers: true, notes: true, autoLayout: true, split: true, sectionNumbers: true, sections: true,
+                      decoration: 'auto', bullet: '•', logo: 'all' }
         },
 
         /** Default edition: LTR header → Draft; RTL header → by interface language (Persian unless Arabic). */
@@ -122,6 +128,10 @@
         },
 
         sample: 'docs/about-kelk-and-samples.js',   // KelkSamples[lang] (tools/build-samples.js)
+        slidesSample: 'docs/slides-samples.js',     // KelkSlideSamples[lang]: the slides sample (AI literacy)
+
+        /** Slides: the full Lucide icon set for :name: icons (loaded on the first icon). */
+        slides: { icons: 'vendor/lucide.min_1.48.0.js' },
 
         /** LaTeX formulas: the local MathJax 4 (lib/MathCore loads it with the first formula). */
         math: { mathjax: 'vendor/mathjax_4.1.3/' },
@@ -132,7 +142,8 @@
             jspdf: { src: 'vendor/jspdf.umd.min_4.2.1.js', global: 'jspdf' },
             mammoth: { src: 'vendor/mammoth.browser.min_1.12.3.js', global: 'mammoth' },
             pdfjs: { src: ['vendor/pdfjs/pdf_6.4.299.js', 'vendor/pdfjs/pdf.worker_6.4.299.js'], global: 'pdfjsLib' },
-            jszip: { src: 'vendor/jszip.min_3.10.2.js', global: 'JSZip' }
+            jszip: { src: 'vendor/jszip.min_3.10.2.js', global: 'JSZip' },
+            pptx: { src: ['vendor/jszip.min_3.10.2.js', 'vendor/pptxgen.min_4.0.1.js'], global: 'PptxGenJS' }
         },
 
         /** Custom header/footer until the user writes their own (↺ brings them back), by interface language. */
