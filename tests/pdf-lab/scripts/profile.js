@@ -75,14 +75,25 @@ const CASES = [
     { engine: 'word', path: 'postprocessed' }],
   ['A Mac font set, no other evidence', { producer: 'Unknown Writer 1.0', creator: '', fonts: ['ABCDEF+HelveticaNeue', 'ABCDEG+Menlo-Regular'] },
     { 'os.value': 'macos', 'os.confidence': 0.55 }],
-  ['Nothing at all', { producer: '', creator: '' }, { engine: 'unknown', 'os.value': null, path: 'unknown', hyphenates: true }]
+  ['Nothing at all', { producer: '', creator: '' }, { engine: 'unknown', 'os.value': null, path: 'unknown', hyphenates: true }],
+  // (the lab's real producers, pdf/real-producers: Office LTSC 2024 on Windows 11, November 2026 — make-real.ps1, make-real.js)
+  ['Word 2024, Save as PDF', { producer: 'Microsoft® Word 2024', creator: 'Microsoft® Word 2024', marked: true }, { engine: 'word', app: 'Word', path: 'export' }],
+  ['Excel LTSC, Save as PDF', { producer: 'Microsoft® Excel® LTSC', creator: 'Microsoft® Excel® LTSC' }, { engine: 'excel', app: 'Excel', path: 'export' }],
+  ['PowerPoint 2024, Save as PDF', { producer: 'Microsoft® PowerPoint® 2024', creator: 'Microsoft® PowerPoint® 2024' }, { engine: 'powerpoint', app: 'PowerPoint', path: 'export' }],
+  ['Microsoft Print to PDF (no Creator: Excel, PowerPoint)', { producer: 'Microsoft: Print To PDF', creator: '' },
+    { engine: 'gdi', path: 'print', 'os.value': 'windows', 'os.confidence': 0.95 }],
+  ['Edge headless (--print-to-pdf)', { producer: 'Skia/PDF m156', creator: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36 Edg/156.0.0.0' },
+    { engine: 'skia', app: 'Edge', 'os.value': 'windows', version: '156.0.0.0' }],
+  ['Firefox 152 printing (WebDriver BiDi)', { producer: 'cairo 1.18.4 (https://cairographics.org)', creator: 'Mozilla Firefox 152.0.3' }, { engine: 'cairo', app: 'Firefox' }]
 ];
 CASES.forEach(([name, m, want]) => check(name, P(m), want));
 
 // ── 2. the lab's own PDFs, through the importer ───────────────────────
 const PREFIX = [[/^calc--/, { engine: 'libreoffice', app: 'Calc' }], [/^impress--/, { engine: 'libreoffice', app: 'Impress' }],
   [/^(lowriter|kelkdocx-lo|pandoc-lo)--/, { engine: 'libreoffice', app: 'Writer' }], [/^lohtml--/, { engine: 'libreoffice' }],
-  [/^chrome-|-chr--/, { engine: 'skia', path: 'export' }], [/^wk-|-wk--/, { engine: 'qt', app: 'wkhtmltopdf' }], [/^kelk--/, { engine: 'jspdf' }], [/^ocr-tesseract--/, { engine: 'ocr', path: 'ocr' }]];
+  [/^chrome-|-chr--/, { engine: 'skia', path: 'export' }],
+  [/^word2024-save--/, { engine: 'word', app: 'Word' }], [/^excel2024--/, { engine: 'excel', app: 'Excel' }], [/^ppt2024--/, { engine: 'powerpoint', app: 'PowerPoint' }],
+  [/^msprint-/, { engine: 'gdi', path: 'print' }], [/^edge--/, { engine: 'skia', app: 'Edge' }], [/^firefox--/, { engine: 'cairo', app: 'Firefox' }], [/^wk-|-wk--/, { engine: 'qt', app: 'wkhtmltopdf' }], [/^kelk--/, { engine: 'jspdf' }], [/^ocr-tesseract--/, { engine: 'ocr', path: 'ocr' }]];
 (async () => {
   const { chromium } = req('playwright');
   const browser = await chromium.launch(), page = await browser.newPage();
