@@ -71,10 +71,6 @@ const KNOWN = {
     'acrobat-word--booklet-fa': [21.8, -78.2, ROTATED],
     'chrome-fa-links--fa-links': [19.4, -80.6, ROTATED]
   },
-  objstm: {
-    'chrome-tagged--features': [85.4, -14.6, "with the tags in object streams, an ordered list restarts at 1 and a quote's «—» is lost"],
-    'chrome-rtl-tagged--ar-article': [97.0, -3.0, "a glyph of «اتُّخذت» lost (its /ActualText in an object stream is not read)"]
-  },
   untag: {
     'chrome-rtl-tagged--ar-article': [100.0, 0.0, "one page: without the structure tree, Chrome's printed header and footer have no evidence left (no repetition) and stay as text"]
   },
