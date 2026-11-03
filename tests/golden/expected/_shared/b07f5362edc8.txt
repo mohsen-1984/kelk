@@ -3,11 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="generator" content="Kelk HtmlBuilder 2.0-rc1">
-<title>Document</title>
+<meta name="generator" content="Kelk HtmlBuilder 2.0">
+<title>ىبى</title>
 <style>
 @font-face{font-family:"Vazirmatn";src:url(data:font/woff2;base64,[111152 bytes sha256 4e3fa217d38f]) format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
-@font-face{font-family:"Vazir Code Hack";src:url(data:font/woff2;base64,[113056 bytes sha256 7cac2a79c75f]) format("woff2");font-weight:400;font-style:normal;font-display:swap}
 *{box-sizing:border-box}
 html{background:#f4f4f2}
 body{margin:0;padding:24px 12px;color:#1c1b1a}

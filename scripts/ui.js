@@ -325,7 +325,7 @@
         order: function (o) {
             const dlg = $('#order');
             if (!dlg) return Promise.resolve(o.docs);
-            const t = K.i18n.t.bind(K.i18n), list = $('#order-list'), ok = $('#order-ok'), count = $('#order-count');
+            const list = $('#order-list'), ok = $('#order-ok'), count = $('#order-count');
             const KIND = { '.md': 'md', '.markdown': 'md', '.txt': 'txt', '.html': 'html', '.htm': 'html', '.docx': 'docx', '.pdf': 'pdf' };
             const ICON = { md: 'file-pen-line', txt: 'file-text', html: 'file-code', docx: 'file-type', pdf: 'file-badge', image: 'file-image', none: 'file-x' };
             const ext = function (n) { const m = /\.[^.\/]+$/.exec(n || ''); return m ? m[0].toLowerCase() : ''; };
@@ -354,12 +354,12 @@
                 const li = el('li', 'order-row');
                 li._doc = d; li.tabIndex = -1;
                 const grip = el('span', 'order-grip');
-                grip.title = t('orderDrag'); grip.setAttribute('aria-hidden', 'true');
+                grip.title = K.i18n.t('orderDrag'); grip.setAttribute('aria-hidden', 'true');
                 const gi = el('i'); gi.setAttribute('data-lucide', 'grip-vertical'); grip.appendChild(gi);
                 const cb = el('input'); cb.type = 'checkbox'; cb.checked = true; cb.setAttribute('aria-label', d.name);
                 const up = el('button', 'btn ghost icon order-up'), down = el('button', 'btn ghost icon order-down');
-                [[up, 'arrow-up', 'orderUp'], [down, 'arrow-down', 'orderDown']].forEach(function (b) {
-                    b[0].type = 'button'; b[0].title = t(b[2]); b[0].setAttribute('aria-label', t(b[2]));
+                [[up, 'arrow-up', K.i18n.t('orderUp')], [down, 'arrow-down', K.i18n.t('orderDown')]].forEach(function (b) {
+                    b[0].type = 'button'; b[0].title = b[2]; b[0].setAttribute('aria-label', b[2]);
                     const ic = el('i'); ic.setAttribute('data-lucide', b[1]); b[0].appendChild(ic);
                 });
                 li.append(grip, cb, iconOf(kind));
@@ -373,16 +373,16 @@
             (o.skipped || []).forEach(function (d) {
                 const li = el('li', 'order-row off');
                 li.appendChild(iconOf('none'));
-                label(d, 'none', d.reason === 'size' ? t('orderTooBig', o.maxMB) : t('orderNoType')).forEach(function (x) { li.appendChild(x); });
+                label(d, 'none', d.reason === 'size' ? K.i18n.t('orderTooBig', o.maxMB) : K.i18n.t('orderNoType')).forEach(function (x) { li.appendChild(x); });
                 skipList.appendChild(li);
             });
             if (o.images) {
                 const li = el('li', 'order-row off img');
                 li.appendChild(iconOf('image'));
-                li.appendChild(el('span', 'order-name', t('orderImages', o.images)));
+                li.appendChild(el('span', 'order-name', K.i18n.t('orderImages', o.images)));
                 skipList.appendChild(li);
             }
-            $('#order-skip-head').textContent = t('orderSkipped', (o.skipped || []).length);
+            $('#order-skip-head').textContent = K.i18n.t('orderSkipped', (o.skipped || []).length);
             $('#order-skip-head').hidden = !(o.skipped || []).length;
             skip.hidden = !skipList.children.length;
             $('#order-label').textContent = o.title || '';
@@ -396,7 +396,7 @@
                     r.querySelector('.order-up').disabled = i === 0;
                     r.querySelector('.order-down').disabled = i === all.length - 1;
                 });
-                count.textContent = t('orderCount', on.length, all.length);
+                count.textContent = K.i18n.t('orderCount', on.length, all.length);
                 ok.disabled = !on.length;
             };
             const move = function (li, by) {

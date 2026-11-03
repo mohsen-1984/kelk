@@ -28,6 +28,8 @@ const vm = require('vm');
 const DYNAMIC = [
     // PdfImporter's notes and errors → a toast: PDF_NOTES / PDF_ERRORS hold each key in full
     { file: 'scripts/importer.js', prefix: 'pdf_' },
+    // PptxBuilder's warnings → the slides pane: WARN_KEYS holds each key in full
+    { file: 'scripts/slides.js', prefix: 'sw_' },
     // Kelk.i18n.apply(): the markup's own keys, checked above from index.html
     { file: 'scripts/i18n.js', arg: "el.getAttribute('data-i18n')" },
     { file: 'scripts/i18n.js', arg: 'kv[1].trim()' }
