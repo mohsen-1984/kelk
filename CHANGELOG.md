@@ -10,10 +10,11 @@ The third release. Kelk reads **PDF** — a PDF becomes Markdown again — and w
 the Markdown on screen becomes an editable .pptx deck. Both in the browser, offline. The libraries in `lib/` are
 2.0; the new `PdfImporter` and `PptxBuilder` are 1.0 (the slide convention: `lib/SLIDES.md`).
 
-PDF import, where it stands: a lab of 144 PDFs from 49 producer variants reads at 96.2 on average; style-fuzzed PDFs
-in English at 93.0 (held out 91.9) and in Persian and Arabic at 77.1 (held out 80.6) — right-to-left PDFs from other
-programs are the weaker side. Also weak: Persian PDFs from wkhtmltopdf and LibreOffice's HTML import, borderless
-two-column tables, turned text and turned pages, formulas from other programs; a scan needs an OCR layer. How it
+PDF import, where it stands: a lab of 188 PDFs reads at 94.6 on average (96.2 for the 144 made by our generators;
+the other 44 come from Word, Excel, PowerPoint, Microsoft Print to PDF, Edge, Chrome and Firefox on Windows);
+style-fuzzed PDFs in English, Persian and Arabic at 86.8 (held out 88.0), right-to-left ones the weaker side. Also
+weak: Persian PDFs from wkhtmltopdf and LibreOffice's HTML import, borderless two-column tables, turned text,
+formulas from other programs; a scan needs an OCR layer. How it
 works and its limits: `lib/PDFIMPORT.md`.
 
 ### Added — slides (PowerPoint)
@@ -102,6 +103,13 @@ works and its limits: `lib/PDFIMPORT.md`.
 - **It says what may be wrong:** pages with unreadable characters, words run together or text under a picture;
   scans, password-protected and damaged files — in the interface's three languages.
 
+- **An import report** instead of toasts: page by page, what was read in full, what may be wrong (characters a font
+  could not name, words run together, text under a picture) and how the page was read. A PDF that was not read well
+  can be imported again in **safe mode** (headings and paragraphs only).
+- Pages set upright by the PDF's own rotation (Word landscape pages, upside-down pages) are read upright; a diagonal
+  watermark stays out of the text; text and its `/ActualText` are read from compressed object streams too.
+- The importer loads on the first PDF import (the page starts lighter).
+
 ### Added — formulas through PDF
 
 - PdfBuilder writes each formula's LaTeX into the PDF (an `/ActualText` span and an XMP map); PdfImporter gives it
@@ -172,7 +180,10 @@ works and its limits: `lib/PDFIMPORT.md`.
 
 - `lib/PDFIMPORT.md`: how the importer works, a field guide to the producers, what a PDF itself loses.
 - `tests/pdf-lab/`: the import lab (Node + Playwright) — corpus, generators, scorer, style fuzzing in English, Persian
-  and Arabic, a metamorphic net of 20 transforms × 24 seeds, a gate against regressions with all 144 files.
+  and Arabic, a metamorphic net of 20 transforms × 24 seeds (185 of 199 unchanged files read exactly the same), a gate
+  against regressions, PDFs from real producers on Windows, hand-written reference Markdown (golden files) and a
+  held-out protocol (`tests/pdf-lab/HELDOUT.md`). Inside, the importer is split into one function per step, with
+  one registry of its 1,007 thresholds and a calibration of each document (`lib/pdfimport/README.md`).
 - Continuous integration on GitHub (`.github/workflows/`): the lab and its gate, the four builders against golden
   snapshots, every .docx checked against the OOXML schemas and opened by LibreOffice, unit tests, lint, links,
   accessibility (axe) in fa / en / ar, a startup size budget, generated files kept fresh, one version string.
