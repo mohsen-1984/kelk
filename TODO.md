@@ -29,11 +29,12 @@ HTML), pandoc, Kelk (corpus scores 97–100; what is left is lost in the PDFs th
 
 **Producers still to test** (files needed — none of these programs runs in the build environment)
 
-- Microsoft Word "Save as PDF" and Microsoft Print to PDF of the lab's own `tests/pdf-lab/corpus/word-*.docx`,
-  and of a Word file with real SmartArt (the lab's `.docx` holds a drawn diagram instead): add them to
-  `tests/pdf-lab/pdf/` as `word-saveas--word-tables.pdf` … to score them
-- Excel's own export ("Save as PDF" / "Export") and larger Microsoft Print to PDF files of sheets with no
-  borders, black borders and white borders (`corpus/xl-border-*.xlsx`; the LibreOffice Calc versions pass)
+- A Word file with real SmartArt (the lab's `.docx` holds a drawn diagram instead), through Word "Save as PDF" and
+  Microsoft Print to PDF
+- ~~Word "Save as PDF" and Microsoft Print to PDF of `corpus/word-*.docx`; Excel's own export and Microsoft Print to
+  PDF of `corpus/xl-border-*.xlsx`~~ — done in plan P4.1 (1405-08-12): `tests/pdf-lab/pdf/real-producers/`
+  (`word2024-save--`, `msprint-word--`, `excel2024--`, `msprint-excel--`, made by `scripts/make-real.ps1`), with
+  PowerPoint, Edge, Chromium and Firefox and the lab's own `corpus/real-*` documents
 - WeasyPrint (the free alternative to Prince): `pip install weasyprint`, then the corpus's HTML through it
   (PyPI was blocked in the build session); Prince itself if a licence is at hand
 
