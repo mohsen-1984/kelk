@@ -94,6 +94,11 @@ const PREFIX = [[/^calc--/, { engine: 'libreoffice', app: 'Calc' }], [/^impress-
   [/^chrome-|-chr--/, { engine: 'skia', path: 'export' }],
   [/^word2024-save--/, { engine: 'word', app: 'Word' }], [/^excel2024--/, { engine: 'excel', app: 'Excel' }], [/^ppt2024--/, { engine: 'powerpoint', app: 'PowerPoint' }],
   [/^msprint-/, { engine: 'gdi', path: 'print' }], [/^edge--/, { engine: 'skia', app: 'Edge' }], [/^firefox--/, { engine: 'cairo', app: 'Firefox' }], [/^wk-|-wk--/, { engine: 'qt', app: 'wkhtmltopdf' }], [/^kelk--/, { engine: 'jspdf' }], [/^ocr-tesseract--/, { engine: 'ocr', path: 'ocr' }]];
+// the held-out real-producer documents (docs/HELDOUT.md): their PDFs are checked like every other, but never named —
+// a failure says "a held-out real file", --all and the headings table leave them out, the tallies count them. The same list as
+// scripts/heldout.js's split (P4.3), hard-coded here until that module is on this branch; then read it from there
+const HELD_OUT_REAL = ['real-deck-fa', 'real-letter-ar', 'real-memo-fa', 'real-report-fa'];
+const heldOut = (dir, f) => path.basename(dir) === 'real-producers' && HELD_OUT_REAL.includes((f.match(/--([\w-]+)\.pdf$/) || [])[1]);
 (async () => {
   const { chromium } = req('playwright');
   const browser = await chromium.launch(), page = await browser.newPage();
@@ -102,14 +107,15 @@ const PREFIX = [[/^calc--/, { engine: 'libreoffice', app: 'Calc' }], [/^impress-
   console.log('\n— the lab\'s PDFs through the importer (' + dirs.map((d) => path.relative(LAB, d)).join(', ') + ')\n');
   const tally = {}, headStats = [];
   for (const dir of dirs) {
-    for (const { name: f, file } of require('./env.js').labPdfs(dir)) {
+    for (const { name: f0, file } of require('./env.js').labPdfs(dir)) {
+      const held = heldOut(path.dirname(file), f0), f = held ? '(a held-out real file)' : f0;
       const b64 = fs.readFileSync(file).toString('base64');
       const prof = await page.evaluate(async (b64) => {
         const bin = atob(b64), u = new Uint8Array(bin.length);
         for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
         try { const r = await PdfImporter.create({ images: 'drop' }).fromArrayBuffer(u.buffer); return Object.assign({}, r.profile, { _structure: r.structure }); } catch (e) { return { error: String(e) }; }
       }, b64);
-      const rule = PREFIX.find(([re]) => re.test(f));
+      const rule = PREFIX.find(([re]) => re.test(f0));
       const key = prof.error ? 'ERROR' : [prof.engine, prof.app, prof.os.value || '-', prof.path, prof.tagged.structTree ? 'struct' : 'nostruct'].join(' · ');
       tally[key] = (tally[key] || 0) + 1;
       if (prof.error) { failed++; console.log('✗', f, prof.error); continue; }
@@ -117,9 +123,9 @@ const PREFIX = [[/^calc--/, { engine: 'libreoffice', app: 'Calc' }], [/^impress-
         if (bad.length) { failed++; console.log('✗', f.padEnd(44), bad.map((k) => k + ': ' + prof[k] + ' ≠ ' + rule[1][k]).join('; ')); } }
       // the structure tree (PdfImporter._structure): trust as the audit expects, headings as the source has them
       const t = prof.tagged || {};
-      const trustRule = /^calc--/.test(f) ? (x) => x < 0.05 : /^(chrome-tagged|kelkdocx-lo|pandoc-lo|lowriter|impress)--/.test(f) ? (x) => x >= 0.5 : !t.structTree ? (x) => x === 0 : null;
+      const trustRule = /^calc--/.test(f0) ? (x) => x < 0.05 : /^(chrome-tagged|kelkdocx-lo|pandoc-lo|lowriter|impress)--/.test(f0) ? (x) => x >= 0.5 : !t.structTree ? (x) => x === 0 : null;
       if (trustRule && !trustRule(t.trust)) { failed++; console.log('✗', f.padEnd(44), 'trust ' + t.trust + ' (cover ' + t.cover + ', sem ' + t.sem + ')'); }
-      const doc = (f.match(/--([\w-]+)\.pdf$/) || [])[1], src = doc && path.join(LAB, 'corpus', doc + '.md');
+      const doc = (f0.match(/--([\w-]+)\.pdf$/) || [])[1], src = doc && path.join(LAB, 'corpus', doc + '.md');
       if (prof._structure && src && fs.existsSync(src)) {
         // (case folded: a style may set headings in capitals, and the tree keeps the drawn text)
         const want = structure(fs.readFileSync(src, 'utf8').toLowerCase()).headings;
@@ -128,12 +134,12 @@ const PREFIX = [[/^calc--/, { engine: 'libreoffice', app: 'Calc' }], [/^impress-
           const bag = new Map(); got.forEach((x) => bag.set(x, (bag.get(x) || 0) + 1));
           let hit = 0; want.forEach((x) => { const n = bag.get(x) || 0; if (n) { hit++; bag.set(x, n - 1); } });
           const pr = hit / got.length, rc = hit / want.length, f1 = pr + rc ? 2 * pr * rc / (pr + rc) : 0;
-          headStats.push([f, f1]);
-          if (/^chrome-tagged--/.test(f) && f1 < 0.99) { failed++; console.log('✗', f.padEnd(44), 'tree headings F1 ' + f1.toFixed(2)); }
+          if (!held) headStats.push([f0, f1]);   // (a per-producer mean of a few files would show a held-out one)
+          if (/^chrome-tagged--/.test(f0) && f1 < 0.99) { failed++; console.log('✗', f.padEnd(44), 'tree headings F1 ' + f1.toFixed(2)); }
         }
       }
       delete prof._structure;
-      if (process.argv.includes('--all')) console.log(f.padEnd(44), JSON.stringify(prof));
+      if (process.argv.includes('--all') && !held) console.log(f.padEnd(44), JSON.stringify(prof));
     }
   }
   Object.keys(tally).sort().forEach((k) => console.log(String(tally[k]).padStart(4), ' ', k));

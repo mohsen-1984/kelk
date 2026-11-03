@@ -38,7 +38,7 @@ function importerFiles(where) {
 //   pages/      single documents made for one layout problem (web layouts, layers, forms, templates, pictures, cards)
 //   producers/  producers we cannot run here, imitated glyph by glyph (Word, PowerPoint, Prince, iText, Acrobat, Adobe PDF Library)
 //   real-producers/  the real programs on Windows: Word, Excel, PowerPoint 2024 (Save as PDF), Microsoft Print to PDF, Edge,
-//               Chrome, Firefox — our own documents (corpus/real-*) and the lab's office files (make-real.ps1, make-real.js)
+//               Chromium (chrome--: Playwright's own build, not a desktop Chrome), Firefox — our own documents (corpus/real-*) and the lab's office files (make-real.ps1, make-real.js)
 const PDF_GROUPS = [
   ['real-producers', /^(word2024-save|msprint-(word|excel|ppt)|excel2024|ppt2024|edge|chrome|firefox)--/],
   ['producers', /^(word\d*-|pptx-|prince-|itext-|acrobat-|pdflib-)/],
