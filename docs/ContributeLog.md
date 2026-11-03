@@ -737,9 +737,10 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 14 | P3.3 report `docs/reports/P3.3-metamorphic-order.md`: the six batches with their causes and nets, the plan's literal migrations measured and rejected, the lab before and after per transform, the review findings and their verdicts, the open items. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 7 | P4.2 review findings applied: chrome-form--form-fa's four grey bars as alike headings and its bordered label/value boxes as GFM tables; itext-word--circular-fa's top heading and the letter head block kept once (rule in the lab README); booklet quote as one paragraph; README: shape-only structure diff, the 23 fa / 10 ar / 17 en split, clipped text, list-marker and site-navigation conventions; gate: a golden missing from an unfiltered run fails (gate-golden.js, compareGolden) with unit tests; visible golden mean 92.7 (two importer misses now caught). |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 3 | P4.2 review fixes applied on the branch, unit tests run. |
+| 1405-08-12 | 2.0-rc1 | Zarrabi | 9 | P4.2 report written (docs/reports/P4.2-golden-50.md): the goldens, golden.js and the gate part, the 23 / 10 / 17 split, the 45 visible goldens rescored (92.7) with the ten worst and their causes, the held-out five as one mean, review findings, the Persian goldens to check. |
 
 <!-- generated:totals -->
-**Entries: 151 · Total: 2092 min (34.87 hours) — Zarrabi 2092 min (144 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 152 · Total: 2101 min (35.02 hours) — Zarrabi 2101 min (145 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
