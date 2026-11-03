@@ -18,7 +18,7 @@
     "test:docx": "node tests/docx-validate.js",
     "test:builders": "node tests/pdf-lab/scripts/roundtrip.js",
     "check:links": "lychee --config .github/lychee.toml \"**/*.md\" index.html",
-    "check:fresh": "node tools/build-icons.js && node tools/build-samples.js && node tests/pdf-lab/scripts/build-corpus-js.js && git diff --exit-code -- assets/icons.js docs/about-kelk-and-samples.js tests/pdf-lab/corpus.js",
+    "check:fresh": "node tools/build-icons.js && node tools/build-samples.js && node tests/pdf-lab/scripts/build-corpus-js.js && git diff --exit-code -- assets/icons.js docs/about-kelk-and-samples.js docs/slides-samples.js tests/pdf-lab/corpus.js",
     "check:a11y": "node tools/check-a11y.js",
     "check:size": "node tools/check-size.js"
   },
