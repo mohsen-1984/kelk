@@ -731,9 +731,10 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 8 | Review of the P3.5 diff: the app driven over `file://` with real PDF imports (clean files, notes, the ladder files, several files, a zip), the panel against the real `r.report`, safe re-import and undo, Copy, focus and Escape, language and theme switches, axe with a real report, the heap after closing the panel, the strings against every note code the importer emits. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 20 | P3.5 review findings applied: strings for `kelkMath`, `monoBody` and `watermarkDropped`, informational codes never open the panel alone, the test derives every code from the importer's `_note(` calls; the PDF bytes kept only for a single-PDF import and released on close (three retainers — the task promise, the dialog handlers, the result — removed; heap checked); a page not read at all shown as "not read"; focus returned when the panel closes itself; the panel shows its findings and rows at desktop sizes with scroll shadows; plural, list separator and a visible safe-mode hint; screenshots redone. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 14 | P3.3 report `docs/reports/P3.3-metamorphic-order.md`: the six batches with their causes and nets, the plan's literal migrations measured and rejected, the lab before and after per transform, the review findings and their verdicts, the open items. |
+| 1405-08-12 | 2.0-rc1 | Zarrabi | 6 | P3.5 report written (docs/reports/P3.5-import-report.md): the panel's parts, checks (unit tests 152, i18n, a11y, size), review findings and their fixes, what stays open. |
 
 <!-- generated:totals -->
-**Entries: 145 · Total: 2027 min (33.78 hours) — Zarrabi 2027 min (138 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 146 · Total: 2033 min (33.88 hours) — Zarrabi 2033 min (139 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
