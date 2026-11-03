@@ -1,0 +1,32 @@
+# MHTML, 3 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/d6baaf1d4e00.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="ltr">
+        <p style="direction:ltr;text-align:justify" class="MsoNormal">Plain English.</p>
+
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/header.htm (text/html) head ===== -->
+<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=utf-8">
+<link id=Main-File rel=Main-File href="../document.htm">
+</head>
+<!-- ===== file:///C:/document_files/header.htm (text/html) body ===== -->
+<body>
+<div style='mso-element:header' id=h1><p class=MsoNormal dir=ltr style='direction:ltr;margin-top:0pt;margin-bottom:0pt;text-align:center;border-bottom:solid black 0.5pt;padding-bottom:4pt'>ISO 2000 Title</p></div>
+<div style='mso-element:footer' id=f1><p class=MsoNormal dir=ltr style='direction:ltr;margin-top:0pt;margin-bottom:0pt;text-align:center;border-top:solid black 0.5pt;padding-top:4pt'>Page <span style='mso-field-code:" PAGE "'></span> of <span style='mso-field-code:" NUMPAGES "'></span></p></div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="header.htm"/>
+ <o:File HRef="filelist.xml"/>
+</xml>

@@ -1,0 +1,25 @@
+# MHTML, 2 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/b1656fe21d17.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="rtl">
+        <h1>عنوان اصلی سند</h1>
+<p class="MsoNormal">این یک پاراگراف فارسی ساده است که <strong>بخش پررنگ</strong> و <em>بخش مورب</em> دارد.</p>
+<p class="MsoNormal">پشتیبانی از <span dir="ltr">4k</span> و <span dir="ltr">3.5GHz</span> و <span dir="ltr">USB3</span> در متن فارسی.</p>
+<p class="MsoNormal">نام سامانه <span dir="ltr">BPMS (Business Process)</span> است و «<span dir="ltr">JAM</span>» هم هست.</p>
+<p class="MsoNormal">این جمله با یک کلمه انگلیسی تمام می‌شود <span dir="ltr">Future</span>.</p>
+<p style="direction:ltr;text-align:justify" class="MsoNormal">This paragraph is purely English, with a Persian comma، here.</p>
+<h2>بخش دوم</h2>
+<p class="MsoNormal">متن اول</p><p class="MsoNormal">متن دوم بعد از شکست خط</p>
+
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="filelist.xml"/>
+</xml>

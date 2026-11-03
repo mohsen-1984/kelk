@@ -13,12 +13,12 @@
 //     down that margin (in the file that showed it, the rule made every page begin with a quote; here the rule
 //     repeats on every page and goes as furniture first — the bar's own guard is kept by the private set).
 //   corpus/fa-links.md → pdf/chrome-fa-links--fa-links.pdf
-const { pdfPath } = require('./env.js');
+const { pdfPath, fileUrl } = require('./env.js');
 const fs = require('fs'), path = require('path'), os = require('os');
 const { KELK, req } = require('./env.js');
 const { chromium } = req('playwright');
 const LAB = path.join(__dirname, '..');
-const WEB = 'file://' + KELK + '/assets/fonts/rastikerdar/webfonts/';
+const WEB = fileUrl(KELK + '/assets/fonts/rastikerdar/webfonts') + '/';
 
 const toc = [['فصل اول: درآمد', '۱'], ['فصل دوم: منابع', '۲'], ['فصل سوم: پیوند به بیرون', '۳']];
 const dots = '.'.repeat(60);
@@ -81,7 +81,7 @@ const md = ['# عددنویسی هندی-عربی', '## فهرست', ...toc.map(
   </style></head><body>${pages.map((p, i) => `<div class="page"><div class="rule"></div><div class="num">${i + 1}</div>${p}</div>`).join('')}</body></html>`;
   const f = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'kelk-links-')), 'p.html'); fs.writeFileSync(f, html);
   const b = await chromium.launch(), page = await b.newPage();
-  await page.goto('file://' + f); await page.evaluate(() => document.fonts.ready);
+  await page.goto(fileUrl(f)); await page.evaluate(() => document.fonts.ready);
   await page.pdf({ path: pdfPath('chrome-fa-links--fa-links.pdf'), preferCSSPageSize: true, printBackground: true });
   await b.close();
   fs.writeFileSync(path.join(LAB, 'corpus', 'fa-links.md'), md);

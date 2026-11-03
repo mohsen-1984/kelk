@@ -1,0 +1,22 @@
+# MHTML, 2 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/904ff5defc77.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="rtl">
+        <p class="MsoNormal">زبانِ تازه را با زبانی که بلدی بشناس</p>
+<p class="MsoNormal"><em>زبانِ تازه را با زبانی که بلدی بشناس</em></p>
+<p class="MsoNormal"><strong>مُحَمَّدٌ رَسُولُ اللَّهِ و رَبِّ العالَمِین</strong></p>
+<p class="MsoNormal"><em><strong>بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِیمِ</strong></em></p>
+<p class="MsoNormal">בְּרֵאשִׁית בָּרָא אֱלֹהִים</p>
+
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="filelist.xml"/>
+</xml>

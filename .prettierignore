@@ -1,0 +1,33 @@
+# Prettier: what `npm run format:check` leaves alone (it also reads .gitignore).
+# .prettierrc encodes the style already in the tree, but the tree is not formatted yet (Prettier would still
+# rewrite most JS files: it expands one-line blocks), so format checking is not part of CI (plan P0.4).
+
+# Third-party and installed code
+vendor/
+node_modules/
+*.min.js
+
+# Generated or vendored files keep whatever their generator writes (.editorconfig's last section), and the
+# base64 font bundles
+lib/pdf-base64-ttf-fonts/
+assets/fonts/embed/
+assets/icons.js
+docs/about-kelk-and-samples.js
+tests/pdf-lab/corpus.js
+# the golden snapshots (written by tests/golden/run.js --update) and the official OOXML schemas (kept unchanged)
+tests/golden/expected/
+tests/ooxml-xsd/
+package-lock.json
+
+# The PDF lab: its PDFs, its outputs (made when run), the baseline gate.js --update writes, and run reports
+tests/pdf-lab/pdf/
+tests/pdf-lab/out/
+tests/pdf-lab/fuzz/
+tests/pdf-lab/meta/
+tests/pdf-lab/baseline.json
+docs/reports/*.json
+
+# Markdown: the lab's corpus .md files are test input (their exact bytes feed the scores), docs/ContributeLog.md
+# has generated sections rewritten by contributelog.mjs, and the docs use hand-made tables, two-space line breaks
+# and RTL text that Prettier would re-pad, re-escape and re-mark (* to _, list markers)
+*.md

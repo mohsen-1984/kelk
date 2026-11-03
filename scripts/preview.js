@@ -12,10 +12,127 @@
 (function (K) {
     'use strict';
 
-    let box, clean = '', mathRun = 0, docStale = false;
+    let box, clean = '', mathRun = 0, soon = 0, docStale = false;
 
-    // DOMPurify's own URI rules: http(s), mailto, tel, relative names; data: for images
-    const PURIFY = { ADD_ATTR: ['target', 'dir', 'align'] };
+    // DOMPurify's own URI rules: http(s), mailto, tel, relative names; data: for images.
+    // The document shares the page with the app: its id / name values get DOMPurify's
+    // "user-content-" prefix (a <div id="toasts"> cannot take over the app's elements), and no
+    // <style> (it would restyle the app) or form control (a fake dialog) reaches the pane.
+    const PURIFY = {
+        ADD_ATTR: ['target', 'dir', 'align'],
+        SANITIZE_NAMED_PROPS: true,
+        FORBID_TAGS: ['form', 'input', 'button', 'textarea', 'select', 'style']
+    };
+    const NAMED_PREFIX = 'user-content-';
+
+    const TASK = 'data-kelk-task';
+
+    /**
+     * A task-list checkbox (GFM "- [ ]", marked's <input type="checkbox" disabled>) is the one
+     * input a document has: the sanitiser leaves a mark in its place (the <input> itself is
+     * forbidden), and taskBoxes() puts a disabled checkbox made by the app back.
+     */
+    function markTask(node, data) {
+        if (data.tagName !== 'input' || !node.parentNode) return;
+        if (String(node.getAttribute('type') || '').toLowerCase() !== 'checkbox') return;
+        const mark = node.ownerDocument.createElement('span');
+        mark.setAttribute(TASK, node.hasAttribute('checked') ? 'done' : 'open');
+        node.parentNode.insertBefore(mark, node);
+    }
+    function taskBoxes(root) {
+        K.$$('span[' + TASK + ']', root).forEach(function (mark) {
+            const box = document.createElement('input');
+            if (mark.getAttribute(TASK) === 'done') box.setAttribute('checked', '');
+            box.setAttribute('disabled', '');
+            box.setAttribute('type', 'checkbox');
+            mark.replaceWith(box);
+        });
+    }
+
+    /**
+     * The pane only — WCAG fixes found by tools/check-a11y.js. Applied after `clean` is taken for the builders and
+     * stripped again by copyAll() (unA11y), so neither the exports nor Copy carry them; every attribute set here
+     * is marked with A11Y.
+     * - a task checkbox (tight list: li > input; loose list: li > p > input) is named by its item's own text, its
+     *   nested lists left out (axe `label`);
+     * - scrollers(): a code block or display formula whose content is wider than its box can be reached and
+     *   scrolled from the keyboard (axe `scrollable-region-focusable`): tabindex="0" on the element that scrolls —
+     *   only while it really overflows, so a short block adds no tab stop. Re-checked on every render (the pane's
+     *   resize and the web fonts' arrival re-render) and once the formulas are typeset.
+     */
+    const A11Y = 'data-kelk-a11y';
+    function a11y(root) {
+        K.$$('li input[type="checkbox"]', root).forEach(function (box) {
+            const li = box.closest('li');
+            if (!li) return;
+            const own = li.cloneNode(true);
+            K.$$('ul, ol', own).forEach(function (l) { l.remove(); });
+            const name = own.textContent.replace(/\s+/g, ' ').trim().slice(0, 120);
+            if (name) { box.setAttribute('aria-label', name); box.setAttribute(A11Y, 'aria-label'); }
+        });
+        scrollers(root);
+    }
+    function scrollers(root) {
+        const overflows = function (el) { return el.scrollWidth > el.clientWidth + 1; };
+        K.$$('pre, .kelk-math', root).forEach(function (el) {
+            const code = el.tagName === 'PRE' ? el.querySelector(':scope > code') : null;
+            [el, code].forEach(function (x) {
+                if (x && x.getAttribute(A11Y) === 'tabindex') { x.removeAttribute('tabindex'); x.removeAttribute(A11Y); }
+            });
+            const target = code && overflows(code) ? code : overflows(el) ? el : null;
+            if (target && !target.hasAttribute('tabindex')) {
+                target.setAttribute('tabindex', '0');
+                target.setAttribute(A11Y, 'tabindex');
+            }
+        });
+    }
+    /** A copy of the pane without what a11y() added (for Copy). */
+    function unA11y(root) {
+        K.$$('[' + A11Y + ']', root).forEach(function (el) {
+            const a = el.getAttribute(A11Y);
+            if (a === 'aria-label' || a === 'tabindex') el.removeAttribute(a);
+            el.removeAttribute(A11Y);
+        });
+        return root;
+    }
+
+    /** HTML of the user through DOMPurify with the preview's rules; without DOMPurify only its text is kept. */
+    function sanitize(html) {
+        if (typeof DOMPurify !== 'undefined') {
+            DOMPurify.addHook('uponSanitizeElement', markTask);
+            try { return DOMPurify.sanitize(String(html || ''), PURIFY); }
+            finally { DOMPurify.removeHook('uponSanitizeElement', markTask); }
+        }
+        const t = document.createElement('template');
+        t.innerHTML = String(html || '');
+        return String(t.content.textContent || '').replace(/[&<>"]/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+        });
+    }
+
+    /**
+     * After the prefix, a link of the document to one of its own ids ([x](#part) → <a id="part">)
+     * points to the prefixed id; web links open a new tab, and every link that does gets
+     * rel="noopener noreferrer".
+     */
+    function fixLinks(root) {
+        // the prefixed names: ids, and the name of an <a name> anchor or an image <map>
+        const named = {};
+        K.$$('[id], a[name], map[name]', root).forEach(function (el) {
+            if (el.id) named[el.id] = true;
+            if (el.getAttribute('name')) named[el.getAttribute('name')] = true;
+        });
+        function follow(el, attr) {
+            let id = el.getAttribute(attr).slice(1);
+            try { id = decodeURIComponent(id); } catch (e) { /* as written */ }
+            if (!id || id.indexOf(NAMED_PREFIX) === 0) return;
+            if (named[NAMED_PREFIX + id]) el.setAttribute(attr, '#' + NAMED_PREFIX + id);
+        }
+        K.$$('a[href^="#"], area[href^="#"]', root).forEach(function (a) { follow(a, 'href'); });
+        K.$$('img[usemap^="#"]', root).forEach(function (img) { follow(img, 'usemap'); });
+        K.$$('a[href^="http"]', root).forEach(function (a) { a.target = '_blank'; });
+        K.$$('a[target], area[target]', root).forEach(function (a) { a.rel = 'noopener noreferrer'; });
+    }
 
     // ── the app's dark theme: the document's own colors, translated for the preview only ──────
     // The exports keep the chosen colors; in the dark preview a light fill becomes a dark fill of
@@ -143,15 +260,30 @@
             if (box && docStale) this.renderDoc();      // the Slides view leaves the document undrawn until it is needed
             return box ? clean : '';
         },
+        /** HTML of the user (the document, the custom header / footer) through the preview's sanitiser. */
+        sanitize: sanitize,
 
         /** Document direction the preview decided ('rtl' | 'ltr'). */
         dir: function () { return (box && box.getAttribute('dir')) || 'rtl'; },
+
+        /** Draw after a pause (typing: `ms`, default config.renderMs); a newer call or a render() replaces it. */
+        renderSoon: function (ms) {
+            clearTimeout(soon);
+            soon = setTimeout(function () { K.preview.render(); }, ms == null ? K.config.renderMs : ms);
+        },
+
+        /**
+         * A drawing still waiting (renderSoon) is made now: whoever reads html() or the page's
+         * title right after a keystroke (the exports, Copy) gets the text as typed.
+         */
+        flush: function () { if (soon) this.render(); },
 
         /**
          * Draw the preview of the active view. In the Slides view only the slides are drawn (Kelk.slides);
          * the document is drawn when its HTML is asked for (an export) or the view changes back.
          */
         render: function () {
+            clearTimeout(soon); soon = 0;
             if (!box) return;
             if (K.slides && K.slides.active()) { docStale = true; K.names.refresh(); K.slides.render(); return; }
             this.renderDoc();
@@ -164,18 +296,16 @@
             if (!md.trim()) {
                 // the empty pane's hint is in the interface's language: its direction, not the last document's
                 box.innerHTML = ''; clean = '';
-                box.setAttribute('dir', K.i18n.lang === 'en' ? 'ltr' : 'rtl');
-                K.names.refresh();
-                return;
+                box.setAttribute('dir', K.i18n.dir());
+                K.names.refresh(); return;
             }
             // Settings → Text → line breaks: a single new line is a line break (as chat apps show a model's
             // answer) — on by default; off: GFM's soft break, the lines of a paragraph run together
             let html = marked.parse(md, { breaks: K.store.get('text.breaks') !== false });
-            if (typeof DOMPurify !== 'undefined') html = DOMPurify.sanitize(html, PURIFY);
-            box.innerHTML = html;
+            box.innerHTML = sanitize(html);
+            taskBoxes(box);                              // task-list checkboxes, disabled
             K.images.resolve(box);                       // ![x](name) → registered image
-
-            K.$$('a[href^="http"]', box).forEach(function (a) { a.target = '_blank'; a.rel = 'noopener'; });
+            fixLinks(box);
 
             // highlight.js: fenced blocks with a language (and plain ones, auto)
             if (typeof hljs !== 'undefined') {
@@ -205,6 +335,7 @@
                 box.setAttribute('dir', BidiView.apply(box, { dir: K.store.get('direction') }).dir);
             }
             K.ui.icons(box);
+            a11y(box);
             K.names.refresh();
             this.typesetMath(pb);
         },
@@ -247,6 +378,7 @@
             const run = ++mathRun;
             const s = K.store.settings();
             const job = pb ? pb.typeset(box) : MathCore.typeset(box, { mode: 'svg', textFont: s.fonts && s.fonts.bidi });
+            job.then(function () { if (run === mathRun) scrollers(box); }, function () {});   // wide formulas: keyboard
             job.catch(function (e) {
                 if (run !== mathRun) return;
                 MathCore.fallbackText(box);
@@ -266,9 +398,10 @@
 
         /** Rich copy of the whole preview (HTML + plain text) for pasting into Word/mail. */
         copyAll: async function () {
+            this.flush();
             try {
                 if (navigator.clipboard && typeof ClipboardItem !== 'undefined') {
-                    const clone = box.cloneNode(true);
+                    const clone = unA11y(box.cloneNode(true));   // the pane's own aria-label / tabindex: not the document's
                     if (typeof BidiCore !== 'undefined') BidiCore.unwrapCodeBlocks(clone);
                     if (typeof BidiView !== 'undefined') BidiView.toAttributes(clone);   // Word reads dir, not classes
                     await navigator.clipboard.write([new ClipboardItem({

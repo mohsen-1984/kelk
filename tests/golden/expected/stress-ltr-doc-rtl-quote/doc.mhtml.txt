@@ -1,0 +1,42 @@
+# MHTML, 2 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/416e8e1fd5ad.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="ltr">
+        <p style="direction:ltr;text-align:justify" class="MsoNormal">An English document.</p>
+<p class="MsoQuote" style="direction:rtl;text-align:right;border-top:none;border-bottom:none;border-left:solid #F6F9F8 .25pt;border-right:solid #1F6F5C 3.5pt;padding-right:12pt;padding-left:12pt;background:#F6F9F8;margin-right:14.15pt;margin-left:0cm" dir="rtl">نقل‌قول فارسی در سند انگلیسی <span dir="ltr">with English words</span>.</p>
+<p class="MsoNormal" style="direction:ltr;text-align:left;margin:0;mso-margin-top-alt:0;mso-margin-bottom-alt:0;line-height:8pt;mso-line-height-rule:exactly;font-size:4.0pt;mso-bidi-font-size:4.0pt">&nbsp;</p><div align="center" dir="ltr"><table style="width:50.0%" class="MsoNormalTable">
+<thead>
+<tr>
+<th style="direction:ltr;text-align:center;border-top:solid #A9B5C4 0.5pt;border-bottom:solid #A9B5C4 0.5pt;border-left:solid #A9B5C4 0.5pt;border-right:solid #A9B5C4 0.5pt;background:#E4E9EF;color:#000000;font-weight:bold;width:59.6%"><p class="MsoTableText" style="direction:ltr;text-align:center;font-weight:bold;color:#000000">A</p></th>
+<th style="direction:ltr;text-align:center;border-top:solid #A9B5C4 0.5pt;border-bottom:solid #A9B5C4 0.5pt;border-left:solid #A9B5C4 0.5pt;border-right:solid #A9B5C4 0.5pt;background:#E4E9EF;color:#000000;font-weight:bold;width:40.4%"><p class="MsoTableText" style="direction:ltr;text-align:center;font-weight:bold;color:#000000">B</p></th>
+</tr>
+</thead>
+<tbody><tr>
+<td style="direction:rtl;text-align:right;border-top:solid #A9B5C4 0.5pt;border-bottom:solid #A9B5C4 0.5pt;border-left:solid #A9B5C4 0.5pt;border-right:solid #A9B5C4 0.5pt;font-weight:normal;width:59.6%"><p class="MsoTableText" style="direction:rtl;text-align:right;font-weight:normal">متن</p></td>
+<td style="border-top:solid #A9B5C4 0.5pt;border-bottom:solid #A9B5C4 0.5pt;border-left:solid #A9B5C4 0.5pt;border-right:solid #A9B5C4 0.5pt;font-weight:normal;width:40.4%"><p class="MsoTableText" style="font-weight:normal">12</p></td>
+</tr>
+<tr>
+<td style="direction:ltr;text-align:left;border-top:solid #A9B5C4 0.5pt;border-bottom:solid #A9B5C4 0.5pt;border-left:solid #A9B5C4 0.5pt;border-right:solid #A9B5C4 0.5pt;background:#F5F7FA;color:#000000;font-weight:normal;width:59.6%"><p class="MsoTableText" style="direction:ltr;text-align:left;font-weight:normal;color:#000000">text</p></td>
+<td style="border-top:solid #A9B5C4 0.5pt;border-bottom:solid #A9B5C4 0.5pt;border-left:solid #A9B5C4 0.5pt;border-right:solid #A9B5C4 0.5pt;background:#F5F7FA;color:#000000;font-weight:normal;width:40.4%"><p class="MsoTableText" style="font-weight:normal;color:#000000">34</p></td>
+</tr>
+</tbody></table></div>
+<ul style="direction:ltr;text-align:justify">
+<li style="direction:ltr;text-align:justify;margin-top:6pt;mso-margin-top-alt:6pt" class="MsoNormal">item with Persian comma، only<ul style="direction:ltr;text-align:justify">
+<li style="direction:ltr;text-align:justify" class="MsoNormal">nested English</li>
+</ul>
+</li>
+</ul>
+
+        <p class=MsoNormal style='direction:ltr;text-align:left'>&nbsp;</p>
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="filelist.xml"/>
+</xml>

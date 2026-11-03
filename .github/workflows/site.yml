@@ -1,0 +1,190 @@
+# Site quality on every push and pull request (plan P2.4): links, generated files, accessibility, startup size.
+# Four jobs, run side by side, each red on its own failure:
+#   links      lychee 0.24.2 over every *.md and index.html (lychee.toml) — relative links and #anchors. Offline on
+#              push / PR: external URLs depend on other people's servers (rate limits, 403s to bots, timeouts) and a
+#              red check nobody can fix in the change is soon ignored. External URLs are checked by the weekly
+#              scheduled run, and by a manual run with "online" ticked.
+#   freshness  the generated files rebuilt from their sources (npm run check:fresh: assets/icons.js,
+#              docs/about-kelk-and-samples.js, tests/pdf-lab/corpus.js), then git diff --exit-code on them.
+#   a11y       axe-core on index.html in fa / en / ar, Playwright's Chromium (node tools/check-a11y.js).
+#   size       the startup budget (node tools/check-size.js against tools/size-budget.json).
+# ESLint is not repeated here: tooling.yml runs `npm run lint` on the same triggers (push, pull request, manual),
+# and a second copy would only turn one lint error into two red checks.
+# The weekly run is about external links only: the other jobs give the same answer for the same commit, so they
+# are skipped on schedule.
+#
+# Same conventions as tooling.yml and pdf-lab.yml: actions pinned to commit SHAs (the tag in the comment),
+# read-only token, every step under bash -euo pipefail with its output teed to $RUNNER_TEMP/logs/<step>.log and
+# uploaded; npm's download cache keyed on package-lock.json, Playwright's Chromium on the playwright version in the
+# lockfile. lychee is the release binary, its version and SHA-256 pinned below.
+name: site
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '23 4 * * 1'      # Mondays 04:23 UTC: external links (lychee online)
+  workflow_dispatch:
+    inputs:
+      online:
+        description: 'Links: check external URLs too (lychee online)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash --noprofile --norc -euo pipefail {0}
+
+jobs:
+  links:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      LYCHEE_VERSION: '0.24.2'
+      # sha256 of lychee-x86_64-unknown-linux-gnu.tar.gz in the lychee-v0.24.2 release (its published digest)
+      LYCHEE_SHA256: '1f4e0ef7f6554a6ed33dd7ac144fb2e1bbed98598e7af973042fc5cd43951c9a'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with: { lfs: false, persist-credentials: false }
+
+      - name: lychee (pinned release binary, SHA-256 checked)
+        id: install
+        run: |
+          mkdir -p "$RUNNER_TEMP/logs" "$RUNNER_TEMP/lychee"
+          {
+            name="lychee-x86_64-unknown-linux-gnu"
+            curl -sSfL --retry 3 -o "$RUNNER_TEMP/lychee/$name.tar.gz" \
+              "https://github.com/lycheeverse/lychee/releases/download/lychee-v$LYCHEE_VERSION/$name.tar.gz"
+            echo "$LYCHEE_SHA256  $RUNNER_TEMP/lychee/$name.tar.gz" | sha256sum -c -
+            tar -xzf "$RUNNER_TEMP/lychee/$name.tar.gz" -C "$RUNNER_TEMP/lychee"
+            echo "$RUNNER_TEMP/lychee/$name" >> "$GITHUB_PATH"
+            "$RUNNER_TEMP/lychee/$name/lychee" --version
+          } 2>&1 | tee "$RUNNER_TEMP/logs/lychee-install.log"
+
+      - name: Links (lychee — relative links and anchors; external URLs on schedule or when asked)
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        env:
+          ONLINE: ${{ github.event_name == 'schedule' || inputs.online == true }}
+          GITHUB_TOKEN: ${{ github.token }}   # lychee uses it for github.com URLs (higher rate limit)
+        run: |
+          offline=true
+          if [ "$ONLINE" = true ]; then offline=false; fi
+          echo "offline=$offline"
+          # the inputs are lychee's own globs (quoted: not the shell's), the same as `npm run check:links`
+          lychee --config lychee.toml --offline="$offline" '**/*.md' index.html 2>&1 | tee "$RUNNER_TEMP/logs/links.log"
+
+      - name: Logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: site-links-logs
+          path: ${{ runner.temp }}/logs/
+          if-no-files-found: ignore
+
+  freshness:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with: { lfs: false, persist-credentials: false }
+
+      # the generators use Node's built-ins only: no npm ci
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with: { node-version: 22 }
+
+      - name: Generated files (npm run check:fresh — regenerate, then git diff --exit-code)
+        run: |
+          mkdir -p "$RUNNER_TEMP/logs"
+          if ! npm run check:fresh 2>&1 | tee "$RUNNER_TEMP/logs/freshness.log"; then
+            echo "::error title=Generated files are stale::run 'npm run check:fresh' and commit the regenerated files (the diff is in the log)"
+            exit 1
+          fi
+
+      - name: Logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: site-freshness-logs
+          path: ${{ runner.temp }}/logs/
+          if-no-files-found: ignore
+
+  a11y:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with: { lfs: false, persist-credentials: false }
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with: { node-version: 22, cache: npm, cache-dependency-path: package-lock.json }
+
+      - name: Playwright version (from the lockfile)
+        id: versions
+        run: |
+          v=$(node -p "require('./package-lock.json').packages['node_modules/playwright'].version")
+          echo "playwright=$v" | tee -a "$GITHUB_OUTPUT"
+
+      - name: Cache (Playwright's Chromium)
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: site-ubuntu-24.04-playwright-${{ steps.versions.outputs.playwright }}
+
+      - name: Install (npm ci, Playwright's Chromium)
+        id: install
+        run: |
+          mkdir -p "$RUNNER_TEMP/logs"
+          {
+            npm ci                                          # package-lock.json's versions into ./node_modules
+            npx playwright install --with-deps chromium     # the browser from the cache when it hit; its apt deps every run
+          } 2>&1 | tee "$RUNNER_TEMP/logs/install.log"
+
+      - name: Accessibility (axe-core on index.html, fa / en / ar)
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: node tools/check-a11y.js 2>&1 | tee "$RUNNER_TEMP/logs/a11y.log"
+
+      - name: Logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: site-a11y-logs
+          path: ${{ runner.temp }}/logs/
+          if-no-files-found: ignore
+
+  size:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with: { lfs: false, persist-credentials: false }
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with: { node-version: 22, cache: npm, cache-dependency-path: package-lock.json }
+
+      - name: Install (npm ci, package-lock.json's versions)
+        id: install
+        run: |
+          mkdir -p "$RUNNER_TEMP/logs"
+          npm ci 2>&1 | tee "$RUNNER_TEMP/logs/install.log"
+
+      - name: Startup size (tools/check-size.js against tools/size-budget.json)
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: node tools/check-size.js 2>&1 | tee "$RUNNER_TEMP/logs/size.log"
+
+      - name: Logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: site-size-logs
+          path: ${{ runner.temp }}/logs/
+          if-no-files-found: ignore

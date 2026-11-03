@@ -4,10 +4,15 @@
 const path = require('path');
 const KELK = path.resolve(process.env.KELK || path.join(__dirname, '..', '..', '..'));
 const LAB = path.resolve(__dirname, '..');
+// a module from next to the scripts, else NODE_TOOLS, else /opt/npm-tools/node_modules (the Linux lab box) when it exists
 function req(name) {
-  try { return require(name); } catch (e) {
-    return require(path.join(process.env.NODE_TOOLS || '/opt/npm-tools/node_modules', name));
+  try { return require(name); } catch (e) { /* not installed next to the scripts */ }
+  const dirs = [process.env.NODE_TOOLS, '/opt/npm-tools/node_modules'].filter((d, i) => d && (i === 0 || require('fs').existsSync(d)));
+  for (const d of dirs) {
+    try { return require(path.join(d, name)); } catch (e) { if (e.code !== 'MODULE_NOT_FOUND') throw e; }
   }
+  throw new Error('cannot load ' + name + (dirs.length ? ' (looked in ' + dirs.join(', ') + ')' : '') +
+    ': run `npm ci` in the repository root (package.json), or install it in a folder outside the repository and set NODE_TOOLS to its node_modules');
 }
 // LAB_OUT=… puts the results elsewhere (the gate compares two output folders: two versions of the importer on
 // the same PDFs); LAB_FUZZ=… reads the fuzzed PDFs from another folder
@@ -51,4 +56,6 @@ function labPdfs(root) {
   const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? walk(path.join(d, e.name)) : /\.pdf$/i.test(e.name) ? [path.join(d, e.name)] : []);
   return walk(root || path.join(LAB, 'pdf')).map((f) => ({ name: path.basename(f), file: f })).sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
 }
-module.exports = { pdfPath, pdfGroup, labPdfs, importerFiles, KELK, LAB, OUT, FUZZ, ORIG: process.env.KELK_ORIG || null, req, lab: 'file://' + KELK + '/tools/pdf-lab.html' };
+// a file:// URL for a local path on any platform ('file://' + path breaks on Windows drive letters and spaces)
+const fileUrl = (f) => require('url').pathToFileURL(path.resolve(f)).href;
+module.exports = { pdfPath, pdfGroup, labPdfs, importerFiles, fileUrl, KELK, LAB, OUT, FUZZ, ORIG: process.env.KELK_ORIG || null, req, lab: fileUrl(path.join(KELK, 'tools', 'pdf-lab.html')) };

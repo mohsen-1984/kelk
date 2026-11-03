@@ -189,14 +189,7 @@
                 try {
                     const data = JSON.parse(await f.text());
                     if (!data || data.app !== 'kelk' || typeof data.settings !== 'object') throw new Error(K.i18n.t('notSettings'));
-                    const s = data.settings;
-                    delete s.ui; delete s.importer;                  // files from before the split
-                    if (!s._auto) {                                  // files from before automatic values
-                        if (s.document && s.document.title === '') s.document.title = null;
-                        if (s.headerFooter && s.headerFooter.header === '') s.headerFooter.header = null;
-                        if (s.headerFooter && s.headerFooter.footer === '') s.headerFooter.footer = null;
-                    }
-                    K.store.replaceSettings(s);
+                    K.store.replaceSettings(data.settings);          // an older file goes through Kelk.store.migrate
                     if (data.logo !== undefined) K.store.saveLogo(data.logo);
                     self.load();
                     K.ui.toast(K.i18n.t('settingsLoaded'));
@@ -252,7 +245,7 @@
             if (logo) {
                 const img = document.createElement('img');
                 img.src = logo;
-                img.alt = 'logo';
+                img.alt = K.i18n.t('logoAlt');
                 thumb.appendChild(img);
             } else {
                 thumb.textContent = K.i18n.t('logoNone');
@@ -398,8 +391,7 @@
             }
             const wordFont = path === 'fonts.wordBidi' || path === 'fonts.wordLatin' || path === 'code.wordFont';
             if (all || reachesPreview(path) || (wordFont && K.store.getUi('previewWordFont'))) {
-                clearTimeout(renderTimer);
-                if (typing) renderTimer = setTimeout(function () { K.preview.render(); }, 200);
+                if (typing) K.preview.renderSoon(200);      // the preview's own timer: an export flushes it
                 else K.preview.render();
             } else K.names.refresh();
         }

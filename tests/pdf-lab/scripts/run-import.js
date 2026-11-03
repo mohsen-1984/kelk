@@ -1,7 +1,7 @@
 // Import every pdf/*.pdf with Kelk's PdfImporter (tools/pdf-lab.html in Chromium, from file://),
 // write out/<name>.md, and score it against corpus/<doc>.md when the file name says which (…--<doc>.pdf).
 //   node scripts/run-import.js [filter]
-const { pdfPath } = require('./env.js');
+const { pdfPath, fileUrl } = require('./env.js');
 const fs = require('fs'), path = require('path');
 const { chromium } = require('./env.js').req('playwright');
 const { score } = require('./score.js');
@@ -15,7 +15,7 @@ const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
   const page = await browser.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(String(e)));
-  await page.goto('file://' + KELK + '/tools/pdf-lab.html');
+  await page.goto(fileUrl(KELK + '/tools/pdf-lab.html'));
   // (each file read where it is: a name the groups would place elsewhere is still found)
   const where = {}; require('./env.js').labPdfs().forEach((x) => { where[x.name] = x.file; });
   const files = Object.keys(where).sort().filter((f) => !filter || filter.test(f));

@@ -1,0 +1,7 @@
+Simple Title
+
+---
+
+Plain text.
+
+---

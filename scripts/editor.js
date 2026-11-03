@@ -6,7 +6,7 @@
 (function (K) {
     'use strict';
 
-    let area, fileName = '', storageWarned = false;
+    let area, fileName = '', storageWarned = false, saveTimer = 0;
 
     /**
      * Undo / redo of the text, kept here because the browser's own undo stops
@@ -50,13 +50,13 @@
         area.dispatchEvent(new CustomEvent('kelk:replaced'));   // the whole text changed (the page's sample hint …)
     }
 
-    function debounce(fn, ms) {
-        let t = null;
-        return function () { clearTimeout(t); t = setTimeout(fn, ms); };
-    }
+    /** Autosave after a pause in typing; saveNow() writes a pending one at once (the page hides or closes). */
+    function saveLater() { clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, K.config.autosaveMs); }
+    function saveNow() { if (!saveTimer) return; clearTimeout(saveTimer); saveTimer = 0; persist(area.value); }
 
     /** Save; warn once when the browser refuses (storage full), again after a success. */
     function persist(text) {
+        clearTimeout(saveTimer); saveTimer = 0;
         if (K.store.saveContent(text)) { storageWarned = false; return; }
         if (!storageWarned) { storageWarned = true; K.ui.toast(K.i18n.t('storageFull'), 'warn'); }
     }
@@ -116,10 +116,8 @@
             area = K.$('#editor');
             area.value = K.store.content();
             fileName = (area.value && K.store.getUi('sourceName')) || '';      // the imported file's name, after a reload
-            const save = debounce(function () { persist(area.value); }, K.config.autosaveMs);
-            const render = debounce(function () { K.preview.render(); }, K.config.renderMs);
             area.addEventListener('input', function (e) {
-                K.editor.stats(); save(); render();
+                K.editor.stats(); saveLater(); K.preview.renderSoon();
                 // a programmatic change (insert, indent) records itself; typing is grouped
                 if (K.editor._quiet) return;
                 if (/^(insertFromPaste|insertFromDrop|deleteByCut|deleteByDrag)$/.test(e.inputType || '')) record();
@@ -191,9 +189,33 @@
                 else if (imgs.length) insertImages(imgs);
             });
 
+            // the last keystrokes are not lost when the tab is closed or hidden within the autosave pause
+            window.addEventListener('pagehide', saveNow);
+            document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') saveNow(); });
+
             scrollSync(K.$('.preview-scroll'));
             this.stats();
             record();                                        // the text the page opened with
+        },
+
+        /**
+         * The text was saved by another tab (Kelk.sync): this tab takes it — one Undo step — unless it
+         * holds typing not saved yet; that typing is saved a moment later and the other tab takes it then.
+         * @returns {boolean} taken
+         */
+        external: function (text) {
+            text = text || '';
+            if (!area || saveTimer || text === area.value) return false;
+            record();
+            const s = area.selectionStart, e = area.selectionEnd;
+            area.value = text;
+            if (document.activeElement === area) area.setSelectionRange(Math.min(s, text.length), Math.min(e, text.length));
+            fileName = (text && K.store.getUi('sourceName')) || '';
+            this.stats();
+            K.preview.render();
+            record();
+            area.dispatchEvent(new CustomEvent('kelk:replaced'));
+            return true;
         },
 
         /** One step back / forward in the text's history (typing in progress closes first). */
@@ -269,7 +291,9 @@
             const bytes = new Blob([v]).size;
             K.$('#st-words').textContent = words.toLocaleString('en-US');
             K.$('#st-chars').textContent = v.length.toLocaleString('en-US');
-            K.$('#st-size').textContent = (bytes / 1024).toFixed(1) + ' KB';
+            const size = K.$('#st-size');
+            size.textContent = K.i18n.t('sizeKb', (bytes / 1024).toFixed(1));
+            size.dir = 'auto';                     // index.html's ltr suited «41.1 KB», not «41.1 كيلوبايت»
             const f = K.$('#st-file');
             f.hidden = !fileName;
             K.$('#st-file-name').textContent = fileName;

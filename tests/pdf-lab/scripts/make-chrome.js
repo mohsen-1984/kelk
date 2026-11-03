@@ -1,6 +1,6 @@
 // Render corpus/*.md (and corpus/*.html) to PDF with Chromium (Skia — same engine as Chrome's "Save as PDF").
 // Variants: CSS style × background graphics × Chrome's header/footer × paper.
-const { pdfPath } = require('./env.js');
+const { pdfPath, fileUrl } = require('./env.js');
 const fs = require('fs'), path = require('path');
 const { chromium } = require('./env.js').req('playwright');
 const marked = require(require('./env.js').KELK + '/vendor/marked.umd.min_18.0.14.js');
@@ -68,7 +68,7 @@ const FOOTER = `<div style="font-size:8px;width:100%;display:flex;justify-conten
   await new Promise((r) => setTimeout(r, 4000));
   const b = await chromium.launch(); const page = await b.newPage();
   for (const f of fs.readdirSync(path.join(LAB, 'scratch-pdf')).filter((f) => /^layout-.*\.html$/.test(f))) {
-    await page.goto('file://' + path.join(LAB, 'scratch-pdf', f));
+    await page.goto(fileUrl(path.join(LAB, 'scratch-pdf', f)));
     const out = pdfPath('chrome-layout--' + f.replace(/\.html$/, '') + '.pdf');
     await page.pdf({ path: out, format: 'A4', printBackground: false, displayHeaderFooter: true, headerTemplate: HEADER, footerTemplate: FOOTER, margin: { top: '0.4in', bottom: '0.4in', left: '0.4in', right: '0.4in' } });
     console.log(path.basename(out));

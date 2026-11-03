@@ -1,0 +1,124 @@
+# The builders (DOCX, DOC, PDF, HTML) and the Markdown importer on every push and pull request (plan P2.3):
+#   1. the builder suite headless (tests/pdf-lab/scripts/roundtrip.js: every corpus case through the four builders,
+#      preview parity, the PDF round trip; red cells outside its KNOWN list fail)
+#   2. DOCX validation (tests/docx-validate.js: package checks, every XML part against the ECMA-376 Transitional
+#      schemas in tests/ooxml-xsd/ with xmllint, every .docx converted by LibreOffice headless → a non-empty PDF)
+#   3. the golden snapshots (tests/golden/run.js: HTML export, .docx XML, .doc parts, PDF → MD, DOCX → MD per case;
+#      a difference prints a unified diff and fails the job; `--update` rewrites them locally)
+#   4. the MarkdownImporter unit tests (tests/unit/markdown-importer.test.js; npm test also runs them in tooling.yml)
+# A workflow of its own, not a job in pdf-lab.yml (that one runs only when the lab's paths change) and not in
+# tooling.yml (no browser or LibreOffice there): every change can move a builder's output.
+#
+# Same conventions as tooling.yml / pdf-lab.yml: actions pinned to commit SHAs (the tag in the comment), read-only
+# token, every step under bash -euo pipefail with its output teed to $RUNNER_TEMP/logs/<step>.log and uploaded with
+# the actual snapshots; all checks run even when another fails (!cancelled()), and each fails the job.
+#
+# Pinned tools. npm ci installs package-lock.json's versions (Playwright 1.56.1 → Chromium 141, jszip, jsdom);
+# Playwright's Chromium is cached on the lockfile's version. The apt packages are pinned to exact ubuntu-24.04
+# (noble-updates) versions, checked after the install:
+#   libxml2-utils            2.9.14+dfsg-1.3ubuntu3.10      (xmllint; libxml2 2.9.14)
+#   libreoffice-writer-nogui 4:24.2.7-0ubuntu0.24.04.7      (soffice, LibreOffice 24.2.7)
+# Ubuntu keeps only the newest version of a package in noble-updates: when a security update replaces one, the
+# install step fails with the version apt now offers (apt-cache policy in its log) — update the pin here and in
+# docs/reports/P2.3-builders-ci.md, re-run, and read the goldens' result (xmllint and LibreOffice do not touch
+# the snapshots).
+#
+# Triggers: every push, every pull request and by hand — the same as tooling.yml and pdf-lab.yml. A push to a
+# branch with an open pull request therefore runs twice (push and pull_request); kept for consistency, so a branch
+# without a PR is checked too. Changing it belongs to all three workflows at once.
+name: builders
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: builders-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash --noprofile --norc -euo pipefail {0}
+
+env:
+  XMLLINT_VERSION: '2.9.14+dfsg-1.3ubuntu3.10'
+  LIBREOFFICE_VERSION: '4:24.2.7-0ubuntu0.24.04.7'
+
+jobs:
+  builders:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with: { lfs: false, persist-credentials: false }
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with: { node-version: 22, cache: npm, cache-dependency-path: package-lock.json }
+
+      - name: Playwright version (from the lockfile)
+        id: versions
+        run: |
+          mkdir -p "$RUNNER_TEMP/logs"
+          v=$(node -p "require('./package-lock.json').packages['node_modules/playwright'].version")
+          echo "playwright=$v" | tee -a "$GITHUB_OUTPUT"
+
+      - name: Cache (Playwright's Chromium)
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: builders-ubuntu-24.04-playwright-${{ steps.versions.outputs.playwright }}
+
+      - name: Tools (npm ci, Playwright's Chromium, xmllint and LibreOffice at their pinned versions)
+        id: tools
+        run: |
+          {
+            sudo apt-get update
+            if ! sudo apt-get install -y --no-install-recommends \
+                "libxml2-utils=$XMLLINT_VERSION" "libreoffice-writer-nogui=$LIBREOFFICE_VERSION"; then
+              echo "::error::a pinned apt version is gone from noble-updates; apt now offers:"
+              apt-cache policy libxml2-utils libreoffice-writer-nogui
+              exit 1
+            fi
+            got_x=$(dpkg-query -W -f='${Version}' libxml2-utils)
+            got_l=$(dpkg-query -W -f='${Version}' libreoffice-writer-nogui)
+            echo "libxml2-utils $got_x, libreoffice-writer-nogui $got_l"
+            # two checks, each exits: `[ a ] && [ b ]` is a list, and set -e does not stop on a failing list member
+            [ "$got_x" = "$XMLLINT_VERSION" ] || { echo "::error::libxml2-utils is $got_x, not $XMLLINT_VERSION"; exit 1; }
+            [ "$got_l" = "$LIBREOFFICE_VERSION" ] || { echo "::error::libreoffice-writer-nogui is $got_l, not $LIBREOFFICE_VERSION"; exit 1; }
+            xmllint --version
+            soffice --version
+            npm ci                                          # package-lock.json's versions into ./node_modules
+            npx playwright install --with-deps chromium     # the browser from the cache when it hit; its apt deps every run
+          } 2>&1 | tee "$RUNNER_TEMP/logs/tools.log"
+
+      - name: Builder suite (roundtrip.js — four builders, preview parity, PDF round trip)
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
+        run: node tests/pdf-lab/scripts/roundtrip.js 2>&1 | tee "$RUNNER_TEMP/logs/roundtrip.log"
+
+      - name: DOCX validation (docx-validate.js — package, OOXML XSD with xmllint, LibreOffice → PDF)
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
+        run: node tests/docx-validate.js --keep "$RUNNER_TEMP/docx-validate" 2>&1 | tee "$RUNNER_TEMP/logs/docx-validate.log"
+
+      - name: Golden snapshots (tests/golden/run.js — a difference fails)
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
+        run: node tests/golden/run.js --out "$RUNNER_TEMP/golden-actual" 2>&1 | tee "$RUNNER_TEMP/logs/golden.log"
+
+      - name: MarkdownImporter unit tests
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
+        run: node --test tests/unit/markdown-importer.test.js 2>&1 | tee "$RUNNER_TEMP/logs/markdown-importer.log"
+
+      - name: Logs, actual snapshots, the .docx files and their PDFs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: builders-logs
+          path: |
+            ${{ runner.temp }}/logs/
+            ${{ runner.temp }}/golden-actual/
+            ${{ runner.temp }}/docx-validate/docx/
+            ${{ runner.temp }}/docx-validate/pdf/*.pdf
+          if-no-files-found: ignore

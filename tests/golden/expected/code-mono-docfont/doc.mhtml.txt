@@ -1,0 +1,31 @@
+# MHTML, 2 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/f7b3ef14faa3.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="rtl">
+        <h1>کد با فونت هم‌عرض</h1>
+<div align="center" class="MsoNormal"><table class="MsoCodeTable" dir="ltr" border="0" cellspacing="0" cellpadding="0" width="98%" style="width:98%;border-collapse:collapse;border:none;mso-border-alt:none;mso-yfti-tbllook:1184;mso-padding-alt:0cm 0cm 0cm 0cm;margin-top:6pt;margin-bottom:6pt"><tbody><tr><td valign="top" style="border:none;border-left:0.75pt solid #D4D0C8;border-right:0.75pt solid #D4D0C8;border-bottom:0.75pt solid #D4D0C8;border-top:0.75pt solid #D4D0C8;mso-border-left-alt:0.75pt solid #D4D0C8;mso-border-right-alt:0.75pt solid #D4D0C8;mso-border-bottom-alt:0.75pt solid #D4D0C8;mso-border-top-alt:0.75pt solid #D4D0C8;background:#E7F1EE;padding:1pt 6px 1pt 6px"><p class="MsoNormal" dir="ltr" style="direction:ltr;text-align:left;margin:0cm;line-height:normal;font-family:&quot;DejaVu Sans Mono&quot;,monospace;mso-ascii-font-family:&quot;DejaVu Sans Mono&quot;;mso-hansi-font-family:&quot;DejaVu Sans Mono&quot;;mso-bidi-font-family:&quot;Vazirmatn&quot;;font-size:8.0pt;mso-bidi-font-size:8.0pt;color:#595959">js</p></td></tr><tr><td valign="top" style="border:none;border-left:0.75pt solid #D4D0C8;border-right:0.75pt solid #D4D0C8;border-bottom:0.75pt solid #D4D0C8;mso-border-left-alt:0.75pt solid #D4D0C8;mso-border-right-alt:0.75pt solid #D4D0C8;mso-border-bottom-alt:0.75pt solid #D4D0C8;background:#FCFCFC;padding:4pt 6px 4pt 6px"><pre style="border:none;mso-border-alt:none;padding:0cm;margin:0cm;background:transparent;width:auto"><code class="language-js">// توضیح فارسی: جمع دو عدد
+function add(a, b) {   // جمع
+  return a + b;        // خروجی
+}
+const msg = "سلام دنیا";
+</code></pre></td></tr></tbody></table></div>
+<p class="MsoNormal" style="direction:rtl;text-align:right;margin:0;mso-margin-top-alt:0;mso-margin-bottom-alt:0;line-height:8pt;mso-line-height-rule:exactly;font-size:4.0pt;mso-bidi-font-size:4.0pt">&nbsp;</p><div align="center" class="MsoNormal"><table class="MsoCodeTable" dir="ltr" border="0" cellspacing="0" cellpadding="0" width="98%" style="width:98%;border-collapse:collapse;border:none;mso-border-alt:none;mso-yfti-tbllook:1184;mso-padding-alt:0cm 0cm 0cm 0cm;margin-top:6pt;margin-bottom:6pt"><tbody><tr><td valign="top" style="border:none;border-left:0.75pt solid #D4D0C8;border-right:0.75pt solid #D4D0C8;border-bottom:0.75pt solid #D4D0C8;border-top:0.75pt solid #D4D0C8;mso-border-left-alt:0.75pt solid #D4D0C8;mso-border-right-alt:0.75pt solid #D4D0C8;mso-border-bottom-alt:0.75pt solid #D4D0C8;mso-border-top-alt:0.75pt solid #D4D0C8;background:#E7F1EE;padding:1pt 6px 1pt 6px"><p class="MsoNormal" dir="ltr" style="direction:ltr;text-align:left;margin:0cm;line-height:normal;font-family:&quot;DejaVu Sans Mono&quot;,monospace;mso-ascii-font-family:&quot;DejaVu Sans Mono&quot;;mso-hansi-font-family:&quot;DejaVu Sans Mono&quot;;mso-bidi-font-family:&quot;Vazirmatn&quot;;font-size:8.0pt;mso-bidi-font-size:8.0pt;color:#595959">code</p></td></tr><tr><td valign="top" style="border:none;border-left:0.75pt solid #D4D0C8;border-right:0.75pt solid #D4D0C8;border-bottom:0.75pt solid #D4D0C8;mso-border-left-alt:0.75pt solid #D4D0C8;mso-border-right-alt:0.75pt solid #D4D0C8;mso-border-bottom-alt:0.75pt solid #D4D0C8;background:#FCFCFC;padding:4pt 6px 4pt 6px"><pre style="border:none;mso-border-alt:none;padding:0cm;margin:0cm;background:transparent;width:auto"><code>┌──────┬──────┐
+│ نام  │ مقدار │
+├──────┼──────┤
+│ key  │ 42   │
+└──────┴──────┘
+</code></pre></td></tr></tbody></table></div>
+<p style="margin-top:6pt;mso-margin-top-alt:6pt" class="MsoNormal">کد درون‌خطی <code>‪متغیر = 1‬</code> و <code>value = 2</code> در متن.</p>
+
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="filelist.xml"/>
+</xml>
