@@ -725,9 +725,10 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 6 | P3.1 baseline rebuilt on the CI runner for Playwright 1.64.1 (manual `pdf-lab` run 41593890106 with `baseline` ticked, its `baseline-candidate` committed whole): corpus 95.72 → 96.22 (P1.3's five files, written at last), fuzz and meta in the Chromium 156 environment — dev 85.98 → 85.91, held-out 86.91 → 86.89 with the same importer (the browser's drawing), meta Chromium 141 → 156. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 12 | Review of the P3.3 diff: the lab claims checked (corpus byte-identical, the gate output, `KNOWN` removals exact), each new rule tried on PDFs built to make it misfire (diagonal titles, grey labels, half-opaque headings, posters; tracked layouts; equal-gap tables; CID fonts with Unicode codes, packed and plain; rotations 90 / 270 with offset boxes), the code, tests and documents read against each other. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 18 | P3.3 review findings applied: the watermark rule drops only a neutral grey at low opacity or light over no dark fill or picture, on a page that keeps upright body text, and notes the words dropped (`watermarkDropped`); whether a font's codes are glyph ids decided per font from its own CIDFont dictionary, packed in an object stream or not (`_cidGlyphIds`), which also ends an older overwrite of correct CID text; the untracked-layout literals registered; `pageOf` takes `.page` only when it is a number (148 rules held page objects); `_tinyText`'s comment restored; the lab README brought to P3.3's figures; unit tests; every lab output byte-identical, `stamp` 24/24. |
+| 1405-08-12 | 2.0-rc1 | Zarrabi | 14 | P3.3 report `docs/reports/P3.3-metamorphic-order.md`: the six batches with their causes and nets, the plan's literal migrations measured and rejected, the lab before and after per transform, the review findings and their verdicts, the open items. |
 
 <!-- generated:totals -->
-**Entries: 139 · Total: 1943 min (32.38 hours) — Zarrabi 1943 min (132 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 140 · Total: 1957 min (32.62 hours) — Zarrabi 1957 min (133 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
