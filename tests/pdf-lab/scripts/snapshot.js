@@ -15,7 +15,7 @@
 // to a hash: the text stays readable and diffable) and _snapshot.json; keep it outside the repository when the
 // PDFs are private. With --against, each file is "same" or shows its changed lines and the signals that moved.
 const fs = require('fs'), path = require('path'), crypto = require('crypto');
-const { KELK, req } = require('./env.js');
+const { KELK, req, fileUrl } = require('./env.js');
 const { chromium } = req('playwright');
 const { structure, words } = require('./score.js');
 const { pdftotext, against } = require('./realwords.js');
@@ -49,7 +49,7 @@ function signals(md, ref) {
   fs.mkdirSync(snap, { recursive: true });
   const browser = await chromium.launch();
   const page = await browser.newPage();
-  await page.goto('file://' + KELK + '/tools/pdf-lab.html');
+  await page.goto(fileUrl(KELK + '/tools/pdf-lab.html'));
   const res = {};
   for (const f of files) {
     const b64 = fs.readFileSync(path.join(dir, f)).toString('base64');

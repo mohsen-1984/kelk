@@ -1,0 +1,18 @@
+# MHTML, 2 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/b1656fe21d17.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="rtl">
+        <p style="margin-bottom:6pt;mso-margin-bottom-alt:6pt" class="MsoNormal">متن سند.</p><table class="MsoQuoteTable" border="0" cellspacing="0" cellpadding="0" dir="rtl" width="95.2%" style="width:95.2%;border-collapse:collapse;border:none;mso-border-alt:none;mso-yfti-tbllook:1184;mso-padding-alt:0cm 0cm 0cm 0cm;margin-right:14.15pt;margin-left:0cm"><tr><td valign="top" style="border-top:none;border-bottom:none;border-left:none;border-right:solid #1F6F5C 3.5pt;mso-border-top-alt:none;mso-border-bottom-alt:none;mso-border-left-alt:none;mso-border-right-alt:solid #1F6F5C 3.5pt;padding:2pt 0cm 2pt 0cm;padding-right:12pt;padding-left:6pt;background:#F6F9F8;direction:rtl;text-align:right"><p class="MsoQuote" style="border-top:none;border-right:none;border-bottom:none;border-left:none;mso-border-alt:none;padding:0cm;margin-right:0cm;margin-left:0cm">نکته مهم: ارزیابی باید مطابق با استانداردهای تعیین شده انجام شود.</p><p class="MsoQuote" style="border-top:none;border-right:none;border-bottom:none;border-left:none;mso-border-alt:none;padding:0cm;margin-right:0cm;margin-left:0cm;direction:ltr;text-align:justify" dir="ltr">Important note: Evaluation must be performed according to defined standards.</p></td></tr></table>
+        <p class=MsoNormal style='direction:rtl;text-align:right'>&nbsp;</p>
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="filelist.xml"/>
+</xml>

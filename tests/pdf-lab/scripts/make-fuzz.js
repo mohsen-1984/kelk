@@ -15,13 +15,17 @@ const fs = require('fs'), path = require('path'), os = require('os'), cp = requi
 const { chromium } = require('./env.js').req('playwright');
 const KELK = require('./env.js').KELK;
 const marked = require(KELK + '/vendor/marked.umd.min_18.0.14.js');
-const LAB = path.join(__dirname, '..'), FUZZ = require('./env.js').FUZZ;
+const LAB = path.join(__dirname, '..'), FUZZ = require('./env.js').FUZZ, fileUrl = require('./env.js').fileUrl;
 
 // the generator's version: a new dimension or style changes the PDFs of every seed, and the gate must not
 // compare means across it (it is part of the manifest's env)
-const GENERATOR = 3;     // 1: the first draw; 2: + headCase, tagged; 3: two-column content fits its column
+// 1: the first draw; 2: + headCase, tagged; 3: two-column content fits its column;
+// 4: + the right-to-left documents (4 of 9: dir rtl, Persian / Arabic body fonts, digits), tracking (letter-spacing)
+const GENERATOR = 4;
 const SPLITS = { dev: { base: 1, count: 100 }, heldout: { base: 100001, count: 100 } };
-const DOCS = ['article', 'features', 'readme', 'report', 'symbols'];
+// round robin over the documents: 4 of 9 right-to-left (44 % of each split)
+const DOCS = ['article', 'features', 'readme', 'report', 'symbols', 'fa-article', 'fa-report', 'ar-article', 'fa-mixed'];
+const isRtl = (doc) => /^(fa|ar)-/.test(doc);
 
 // ── seeded random (mulberry32) ─────────────────────────────────────────
 function rng(seed) {
@@ -47,6 +51,50 @@ const FONTS = {
 };
 const MONO = { 'dejavu-mono': '"DejaVu Sans Mono",monospace', 'liberation-mono': '"Liberation Mono",monospace', courier: '"Courier 10 Pitch",Courier,monospace' };
 const HEAD_SCALE = { large: [2.0, 1.55, 1.25, 1.1], medium: [1.6, 1.3, 1.15, 1.0], small: [1.3, 1.15, 1.05, 1.0] };
+// right-to-left body fonts: Vazirmatn and Sahel from the repository (assets/fonts/download/vazirmatn-sahel-ttf.zip,
+// static TTFs: wkhtmltopdf takes no woff2), loaded by @font-face from a temporary folder; Noto Naskh Arabic from the
+// system (fonts-noto-core on the CI runner), by @font-face local(). Each is declared under a family of its own
+// (`face`) with a unicode-range of the Arabic blocks, ZWNJ / ZWJ and the direction marks, so it serves the Arabic
+// script only: Latin letters, ASCII digits, spaces and Latin punctuation fall through to the drawn Latin font
+// (`latinFont`) — Vazirmatn and Sahel have Latin glyphs of their own, which would otherwise take every Latin run.
+const RTL_RANGE = 'U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF,U+200C-200F';
+const RTL_FONTS = {
+  vazirmatn: { family: 'Vazirmatn', face: 'Fuzz Vazirmatn', files: { 400: 'vazirmatn/Vazirmatn-Regular.ttf', 700: 'vazirmatn/Vazirmatn-Bold.ttf' } },
+  sahel: { family: 'Sahel', face: 'Fuzz Sahel', files: { 400: 'sahel/Sahel.ttf', 700: 'sahel/Sahel-Bold.ttf' } },
+  'noto-naskh': { family: 'Noto Naskh Arabic', face: 'Fuzz Naskh', files: null,
+    local: { 400: ['Noto Naskh Arabic', 'Noto Naskh Arabic Regular', 'NotoNaskhArabic-Regular'], 700: ['Noto Naskh Arabic Bold', 'NotoNaskhArabic-Bold'] } }
+};
+const NASKH_FACE = Object.entries(RTL_FONTS['noto-naskh'].local).map(([w, names]) =>
+  `@font-face{font-family:"Fuzz Naskh";src:${names.map((n) => `local("${n}")`).join(',')};font-weight:${w};unicode-range:${RTL_RANGE}}`).join('\n');
+const FONT_ZIP = path.join(__dirname, '..', '..', '..', 'assets', 'fonts', 'download', 'vazirmatn-sahel-ttf.zip');
+// tracking: letter-spacing over the whole text, as a producer sets it (the metamorphic net's trackTight / trackLoose
+// shift each run's glyphs by Tc after the fact; here the producer lays the lines out with it)
+const TRACKING = { none: '0', tight: '-0.04em', loose: '0.08em' };
+
+// the digits of a right-to-left document (`digits`): asis — as written; ascii — every number ASCII; native — every
+// number of the running text in the native digits (Persian ۰–۹ in fa, Arabic-Indic ٠–٩ in ar) except one attached to a
+// Latin word (directly or through one space or hyphen: SHA-256, p95, Alpine 3.19, 64 GB, PostgreSQL 16 stay ASCII, as
+// Persian text writes them). A number is a run of digits with its separators: native writes the decimal point ٫, the
+// thousands separator ٬ and a following percent sign ٪ (as ar-article does), ascii writes them . , % back. In the text
+// only — code (fenced and inline), link targets, bare addresses and list markers keep theirs; table cells are text.
+const FA = '۰۱۲۳۴۵۶۷۸۹', AR = '٠١٢٣٤٥٦٧٨٩';
+const NUM = /[0-9۰-۹٠-٩]+(?:[.,٫٬][0-9۰-۹٠-٩]+)*[%٪]?/g;
+function digitsTo(md, mode, lang) {
+  if (mode !== 'ascii' && mode !== 'native') return md;
+  const native = lang === 'ar' ? AR : FA;
+  const toAscii = (n) => n.replace(/[۰-۹]/g, (c) => String(FA.indexOf(c))).replace(/[٠-٩]/g, (c) => String(AR.indexOf(c)))
+    .replace(/٫/g, '.').replace(/٬/g, ',').replace(/٪/g, '%');
+  const toNative = (n) => n.replace(/[0-9]/g, (c) => native[+c]).replace(/\./g, '٫').replace(/,/g, '٬').replace(/%/g, '٪');
+  const latinNear = (t, at, end) => /[A-Za-z][ -]?$/.test(t.slice(Math.max(0, at - 2), at)) || /^[ -]?[A-Za-z]/.test(t.slice(end, end + 2));
+  const conv = (t) => t.replace(NUM, (n, at) => mode === 'ascii' ? toAscii(n) : latinNear(t, at, at + n.length) ? n : toNative(n));
+  let fence = false;
+  return md.split('\n').map((line) => {
+    if (/^\s*```/.test(line)) { fence = !fence; return line; }
+    if (fence) return line;
+    const lead = (line.match(/^\s*(?:\d+[.)]\s+)?/) || [''])[0];     // a numbered item's marker stays ASCII (Markdown syntax)
+    return lead + line.slice(lead.length).split(/(`[^`]*`|\]\([^)]*\)|https?:\/\/\S+)/).map((p, i) => i % 2 ? p : conv(p)).join('');
+  }).join('\n');
+}
 
 function drawStyle(seed) {
   const r = rng(seed);
@@ -73,18 +121,41 @@ function drawStyle(seed) {
     // (drawn last: a new dimension goes at the end, so the styles drawn before it stay the same per seed)
     headCase: pick(r, { none: 4, upper: 1 }),
     // a structure tree and an outline (desktop Chrome writes them; headless Chrome only when asked)
-    tagged: pick(r, { no: 1, yes: 1 })
+    tagged: pick(r, { no: 1, yes: 1 }),
+    // generator 4 — drawn for every seed, whatever its document, so the draws above keep their values
+    rtlFont: pick(r, Object.keys(RTL_FONTS)),
+    // asis (the document as written: fa-report and fa-mixed mix ASCII and Persian digits on purpose) added after
+    // ascii and native: one draw still, so `tracking` keeps its value per seed
+    digits: pick(r, { ascii: 1, native: 1, asis: 1 }),
+    tracking: pick(r, { none: 2, tight: 1, loose: 1 })
   };
+  // the direction follows the document; a right-to-left one is set in its right-to-left font (`font`), Latin runs in
+  // the drawn Latin one (`latinFont`); a left-to-right one has no digits to choose and no second font ('-')
+  s.dir = isRtl(s.doc) ? 'rtl' : 'ltr';
+  if (s.dir === 'rtl') { s.latinFont = s.font; s.font = s.rtlFont; } else { s.digits = '-'; s.latinFont = '-'; }
+  delete s.rtlFont;
   // what the producer cannot do is recorded as what it did (wkhtmltopdf: no CSS columns, no Chrome header/footer)
   if (s.producer === 'wkhtmltopdf') { s.columns = '1'; s.headerFooter = 'off'; s.tagged = 'no'; }
   return s;
 }
 
-function css(s) {
-  const pt = s.size, hs = HEAD_SCALE[s.headScale];
-  const hf = s.headFont === 'sans' ? '"Liberation Sans",sans-serif' : s.headFont === 'serif' ? '"Liberation Serif",serif' : 'inherit';
+// faces: the @font-face rules of the right-to-left fonts (url per weight), '' when none is needed
+function css(s, faces) {
+  const pt = s.size, hs = HEAD_SCALE[s.headScale], rtl = s.dir === 'rtl';
+  // right-to-left: the right-to-left font first (it holds the Arabic letters; a Latin font such as DejaVu would take
+  // them too), the Latin one after it for what it lacks; headings in a sans / serif pair of the same kind
+  const body = rtl ? `"${RTL_FONTS[s.font].face}",${FONTS[s.latinFont]}` : FONTS[s.font];
+  const hf = s.headFont === 'sans' ? (rtl ? '"Fuzz Vazirmatn","Liberation Sans",sans-serif' : '"Liberation Sans",sans-serif')
+    : s.headFont === 'serif' ? (rtl ? '"Fuzz Naskh","Liberation Serif",serif' : '"Liberation Serif",serif') : 'inherit';
+  // a code block is left to right in either direction: its sheet is never mirrored (its bar stays on the left)
+  const codeBlock = { box: 'pre{background:#f4f5f7;border:1px solid #d5d8dc;padding:8px;font-size:.85em}',
+    bar: 'pre{border-left:3px solid #888;padding-left:8px;font-size:.85em}',
+    plain: 'pre{font-size:.85em;margin-left:1.5em}',
+    dashed: 'pre{border:1px dashed #999;padding:6px;font-size:.85em}',
+    dark: 'pre{background:#272822;color:#f8f8f2;padding:10px;font-size:.85em}' }[s.code];
   const out = [
-    `body{font-family:${FONTS[s.font]};font-size:${pt}pt;line-height:${s.leading};text-align:${s.align};color:#111;margin:0}`,
+    faces || '',
+    `body{font-family:${body};font-size:${pt}pt;line-height:${s.leading};text-align:${s.align};color:#111;margin:0}`,
     // two columns: content fits its column, as a real two-column document's does (tables and code set smaller,
     // a word broken only when it cannot fit) — a table wider than the column was cut at the page edge (its last
     // column never drawn: lost in the PDF itself, generator 2)
@@ -95,11 +166,7 @@ function css(s) {
     `code,pre{font-family:${MONO[s.mono]}}`,
     s.inlineCode === 'chip' ? 'code{background:#eceff2;padding:.1em .3em;border-radius:3px;font-size:.88em}' : 'code{font-size:.92em}',
     'pre code{background:none;padding:0;font-size:inherit}',
-    { box: 'pre{background:#f4f5f7;border:1px solid #d5d8dc;padding:8px;font-size:.85em}',
-      bar: 'pre{border-left:3px solid #888;padding-left:8px;font-size:.85em}',
-      plain: 'pre{font-size:.85em;margin-left:1.5em}',
-      dashed: 'pre{border:1px dashed #999;padding:6px;font-size:.85em}',
-      dark: 'pre{background:#272822;color:#f8f8f2;padding:10px;font-size:.85em}' }[s.code],
+    rtl ? '' : codeBlock,
     { bar: 'blockquote{border-left:4px solid #bbb;margin:0 0 .8em;padding:0 1em;color:#444}',
       box: 'blockquote{background:#eef2f8;margin:0 0 .8em;padding:.4em 1em}',
       indent: 'blockquote{margin:0 2.5em .8em}',
@@ -111,10 +178,39 @@ function css(s) {
       none: 'table{border-collapse:collapse} th,td{padding:1px 6px}',
       'header-dark': 'table{border-collapse:collapse} th{background:#234;color:#fff} th,td{padding:3px 8px;border-bottom:1px solid #ccc}' }[s.table],
     { default: '', tight: 'ul,ol{padding-left:1.2em}', wide: 'ul,ol{padding-left:2.6em}' }[s.list],
+    s.tracking && s.tracking !== 'none' ? `body{letter-spacing:${TRACKING[s.tracking]}}` : '',
     s.headCase === 'upper' ? 'h1,h2,h3,h4{text-transform:uppercase;letter-spacing:.04em}' : '',
     'a{color:#0645ad}'
   ];
-  return out.filter(Boolean).join('\n');
+  // right-to-left: the sheet mirrored (bars, indents, start alignment on the right — old WebKit has no logical
+  // properties), except the faces and the code block: code is left to right as the right-to-left sheets of the corpus
+  // set it (make-rtl.js), its bar and indent on the left. A table's `align="left"` (Markdown `:---`) is kept as
+  // written: marked writes it as an attribute, and browsers, GitHub and make-rtl.js print it on the left too.
+  let sheet = out.filter(Boolean).join('\n');
+  if (rtl) {
+    const [fc, rest] = [faces || '', sheet.slice((faces || '').length)];
+    sheet = fc + rest.replace(/\b(left|right)\b/g, (m) => m === 'left' ? 'right' : 'left') + '\n' + codeBlock + '\npre{direction:ltr;text-align:left}';
+  }
+  return sheet;
+}
+
+// the right-to-left fonts' TTFs out of the repository's zip into tmp: { key: '@font-face …' }, and a short hash of the
+// zip for the env (another font file draws other PDFs)
+async function rtlFaces(tmp) {
+  const JSZip = require(path.join(__dirname, '..', '..', '..', 'vendor', 'jszip.min_3.10.2.js'));
+  const buf = fs.readFileSync(FONT_ZIP), zip = await JSZip.loadAsync(buf), faces = {};
+  for (const [k, f] of Object.entries(RTL_FONTS)) {
+    if (!f.files) continue;
+    const rules = [];
+    for (const [w, entry] of Object.entries(f.files)) {
+      const out = path.join(tmp, path.basename(entry));
+      fs.writeFileSync(out, await zip.file(entry).async('nodebuffer'));
+      rules.push(`@font-face{font-family:"${f.face}";src:url("${fileUrl(out)}") format("truetype");font-weight:${w};unicode-range:${RTL_RANGE}}`);
+    }
+    faces[k] = rules.join('\n');
+  }
+  faces['noto-naskh'] = NASKH_FACE;
+  return { faces, hash: require('crypto').createHash('sha1').update(buf).digest('hex').slice(0, 12) };
 }
 
 const MARGIN = { narrow: '1cm', normal: '2cm', wide: '3cm' };
@@ -129,36 +225,64 @@ const HF = `<div style="font-size:7px;width:100%;display:flex;justify-content:sp
   const forceTagged = (process.argv.find((a) => /^--tagged=/.test(a)) || '').split('=')[1] || null;
   const dir = path.join(FUZZ, split);
   fs.mkdirSync(dir, { recursive: true });
-  fs.readdirSync(dir).filter((f) => /\.pdf$/.test(f)).forEach((f) => fs.unlinkSync(path.join(dir, f)));
+  // the PDFs and the sources of the files whose digits were rewritten (<name>.md, scored instead of corpus/<doc>.md)
+  fs.readdirSync(dir).filter((f) => /\.(pdf|md)$/.test(f)).forEach((f) => fs.unlinkSync(path.join(dir, f)));
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'kelk-fuzz-'));
   const browser = await chromium.launch(), page = await browser.newPage();
+  const rf = await rtlFaces(tmp), allFaces = Object.values(rf.faces).join('\n');
   // the environment: the same seed gives the same PDF only with the same browser, wkhtmltopdf and fonts —
   // the gate compares stored scores only when this matches (gate.js)
   const env = { generator: GENERATOR, chromium: browser.version(), wkhtmltopdf: null, fonts: {} };
   try { env.wkhtmltopdf = cp.execFileSync('wkhtmltopdf', ['--version']).toString().trim(); } catch (e) { /* not installed */ }
-  Object.keys(FONTS).concat(Object.keys(MONO)).forEach((k) => {
-    const fam = (FONTS[k] || MONO[k]).split(',')[0].replace(/"/g, '');
-    try { env.fonts[k] = path.basename(cp.execFileSync('fc-match', ['-f', '%{file}', fam]).toString()); } catch (e) { env.fonts[k] = null; }
+  const fcMatch = (fam) => { try { return path.basename(cp.execFileSync('fc-match', ['-f', '%{file}', fam]).toString()); } catch (e) { return null; } };
+  Object.keys(FONTS).concat(Object.keys(MONO)).forEach((k) => { env.fonts[k] = fcMatch((FONTS[k] || MONO[k]).split(',')[0].replace(/"/g, '')); });
+  // the right-to-left fonts: the repository's (by the zip's hash), the system's Noto Naskh Arabic by its file and that
+  // file's hash (a package update changes the hash). Whether the browser has it is asked through the very face the
+  // pages use (local(), unicode-range); a missing one is drawn in the fallback — said below, and recorded (null), so
+  // such a run never matches a baseline's env
+  const naskhHere = await page.evaluate(async (face) => {
+    const st = document.createElement('style'); st.textContent = face; document.head.appendChild(st);
+    try { return (await document.fonts.load('40px "Fuzz Naskh"', 'سلام')).some((f) => f.status === 'loaded'); } catch (e) { return false; }
+  }, NASKH_FACE);
+  const sha = (f) => require('crypto').createHash('sha1').update(fs.readFileSync(f)).digest('hex').slice(0, 12);
+  let naskhFile = null;
+  try { naskhFile = cp.execFileSync('fc-match', ['-f', '%{file}', RTL_FONTS['noto-naskh'].family]).toString(); } catch (e) { /* no fontconfig */ }
+  Object.entries(RTL_FONTS).forEach(([k, f]) => {
+    env.fonts[k] = f.files ? path.basename(FONT_ZIP) + '#' + rf.hash
+      : !naskhHere ? null : naskhFile && fs.existsSync(naskhFile) ? path.basename(naskhFile) + '#' + sha(naskhFile) : f.family;
   });
   const manifest = { split, generated: new Date().toISOString(), env, samples: [] };
+  let noWk = 0, noNaskh = 0;      // drawn for wkhtmltopdf, made with Chromium (not installed); Noto Naskh Arabic missing
   for (let i = 0; i < count; i++) {
     const seed = SPLITS[split].base + i, s = drawStyle(seed);
-    if (s.producer === 'wkhtmltopdf' && !env.wkhtmltopdf) s.producer = 'chromium';
+    if (s.producer === 'wkhtmltopdf' && !env.wkhtmltopdf) { s.producer = 'chromium'; noWk++; }
     if (forceTagged && s.producer === 'chromium') s.tagged = forceTagged === 'all' ? 'yes' : 'no';
-    const md = fs.readFileSync(path.join(LAB, 'corpus', s.doc + '.md'), 'utf8');
-    const title = (md.match(/^# (.+)$/m) || [, s.doc])[1];
-    const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${title}</title><style>${css(s)}</style></head><body>${marked.parse(md)}</body></html>`;
+    if (s.dir === 'rtl' && (s.font === 'noto-naskh' || s.headFont === 'serif') && !naskhHere) noNaskh++;
     const name = `fz${seed}-${s.producer === 'chromium' ? 'chr' : 'wk'}--${s.doc}`;
+    const lang = s.dir === 'rtl' ? s.doc.slice(0, 2) : 'en';
+    let md = fs.readFileSync(path.join(LAB, 'corpus', s.doc + '.md'), 'utf8');
+    if (s.dir === 'rtl') {
+      const md2 = digitsTo(md, s.digits, lang);
+      if (md2 !== md) { md = md2; s.source = name + '.md'; fs.writeFileSync(path.join(dir, s.source), md); }
+    }
+    const title = (md.match(/^# (.+)$/m) || [, s.doc])[1];
+    const html = `<!doctype html><html lang="${lang}"${s.dir === 'rtl' ? ' dir="rtl"' : ''}><head><meta charset="utf-8"><title>${title}</title>` +
+      `<style>${css(s, s.dir === 'rtl' ? allFaces : '')}</style></head><body>${marked.parse(md)}</body></html>`;
     const out = path.join(dir, name + '.pdf');
     if (s.producer === 'chromium') {
-      await page.setContent(html);
+      // right-to-left: from a file, so the page may load the fonts from tmp (file://); the fonts loaded before printing
+      if (s.dir === 'rtl') {
+        const hp = path.join(tmp, name + '.html'); fs.writeFileSync(hp, html);
+        await page.goto(fileUrl(hp)); await page.evaluate(() => document.fonts.ready);
+      } else await page.setContent(html);
       await page.pdf({ path: out, format: s.paper, printBackground: true, displayHeaderFooter: s.headerFooter === 'on',
         headerTemplate: '<span></span>', footerTemplate: HF, tagged: s.tagged === 'yes', outline: s.tagged === 'yes',
         margin: { top: MARGIN[s.margin], bottom: MARGIN[s.margin], left: MARGIN[s.margin], right: MARGIN[s.margin] } });
     } else {
       const hp = path.join(tmp, name + '.html'); fs.writeFileSync(hp, html);
       const m = MARGIN[s.margin].replace('cm', '0mm');
-      cp.execFileSync('wkhtmltopdf', ['--quiet', '-s', s.paper, '-T', m, '-B', m, '-L', m, '-R', m, hp, out], { stdio: ['ignore', 'ignore', 'pipe'] });
+      // (local files: the right-to-left fonts' @font-face urls)
+      cp.execFileSync('wkhtmltopdf', ['--quiet', '--enable-local-file-access', '-s', s.paper, '-T', m, '-B', m, '-L', m, '-R', m, hp, out], { stdio: ['ignore', 'ignore', 'pipe'] });
     }
     manifest.samples.push(Object.assign({ name, seed }, s));
     process.stdout.write('.');
@@ -166,6 +290,10 @@ const HF = `<div style="font-size:7px;width:100%;display:flex;justify-content:sp
   await browser.close();
   fs.rmSync(tmp, { recursive: true, force: true });
   fs.writeFileSync(path.join(dir, 'manifest.json'), JSON.stringify(manifest, null, 1));
-  console.log('\n' + count + ' PDFs in ' + path.relative(process.cwd(), dir) + '/ (manifest.json has each style)');
+  const nRtl = manifest.samples.filter((s) => s.dir === 'rtl').length;
+  console.log('');
+  if (noWk) console.log('wkhtmltopdf not found: ' + noWk + ' files drawn with Chromium instead');
+  if (noNaskh) console.log('Noto Naskh Arabic not found: ' + noNaskh + ' right-to-left files set (body or headings) in the browser\'s fallback instead');
+  console.log(count + ' PDFs in ' + path.relative(process.cwd(), dir) + '/, ' + nRtl + ' right-to-left (' + Math.round(100 * nRtl / count) + ' %) — manifest.json has each style');
 })();
 

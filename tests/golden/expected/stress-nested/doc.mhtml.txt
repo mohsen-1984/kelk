@@ -1,0 +1,30 @@
+# MHTML, 2 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/b1656fe21d17.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="rtl">
+        <p class=MsoNormal style='direction:rtl;text-align:right'>&nbsp;</p>
+        <ul>
+<li class="MsoNormal"><p style="margin-top:0pt;margin-bottom:3pt;mso-margin-top-alt:0pt;mso-margin-bottom-alt:3pt" class="MsoNormal">مورد با پاراگراف</p>
+<p style="direction:ltr;text-align:justify;margin-top:0pt;mso-margin-top-alt:0pt;margin-bottom:6pt;mso-margin-bottom-alt:6pt" class="MsoNormal">English paragraph inside RTL item.</p>
+<p class="MsoQuote" style="border-top:none;border-bottom:none;border-right:solid #F6F9F8 .25pt;border-left:solid #1F6F5C 3.5pt;padding-left:12pt;padding-right:12pt;background:#F6F9F8;margin-left:14.15pt;margin-right:0cm;direction:ltr;text-align:justify" dir="ltr">quote inside list item</p>
+</li>
+<li style="direction:ltr;text-align:justify;margin-top:6pt;mso-margin-top-alt:6pt;margin-bottom:6pt;mso-margin-bottom-alt:6pt" class="MsoNormal"><p style="direction:ltr;text-align:justify;margin-bottom:3pt;mso-margin-bottom-alt:3pt;margin-top:6pt;mso-margin-top-alt:6pt" class="MsoNormal">second</p>
+</li>
+</ul>
+<div align="left" dir="rtl"><table class="MsoQuoteTable" border="0" cellspacing="0" cellpadding="0" dir="ltr" width="95.2%" style="width:95.2%;border-collapse:collapse;border:none;mso-border-alt:none;mso-yfti-tbllook:1184;mso-padding-alt:0cm 0cm 0cm 0cm;margin-left:14.15pt;margin-right:0cm"><tr><td valign="top" style="border-top:none;border-bottom:none;border-right:none;border-left:solid #1F6F5C 3.5pt;mso-border-top-alt:none;mso-border-bottom-alt:none;mso-border-right-alt:none;mso-border-left-alt:solid #1F6F5C 3.5pt;padding:2pt 0cm 2pt 0cm;padding-left:12pt;padding-right:6pt;background:#F6F9F8;direction:ltr;text-align:left"><p class="MsoQuote" style="border-top:none;border-right:none;border-bottom:none;border-left:none;mso-border-alt:none;padding:0cm;margin-right:0cm;margin-left:0cm;direction:ltr;text-align:left" dir="ltr">Heading in quote</p><p class="MsoQuote" style="border-top:none;border-right:none;border-bottom:none;border-left:none;mso-border-alt:none;padding:0cm;margin-right:0cm;margin-left:0cm;direction:rtl;text-align:justify" dir="rtl">متن و (<span dir="ltr">parenthesis with English</span>) و <span dir="ltr">"quoted English"</span> پایان.</p><ul style="direction:ltr;text-align:justify">
+<li style="border-top:none;border-right:none;border-bottom:none;border-left:none;mso-border-alt:none;padding:0cm;margin-right:0cm;margin-left:0cm;margin-top:0pt;margin-bottom:3pt;mso-margin-bottom-alt:3pt;line-height:100%;direction:ltr;text-align:justify" class="MsoQuote">list in quote with 4-bit and 1,000mAh</li>
+</ul></td></tr></table></div>
+
+        <p class=MsoNormal style='direction:rtl;text-align:right'>&nbsp;</p>
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="filelist.xml"/>
+</xml>

@@ -73,26 +73,10 @@
     /** For Kelk.slides: which sample is on screen, and loading the other one when the view changes. */
     K.samples = { of: sampleOf, load: function (set) { return loadSample(false, set); } };
 
-    /**
-     * First visit: the language from the browser's locale. Any Persian entry
-     * in the user's language list (fa, fa-IR, fa-AF, prs) → Persian; an English
-     * browser with an Iranian or Afghan time zone (common: an English UI on a
-     * Persian speaker's system) → Persian too; otherwise English.
-     */
-    function firstLanguage() {
-        const langs = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''])
-            .map(function (l) { return String(l).toLowerCase(); });
-        if (langs.some(function (l) { return /^(fa|prs)\b/.test(l); })) return 'fa';
-        if (langs.some(function (l) { return /^ar\b/.test(l); })) return 'ar';
-        let tz = '';
-        try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { /* none */ }
-        if (/^Asia\/(Tehran|Kabul)$/.test(tz)) return 'fa';
-        return langs[0] ? 'en' : 'fa';
-    }
-
     function start() {
         const u = K.store.ui();
-        const lang = u.lang || firstLanguage();
+        // first visit: the browser's language (scripts/boot.js, which already set <html lang dir> and the theme)
+        const lang = u.lang || K.boot.firstLanguage();
         K.i18n.apply(lang);
         K.ui.theme(u.theme || '');
         K.ui.layout(u.layout);
@@ -114,6 +98,7 @@
         const langButtons = function () {
             const box = K.$('#lang-switch');
             K.$$('button', box).forEach(function (b) { b.remove(); });
+            box.setAttribute('aria-label', K.i18n.t('languageGroup'));
             Object.keys(K.i18n.languages).forEach(function (code) {
                 if (code === K.i18n.lang) return;
                 const b = document.createElement('button');
@@ -149,6 +134,7 @@
             K.store.setUi('lang', next);
             K.i18n.apply(next);
             langButtons();
+            K.editor.stats();                                // the size's unit
             K.ui.layout(K.store.getUi('layout'));
             K.settings.showLogo();
             K.settings.fontPack();
@@ -269,6 +255,35 @@
             else if (mod && !e.shiftKey && k === 'o') { e.preventDefault(); K.$('#file-import').click(); }
             else if (mod && e.key === ',') { e.preventDefault(); togglePane(); }
             else if (e.key === 'F1') { e.preventDefault(); K.ui.help(false); K.ui.dialog('#guide', true); }
+        });
+
+        // another tab of Kelk saved (the storage event reaches every OTHER tab of the same origin): this tab
+        // follows it — text, images, profile, logo, page settings — so it never writes back what it showed before
+        window.addEventListener('storage', function (e) {
+            const pre = K.config.storagePrefix;
+            if (e.key === null) {
+                // the storage was cleared (another tab's site data, DevTools): this tab's text and images are
+                // written back, not taken as empty; the profile and page settings fall back to the defaults
+                K.store.saveContent(K.editor.value());
+                K.store.saveImages(K.images.all());
+                K.settings.load();
+                return;
+            }
+            if (e.key.indexOf(pre) !== 0) return;
+            const key = e.key.slice(pre.length);
+            if (key === 'images') { K.images.reload(); K.preview.render(); }
+            if (key === 'content' && K.editor.external(K.store.content())) {
+                K.names.followStored(true);
+                K.ui.toast(K.i18n.t('tabSynced'));
+            }
+            if (key === 'ui') {
+                const u = K.store.ui();
+                if (u.lang && u.lang !== K.i18n.lang) switchLang(u.lang);
+                K.ui.theme(u.theme || '');                  // the preview's colors follow in settings.load() below
+                K.ui.layout(u.layout);
+                K.names.followStored(false);
+            }
+            if (key === 'settings' || key === 'ui' || key === 'logo') K.settings.load();
         });
 
         K.ui.icons();

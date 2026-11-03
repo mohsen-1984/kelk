@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="Kelk HtmlBuilder 2.0-rc1">
+<title>گزارش 😀 ✓</title>
+<style>
+@font-face{font-family:"Vazirmatn";src:url(data:font/woff2;base64,[111152 bytes sha256 4e3fa217d38f]) format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Vazir Code Hack";src:url(data:font/woff2;base64,[113056 bytes sha256 7cac2a79c75f]) format("woff2");font-weight:400;font-style:normal;font-display:swap}
+*{box-sizing:border-box}
+html{background:#f4f4f2}
+body{margin:0;padding:24px 12px;color:#1c1b1a}
+.page{max-width:776px;margin:0 auto;background:#fff;padding:40px 48px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.doc{font-family:"Vazirmatn","Vazirmatn",sans-serif;font-size:12.0pt;line-height:1.60;--bd-base:24pt;--bd-step:18pt}
+.doc .bd-ltr,.doc .bd-iso-ltr:not(code){font-family:"Vazirmatn",sans-serif}
+.doc .bd-rtl,.doc .bd-iso-rtl:not(code){font-family:"Vazirmatn","Vazirmatn",sans-serif}
+.doc p{margin:4pt 0 6pt}
+.doc p,.doc.bd-root p:is(.bd-ltr,.bd-rtl){text-align:justify}
+.doc li,.doc.bd-root li:is(.bd-ltr,.bd-rtl){text-align:justify}
+.doc :is(p,li).kelk-start,.doc.bd-root :is(p,li).kelk-start:is(.bd-ltr,.bd-rtl){text-align:start}
+.doc h1{font-size:15.0pt;color:#44546A;margin:18pt 0 6.0pt}
+.doc h2{font-size:14.0pt;color:#293E1A;margin:16pt 0 6.0pt}
+.doc h3{font-size:13.0pt;color:#666666;margin:14pt 0 6.0pt}
+.doc h4{font-size:12.0pt;color:#204F7A;margin:12pt 0 6.0pt}
+.doc h5{font-size:12.0pt;color:#6C5200;margin:10pt 0 6.0pt}
+.doc h6{font-size:12.0pt;color:#000000;margin:8pt 0 6.0pt;font-style:italic}
+.doc a{color:#0563C1}.doc a:visited{color:#954F72}
+.doc ul,.doc ol{margin:.3em 0}.doc li{line-height:1.45;margin-block:0 3pt}
+.doc ol ol,.doc ol ol ol{list-style-type:decimal}.doc li:has(>input[type=checkbox]){list-style:none}
+.doc table{border-collapse:collapse;margin:.5em auto 1em;max-width:100%}.doc table.kelk-fit{table-layout:fixed}
+.doc th,.doc td{padding:3pt 6pt;vertical-align:top;line-height:1.45}
+.doc th:not([align]),.doc.bd-root th:not([align]):is(.bd-ltr,.bd-rtl){text-align:center}
+.doc blockquote{margin:.5em 0;margin-inline-start:14.15pt;padding:.2em 0;padding-inline-start:12pt;border-inline-start:3.5pt solid #1F6F5C;color:#4A4A4A;background:#F6F9F8;padding-block:.35em;padding-inline-end:.7em;border-radius:3px 8px 8px 3px;border-start-start-radius:3px;border-end-start-radius:3px;border-start-end-radius:8px;border-end-end-radius:8px}
+.doc blockquote p{margin:.2em 0}
+.doc code{font-family:"Vazir Code Hack",ui-monospace,Consolas,monospace;font-size:10.0pt;background:#f4f2ee;padding:.05em .3em;border-radius:3px}
+.doc code :is(.bd-iso-rtl){font-family:"Vazir Code Hack",ui-monospace,Consolas,monospace}
+.doc .code{margin:.6em 0;border:0.75pt solid #d4d0c8;background:#FCFCFC;color:#1c1b1a;direction:ltr;border-radius:6px;overflow:hidden}
+.doc .code-lang{background:#E7F1EE;border-bottom:0.75pt solid #d4d0c8;color:#595959;font:8.0pt "Vazir Code Hack",ui-monospace,Consolas,monospace;padding:2pt 6pt;text-align:left}
+.doc pre{margin:0;padding:6pt 8pt;overflow-x:auto;direction:ltr;text-align:left;line-height:1.45}
+.doc pre code{background:none;padding:0;font-size:10.0pt}
+.doc img{max-width:100%;height:auto}.doc hr{border:0;border-top:1px solid #a0a0a0}
+.doc table.kelk-fit :is(td,th){overflow-wrap:anywhere}
+.doc .kelk-toc-title{font-weight:700;font-size:14.0pt;color:#2F5496;margin:0 0 6pt}
+.doc .kelk-toc-entry,.doc.bd-root .kelk-toc-entry:is(.bd-ltr,.bd-rtl){margin-block:2pt;text-align:start}
+.doc .kelk-toc-entry a{color:inherit;text-decoration:none}.doc .kelk-toc-entry a:hover{text-decoration:underline}
+.doc .toc-1{font-weight:600}.doc.bd-root .kelk-toc-entry.toc-2,.doc .toc-2{margin-inline-start:calc(1 * 18pt)}.doc.bd-root .kelk-toc-entry.toc-3,.doc .toc-3{margin-inline-start:calc(2 * 18pt)}.doc.bd-root .kelk-toc-entry.toc-4,.doc .toc-4{margin-inline-start:calc(3 * 18pt)}.doc.bd-root .kelk-toc-entry.toc-5,.doc .toc-5{margin-inline-start:calc(4 * 18pt)}.doc.bd-root .kelk-toc-entry.toc-6,.doc .toc-6{margin-inline-start:calc(5 * 18pt)}
+.kelk-header,.kelk-footer{font-family:"Vazirmatn","Vazirmatn",sans-serif;font-size:9pt;color:#333}
+.kelk-header{margin-bottom:12pt}.kelk-footer{margin-top:16pt}
+.hf-table{width:100%;border-collapse:collapse}.hf-table td{padding:3pt 5pt;vertical-align:middle;text-align:center}
+.hf-table td.hf-author{text-align:start}.hf-title{font-weight:700}
+.hf-simple{text-align:center;margin:0}
+.doc .code-nested{display:inline-block;width:100%;border:1px solid #d4d0c8;border-radius:3px;padding:1px 5px;margin:1px 0;vertical-align:top}
+.bd-doc-rtl{direction:rtl}.bd-doc-ltr{direction:ltr}
+.bd-ltr,.bd-ltr-table{direction:ltr}.bd-rtl{direction:rtl}
+.bd-root :is(p,h1,h2,h3,h4,h5,h6,li,blockquote,ul,ol,dt,dd):is(.bd-ltr,.bd-rtl){text-align:start}
+.bd-root :is(td,th):is(.bd-ltr,.bd-rtl):not([align]):not([style*="text-align"]){text-align:start}
+.bd-iso-ltr{unicode-bidi:isolate;direction:ltr}.bd-iso-rtl{unicode-bidi:isolate;direction:rtl}
+.bd-root pre{direction:ltr;text-align:left}
+.bd-root :is(ul,ol){padding-inline-start:0}
+.bd-root li{--bd-b:1;--bd-s:0;margin-inline-start:calc(var(--bd-b) * var(--bd-base,1.7em) + var(--bd-s) * var(--bd-step,1.7em))}
+.bd-root li.bd-b0{--bd-b:0}.bd-root li.bd-s1{--bd-s:1}.bd-root li.bd-s2{--bd-s:2}.bd-root li.bd-s3{--bd-s:3}.bd-root li.bd-s4{--bd-s:4}.bd-root li.bd-s5{--bd-s:5}.bd-root li.bd-s6{--bd-s:6}.bd-root li.bd-s7{--bd-s:7}.bd-root li.bd-s8{--bd-s:8}.bd-root li.bd-s9{--bd-s:9}
+.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-template-tag,.hljs-template-variable,.hljs-type,.hljs-variable.language_{color:#d73a49}.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#6f42c1}.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable{color:#005cc5}.hljs-meta .hljs-string,.hljs-regexp,.hljs-string{color:#032f62}.hljs-built_in,.hljs-symbol{color:#e36209}.hljs-code,.hljs-comment,.hljs-formula{color:#6a737d}.hljs-name,.hljs-quote,.hljs-selector-pseudo,.hljs-selector-tag{color:#22863a}.hljs-section{color:#005cc5;font-weight:700}.hljs-bullet{color:#735c0f}.hljs-emphasis{font-style:italic}.hljs-strong{font-weight:700}.hljs-addition{color:#22863a;background-color:#f0fff4}.hljs-deletion{color:#b31d28;background-color:#ffeef0}
+@page{size:21.0cm 29.7cm;margin:1.5cm;@bottom-center{content:"صفحه " counter(page) " از " counter(pages);font-size:9pt}}
+@media print{html,body{background:#fff}body{padding:0}.page{max-width:none;padding:0;box-shadow:none}.doc .code,.doc table,.doc img{break-inside:avoid}}
+</style>
+</head>

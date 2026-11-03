@@ -7,14 +7,14 @@
 //                          columns, every cell drawn with its own borders, and a paragraph merged over three columns —
 //                          their text had been sliced at the column positions
 //   node scripts/make-tables-rtl.js
-const { pdfPath } = require('./env.js');
+const { pdfPath, fileUrl } = require('./env.js');
 const fs = require('fs'), path = require('path'), os = require('os'), cp = require('child_process');
 const { KELK, req } = require('./env.js');
 const { chromium } = req('playwright');
 const D = req('docx');
 const LAB = path.join(__dirname, '..');
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'kelk-tab-'));
-const WEB = 'file://' + KELK + '/assets/fonts/rastikerdar/webfonts/';
+const WEB = fileUrl(KELK + '/assets/fonts/rastikerdar/webfonts') + '/';
 (async () => {
   // 1. the receipt card
   const rows = fs.readFileSync(path.join(LAB, 'corpus', 'receipt.md'), 'utf8').split('\n').filter((l) => /^\| /.test(l) && !/^\| ---/.test(l))
@@ -28,7 +28,7 @@ const WEB = 'file://' + KELK + '/assets/fonts/rastikerdar/webfonts/';
     <table>${rows.map((r) => '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td></tr>').join('')}</table></div></body></html>`;
   const f = path.join(TMP, 'r.html'); fs.writeFileSync(f, html);
   const b = await chromium.launch(), page = await b.newPage();
-  await page.goto('file://' + f); await page.evaluate(() => document.fonts.ready);
+  await page.goto(fileUrl(f)); await page.evaluate(() => document.fonts.ready);
   await page.pdf({ path: pdfPath('chrome-card--receipt.pdf'), format: 'A5', printBackground: true });
   await b.close();
   // 2. the Word table with merged cells

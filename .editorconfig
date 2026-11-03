@@ -1,0 +1,40 @@
+# https://editorconfig.org — matches the style already in the tree.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+
+[{lib,scripts}/**.js]
+indent_size = 4
+
+[tests/pdf-lab/scripts/**.js]
+indent_size = 2
+
+[*.html]
+indent_size = 4
+
+[*.css]
+indent_size = 2
+
+[*.py]
+indent_size = 4
+
+[*.{json,yml,yaml,mjs}]
+indent_size = 2
+
+# Two trailing spaces are a Markdown line break.
+[*.md]
+trim_trailing_whitespace = false
+
+# Generated or vendored files keep whatever their generator writes.
+[{vendor/**,lib/pdf-base64-ttf-fonts/**,assets/icons.js,docs/about-kelk-and-samples.js,tests/pdf-lab/corpus.js,tests/golden/expected/**,tests/ooxml-xsd/**}]
+charset = unset
+end_of_line = unset
+insert_final_newline = unset
+trim_trailing_whitespace = unset
+indent_style = unset
+indent_size = unset

@@ -2,6 +2,10 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="utf-8">
+    <!-- Content Security Policy (docs/reports/P1.2-security.md): scripts only from the app's own files (no inline
+         script, handler or eval); inline styles (the builders' and MathJax's); images also from the web (a document may
+         name a public image); workers from the app or a blob; no plugin, no <base>, no form submission. -->
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: http:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Kelk — Markdown to Word, PowerPoint, PDF and HTML and back, right-to-left first</title>
     <meta name="description" content="Kelk: convert Markdown (GFM) to Word DOCX, Word DOC (MHTML), PowerPoint PPTX slides, PDF and standalone HTML — and Word, HTML and PDF back to Markdown — entirely client-side in your browser. Right-to-left first (Persian, Arabic, Hebrew, Urdu) and every left-to-right language; LaTeX formulas; offline, no upload, open source.">
@@ -32,6 +36,8 @@
 
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231f6f5c'/%3E%3Cg transform='translate(4 4) rotate(40 12 12)'%3E%3Cpath d='M7.4 2.2h9.2v5.6c0 1.6-.7 2.8-1.5 4.1L12 21.8l-3.1-9.9c-.8-1.3-1.5-2.5-1.5-4.1z' fill='%23fff'/%3E%3Cpath d='M12 12.6v8' stroke='%231f6f5c' stroke-width='1.3' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='11.2' r='1.5' fill='%231f6f5c'/%3E%3C/g%3E%3C/svg%3E">
 
+    <!-- before the stylesheets: <html lang dir> and the theme from the stored page settings (no wrong-language flash) -->
+    <script src="scripts/boot.js"></script>
     <link rel="stylesheet" href="styles/tokens.css">
     <link rel="stylesheet" href="styles/base.css">
     <link rel="stylesheet" href="styles/components.css">
@@ -416,7 +422,7 @@
                             <span class="hint" data-i18n="wordFontsGetHint"></span>
                             <div class="btn-row">
                                 <a class="btn soft" id="word-font-zip" download><i data-lucide="download"></i><span data-i18n="wordFontsGet"></span></a>
-                                <a class="btn ghost" id="word-font-site" target="_blank" rel="noopener"><i data-lucide="external-link"></i><span data-i18n="wordFontsSite"></span></a>
+                                <a class="btn ghost" id="word-font-site" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i><span data-i18n="wordFontsSite"></span></a>
                             </div>
                         </div>
                         <label class="check"><input type="checkbox" data-ui="previewWordFont"><span data-i18n="previewWordFont"></span></label>
@@ -538,7 +544,7 @@
     <footer class="note">
         <span data-i18n="footerOffline"></span>
         <span data-i18n="footerLib"></span>
-        <a id="repo-link" href="#" rel="noopener" target="_blank">GitHub</a>
+        <a id="repo-link" href="#" rel="noopener noreferrer" target="_blank">GitHub</a>
     </footer>
 </div>
 

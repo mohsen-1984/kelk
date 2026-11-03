@@ -3,17 +3,22 @@
 // dev:     everything — the mean, the scores per style value, the weakest files by name.
 // heldout: aggregates only (the mean and the scores per style value); file names and their Markdown
 //          stay unread unless --show is given. Looking at a held-out file to write a rule turns it into dev.
-// Each run is compared with the previous one of the same split (_scores.prev.json): what moved.
+// Each run is compared with the previous one of the same split (_scores.prev.json): what moved — only when both read
+// PDFs of the same generator and env (else a note).
 const fs = require('fs'), path = require('path');
 const { chromium } = require('./env.js').req('playwright');
 const { score } = require('./score.js');
 const { markupLoss } = require('./markup.js');
 const { LAB, OUT, FUZZ, lab } = require('./env.js');
 
-const METRICS = ['recall', 'order', 'headings', 'lists', 'tables', 'code', 'quotes', 'total'];
-const SHORT = { recall: 'words', order: 'order', headings: 'head', lists: 'list', tables: 'tabl', code: 'code', quotes: 'quote', total: 'total' };
-const DIMS = ['producer', 'doc', 'font', 'size', 'leading', 'paper', 'margin', 'align', 'columns', 'headScale', 'headFont',
-  'paragraph', 'quote', 'code', 'mono', 'inlineCode', 'table', 'list', 'headerFooter', 'headCase', 'tagged'];
+// rtl: right-to-left documents only, outside the total (score.js: ZWNJ, yeh / kaf, digits, brackets) — its mean is over
+// the right-to-left files alone
+const METRICS = ['recall', 'order', 'headings', 'lists', 'tables', 'code', 'quotes', 'total', 'rtl'];
+const RTL_PARTS = ['zwnj', 'yehKaf', 'digits', 'brackets'];
+const SHORT = { recall: 'words', order: 'order', headings: 'head', lists: 'list', tables: 'tabl', code: 'code', quotes: 'quote', total: 'total', rtl: 'rtl' };
+const DIMS = ['dir', 'producer', 'doc', 'font', 'latinFont', 'size', 'leading', 'paper', 'margin', 'align', 'columns', 'headScale', 'headFont',
+  'paragraph', 'quote', 'code', 'mono', 'inlineCode', 'table', 'list', 'headerFooter', 'headCase', 'tagged', 'digits', 'tracking'];
+const TOTAL = METRICS.indexOf('total');
 const pct = (x) => x === undefined || x === null || isNaN(x) ? '   - ' : (100 * x).toFixed(1).padStart(5);
 const mean = (rows, k) => { const v = rows.map((r) => r[k]).filter((x) => typeof x === 'number'); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : undefined; };
 
@@ -41,7 +46,9 @@ const mean = (rows, k) => { const v = rows.map((r) => r[k]).filter((x) => typeof
     else {
       fs.writeFileSync(path.join(outDir, s.name + '.md'), r.markdown);
       // case folded: a style may set headings in capitals (text-transform), which no PDF can undo
-      Object.assign(row, score(fs.readFileSync(path.join(LAB, 'corpus', s.doc + '.md'), 'utf8'), r.markdown, { fold: true }));
+      // the source as printed: <name>.md beside the PDF when make-fuzz.js rewrote its digits, else corpus/<doc>.md
+      const src = s.source ? path.join(dir, s.source) : path.join(LAB, 'corpus', s.doc + '.md');
+      Object.assign(row, score(fs.readFileSync(src, 'utf8'), r.markdown, { fold: true }));
       row.markup = markupLoss(r.html, r.markdown).lost;
     }
     rows.push(row); process.stdout.write('.');
@@ -50,10 +57,23 @@ const mean = (rows, k) => { const v = rows.map((r) => r[k]).filter((x) => typeof
   console.log('\n');
 
   const scoresPath = path.join(res, '_scores.json'), prevPath = path.join(res, '_scores.prev.json');
-  const prev = fs.existsSync(scoresPath) ? JSON.parse(fs.readFileSync(scoresPath, 'utf8')) : null;
-  if (prev) fs.writeFileSync(prevPath, JSON.stringify(prev, null, 1));
+  const last = fs.existsSync(scoresPath) ? JSON.parse(fs.readFileSync(scoresPath, 'utf8')) : null;
+  if (last) fs.writeFileSync(prevPath, JSON.stringify(last, null, 1));
+  // the previous run is compared only when it read the same PDFs (the same generator and env): another set's means
+  // and files say nothing about a change of the importer
+  const prev = last && JSON.stringify(last.summary.env || null) === JSON.stringify(manifest.env || null) ? last : null;
+  const prevNote = last && !prev ? '(no change since the last run printed: it read PDFs of another generator or env — generator ' +
+    ((last.summary.env || {}).generator || '?') + ' → ' + ((manifest.env || {}).generator || '?') + ')' : null;
   const summary = { split, at: new Date().toISOString(), n: rows.length, errors: rows.filter((r) => r.error).length, env: manifest.env || null, mean: {} };
-  METRICS.forEach((k) => { summary.mean[k] = mean(rows, k); });
+  METRICS.concat(RTL_PARTS).forEach((k) => { summary.mean[k] = mean(rows, k); });
+  // per direction (generator 4: a split holds left-to-right and right-to-left documents)
+  const dirOf = (r) => r.style.dir || 'ltr';
+  summary.byDir = {};
+  [...new Set(rows.map(dirOf))].sort().forEach((d) => {
+    const rs = rows.filter((r) => dirOf(r) === d), m = {};
+    METRICS.concat(RTL_PARTS).forEach((k) => { const v = mean(rs, k); if (v !== undefined) m[k] = v; });
+    summary.byDir[d] = { n: rs.length, mean: m };
+  });
   // inline markup the Markdown lost, summed over the split (should be 0), and in how many files
   summary.markup = rows.reduce((a, r) => a + (r.markup || 0), 0); summary.markupFiles = rows.filter((r) => r.markup).length;
   fs.writeFileSync(scoresPath, JSON.stringify({ summary, rows }, null, 1));
@@ -65,6 +85,9 @@ const mean = (rows, k) => { const v = rows.map((r) => r[k]).filter((x) => typeof
     const d = summary.mean[k] - prev.summary.mean[k];
     return isNaN(d) ? '   - ' : ((d >= 0 ? '+' : '') + (100 * d).toFixed(1)).padStart(5);
   }).join(' '));
+  if (prevNote) console.log(prevNote);
+  Object.entries(summary.byDir).forEach(([d, x]) => console.log(('  ' + d + ' (' + x.n + ')').padEnd(30), METRICS.map((k) => pct(x.mean[k])).join(' ')));
+  if (summary.byDir.rtl) console.log('  rtl details'.padEnd(30), RTL_PARTS.map((k) => k + ' ' + pct(summary.byDir.rtl.mean[k]).trim()).join(' · '));
   if (summary.errors) console.log('errors:', summary.errors);
   console.log('inline markup lost in the Markdown:', summary.markup, 'in', summary.markupFiles, 'file(s)');
 
@@ -75,7 +98,7 @@ const mean = (rows, k) => { const v = rows.map((r) => r[k]).filter((x) => typeof
     const vals = [...new Set(rows.map((r) => String(r.style[d])))];
     if (vals.length < 2) return;
     vals.map((v) => { const rs = rows.filter((r) => String(r.style[d]) === v); return { d, v, n: rs.length, m: METRICS.map((k) => mean(rs, k)) }; })
-      .sort((a, b) => a.m[7] - b.m[7])
+      .sort((a, b) => a.m[TOTAL] - b.m[TOTAL])
       .forEach((x, i) => lines.push((i ? '' : x.d).padEnd(13) + (x.v + ' (' + x.n + ')').padEnd(17) + x.m.map(pct).join(' ')));
   });
   console.log(''.padEnd(30), METRICS.map((k) => SHORT[k].padStart(5)).join(' '));

@@ -8,7 +8,7 @@
     'use strict';
 
     K.config = {
-        version: '2.0-rc2',             // release candidate; '2.0' at the release
+        version: '2.0',
         repoUrl: 'https://github.com/mohsen-1984/kelk',   // the footer link (hidden when empty)
         storagePrefix: 'kelk.',
         maxFileMB: 20,                  // the default of Settings → App → Largest file to import (ui.importer.maxMB)
@@ -33,8 +33,10 @@
                         maxMB: '20', separator: 'name' }   // largest file to import (MB); between files: name | rule | none
         },
 
-        /** Export profile (Kelk.store.settings). */
+        /** Export profile (Kelk.store.settings; stored: what differs from these, and schemaVersion). */
         defaults: {
+            // the profile's schema: Kelk.store.migrate brings an older stored profile or settings file up to it
+            schemaVersion: 1,
             document: { title: null, edition: null, author: '', link: '' },   // null → automatic (first H1 / words; Draft / پیش‌نویس)
             logoHeight: '1cm',
             headerFooter: {
@@ -176,4 +178,7 @@
             zip: ['.zip']
         }
     };
+
+    // the creator written into exported files comes from the one version above (lib/BuilderBase.js loads first)
+    if (typeof BuilderBase !== 'undefined') BuilderBase.version = K.config.version;
 })(window.Kelk = window.Kelk || {});

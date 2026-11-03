@@ -1,0 +1,25 @@
+# MHTML, 2 parts
+
+<!-- ===== file:///C:/document.htm (text/html) head ===== -->
+<!-- shared: _shared/b1656fe21d17.txt -->
+<!-- ===== file:///C:/document.htm (text/html) body ===== -->
+<body lang=EN-US style='tab-interval:36.0pt;word-wrap:break-word'>
+<div class="WordSection1" dir="rtl">
+        <p class="MsoNormal">ؠ بؠ ؠب بؠب</p>
+<p class="MsoNormal">ػ بػ ػب بػب</p>
+<p class="MsoNormal">ؼ بؼ ؼب بؼب</p>
+<p class="MsoNormal">ؾ بؾ ؾب بؾب</p>
+<p class="MsoNormal">ؿ بؿ ؿب بؿب</p>
+<p class="MsoNormal">ۺ بۺ ۺب بۺب</p>
+<p class="MsoNormal">ۻ بۻ ۻب بۻب</p>
+<p class="MsoNormal">ۼ بۼ ۼب بۼب</p>
+
+</div>
+</body>
+</html>
+
+<!-- ===== file:///C:/document_files/filelist.xml (text/xml) ===== -->
+<xml xmlns:o="urn:schemas-microsoft-com:office:office">
+ <o:MainFile HRef="../document.htm"/>
+ <o:File HRef="filelist.xml"/>
+</xml>

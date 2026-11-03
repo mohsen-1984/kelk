@@ -111,9 +111,11 @@
             const sm = K.config.samples[K.i18n.lang] || K.config.samples.fa;
             const h = hf.header == null ? sm.header : hf.header;     // null → the sample of the interface language
             const f = hf.footer == null ? sm.footer : hf.footer;
+            // the custom HTML through the preview's sanitiser (no script, handler, style, form or javascript: link)
+            const custom = function (x) { return K.preview.sanitize(fillCustom(x, s, logo, K.names.hfDir())); };
             return {
-                header: h.trim() ? { html: fillCustom(h, s, logo, K.names.hfDir()), title: title || undefined } : null,
-                footer: f.trim() ? { html: fillCustom(f, s, logo, K.names.hfDir()), title: title || undefined } : null
+                header: h.trim() ? { html: custom(h), title: title || undefined } : null,
+                footer: f.trim() ? { html: custom(f), title: title || undefined } : null
             };
         }
         return {};
@@ -126,6 +128,10 @@
         if (kind === 'pdf') b.registerFonts(window.PdfFonts || {});
         if (kind === 'html') b.registerWebFonts(window.KelkWebFonts || {});
         const hf = headerFooter(s, logo);
+        // {date} of a custom header/footer in the language of its page/of words (Arabic in the Arabic interface)
+        [hf.header, hf.footer].forEach(function (o) {
+            if (o && o.html != null) o.dateLocale = K.i18n.dateLocale(K.names.hfDir());
+        });
         return b.configure({
             direction: s.direction,
             page: { size: s.page.size, orientation: s.page.orientation, margin: s.page.margin },
@@ -158,6 +164,7 @@
          * inside (Kelk.images.embed), so the file is whole on its own.
          */
         run: async function (kind, btn) {
+            K.preview.flush();                             // a keystroke of the last 250 ms is in the preview, title and name
             const md = K.editor.value();
             if (!md.trim()) { K.ui.toast(K.i18n.t('emptyDoc'), 'warn'); return; }
             if (kind === 'md') {
@@ -171,6 +178,7 @@
             try {
                 const blob = await K.ui.task(K.i18n.t('taskExport', kind.toUpperCase()), async function () {
                     await K.ui.paint();                        // the dialog is up before the builder holds the page
+                    K.preview.flush();                         // typed while the dialog came up (nothing waiting: no-op)
                     const html = K.preview.html();
                     // Word / PDF: a formula with right-to-left \text embeds the web font in its image
                     if (kind !== 'html' && /data-tex="[^"]*[֐-ࣿ]/.test(html)) await K.fonts.forHtml(md);
@@ -205,6 +213,7 @@
         // exposed for tests
         _configure: configure,
         _htmlPage: async function () {
+            K.preview.flush();
             await K.fonts.forHtml(K.editor.value());
             return configure(HtmlBuilder.create(), 'html').addFromHtml(K.preview.html()).toHtml();
         },

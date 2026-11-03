@@ -27,6 +27,18 @@
     K.images = {
         init: function () { map = K.store.images(); },
 
+        /**
+         * Another tab stored its images (Kelk.sync): take its map, so this tab's next save does not drop
+         * them; an image this tab could only keep in memory (storage full) stays while its text names it.
+         */
+        reload: function () {
+            const stored = K.store.images(), text = K.editor.value();
+            Object.keys(map).forEach(function (k) {
+                if (!(k in stored) && (text.indexOf('(' + k) >= 0 || text.indexOf('(' + encodeURI(k)) >= 0)) stored[k] = map[k];
+            });
+            map = stored;
+        },
+
         get: function (name) { return name === 'logo' ? K.store.logo() : map[name]; },
 
         all: function () { return Object.assign({}, map); },
