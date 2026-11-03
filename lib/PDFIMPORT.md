@@ -374,7 +374,11 @@ What stays unknown after the repairs is **dropped**: a stray Latin Extended lett
    them are, and a file that packed them found no program — every repair that reads one was skipped (a Persian list's
    brackets came back «)…(», a ZWNJ was lost; the metamorphic `objstm` transform: the Persian Word file −50 → 0).
    **A composite font with no ToUnicode at all** (`_gsubByCode`: every code read as the character of its own number,
-   three codes at least and no more than one in fifty read otherwise; an Identity CID → glyph map) is named glyph by
+   three codes at least and no more than one in fifty read otherwise; its codes its glyph ids — `_cidGlyphIds`, per
+   font from its own CIDFont dictionary, packed or not: Identity or no map, or a CIDToGIDMap stream that maps every
+   code it draws to itself; a font whose CIDs are the Unicode values, mapped to glyphs by a stream, is read by no
+   program at all — its codes as glyph ids had turned a correct «Quarterly Report» into «nì~êíÉêäó oÉéçêí», and
+   packed by qpdf the file-wide test before it saw no map: «nì~êíÉêäó=…») is named glyph by
    glyph from its program (`_gsubByCodeGlyph`): a ligature by its letters, a form by the glyph it replaces, then the
    cmap's character, the cmap's space a space where it has room — every glyph, not only the codes marked unmapped or
    guessed (a code under 0x100 read as itself is no character either: a Chrome subset's "Quarterly" came in as
@@ -497,11 +501,17 @@ What stays unknown after the repairs is **dropped**: a stray Latin Extended lett
   more) — goes: a Word letterhead's 1-pt code in its logo, a printer's stamp. A page drawn small is left
   alone.
 - **A watermark drawn as text** goes (`_watermark`, rule `extract.watermarkDropped`): a run of glyphs turned
-  off the axes (more than 15° from 0 / 90 / 180 / 270), at least 1.5 × the page's upright body size (30 pt on a
-  page without one), faint — shown at 60 % opacity or less, or in a light grey — and spanning 40 % of the page's
-  shorter side. All four are asked: a table's turned header or a side label (on an axis), a turned caption of
-  the body's size, a black diagonal title and light grey upright text stay. The metamorphic `stamp` (pdf-lib's
-  diagonal «CONFIDENTIAL DRAFT» at 30 %) read its letters into the lines and blocks they fell across (−32.7).
+  off the axes (more than 15° from 0 / 90 / 180 / 270), at least 1.5 × the page's upright body size, spanning
+  40 % of the page's shorter side, and faint against what is behind it: a *neutral grey* (channels within 0.08
+  of each other) shown at 60 % opacity or less, or light (every channel 0.7 or more, #b3b3b3 and lighter), with
+  not half of its letters over a picture or a dark fill (luminance under 0.6) drawn before them. A page keeps its
+  text: one with fewer than 20 upright body glyphs (a poster whose only words are on the diagonal) is left as it
+  is. All are asked — what a designer sets on the diagonal is content: a white title on a dark band, a coloured
+  heading at half opacity, a pastel line, a mid-grey (#999) chart label, a table's turned header or a side label
+  (on an axis), a turned caption of the body's size, a black diagonal title, light grey upright text stay. What
+  is dropped is told: note `watermarkDropped` in `r.notes`, its message naming the words and pages (the page
+  record's `.watermark`). The metamorphic `stamp` (pdf-lib's diagonal «CONFIDENTIAL DRAFT», #999 at 30 %) read
+  its letters into the lines and blocks they fell across (−32.7).
 
 ### Numbers in right-to-left text
 
