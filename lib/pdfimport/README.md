@@ -44,7 +44,8 @@ counts the reasons a paragraph group was opened.
 | `_rawBody` | `_pageMarkedTexts`, `_rawStream` | one object's dictionary text, by reference |
 | `_rawStream` | `_pageMarkedTexts`, `_rawObjStms`, `_outlineJoins`, `_gsubPrograms` | a stream object's data, plain or Flate (null otherwise) |
 | `_mathIn` | `fromArrayBuffer` | formulas from Kelk's own map: what is drawn inside a formula's box goes, one glyph stands in its place |
-| `_fontPrograms` | `_outlineJoins`, `_gsubPrograms` | the embedded TrueType programs by font name, read once |
+| `_fontPrograms` | `_outlineJoins`, `_gsubPrograms`, `_cidGlyphIds` | the embedded TrueType programs by font name, read once (and each CIDFontType2's CID → glyph map by name) |
+| `_cidGlyphIds` | `_outlineJoins`, `_gsubRepair` | per composite font: are its codes its glyph ids (its own CIDToGIDMap: Identity, or a stream mapping its codes to themselves) |
 | `_outlineJoins` | `fromArrayBuffer` | forms by outline: which side of a glyph an Arabic letter's joining stroke reaches |
 | `_gsubRepair` | `fromArrayBuffer` | ligature glyphs with no Unicode, read from the embedded font's own GSUB table |
 | ↳ `_gsubByCode` | `_gsubRepair` | step 0: composite fonts with no ToUnicode (every code read as itself) |
@@ -75,7 +76,8 @@ counts the reasons a paragraph group was opened.
 | ↳ `_codeRepair` | `_extractPage` | after the walk: a code mapped to U+FFFD in a font that maps ASCII to itself |
 | ↳ `_dashedRules` | `_extractPage` | after the walk: a dashed or dotted border drawn dash by dash becomes one rule |
 | ↳ `_tinyText` | `_extractPage` | after the walk: text too small to read |
-| ↳ `_watermark` | `_extractPage` | after the walk: a watermark drawn as text (turned off the axes, large, faint, across the page) |
+| ↳ `_watermark` | `_extractPage` | after the walk: a watermark drawn as text (turned off the axes, large, faint against what is behind it, across the page; the page keeps its body) |
+| ↳ ↳ `_watermarkFaint` | `_watermark` | its tests of a letter: a neutral faint grey; over a picture or a dark fill |
 | `_formsByOrder` | `fromArrayBuffer` | glyphs with no Unicode (ligatures, small capitals, Arabic forms): by order of the codes in a row |
 | ↳ `_formsRuns` | `_formsByOrder` | step 1: a letter's codes in a row whose widths agree with the forms' order |
 | ↳ `_formsPlaces` | `_formsByPlace`, `_formsByOutline` | where each code of a font stands (allows a back join, a forward one) |

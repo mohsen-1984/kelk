@@ -59,3 +59,30 @@ test('step 6a: a glyph named by its ligature, its form\'s base glyph, its cmap; 
   assert.deepEqual(run(glyph(3, '‌')), [false, '‌', false], 'the walk\'s ZWNJ stays');
   assert.deepEqual(run(glyph(99)), [false, 'c', false], 'a glyph the program does not name stays');
 });
+
+// (review of P3.3: rv33's cid-unicode.pdf — CIDs are the Unicode values, a CIDToGIDMap stream, no ToUnicode — plain and packed)
+function rawFile(dict, packed, table) {
+  const x = PdfImporter.create();
+  x._fire = function () {};
+  const obj = '5 0 obj\n' + dict + '\nendobj\n', str = packed ? '1 0 obj\n<< /Type /ObjStm /N 1 /First 4 >>\nstream\n...\nendstream\nendobj\n' : obj;
+  const R = { str: str, idx: packed ? { '1 0': 7 } : { '5 0': 7 } };
+  x._rawIdx = function () { return R; };
+  x._rawObjStms = async function () { return packed ? { '5 0': dict } : {}; };
+  x._rawStream = async function (ref) { return ref === '7 0' ? table : null; };
+  return x;
+}
+test('a composite font\'s codes are glyph ids by its own CIDToGIDMap, plain or in an object stream', async function () {
+  const W = '/W [' + Array.from({ length: 224 }, function (_, i) { return (32 + i) + ' [556]'; }).join(' ') + ']';   // (past 1200 characters)
+  const uni = new Uint8Array(512); [81, 117, 32].forEach(function (u) { uni[2 * u + 1] = u === 32 ? 3 : u - 29; });      // CID = Unicode → glyph
+  const ident = new Uint8Array(512); for (let c = 0; c < 256; c++) ident[2 * c + 1] = c;
+  const fonts = { f: { composite: true, name: 'ArialMT' } }, gs = [{ glyphs: [glyph(81, 'Q'), glyph(117, 'u'), glyph(32, ' ')], fonts: fonts }];
+  const dict = (map) => '<< /Type /Font /Subtype /CIDFontType2 /BaseFont /ArialMT /DW 1000 ' + W + map + ' >>';
+  for (const packed of [false, true]) {
+    assert.deepEqual(await rawFile(dict(' /CIDToGIDMap 7 0 R'), packed, uni)._cidGlyphIds(gs, fonts), { f: false }, packed ? 'packed' : 'plain');
+    assert.deepEqual(await rawFile(dict(' /CIDToGIDMap 7 0 R'), packed, ident)._cidGlyphIds(gs, fonts), { f: true }, 'a stream that maps each code to itself');
+    assert.deepEqual(await rawFile(dict(' /CIDToGIDMap /Identity'), packed, null)._cidGlyphIds(gs, fonts), { f: true });
+    assert.deepEqual(await rawFile(dict(''), packed, null)._cidGlyphIds(gs, fonts), { f: true }, 'no map: Identity');
+  }
+  // (the guard of step 0: a font whose codes are no glyph ids is not read by its codes)
+  assert.deepEqual(imp._gsubByCode(page([glyph(54), glyph(381), glyph(569)]), { f: { font: font } }, { f: false }), {});
+});
