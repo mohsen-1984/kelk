@@ -11,7 +11,9 @@
 # program's own styles (Heading 1, List Bullet, a bordered table, a sheet's cells, a deck's title and text
 # layouts), right to left where the document is. The lab's older Office files (corpus/word-*.docx,
 # corpus/xl-border-*.xlsx) go through the same exports (TODO "Producers still to test").
-# Needs Windows with Microsoft Office (Word, Excel, PowerPoint: 365 or 2024; this lab's files come from Office LTSC 2024) and the "Microsoft Print to PDF" printer.
+# Needs Windows with Microsoft Office LTSC 2024 (Word, Excel, PowerPoint; an older Office draws other default fonts), the
+# "Microsoft Print to PDF" printer, the fonts B Nazanin and Traditional Arabic, and Node (strip-meta.js at the end):
+# corpus/real-src/README.md, «What remaking needs».
 # The browsers' PDFs of the same text: make-real.js.
 #   powershell -NoProfile -ExecutionPolicy Bypass -File tests/pdf-lab/scripts/make-real.ps1 [-Only name-regex] [-Rebuild]
 # Each document runs in its own PowerShell process with a time limit (an open Office dialog would block the
@@ -221,10 +223,10 @@ if ($Worker) {
       $file.Close(0)
     } elseif ($d.k -eq 'excel') {
       $app = New-Object -ComObject Excel.Application; $app.Visible = $false; $app.DisplayAlerts = $false
-      # the lab's English sheets as an English Windows shows them: a Persian locale writes 24.50 as 24/50 (its decimal
-      # sign); Excel keeps these options, so they are put back after the export
+      # every sheet as an English Windows shows it, whatever this machine's locale: a Persian locale writes 24.50 as
+      # 24/50 and 1,250 with its own separators; Excel keeps these options, so they are put back after the export
       $sep = @($app.UseSystemSeparators, $app.DecimalSeparator, $app.ThousandsSeparator)
-      if ($d.existing) { $app.UseSystemSeparators = $false; $app.DecimalSeparator = '.'; $app.ThousandsSeparator = ',' }
+      $app.UseSystemSeparators = $false; $app.DecimalSeparator = '.'; $app.ThousandsSeparator = ','
       try {
         $file = if ($d.existing -or ((Test-Path $src) -and -not $Rebuild)) { $app.Workbooks.Open([string]$src, 0, $true) } else { Build-Excel $app $d $src }
         Export-Excel $app $file $d
@@ -270,5 +272,9 @@ try {
   }
   if ($defaultPrinter -and (Get-CimInstance Win32_Printer -Filter 'Default=TRUE').Name -ne $defaultPrinter) { Write-Output ('NOTE: the default printer is no longer ' + $defaultPrinter + ': set it back by hand') }
 }
+# no user name and no local folder in the committed files: Office writes the user as the author (the sources' core.xml,
+# the Save as PDF files' /Author and XMP) and a workbook's folder (x15ac:absPath); strip-meta.js clears them
+& node (Join-Path $PSScriptRoot 'strip-meta.js') $SRC $PDF
+if ($LASTEXITCODE) { $failed++; Write-Output 'FAILED strip-meta.js: personal metadata may be left in the files' }
 Get-ChildItem $PDF -Filter *.pdf | Sort-Object Name | ForEach-Object { '{0,8}  {1}' -f $_.Length, $_.Name }
 if ($failed) { exit 1 }
