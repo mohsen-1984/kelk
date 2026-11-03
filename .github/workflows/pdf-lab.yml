@@ -4,6 +4,8 @@
 # environment baseline.json was written in. With no commit before (a new branch, the first push, a manual
 # run), or when the base importer leaves no corpus results, head is compared with baseline.json: its corpus
 # part always, its fuzz and meta parts only if the env matches — the run's summary says which comparison it made.
+# The golden files (tests/pdf-lab/golden/, golden.js) are head's, imported by both importers: compared file by file,
+# as the corpus, against base's results or baseline.json's golden section.
 #
 # Failures are never hidden. Every step runs under bash -euo pipefail and tees its output to
 # $RUNNER_TEMP/logs/<step>.log, uploaded with the results. The base importer's steps may fail (an old
@@ -139,6 +141,14 @@ jobs:
         env: { KELK: '${{ github.workspace }}/base', LAB_OUT: '${{ runner.temp }}/base' }
         run: node tests/pdf-lab/scripts/run-import.js 2>&1 | tee "$RUNNER_TEMP/logs/base-import.log"
 
+      # head's golden/ files (written from the page), imported by the base importer
+      - name: Base importer, golden files
+        id: base_golden
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' && steps.base_checkout.outcome == 'success' }}
+        continue-on-error: true
+        env: { KELK: '${{ github.workspace }}/base', LAB_OUT: '${{ runner.temp }}/base' }
+        run: node tests/pdf-lab/scripts/golden.js 2>&1 | tee "$RUNNER_TEMP/logs/base-golden.log"
+
       - name: Base importer, fuzz dev
         id: base_dev
         if: ${{ !cancelled() && steps.tools.outcome == 'success' && steps.base_checkout.outcome == 'success' && steps.make_dev.outcome == 'success' }}
@@ -166,6 +176,11 @@ jobs:
         if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
         env: { LAB_OUT: '${{ runner.temp }}/head' }
         run: node tests/pdf-lab/scripts/run-import.js 2>&1 | tee "$RUNNER_TEMP/logs/head-import.log"
+
+      - name: Head importer, golden files
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
+        env: { LAB_OUT: '${{ runner.temp }}/head' }
+        run: node tests/pdf-lab/scripts/golden.js 2>&1 | tee "$RUNNER_TEMP/logs/head-golden.log"
 
       - name: Head importer, fuzz dev
         if: ${{ !cancelled() && steps.make_dev.outcome == 'success' }}
@@ -227,6 +242,7 @@ jobs:
           BASE_SHA: ${{ steps.base.outputs.sha }}
           BASE_CHECKOUT: ${{ steps.base_checkout.outcome }}
           BASE_CORPUS: ${{ steps.base_corpus.outcome }}
+          BASE_GOLDEN: ${{ steps.base_golden.outcome }}
           BASE_DEV: ${{ steps.base_dev.outcome }}
           BASE_HELDOUT: ${{ steps.base_heldout.outcome }}
           BASE_META: ${{ steps.base_meta.outcome }}
@@ -242,6 +258,7 @@ jobs:
               echo '| base part | step | |'
               echo '|---|---|---|'
               echo "| corpus | ${BASE_CORPUS:-skipped} | $(has _scores.json) |"
+              echo "| golden | ${BASE_GOLDEN:-skipped} | $(has golden/_scores.json) |"
               echo "| fuzz/dev | ${BASE_DEV:-skipped} | $(has fuzz-dev/_scores.json) |"
               echo "| fuzz/heldout | ${BASE_HELDOUT:-skipped} | $(has fuzz-heldout/_scores.json) |"
               echo "| meta | ${BASE_META:-skipped} | $(has meta/_scores.json) |"
@@ -255,7 +272,7 @@ jobs:
             else why="the base importer (\`$BASE_SHA\`) left no corpus results (its run-import.js step: ${BASE_CORPUS:-skipped})"; fi
             {
               echo "**Fallback: head against baseline.json** — $why."
-              echo 'Corpus compared file by file; fuzz and meta only where the baseline env matches this runner (else noted, not compared).'
+              echo 'Corpus and golden files compared file by file; fuzz and meta only where the baseline env matches this runner (else noted, not compared).'
             } >> "$sum"
             echo "::warning title=pdf-lab gate::compared with baseline.json, not the base importer — $why"
             node tests/pdf-lab/scripts/gate.js 2>&1 | tee "$log" || rc=$?
@@ -292,6 +309,8 @@ jobs:
             ${{ runner.temp }}/head/_scores.json
             ${{ runner.temp }}/head/fuzz-dev/_scores.json
             ${{ runner.temp }}/head/meta/_scores.json
+            ${{ runner.temp }}/head/golden/
             ${{ runner.temp }}/base/_scores.json
+            ${{ runner.temp }}/base/golden/_scores.json
             ${{ runner.temp }}/logs/
           if-no-files-found: ignore
