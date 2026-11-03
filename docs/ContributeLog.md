@@ -723,9 +723,10 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 12 | P3.1 report `docs/reports/P3.1-split.md`: the splits per file, the items carried in the sub-phase (Playwright, lazy loading, the stress block, engines, the commit check), the stress finding, the lab, the review findings and their verdicts, CI and the open items. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 10 | P3.2 report `docs/reports/P3.2-registry.md`: the registry, calibration and telemetry, the 1,007 entries and 377 rules by part, the rules that never fire on the corpus, the lab, the review findings and where each went. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 6 | P3.1 baseline rebuilt on the CI runner for Playwright 1.64.1 (manual `pdf-lab` run 41593890106 with `baseline` ticked, its `baseline-candidate` committed whole): corpus 95.72 → 96.22 (P1.3's five files, written at last), fuzz and meta in the Chromium 156 environment — dev 85.98 → 85.91, held-out 86.91 → 86.89 with the same importer (the browser's drawing), meta Chromium 141 → 156. |
+| 1405-08-12 | 2.0-rc1 | Zarrabi | 21 | P3.4 confidence and fallback ladder: `lib/pdfimport/ladder.js` — a page confidence from lost and guessed glyphs, glued words, text under a cropped picture, the structure tree's disagreement, ambiguous gaps and too few gap samples, and the rung (full → simplified → textContent from pdf.js's text → ocr note) with 19 fixed thresholds; a failed extraction or layout goes a rung down instead of `pageFailed`; `mode: auto \| safe \| full`; `r.pages` and `r.report` (the contract the report panel reads); three lab PDFs that must demote (`tests/pdf-lab/ladder/`, `make-ladder.js`) checked by `run-stress.js`; unit tests; auto mode byte-identical on corpus and fuzz dev, no corpus page demoted; safe mode on the corpus: words 97.8, order 97.5. |
 
 <!-- generated:totals -->
-**Entries: 137 · Total: 1913 min (31.88 hours) — Zarrabi 1913 min (130 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 138 · Total: 1934 min (32.23 hours) — Zarrabi 1934 min (131 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---

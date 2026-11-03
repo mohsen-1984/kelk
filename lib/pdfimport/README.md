@@ -1,16 +1,16 @@
 # PdfImporter's parts (`lib/pdfimport/`)
 
-The five files that carry the importer's pipeline. `lib/PdfImporter.js` is the core (options, shared helpers
+The files that carry the importer's pipeline. `lib/PdfImporter.js` is the core (options, shared helpers
 in `PdfImporter._internal`, `fromArrayBuffer`, structure tree, Kelk's own source, Markdown); each file here adds
 its methods to `PdfImporter.prototype` with `Object.assign`. Plain scripts, no build step, work from `file://`.
 
 Load order, after pdf.js and `MarkdownImporter.js`: `lib/PdfImporter.js`, then `thresholds`, `calibration`,
-`extract`, `lines`, `regions`, `order`, `blocks` (`PdfImporter.PARTS`; the app loads them on the first PDF import). The rules and why each is as it is: [`../PDFIMPORT.md`](../PDFIMPORT.md);
+`extract`, `lines`, `regions`, `ladder`, `order`, `blocks` (`PdfImporter.PARTS`; the app loads them on the first PDF import). The rules and why each is as it is: [`../PDFIMPORT.md`](../PDFIMPORT.md);
 the stage list is in the header of `lib/PdfImporter.js`.
 
 The tables list every method defined in a file, in pipeline order, with its callers and what it does. A step
 function stands under its caller, marked `↳`. `fromArrayBuffer` (in the core) drives the pipeline: `_extractPage`,
-the repairs, `_classifyFonts`, then `_layout`, then `_toHtml`.
+the repairs, `_classifyFonts`, then `_layout` (each page through the ladder), then `_toHtml`, then `_ladReport`.
 
 Rule: every function is at most 150 lines (ESLint `max-lines-per-function`, `eslint.config.js`). A long method is
 split into steps that take an explicit parameter object, not into closures over its locals.
@@ -127,7 +127,7 @@ counts the reasons a paragraph group was opened.
 | ↳ `_bodyFamilies` | `_layout` | step 6: the body text's font family and the heading families |
 | ↳ `_bodyPitches` | `_layout` | step 7: the body text's line pitch and the document's pitch of code |
 | ↳ `_layoutPage` | `_layout` | step 8 (per page): the page's blocks, its letterhead, pictures out of the text, quality noted |
-| ↳ ↳ `_pageFallback` | `_layoutPage` | step 8a: a page whose layout failed, its lines as plain paragraphs |
+| ↳ ↳ `_pageFallback` | `_ladder` | step 8a: the last resort — a page no rung of the ladder gave, its lines as plain paragraphs |
 | `_hiddenPictures` | `_layout` | a picture that draws nothing (transparent soft mask) is dropped |
 | `_pageBorders` | `_layout` | a page border (art border tiles, rules, bands) is no content |
 | `_calliGaps` | `_layout` | word gaps a calligraphic font closed, restored |
@@ -147,6 +147,23 @@ counts the reasons a paragraph group was opened.
 | ↳ `_tablePreamble` | `_tableBlock` | step 6: «label: value» rows between the title and the first fully celled row |
 | ↳ `_cellItems` | `_tableBlock` | a list inside a table cell: each item keeps its line and its marker as «•» |
 | `_codeBlock` | `_pbBlocks`, `_pbUnframedCode`, `_joinPageBreak` | a code box's lines as a code block |
+
+## ladder.js — 4.9 each page's confidence and the fallback ladder (PDFIMPORT.md §7a)
+
+Pure: `PdfImporter._ladder.conf` (`ladderConf`: a page's signs → 0–1) and `.decide` (`ladderDecide`: signs, conf,
+mode → { mode, why }), tested in `tests/unit/ladder.test.js`.
+
+| Method | Called from | Step |
+|---|---|---|
+| `_ladMode` | `_ladder`, `_pageLines`, `fromArrayBuffer`, `_ladReport` | the import's mode: `hooks.mode`, else `options.mode` ('auto' / 'safe' / 'full') |
+| `_ladK` | `_ladder` | the thresholds `ladderConf` and `ladderDecide` read |
+| `_ladder` | `_layoutPage` | one page: its signs, confidence and mode; its blocks in that mode, a rung down when one gives nothing, the note |
+| ↳ `_ladSignals` | `_ladder` | the page's signs: `_pageQuality`'s counts and flags, guessed glyphs, the tree's agreement (`_treeVote`), ambiguous gaps, word-gap samples, the largest picture |
+| ↳ `_ladFlatten` | `_ladder` | simplified from the laid-out blocks: tables' rows, lists' items, quotes' blocks as paragraphs |
+| ↳ `_ladSimpleBlocks` | `_ladder` | simplified from the lines (the layout failed): rows top down, paragraphs by size and gap, large short lines headings |
+| ↳ `_ladTextContent` | `_ladder` | textContent: pdf.js's `getTextContent()` in lines (by the letters' direction) and paragraphs (by the gap) |
+| ↳ `_ladOcr` | `_ladder` | ocr: the page's pictures, or the page rendered whole (`_crop`) |
+| `_ladReport` | `fromArrayBuffer` | `r.pages` and `r.report` (summary, demoted pages and why, flags and notes with their pages) |
 
 ## order.js — 4. reading order: the page's blocks (`_pageBlocks`), XY-cut, borderless tables (PDFIMPORT.md §8.1, §8.3)
 

@@ -138,7 +138,7 @@
             pdfimport: {
                 src: ['lib/PdfImporter.js', 'lib/pdfimport/thresholds.js', 'lib/pdfimport/calibration.js',
                     'lib/pdfimport/extract.js', 'lib/pdfimport/lines.js', 'lib/pdfimport/regions.js',
-                    'lib/pdfimport/order.js', 'lib/pdfimport/blocks.js'],
+                    'lib/pdfimport/ladder.js', 'lib/pdfimport/order.js', 'lib/pdfimport/blocks.js'],
                 global: 'PdfImporter'
             },
             jszip: { src: 'vendor/jszip.min_3.10.2.js', global: 'JSZip' }

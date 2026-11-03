@@ -26,7 +26,7 @@ function importerFiles(where) {
   let core = path.resolve(where);
   if (fs.statSync(core).isDirectory()) core = fs.existsSync(path.join(core, 'lib', 'PdfImporter.js')) ? path.join(core, 'lib', 'PdfImporter.js') : path.join(core, 'PdfImporter.js');
   const dir = path.join(path.dirname(core), 'pdfimport');
-  const parts = ['thresholds', 'calibration', 'extract', 'lines', 'regions', 'order', 'blocks'].map((p) => path.join(dir, p + '.js')).filter((f) => fs.existsSync(f));
+  const parts = ['thresholds', 'calibration', 'extract', 'lines', 'regions', 'ladder', 'order', 'blocks'].map((p) => path.join(dir, p + '.js')).filter((f) => fs.existsSync(f));
   return [core].concat(parts);
 }
 
