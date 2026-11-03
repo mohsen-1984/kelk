@@ -6,7 +6,10 @@
 //                                every page → 'ocr' (a note, the picture kept)
 //   ladder/t3-glued--lost.pdf    a Type 3 font of drawn boxes whose ToUnicode maps one code in twelve to U+FFFD, set
 //                                with no word spaces (the words glued): suspectSpaces + lostGlyphs → 'simplified'
-//   ladder/t3-glued--lost25.pdf  the same with one code in four lost: lost ≥ 20 % → 'textContent'
+//   ladder/t3-glued--lost25.pdf  the same with one code in four lost: lost ≥ 20 % → 'simplified' (why lostGlyphs).
+//                                pdf.js's text was tried and kept nothing more — the glyphs' letters come from it, its
+//                                U+FFFD are theirs (74 either way) —, so it is not taken: textContent only where it
+//                                shows demonstrably fewer lost (ladder.js _ladTcBetter), or where extraction failed
 const { req, lab, LAB } = require('./env.js');
 const fs = require('fs'), path = require('path');
 const { PDFDocument } = req('pdf-lib');
