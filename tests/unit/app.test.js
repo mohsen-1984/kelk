@@ -173,3 +173,83 @@ test('a settings file from before schemaVersion, through the Settings pane, is m
   assert.equal(K.store.get('page.size'), 'Letter');
   w.close();
 });
+
+// The PDF importer is not part of the startup (plan P3.2 / P5.1): Kelk.libs.need('pdfimport') loads
+// lib/PdfImporter.js and lib/pdfimport/*.js, in order, on the first PDF import.
+
+test('the PDF importer is not loaded at startup; its loader lists the core and PdfImporter.PARTS in order', async function () {
+  const { window: w, errors } = await appWindow(OPENED);
+  assert.equal(w.PdfImporter, undefined, 'no PdfImporter before the first PDF import');
+  assert.equal(w.document.querySelector('script[src*="PdfImporter"], script[src*="pdfimport/"]'), null);
+  const PARTS = require('../../lib/PdfImporter.js').PARTS;
+  assert.deepEqual(
+    Array.from(w.Kelk.config.libs.pdfimport.src),
+    ['lib/PdfImporter.js'].concat(
+      PARTS.map(function (p) {
+        return 'lib/pdfimport/' + p + '.js';
+      })
+    )
+  );
+  assert.deepEqual(errors, []);
+  w.close();
+});
+
+test('a PDF import loads pdf.js, then the importer, before PdfImporter.create', async function () {
+  const { window: w, errors } = await appWindow(OPENED);
+  const K = w.Kelk;
+  const calls = [];
+  K.libs.need = function (name) {
+    calls.push('need ' + name);
+    if (name === 'pdfimport') {
+      w.PdfImporter = {
+        create: function () {
+          calls.push('create');
+          return {
+            fromArrayBuffer: function () {
+              return Promise.resolve({ markdown: '# From the PDF\n', notes: [], messages: [] });
+            }
+          };
+        }
+      };
+    }
+    return Promise.resolve();
+  };
+  await K.importer.fromFile(new w.File(['%PDF-1.7'], 'doc.pdf', { type: 'application/pdf' }));
+  assert.deepEqual(calls, ['need pdfjs', 'need pdfimport', 'create']);
+  assert.equal(K.editor.value(), '# From the PDF\n');
+  assert.deepEqual(errors, []);
+  w.close();
+});
+
+test('Kelk.libs.need("pdfimport") loads each file once, in order; a load that failed half way is finished next time', async function () {
+  const { window: w, errors } = await appWindow(OPENED);
+  const K = w.Kelk;
+  const real = K.ui.loadScript;
+  let failOnce = 'lib/pdfimport/order.js';
+  K.ui.loadScript = function (src) {
+    if (src === failOnce) {
+      failOnce = null;
+      return Promise.reject(new Error('offline'));
+    }
+    return real(src);
+  };
+  await assert.rejects(K.libs.need('pdfimport'), /offline/);
+  assert.equal(typeof w.PdfImporter, 'function', 'the core ran');
+  assert.equal(typeof w.PdfImporter.prototype._calibrate, 'function', 'the parts before the failure ran');
+  const P = await K.libs.need('pdfimport');
+  assert.equal(P, w.PdfImporter);
+  const appended = function () {
+    return Array.from(w.document.querySelectorAll('script[src]'))
+      .map(function (s) {
+        return s.getAttribute('src');
+      })
+      .filter(function (s) {
+        return /PdfImporter|pdfimport\//.test(s);
+      });
+  };
+  assert.deepEqual(appended(), Array.from(K.config.libs.pdfimport.src), 'each file appended once, in order');
+  await K.libs.need('pdfimport');
+  assert.deepEqual(appended(), Array.from(K.config.libs.pdfimport.src), 'a later call loads nothing');
+  assert.deepEqual(errors, []);
+  w.close();
+});

@@ -704,9 +704,10 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 26 | Answering the end-of-P2 questions (branches, advisories and engines, `pagesLinks`, the PR check, size budget, workload) and the size-budget question of P3.2 (proposed). |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 15 | P3.1 function map `lib/pdfimport/README.md`: every one of the 159 methods of the five parts in pipeline order with its callers and its step, step functions under their caller; checked against the files' method lists; pointer in `lib/README.md`. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 13 | P3.2 groundwork: `lib/pdfimport/thresholds.js` (registry `PdfImporter._thresholds`, `_t()` returning the default until an entry is switched to calibrated with `minSamples`, `_fire()` / `r.rules`, `r.calibration` with `debug`), `lib/pdfimport/calibration.js` (`_calibrate()` → frozen body / fonts / gaps / steps / columns / tracking / regions with sample counts), `tests/pdf-lab/scripts/rules.js` and a gate note for rules that stop firing, `_rules.json` from `run-import.js`, both files in every load list; 7 unit tests. |
+| 1405-08-12 | 2.0-rc1 | Zarrabi | 30 | PDF importer loaded on demand (the importer part of P5.1, taken into P3.2): `libs.pdfimport` in `scripts/config.js` loads `lib/PdfImporter.js` and its seven parts with `<script>` tags on the first PDF import, after pdf.js; `K.libs.need` counts a several-file library as loaded only when all its files ran and finishes a half-done load; 3 unit tests; startup 1,985,290 → 1,294,421 bytes (budget 1,990,000); PDF import under the CSP on `file://` and http checked. |
 
 <!-- generated:totals -->
-**Entries: 118 · Total: 1540 min (25.67 hours) — Zarrabi 1540 min (111 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 119 · Total: 1570 min (26.17 hours) — Zarrabi 1570 min (112 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---

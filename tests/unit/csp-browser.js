@@ -229,6 +229,7 @@ async function run(label, url) {
   // let them compile ('wasm-unsafe-eval'), or scanned PDFs lose their pictures (no pure-JS fallback is shipped)
   r.steps.wasm = await page.evaluate(async function () {
     const out = {};
+    await window.Kelk.libs.need('pdfimport'); // on demand since P3.2 (the PDF import above loaded it already)
     const F = new window.PdfImporter()._binaryDataFactory();
     for (const name of ['openjpeg.wasm', 'jbig2.wasm']) {
       try {
