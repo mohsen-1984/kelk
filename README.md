@@ -111,7 +111,14 @@ tests/         builder-suite.html — every test case through the four document 
                pdf-import-suite.html — PDFs you pick, scored offline ·
                pdf-lab/ — 144 PDFs from 49 producer variants, scored, fuzzed and gated (Node + Playwright)
 tools/         bidi-lab.html (every direction rule) · build_pdf_fonts.py · build-icons.js · build-samples.js · og-image.html (source of assets/og-image.png)
+               · check-*.js (version, interface strings, accessibility, startup size)
+.github/       CI on every push: the PDF lab and its gate, the builders against golden snapshots, .docx checked
+               against the OOXML schemas, unit tests, lint, links, accessibility
+package.json   the dev tools CI installs (npm ci) — the app itself has no build step and no dependencies to install
 ```
+
+Release downloads: `kelk_2.0.zip` is the app (what most people want); `kelk_2.0-with-pdf-lab.zip` adds
+`tests/pdf-lab/` (144 PDFs, about 15 MB) for working on the PDF importer.
 
 ## Contact, credits, license
 
