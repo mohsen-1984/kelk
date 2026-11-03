@@ -21,6 +21,28 @@ dates in them are invented.
 Tahoma, Arial, Calibri / Aptos, Segoe UI) are the Windows machine's and are embedded as subsets, as every producer
 embeds them.
 
+The sources and the PDFs hold no user name and no local folder: Office writes the Windows user as the author
+(`docProps/core.xml`, a Save as PDF file's `/Author` and XMP `dc:creator`) and a workbook's folder (`x15ac:absPath`);
+`scripts/strip-meta.js` clears them (make-real.ps1 runs it at its end) and keeps Producer and Creator, which name the
+application. The page content is not touched (the script compares every page's content stream before and after).
+
+## What remaking needs
+
+Importing and scoring these PDFs needs only Node and Playwright. Remaking them needs:
+
+| What | Why |
+|---|---|
+| Windows with **Microsoft Office LTSC 2024** (Word, Excel, PowerPoint) | the files are what Office 2024 draws: its default fonts are Aptos (Word, PowerPoint) and Aptos Narrow (Excel); Office 2021 and older use Calibri, which moves every line and cell. Office 365 is close but not the same build |
+| the **Microsoft Print to PDF** printer | the `msprint-*` files (it ships with Windows 10 and 11; *Windows features* → *Microsoft Print to PDF* if it was removed) |
+| **Microsoft Edge** and **Mozilla Firefox** at their default paths (or `EDGE=…`, `FIREFOX=…`) | `edge--*`, `firefox--*` (make-real.js); `chrome--*` is Playwright's own Chromium (`npm ci`; no Chrome needed) |
+| the font **Traditional Arabic** | the Arabic letter; it ships with Windows |
+| the font **B Nazanin** | the Persian memo and the bordered sheet. It is **not** a Windows font: it is one of the free "B" Persian fonts (Borna Rayaneh) that most Persian Office installations add. Install `BNazanin.ttf` (and the Bold) **for the current user** — right-click → *Install*, which puts it in `%LOCALAPPDATA%\Microsoft\Windows\Fonts` (no administrator); Word, Excel and the browsers find it there. Without it every program falls back to another font and the PDFs differ |
+| Node (the dev tools from `npm ci`) | `make-real.js` and `strip-meta.js` |
+
+The Windows locale and number format do not matter: `make-real.ps1` sets Excel's decimal and thousands separators to
+`.` and `,` for every sheet (and puts the user's own back afterwards), and sets Word's numeral option to *Context* for
+the run.
+
 Remake on Windows with Office (an existing `.docx` / `.xlsx` / `.pptx` is reused unless `-Rebuild`):
 
 ```sh
