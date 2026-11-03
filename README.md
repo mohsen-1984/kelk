@@ -117,7 +117,7 @@ tools/         bidi-lab.html (every direction rule) · build_pdf_fonts.py · bui
 package.json   the dev tools CI installs (npm ci) — the app itself has no build step and no dependencies to install
 ```
 
-Release downloads: `kelk_2.0.zip` is the app (what most people want); `kelk_2.0-with-pdf-lab.zip` adds
+Release downloads: `kelk_2.0.zip` is the app (what most people want); `kelk-with-pdf-lab_2.0.zip` adds
 `tests/pdf-lab/` (144 PDFs, about 15 MB) for working on the PDF importer.
 
 ## Contact, credits, license
