@@ -4,7 +4,7 @@
  *   .zip              its documents, in name order, and its images (JSZip, loaded on the first .zip)
  *   .html / .htm      MarkdownImporter.fromHtml
  *   .docx             MarkdownImporter.fromDocx (mammoth)
- *   .pdf              PdfImporter (PDF.js, loaded on the first .pdf) → HTML → MarkdownImporter
+ *   .pdf              PdfImporter (it and PDF.js loaded on the first .pdf) → HTML → MarkdownImporter
  *   rich paste        MarkdownImporter.fromHtml (Word, web pages)
  * Cleaning, sanitizing and nested-table handling happen once, inside
  * MarkdownImporter (lib/), with the options of Settings → Import.
@@ -160,6 +160,7 @@
     /** A PDF → Markdown, page by page on the task's bar; Cancel stops it at the next page. */
     async function fromPdf(file, name, t) {
         await K.libs.need('pdfjs');                  // loaded on the first .pdf import
+        await K.libs.need('pdfimport');              // PdfImporter and its parts, after pdf.js (as its header says)
         const o = K.store.getUi('importer'), base = name.replace(/\.[^.]+$/, '');
         // the import's messages come once, at its end (K.ui.batch), and its pictures are stored once
         return K.ui.batch(async function () {
