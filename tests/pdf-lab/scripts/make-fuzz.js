@@ -4,13 +4,14 @@
 // written down in manifest.json.
 //
 //   node scripts/make-fuzz.js [split] [count]     split: dev (default) | heldout
+//   node scripts/make-fuzz.js --rotate            the held-out block now and the next one, and how to rotate (docs/HELDOUT.md)
 //
 // Two splits, two uses (PDFIMPORT.md §11):
 //   dev      debug freely: open the files, read the Markdown, write rules from what you see
 //   heldout  never opened while a rule is written — only its aggregate scores are read (run-fuzz.js).
 //            It measures whether a change generalises; the moment a rule is tuned on one of its
 //            files it becomes a second dev set and stops measuring anything.
-// The seeds of the two splits never overlap (dev 1…, heldout 100001…).
+// The seeds of the two splits never overlap (dev 1…, heldout HELDOUT_BASE…: 100001… until the first rotation).
 const fs = require('fs'), path = require('path'), os = require('os'), cp = require('child_process');
 const { chromium } = require('./env.js').req('playwright');
 const KELK = require('./env.js').KELK;
@@ -22,7 +23,16 @@ const LAB = path.join(__dirname, '..'), FUZZ = require('./env.js').FUZZ, fileUrl
 // 1: the first draw; 2: + headCase, tagged; 3: two-column content fits its column;
 // 4: + the right-to-left documents (4 of 9: dir rtl, Persian / Arabic body fonts, digits), tracking (letter-spacing)
 const GENERATOR = 4;
-const SPLITS = { dev: { base: 1, count: 100 }, heldout: { base: 100001, count: 100 } };
+// The held-out split's first seed. It rotates (docs/HELDOUT.md, "Rotation"): every 6 months, or as soon as a held-out
+// file was opened (run-fuzz.js heldout --show, logged in docs/reports/heldout-opened.log) — then it moves up by 100000
+// (the next unused block: 200001, 300001, …), HELDOUT_ROTATION goes up by one, a row is added below, and the gate's
+// held-out baseline is rebuilt (the rotation is part of the manifest's env, so the old means are never compared
+// with the new set's). Never back to an earlier block: those files were seen.
+// Rotation history (Solar Hijri date · base · why):
+//   0  (from the start)  100001  the first held-out block, generators 1–4; its rotation clock starts 1405-08-12 (P4.3)
+const HELDOUT_ROTATION = 0;
+const HELDOUT_BASE = 100001 + 100000 * HELDOUT_ROTATION;
+const SPLITS = { dev: { base: 1, count: 100 }, heldout: { base: HELDOUT_BASE, count: 100 } };
 // round robin over the documents: 4 of 9 right-to-left (44 % of each split)
 const DOCS = ['article', 'features', 'readme', 'report', 'symbols', 'fa-article', 'fa-report', 'ar-article', 'fa-mixed'];
 const isRtl = (doc) => /^(fa|ar)-/.test(doc);
@@ -217,6 +227,15 @@ const MARGIN = { narrow: '1cm', normal: '2cm', wide: '3cm' };
 const HF = `<div style="font-size:7px;width:100%;display:flex;justify-content:space-between;padding:0 1cm;font-family:Arial"><span class="title"></span><span><span class="pageNumber"></span>/<span class="totalPages"></span></span></div>`;
 
 (async () => {
+  // --rotate: what the next rotation is and how it is done (docs/HELDOUT.md) — it changes nothing itself
+  if (process.argv.includes('--rotate')) {
+    const next = HELDOUT_ROTATION + 1;
+    console.log('held-out now: rotation ' + HELDOUT_ROTATION + ', seeds ' + HELDOUT_BASE + '–' + (HELDOUT_BASE + SPLITS.heldout.count - 1) + '\n' +
+      'next:         rotation ' + next + ', seeds ' + (100001 + 100000 * next) + '–' + (100001 + 100000 * next + SPLITS.heldout.count - 1) + '\n' +
+      'to rotate: set HELDOUT_ROTATION = ' + next + ' in scripts/make-fuzz.js, add its row to the rotation history, run make-fuzz.js heldout,\n' +
+      'and rebuild the held-out part of baseline.json in the approval step — docs/HELDOUT.md, "Rotation"');
+    return;
+  }
   const split = process.argv[2] || 'dev';
   if (!SPLITS[split]) { console.error('split: dev | heldout'); process.exit(1); }
   const count = +process.argv[3] || SPLITS[split].count;
@@ -251,7 +270,10 @@ const HF = `<div style="font-size:7px;width:100%;display:flex;justify-content:sp
     env.fonts[k] = f.files ? path.basename(FONT_ZIP) + '#' + rf.hash
       : !naskhHere ? null : naskhFile && fs.existsSync(naskhFile) ? path.basename(naskhFile) + '#' + sha(naskhFile) : f.family;
   });
-  const manifest = { split, generated: new Date().toISOString(), env, samples: [] };
+  // a rotated held-out block is another set of PDFs: recorded in the env (from the first rotation on, so the env of
+  // the first block — and the baselines written with it — stay as they are)
+  if (split === 'heldout' && HELDOUT_ROTATION > 0) env.heldoutRotation = HELDOUT_ROTATION;
+  const manifest = { split, generated: new Date().toISOString(), base: SPLITS[split].base, env, samples: [] };
   let noWk = 0, noNaskh = 0;      // drawn for wkhtmltopdf, made with Chromium (not installed); Noto Naskh Arabic missing
   for (let i = 0; i < count; i++) {
     const seed = SPLITS[split].base + i, s = drawStyle(seed);
