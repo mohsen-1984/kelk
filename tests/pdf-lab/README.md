@@ -22,8 +22,9 @@ pdf/       the PDFs made from them: <producer>--<doc>.pdf (188 files), in six fo
            A file's folder follows from its name (scripts/env.js: pdfGroup); generators write through
            pdfPath(name) and the runners walk every folder (labPdfs), so names stay unique across folders
            and a filter matches as before
+golden/    golden files: <name>.md typed by hand from the pages of the lab PDF <name>.pdf (scripts/golden.js)
 scripts/   generators, the importer runs, the scorer, inspection tools
-out/       (made when run) the imported Markdown / HTML and _scores.json
+out/       (made when run) the imported Markdown / HTML and _scores.json (golden files: out/golden/)
 fuzz/      (made when run) style-fuzzed PDFs: dev/ and heldout/, each with its manifest.json (and the sources
            whose digits a style rewrote, <name>.md)
            (their results go to out/fuzz-dev/, out/fuzz-heldout/)
@@ -394,6 +395,53 @@ producer, and the trees' headings against the source's (Chrome tagged 100, Libre
 fuzz files of dev 99.5 — the importer's own headings on those: 93.3). That is the trust
 weight of the next step (TODO: the structure tree as a prior).
 
+## Golden files
+
+A corpus reference (`corpus/<doc>.md`) is the *source* of a document: every producer's PDF of it is scored
+against the same text, so a producer that drops a heading level, draws a list as plain paragraphs or loses a line
+is scored against what it never printed. A golden file is the other reference: `golden/<name>.md` is what a careful
+person types from the pages of one lab PDF, `<name>.pdf` (found anywhere under `pdf/`) — its text, the heading
+hierarchy as it looks, lists and their nesting, tables with their real rows and columns, quotes, code; running heads,
+feet, page numbers and decorations left out, as the corpus does. 50 of them (plan P4.2: 20 Persian, 10 Arabic, 20
+English, across the producer families).
+
+**The rule.** A golden is written from the page, **never from the importer's output** — not started from `out/`,
+not corrected after a look at a run, or it would hold the importer's mistakes as right. The source reference may be
+copied for the exact characters (Persian and Arabic typed from a picture go wrong), but the page decides structure
+and text. The owner checks the Persian ones.
+
+`scripts/golden.js` imports each PDF as `run-import.js` does (the same options, pictures out before scoring), scores
+it with `score.js` against its golden, and compares the structure (`scripts/structdiff.js`) — three sequences, each
+aligned with the fewest edits:
+
+| Part | Sequence | An edit |
+|---|---|---|
+| heading tree | the heading levels, in order | a heading missing, extra, or at another level |
+| table shapes | rows × columns of each table (the header row counted), in order | a table missing, extra, or of another shape |
+| list nesting | the depth of each list item, in order | an item missing, extra, or at another depth |
+
+Headings, tables and lists inside quotes and list items count. A structure cell prints as `12/13 −1 +2 ~0`: the
+golden's count / the import's, then missing, extra, changed.
+
+```sh
+node scripts/golden.js [filter]            # every golden/*.md (filter: a regexp on the name)
+node scripts/golden.js --dir other/        # another folder of goldens (trying the tool, a draft) — never written to the baseline
+```
+
+It writes `out/golden/<name>.md` (the importer's Markdown, pictures as `![](img-<page>-<n>)`) and
+`out/golden/_scores.json`: `{ dir, lab, filter, n, errors, mean, rows }`, each row `{ name, ms, recall, order,
+headings, lists, tables, code, quotes, total, rtl…, extra, struct: { headings, tables, lists: { want, got, missing,
+extra, changed }, edits } }`; `mean` holds each metric's mean over the files that have it and the edits per file. A
+golden whose PDF is not in the lab is an error row, and any error row exits 1. A missing `golden/` folder is no error
+(nothing to score).
+
+**In the gate**, as the corpus, file by file: a golden file fails when it crashes (or lost its PDF), or its total
+drops more than **0.5 point** (`TOL_GOLDEN`) against the compared side (`baseline.json`'s `golden` section, or
+`--against DIR`'s `golden/_scores.json`). A new golden file, one gone, one metric down while the total holds, and a
+structure diff that grew are notes. `--update` writes the `golden` section only from a run of the lab's own
+`golden/` holding every golden file (a filtered run is refused as the corpus is, `--partial` merges its files; a
+`--dir` run is refused); a run without `golden.js` keeps the old section. In CI both importers import head's goldens.
+
 ## The gate
 
 `scripts/gate.js` reads the results of the runs (it runs nothing) and fails — exit code 1 — when a
@@ -402,6 +450,7 @@ change made the importer worse:
 | What | Fails when |
 |---|---|
 | corpus | a file crashes, or its total drops more than 0.5 point, or its right-to-left details (`rtl`) drop more than 0.5 point, or it is no longer scored (its `corpus/<doc>.md` missing or renamed) |
+| golden | a golden file crashes or has no PDF, or its total drops more than 0.5 point (see «Golden files») |
 | fuzz `dev`, `heldout` | a PDF crashes, or the split's **mean** total drops more than 1 point, or so does a direction's (`ltr`, `rtl`) mean total or the `rtl` column's mean over the right-to-left files (a loss on the 44 right-to-left files alone barely moves the split's mean); an older baseline without them gives a note |
 | inline markup (`mkup`) | bold, italic, strike or inline code the importer wrote in HTML that a CommonMark parser no longer finds in its Markdown (`markup.js`: «بود**.**» stays literal asterisks) — any rise, on a corpus file or summed over a fuzz split; it should stay 0 |
 
@@ -410,7 +459,7 @@ The fuzz splits are gated on their means only: per file would read held-out file
 groups per style value are too small (fewer than 15 files in most) to tell a change from noise.
 
 ```sh
-node scripts/run-import.js && node scripts/run-fuzz.js dev && node scripts/run-fuzz.js heldout && node scripts/run-meta.js
+node scripts/run-import.js && node scripts/golden.js && node scripts/run-fuzz.js dev && node scripts/run-fuzz.js heldout && node scripts/run-meta.js
 node scripts/gate.js                       # against baseline.json
 node scripts/gate.js --update              # this run becomes the baseline (refused if the gate fails)
 node scripts/gate.js --update --partial    # a filtered run: its files merged into the baseline, the others kept

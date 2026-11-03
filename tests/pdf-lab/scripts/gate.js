@@ -13,6 +13,7 @@
 //   out/_scores.json                         run-import.js (the corpus)
 //   out/fuzz-dev/_scores.json, fuzz-heldout  run-fuzz.js dev | heldout
 //   out/meta/_scores.json                    run-meta.js (the metamorphic net)
+//   out/golden/_scores.json                  golden.js (the golden files: golden/<name>.md typed from the page)
 //
 // What fails:
 //   corpus  a file that crashes, or whose total drops more than TOL_FILE (one file is enough: the corpus
@@ -26,6 +27,11 @@
 //           total and the rtl column's mean over the right-to-left files (an old baseline without them: a note). Means only — per file
 //           would read held-out files one by one, and per style value the groups are too small to
 //           tell a change from noise (fewer than 15 files in most)
+//   golden  a golden file that crashes (or lost its PDF), or whose total drops more than TOL_GOLDEN against the
+//           compared side (baseline.json's golden section, or --against's golden/_scores.json); a new golden file, one
+//           gone, a structure diff that grew (structdiff.js edits) or one metric down while the total holds: notes.
+//           --update writes the section only from a run of the lab's own golden/ folder holding every golden file
+//           (else refused, as the corpus; --partial merges the run's files)
 //   rules   (a note, never a failure) a rule that fired on a corpus file and no longer does on it (rules.js,
 //           out/_rules.json; the baseline keeps each file's fired rules from --update)
 //   meta    a crash; a file of a "same" transform not byte-identical to its reference outside run-meta.js KNOWN (or
@@ -46,6 +52,7 @@ const { LAB, OUT, labPdfs } = require('./env.js');
 const rulesLib = require('./rules.js');
 
 const TOL_FILE = 0.005, TOL_MEAN = 0.010, TOL_HARD = 0.030;      // 0.5, 1 and 3 points of 100
+const TOL_GOLDEN = 0.005;                                         // 0.5 point, per golden file
 const METRICS = ['recall', 'order', 'headings', 'lists', 'tables', 'code', 'quotes', 'total'];
 const CORPUS_EXTRA = ['rtl', 'zwnj', 'yehKaf', 'digits', 'brackets'];   // right-to-left details (score.js), corpus only
 const LINKS = 'links';                                             // links found with their address (run-import.js), corpus only
@@ -96,6 +103,17 @@ function load(dir) {
           total: x.files ? Object.values(x.files).reduce((a, v) => a + v, 0) / Object.values(x.files).length : +x.total.toFixed(4),
           delta: +x.delta.toFixed(4), files: x.files,
           exact: (meta.rows || []).filter((r) => r.transform === t && r.same).map((r) => r.seed) }])) };
+  // the golden files, per file as the corpus (golden.js): lab = it read the lab's golden/ folder, filter = a filtered run
+  const golden = read(path.join(dir, 'golden', '_scores.json'));
+  if (golden) {
+    run.golden = { lab: !!golden.lab, filter: golden.filter || null, files: {} };
+    (golden.rows || []).forEach((r) => {
+      const o = { error: r.error || null };
+      METRICS.concat(CORPUS_EXTRA).forEach((k) => { if (typeof r[k] === 'number') o[k] = +r[k].toFixed(4); });
+      if (r.struct) o.edits = r.struct.edits;
+      run.golden.files[r.name] = o;
+    });
+  }
   return run;
 }
 const sameEnv = (a, b) => JSON.stringify(a || null) === JSON.stringify(b || null);
@@ -262,11 +280,49 @@ else {
   Object.entries(uncompared).forEach(([why, ts]) => notes.push('meta: not compared — ' + why + ': ' + ts.join(', ')));
 }
 
+// ── the golden files: file by file ─────────────────────────────────────
+// the compared side: --against's golden/_scores.json, or baseline.json's golden section ({ name: { total, … } })
+const goldenBase = base ? (against ? base.golden && base.golden.files : base.golden) : null;
+if (!cur.golden) notes.push('golden: not run (scripts/golden.js)');
+else {
+  const other = against ? 'the other run' : BNAME;
+  if (!cur.golden.lab) notes.push('golden: this run read another folder than golden/ — compared by name all the same');
+  if (base && !goldenBase && Object.keys(cur.golden.files).length) notes.push('golden: ' + other + ' has no golden results — not compared');
+  const gb = goldenBase || {}, moves = [], rose = [];
+  Object.entries(cur.golden.files).forEach(([n, c]) => {
+    const b = gb[n];
+    if (c.error) { if (!(b && b.error)) fails.push('golden: ' + n + ' — ' + c.error); return; }
+    if (!goldenBase) return;
+    if (!b) { notes.push('golden: new file ' + n + ' (' + p1(c.total) + ')'); return; }
+    if (typeof b.total !== 'number' || typeof c.total !== 'number') return;
+    const d = c.total - b.total;
+    if (d < -TOL_GOLDEN) fails.push('golden: ' + n + ' ' + p1(b.total) + ' → ' + p1(c.total));
+    else {
+      if (d > TOL_GOLDEN) rose.push(n + ' ' + p1(b.total) + ' → ' + p1(c.total));
+      METRICS.slice(0, -1).forEach((k) => { if (typeof b[k] === 'number' && typeof c[k] === 'number' && c[k] - b[k] < -0.02) moves.push(n + ' ' + SHORT[k] + ' ' + p1(b[k]) + ' → ' + p1(c[k])); });
+    }
+    if (typeof b.edits === 'number' && typeof c.edits === 'number' && c.edits > b.edits) moves.push(n + ' structure edits ' + b.edits + ' → ' + c.edits);
+  });
+  if (goldenBase) {
+    const gone = Object.keys(gb).filter((n) => !cur.golden.files[n]);
+    if (gone.length) notes.push('golden: ' + gone.length + ' file(s) of ' + other + ' not in this run' + (cur.golden.filter ? ' (filtered: ' + cur.golden.filter + ')' : '') + ': ' + gone.slice(0, 10).join(', ') + (gone.length > 10 ? ' …' : ''));
+  }
+  if (rose.length) notes.push('golden, better: ' + rose.join(', '));
+  if (moves.length) notes.push('golden, one metric down (or the structure diff up) while the total holds: ' + moves.join('; '));
+}
+
 // ── report ─────────────────────────────────────────────────────────────
 const cm = (run) => { const v = Object.values(run.corpus || {}).map((r) => r.total).filter((x) => typeof x === 'number'); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : undefined; };
 console.log('gate: this run (' + path.relative(process.cwd(), OUT) + ') against ' + (against ? path.relative(process.cwd(), path.resolve(String(against))) : BNAME) + '\n');
 console.log(''.padEnd(22), METRICS.map((k) => SHORT[k].padStart(6)).join(''));
 if (base && base.corpus) console.log('corpus mean'.padEnd(22), ''.padStart(6 * 7), (p1(cm(base)) + ' → ' + p1(cm(cur))).padStart(6));
+if (cur.golden) {
+  // this run's mean, and both sides' over the files both scored (a new golden file does not move it)
+  const gt = (files, names) => { const v = names.map((n) => files[n] && files[n].total).filter((x) => typeof x === 'number'); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : undefined; };
+  const mine = Object.keys(cur.golden.files).filter((n) => typeof cur.golden.files[n].total === 'number'), both = goldenBase ? mine.filter((n) => goldenBase[n] && typeof goldenBase[n].total === 'number') : [];
+  console.log(('golden mean (' + mine.length + ')').padEnd(22), ''.padStart(6 * 7), p1(gt(cur.golden.files, mine)).padStart(6),
+    both.length ? '  (' + p1(gt(goldenBase, both)) + ' → ' + p1(gt(cur.golden.files, both)) + ' over the ' + both.length + ' both have)' : '');
+}
 fuzzRows.forEach(([split, b, c]) => {
   console.log(('fuzz/' + split).padEnd(22), METRICS.map((k) => p1(c[k]).padStart(6)).join(''));
   if (b) console.log('  change'.padEnd(22), METRICS.map((k) => (typeof b[k] === 'number' && typeof c[k] === 'number' ? d1(c[k] - b[k]) : '-').padStart(6)).join(''));
@@ -286,7 +342,7 @@ const mk = (run) => run && run.corpus ? Object.values(run.corpus).reduce((a, r) 
 console.log('inline markup lost'.padEnd(22), 'corpus', mk(cur), 'files' + (base ? ' (was ' + mk(base) + ')' : ''),
   ...['dev', 'heldout'].filter((s) => cur.fuzz[s]).map((s) => '· ' + s + ' ' + cur.fuzz[s].markup + (base && base.fuzz && base.fuzz[s] ? ' (was ' + (base.fuzz[s].markup || 0) + ')' : '')));
 if (notes.length) { console.log('\nnotes'); notes.forEach((n) => console.log('  · ' + n)); }
-if (fails.length) { console.log('\nFAILED (tolerance: ' + p1(TOL_FILE) + ' per corpus file, ' + p1(TOL_MEAN) + ' per fuzz or meta mean, ' + p1(TOL_HARD) + ' per hard transform)'); fails.forEach((f) => console.log('  ✗ ' + f)); }
+if (fails.length) { console.log('\nFAILED (tolerance: ' + p1(TOL_FILE) + ' per corpus file, ' + p1(TOL_GOLDEN) + ' per golden file, ' + p1(TOL_MEAN) + ' per fuzz or meta mean, ' + p1(TOL_HARD) + ' per hard transform)'); fails.forEach((f) => console.log('  ✗ ' + f)); }
 else console.log('\npassed');
 
 // ── --update: this run becomes the baseline ────────────────────────────
@@ -318,6 +374,21 @@ if (opt('--update')) {
       if (!out.meta.transforms[t] && x.files && x.v !== undefined) { out.meta.transforms[t] = x; kept.push('meta/' + t); }
     });
   } else if (old.meta) { out.meta = old.meta; kept.push('meta'); }
+  // golden: as the corpus — only a run of the lab's own golden/ folder holding every golden file is written whole;
+  // --partial merges a filtered run's files; a run without golden.js keeps the old section
+  if (cur.golden) {
+    const gdir = path.join(LAB, 'golden');
+    const all = fs.existsSync(gdir) ? fs.readdirSync(gdir).filter((f) => /\.md$/i.test(f) && !/^readme\.md$/i.test(f)).map((f) => f.replace(/\.md$/i, '')) : [];
+    const gmissing = all.filter((n) => !cur.golden.files[n]);
+    if (!cur.golden.lab) { console.log('\n' + BNAME + ' not written: the golden run read another folder than golden/ (golden.js --dir) — run it on the lab\'s own'); process.exit(1); }
+    if (gmissing.length && !partial) {
+      console.log('\n' + BNAME + ' not written: this run holds ' + Object.keys(cur.golden.files).length + ' golden files, golden/ ' + all.length +
+        ' — missing ' + gmissing.slice(0, 10).join(', ') + (gmissing.length > 10 ? ' … (' + gmissing.length + ')' : '') +
+        '\n  run scripts/golden.js without a filter, or add --partial to merge these files into the baseline');
+      process.exit(1);
+    }
+    out.golden = partial ? Object.assign({}, old.golden || {}, cur.golden.files) : cur.golden.files;
+  } else if (old.golden) { out.golden = old.golden; kept.push('golden'); }
   fs.writeFileSync(BASELINE, JSON.stringify(out, null, 1) + '\n');
   if (partial) console.log('\nmerged ' + Object.keys(cur.corpus).length + ' corpus file(s) into ' + Object.keys(old.corpus || {}).length + ' (' +
     Object.keys(cur.corpus).filter((n) => !(old.corpus || {})[n]).length + ' new): ' + Object.keys(out.corpus).length + ' in all');
