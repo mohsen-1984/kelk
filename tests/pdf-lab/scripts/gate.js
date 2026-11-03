@@ -14,6 +14,7 @@
 //   out/fuzz-dev/_scores.json, fuzz-heldout  run-fuzz.js dev | heldout
 //   out/meta/_scores.json                    run-meta.js (the metamorphic net)
 //   out/golden/_scores.json                  golden.js (the golden files: golden/<name>.md typed from the page)
+//   out/real-heldout/_scores.json            run-import.js --real-heldout (one mean, docs/HELDOUT.md)
 //
 // What fails:
 //   corpus  a file that crashes, or whose total drops more than TOL_FILE (one file is enough: the corpus
@@ -31,7 +32,11 @@
 //           compared side (baseline.json's golden section, or --against's golden/_scores.json); a new golden file, one
 //           gone, a structure diff that grew (structdiff.js edits) or one metric down while the total holds: notes.
 //           --update writes the section only from a run of the lab's own golden/ folder holding every golden file
-//           (else refused, as the corpus; --partial merges the run's files)
+//           (else refused, as the corpus; --partial merges the run's files). The goldens on held-out real-producer
+//           PDFs (heldout.js) are no rows: one mean (golden.js heldout, baseline goldenHeldout), failing on a crash or a
+//           drop of more than TOL_MEAN over as many files
+//   realHeldout  the held-out real-producer documents (heldout.js): a crash, or their mean total dropping more than
+//           TOL_MEAN — a mean only, over the same documents and count on both sides (else a note)
 //   rules   (a note, never a failure) a rule that fired on a corpus file and no longer does on it (rules.js,
 //           out/_rules.json; the baseline keeps each file's fired rules from --update)
 //   meta    a crash; a file of a "same" transform not byte-identical to its reference outside run-meta.js KNOWN (or
@@ -67,6 +72,8 @@ if (opt('--update') && opt('--against')) { console.error('--update with --agains
 const p1 = (x) => typeof x === 'number' ? (100 * x).toFixed(1) : '-';
 const d1 = (x) => (x >= 0 ? '+' : '') + (100 * x).toFixed(1);
 const read = (f) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { return null; } };
+// the held-out real-producer PDFs (heldout.js, docs/HELDOUT.md): never in the corpus part, file by file — one mean (realHeldout)
+const heldReal = new Set(require('./heldout.js').splitRealPdfs(labPdfs(), (n) => require('./env.js').pdfGroup(n) === 'real-producers').heldout.map((x) => x.name.replace(/\.pdf$/, '')));
 
 // one run, from its output folder, in the baseline's shape
 function load(dir) {
@@ -106,8 +113,9 @@ function load(dir) {
   // the golden files, per file as the corpus (golden.js): lab = it read the lab's golden/ folder, filter = a filtered run
   const golden = read(path.join(dir, 'golden', '_scores.json'));
   if (golden) {
-    run.golden = { lab: !!golden.lab, filter: golden.filter || null, files: {} };
-    (golden.rows || []).forEach((r) => {
+    // (a held-out real-producer PDF's golden: its mean only, golden.heldout — an older run's row of one is dropped)
+    run.golden = { lab: !!golden.lab, filter: golden.filter || null, files: {}, heldout: golden.heldout || null };
+    (golden.rows || []).filter((r) => !heldReal.has(r.name)).forEach((r) => {
       const o = { error: r.error || null };
       METRICS.concat(CORPUS_EXTRA).forEach((k) => { if (typeof r[k] === 'number') o[k] = +r[k].toFixed(4); });
       if (r.struct) o.edits = r.struct.edits;
@@ -129,7 +137,7 @@ if (!base) notes.push(against ? 'nothing to compare with in ' + against : 'no ' 
 // ── the corpus: file by file ───────────────────────────────────────────
 if (base && base.corpus) {
   const dropped = [], rose = [], metricMoves = [], gone = [];
-  Object.keys(base.corpus).forEach((name) => {
+  Object.keys(base.corpus).filter((name) => !heldReal.has(name)).forEach((name) => {
     const b = base.corpus[name], c = cur.corpus[name];
     if (!c) { gone.push(name); return; }
     if (c.error && !b.error) { fails.push('corpus: ' + name + ' crashes — ' + c.error); return; }
@@ -283,6 +291,9 @@ else {
 // ── the golden files: file by file ─────────────────────────────────────
 // the compared side: --against's golden/_scores.json, or baseline.json's golden section ({ name: { total, … } })
 const goldenBase = base ? (against ? base.golden && base.golden.files : base.golden) : null;
+if (goldenBase) heldReal.forEach((n) => { delete goldenBase[n]; });
+// the goldens on held-out real-producer PDFs: one mean (golden.js heldout; baseline.json goldenHeldout)
+const goldenHeldBase = base ? (against ? base.golden && base.golden.heldout : base.goldenHeldout) : null;
 if (!cur.golden) notes.push('golden: not run (scripts/golden.js)');
 else {
   const other = against ? 'the other run' : BNAME;
@@ -309,10 +320,43 @@ else {
   }
   if (rose.length) notes.push('golden, better: ' + rose.join(', '));
   if (moves.length) notes.push('golden, one metric down (or the structure diff up) while the total holds: ' + moves.join('; '));
+  // held out: a crash more than the compared side, or the mean total dropping more than TOL_MEAN — over as many files
+  const hc = cur.golden.heldout, hb = goldenHeldBase;
+  if (hc && hc.errors && !(hb && hb.errors >= hc.errors)) fails.push('golden, held out: ' + hc.errors + ' file(s) crash');
+  if (hc && hb && hb.n !== hc.n) notes.push('golden, held out: ' + other + ' read ' + hb.n + ' files, this run ' + hc.n + ' — not compared');
+  else if (hc && hb && typeof hb.mean.total === 'number' && typeof hc.mean.total === 'number' && hc.mean.total - hb.mean.total < -TOL_MEAN)
+    fails.push('golden, held out: mean ' + p1(hb.mean.total) + ' → ' + p1(hc.mean.total) + ' (' + hc.n + ' files)');
+  if (!hc && hb) notes.push('golden, held out: not in this run' + (cur.golden.filter ? ' (a filtered run leaves them out)' : ''));
+}
+
+// ── the held-out real producers: one mean (docs/HELDOUT.md) ───────────
+// run-import.js --real-heldout writes out/real-heldout/_scores.json: the count, the crashes, the held-out documents
+// and the mean total — nothing per file. Fails on a crash more than the compared side, or the mean total dropping
+// more than TOL_MEAN; compared only when both sides read the same documents and as many PDFs (another split or a
+// PDF added is a note). The held-out log (heldout-opened.log, run-fuzz.js --show) is named whenever it has lines.
+const realHeldout = (() => {
+  const c = read(path.join(OUT, 'real-heldout', '_scores.json'));
+  const b = against ? read(path.join(path.resolve(String(against)), 'real-heldout', '_scores.json')) : base && base.realHeldout;
+  const other = against ? 'the other run' : BNAME;
+  if (!c) { notes.push('real held-out: not run (scripts/run-import.js --real-heldout)'); return null; }
+  if (c.errors && !(b && b.errors >= c.errors)) fails.push('real held-out: ' + c.errors + ' PDF(s) crash');
+  if (!b) { notes.push('real held-out: nothing to compare with in ' + other + ' — mean ' + p1(c.mean.total) + ' (' + c.n + ' PDFs)'); return { c, b: null }; }
+  if (JSON.stringify(b.docs) !== JSON.stringify(c.docs) || b.n !== c.n) {
+    notes.push('real held-out: ' + other + ' read other files (' + b.n + ' PDFs of ' + (b.docs || []).join(', ') + '; now ' + c.n + ' of ' + c.docs.join(', ') + ') — not compared');
+    return { c, b: null };
+  }
+  if (typeof b.mean.total === 'number' && typeof c.mean.total === 'number' && c.mean.total - b.mean.total < -TOL_MEAN)
+    fails.push('real held-out: mean ' + p1(b.mean.total) + ' → ' + p1(c.mean.total));
+  return { c, b };
+})();
+const openedLog = path.join(OUT, 'heldout-opened.log');
+if (fs.existsSync(openedLog)) {
+  const n = fs.readFileSync(openedLog, 'utf8').split('\n').filter((l) => l.trim()).length;
+  if (n) notes.push('held-out opened: ' + n + ' line(s) in ' + openedLog + ' — rotate and say so in the report (docs/HELDOUT.md)');
 }
 
 // ── report ─────────────────────────────────────────────────────────────
-const cm = (run) => { const v = Object.values(run.corpus || {}).map((r) => r.total).filter((x) => typeof x === 'number'); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : undefined; };
+const cm = (run) => { const v = Object.entries(run.corpus || {}).filter(([n]) => !heldReal.has(n)).map(([, r]) => r.total).filter((x) => typeof x === 'number'); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : undefined; };
 console.log('gate: this run (' + path.relative(process.cwd(), OUT) + ') against ' + (against ? path.relative(process.cwd(), path.resolve(String(against))) : BNAME) + '\n');
 console.log(''.padEnd(22), METRICS.map((k) => SHORT[k].padStart(6)).join(''));
 if (base && base.corpus) console.log('corpus mean'.padEnd(22), ''.padStart(6 * 7), (p1(cm(base)) + ' → ' + p1(cm(cur))).padStart(6));
@@ -322,6 +366,9 @@ if (cur.golden) {
   const mine = Object.keys(cur.golden.files).filter((n) => typeof cur.golden.files[n].total === 'number'), both = goldenBase ? mine.filter((n) => goldenBase[n] && typeof goldenBase[n].total === 'number') : [];
   console.log(('golden mean (' + mine.length + ')').padEnd(22), ''.padStart(6 * 7), p1(gt(cur.golden.files, mine)).padStart(6),
     both.length ? '  (' + p1(gt(goldenBase, both)) + ' → ' + p1(gt(cur.golden.files, both)) + ' over the ' + both.length + ' both have)' : '');
+  const hc = cur.golden.heldout, hb = goldenHeldBase;
+  if (hc) console.log(('  held out (' + hc.n + ')').padEnd(22), ''.padStart(6 * 7), p1(hc.mean.total).padStart(6),
+    hb && hb.n === hc.n ? '  (was ' + p1(hb.mean.total) + ', ' + d1(hc.mean.total - hb.mean.total) + ') — a mean only, docs/HELDOUT.md' : '  — a mean only, docs/HELDOUT.md');
 }
 fuzzRows.forEach(([split, b, c]) => {
   console.log(('fuzz/' + split).padEnd(22), METRICS.map((k) => p1(c[k]).padStart(6)).join(''));
@@ -338,11 +385,13 @@ if (metaRows.length) {
   metaRows.forEach(([t, b, c]) => console.log('  ' + t.padEnd(12), (c.same + '/' + c.n).padStart(6), p1(c.total).padStart(6), d1(c.delta).padStart(6),
     b ? '  (was ' + b.same + '/' + b.n + ' ' + p1(b.total) + (b.n !== c.n ? ', now ' + b.curSame + '/' + b.n + ' ' + p1(b.cur) + ' on those seeds' : '') + ')' : ''));
 }
+if (realHeldout) console.log('real held-out'.padEnd(22), 'mean total ' + p1(realHeldout.c.mean.total) + (realHeldout.b ? ' (was ' + p1(realHeldout.b.mean.total) + ', ' + d1(realHeldout.c.mean.total - realHeldout.b.mean.total) + ')' : '') +
+  ' · ' + realHeldout.c.n + ' PDFs of ' + realHeldout.c.docs.length + ' documents');
 const mk = (run) => run && run.corpus ? Object.values(run.corpus).reduce((a, r) => a + (r.markup || 0), 0) : '-';
 console.log('inline markup lost'.padEnd(22), 'corpus', mk(cur), 'files' + (base ? ' (was ' + mk(base) + ')' : ''),
   ...['dev', 'heldout'].filter((s) => cur.fuzz[s]).map((s) => '· ' + s + ' ' + cur.fuzz[s].markup + (base && base.fuzz && base.fuzz[s] ? ' (was ' + (base.fuzz[s].markup || 0) + ')' : '')));
 if (notes.length) { console.log('\nnotes'); notes.forEach((n) => console.log('  · ' + n)); }
-if (fails.length) { console.log('\nFAILED (tolerance: ' + p1(TOL_FILE) + ' per corpus file, ' + p1(TOL_GOLDEN) + ' per golden file, ' + p1(TOL_MEAN) + ' per fuzz or meta mean, ' + p1(TOL_HARD) + ' per hard transform)'); fails.forEach((f) => console.log('  ✗ ' + f)); }
+if (fails.length) { console.log('\nFAILED (tolerance: ' + p1(TOL_FILE) + ' per corpus file, ' + p1(TOL_GOLDEN) + ' per golden file, ' + p1(TOL_MEAN) + ' per fuzz, meta, real held-out or held-out golden mean, ' + p1(TOL_HARD) + ' per hard transform)'); fails.forEach((f) => console.log('  ✗ ' + f)); }
 else console.log('\npassed');
 
 // ── --update: this run becomes the baseline ────────────────────────────
@@ -350,7 +399,8 @@ if (opt('--update')) {
   const partial = !!opt('--partial');
   if (fails.length && !opt('--force')) { console.log('\n' + BNAME + ' not written: the gate failed (--force writes it anyway)'); process.exit(1); }
   // a filtered run written as the whole baseline leaves the other files ungated: by name, against every lab PDF
-  const lab = labPdfs().map((x) => x.name.replace(/\.pdf$/, '')), missing = lab.filter((n) => !cur.corpus[n]);   // as run-import.js names them
+  // (the held-out real-producer PDFs are not in the corpus run: scored as a mean, above)
+  const lab = labPdfs().map((x) => x.name.replace(/\.pdf$/, '')).filter((n) => !heldReal.has(n)), missing = lab.filter((n) => !cur.corpus[n]);   // as run-import.js names them
   if (missing.length && !partial) {
     console.log('\n' + BNAME + ' not written: this run holds ' + Object.keys(cur.corpus).length + ' corpus files, the lab ' + lab.length +
       ' — missing ' + missing.slice(0, 10).join(', ') + (missing.length > 10 ? ' … (' + missing.length + ')' : '') +
@@ -361,6 +411,7 @@ if (opt('--update')) {
   if (partial && !old.corpus) { console.log('\n' + BNAME + ' not written: --partial needs an existing baseline to merge into — run an unfiltered --update first'); process.exit(1); }
   const out = { written: new Date().toISOString(), note: 'scripts/gate.js --update; the fuzz means hold only for their env',
                 corpus: partial ? Object.assign({}, old.corpus || {}, cur.corpus) : cur.corpus, fuzz: {} };
+  heldReal.forEach((n) => { delete out.corpus[n]; });      // (an older baseline's per-file rows of held-out real files)
   Object.keys(cur.fuzz).forEach((s) => { out.fuzz[s] = Object.assign({}, cur.fuzz[s]); delete out.fuzz[s].files; });
   // each corpus file's fired rules (a run without _rules.json keeps the old ones)
   if (cur.rules) out.rules = partial ? Object.assign({}, old.rules || {}, cur.rules) : cur.rules; else if (old.rules) out.rules = old.rules;
@@ -378,7 +429,8 @@ if (opt('--update')) {
   // --partial merges a filtered run's files; a run without golden.js keeps the old section
   if (cur.golden) {
     const gdir = path.join(LAB, 'golden');
-    const all = fs.existsSync(gdir) ? fs.readdirSync(gdir).filter((f) => /\.md$/i.test(f) && !/^readme\.md$/i.test(f)).map((f) => f.replace(/\.md$/i, '')) : [];
+    // (a golden on a held-out real-producer PDF is no row: its mean is goldenHeldout, below)
+    const all = fs.existsSync(gdir) ? fs.readdirSync(gdir).filter((f) => /\.md$/i.test(f) && !/^readme\.md$/i.test(f)).map((f) => f.replace(/\.md$/i, '')).filter((n) => !heldReal.has(n)) : [];
     const gmissing = all.filter((n) => !cur.golden.files[n]);
     if (!cur.golden.lab) { console.log('\n' + BNAME + ' not written: the golden run read another folder than golden/ (golden.js --dir) — run it on the lab\'s own'); process.exit(1); }
     if (gmissing.length && !partial) {
@@ -388,7 +440,12 @@ if (opt('--update')) {
       process.exit(1);
     }
     out.golden = partial ? Object.assign({}, old.golden || {}, cur.golden.files) : cur.golden.files;
-  } else if (old.golden) { out.golden = old.golden; kept.push('golden'); }
+    heldReal.forEach((n) => { delete out.golden[n]; });
+    // the held-out goldens' mean: this run's (an unfiltered run), else the old one
+    if (cur.golden.heldout) out.goldenHeldout = cur.golden.heldout; else if (old.goldenHeldout) { out.goldenHeldout = old.goldenHeldout; kept.push('golden, held out'); }
+  } else if (old.golden) { out.golden = old.golden; kept.push('golden'); if (old.goldenHeldout) out.goldenHeldout = old.goldenHeldout; }
+  // the real held-out mean: this run's, else the old one
+  if (realHeldout) out.realHeldout = realHeldout.c; else if (old.realHeldout) { out.realHeldout = old.realHeldout; kept.push('real held-out'); }
   fs.writeFileSync(BASELINE, JSON.stringify(out, null, 1) + '\n');
   if (partial) console.log('\nmerged ' + Object.keys(cur.corpus).length + ' corpus file(s) into ' + Object.keys(old.corpus || {}).length + ' (' +
     Object.keys(cur.corpus).filter((n) => !(old.corpus || {})[n]).length + ' new): ' + Object.keys(out.corpus).length + ' in all');

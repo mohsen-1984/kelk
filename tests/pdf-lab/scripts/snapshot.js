@@ -14,6 +14,10 @@
 // KELK=… picks the importer, as everywhere in the lab. The snapshot folder holds <name>.md (pictures shortened
 // to a hash: the text stays readable and diffable) and _snapshot.json; keep it outside the repository when the
 // PDFs are private. With --against, each file is "same" or shows its changed lines and the signals that moved.
+// The held-out protocol's third guard (docs/HELDOUT.md), reference-free: the private files in tests/pdf-lab/real/
+// (gitignored) snapshotted before a rule change and again after it with --against —
+//   node scripts/snapshot.js tests/pdf-lab/real <outside>/snap-before
+//   node scripts/snapshot.js tests/pdf-lab/real <outside>/snap-after --against <outside>/snap-before
 const fs = require('fs'), path = require('path'), crypto = require('crypto');
 const { KELK, req, fileUrl } = require('./env.js');
 const { chromium } = req('playwright');

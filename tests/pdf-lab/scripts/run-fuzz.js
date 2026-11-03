@@ -3,6 +3,8 @@
 // dev:     everything — the mean, the scores per style value, the weakest files by name.
 // heldout: aggregates only (the mean and the scores per style value); file names and their Markdown
 //          stay unread unless --show is given. Looking at a held-out file to write a rule turns it into dev.
+//          --show on held-out appends a line (date, split, user, generator, seed base) to LAB_OUT/heldout-opened.log
+//          and warns: the split must then be rotated (docs/HELDOUT.md), and every report checks that log.
 // Each run is compared with the previous one of the same split (_scores.prev.json): what moved — only when both read
 // PDFs of the same generator and env (else a note).
 const fs = require('fs'), path = require('path');
@@ -28,6 +30,11 @@ const mean = (rows, k) => { const v = rows.map((r) => r[k]).filter((x) => typeof
   const dir = path.join(FUZZ, split), res = path.join(OUT, 'fuzz-' + split);   // the PDFs; the results
   if (!fs.existsSync(path.join(dir, 'manifest.json'))) { console.error('no fuzz/' + split + '/manifest.json — run make-fuzz.js ' + split); process.exit(1); }
   const manifest = JSON.parse(fs.readFileSync(path.join(dir, 'manifest.json'), 'utf8'));
+  // a held-out split opened: written down before anything is printed (docs/HELDOUT.md)
+  if (show && split !== 'dev') {
+    require('./heldout.js').logOpened(OUT, { split: 'fuzz:' + split, generator: (manifest.env || {}).generator,
+      base: manifest.base !== undefined ? manifest.base : manifest.samples.length ? Math.min(...manifest.samples.map((s) => s.seed)) : null });
+  }
   const outDir = res; fs.mkdirSync(outDir, { recursive: true });
   const browser = await chromium.launch(), page = await browser.newPage();
   await page.goto(lab);

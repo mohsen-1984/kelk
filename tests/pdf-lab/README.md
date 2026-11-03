@@ -154,7 +154,9 @@ them to `pdf/` with a `--<doc>` suffix to score them, or to any folder for `run-
 ## Running it
 
 ```sh
-node scripts/run-import.js [filter]   # import pdf/*/*.pdf, score against corpus/<doc>.md, write out/
+node scripts/run-import.js [filter]   # import pdf/*/*.pdf, score against corpus/<doc>.md, write out/ (held-out real documents left out)
+node scripts/run-import.js --real-heldout   # the held-out real-producer documents: their mean only (docs/HELDOUT.md)
+node scripts/heldout.js               # the real-producer split: the documents on each side
 node scripts/roundtrip.js             # Kelk's own round trip: tests/builder-suite.html, md → PDF → md
 node scripts/math-roundtrip.js        # formulas through Kelk and back: every case of tests/math-cases.js, en and fa (76 checks)
 DIR=folder node scripts/run-real.js   # any PDFs: words found (recall) and their order, against pdftotext
@@ -206,7 +208,7 @@ sets measure that gap.
 
 ```sh
 node scripts/make-fuzz.js dev        # 100 PDFs: fuzz/dev/      (seeds 1–100)
-node scripts/make-fuzz.js heldout    # 100 PDFs: fuzz/heldout/  (seeds 100001–100100)
+node scripts/make-fuzz.js heldout    # 100 PDFs: fuzz/heldout/  (seeds HELDOUT_BASE…: 100001–100100 until the first rotation)
 node scripts/run-fuzz.js dev         # mean, per direction, scores per style value, weakest files, what moved
 node scripts/run-fuzz.js heldout     # mean, per direction and scores per style value only
 ```
@@ -246,7 +248,9 @@ only when the previous run read PDFs of the same generator and env.
 what you see. `heldout` is for judgement: only its means and its per-value table are read
 (`run-fuzz.js heldout` hides file names; `--show` prints them). A rule written after looking at a
 held-out file has turned that split into a second dev set, and nothing measures generalisation any more
-— then draw a new held-out split with other seeds. A change is good when dev improves **and**
+— then draw a new held-out split with other seeds (the rotation of [`docs/HELDOUT.md`](../../docs/HELDOUT.md):
+`--show` on held-out is logged to `LAB_OUT/heldout-opened.log`, and `make-fuzz.js` `HELDOUT_ROTATION` moves the
+seed base up by 100000). A change is good when dev improves **and**
 held-out does not drop.
 
 **Reading the table.** Per dimension, the weakest value comes first: that is where to look next (in
@@ -435,12 +439,22 @@ extra, changed }, edits } }`; `mean` holds each metric's mean over the files tha
 golden whose PDF is not in the lab is an error row, and any error row exits 1. A missing `golden/` folder is no error
 (nothing to score).
 
+**Goldens on held-out PDFs.** Five goldens are typed from PDFs of held-out real-producer documents (`scripts/heldout.js`,
+[`docs/HELDOUT.md`](../../docs/HELDOUT.md): `real-letter-ar` three times, `real-report-fa`, `real-memo-fa`). A score per
+file would read those documents one by one, so they are read as the held-out is: `golden.js` scores them but prints
+and writes no row, no Markdown and no name with a score of them — only `heldout: { n, errors, mean: { total, rtl,
+edits } }` in `_scores.json` and one `held-out` line; a filtered run leaves them out. They stay in `golden/` (a golden
+is typed by a person; moving them would mean typing others) and are gated as a mean (below).
+
 **In the gate**, as the corpus, file by file: a golden file fails when it crashes (or lost its PDF), or its total
 drops more than **0.5 point** (`TOL_GOLDEN`) against the compared side (`baseline.json`'s `golden` section, or
 `--against DIR`'s `golden/_scores.json`). A new golden file, one gone, one metric down while the total holds, and a
 structure diff that grew are notes. `--update` writes the `golden` section only from a run of the lab's own
 `golden/` holding every golden file (a filtered run is refused as the corpus is, `--partial` merges its files; a
-`--dir` run is refused); a run without `golden.js` keeps the old section. In CI both importers import head's goldens.
+`--dir` run is refused); a run without `golden.js` keeps the old section. The held-out goldens are one mean
+(`baseline.json` `goldenHeldout`, `--against`'s `golden/_scores.json` `heldout`): a crash, or the mean total dropping
+more than **1 point** over as many files, fails; `--update` writes it from an unfiltered run, else keeps the old one.
+In CI both importers import head's goldens.
 
 ## The gate
 
@@ -450,8 +464,9 @@ change made the importer worse:
 | What | Fails when |
 |---|---|
 | corpus | a file crashes, or its total drops more than 0.5 point, or its right-to-left details (`rtl`) drop more than 0.5 point, or it is no longer scored (its `corpus/<doc>.md` missing or renamed) |
-| golden | a golden file crashes or has no PDF, or its total drops more than 0.5 point (see «Golden files») |
+| golden | a golden file crashes or has no PDF, or its total drops more than 0.5 point; the goldens on held-out real PDFs as one mean, more than 1 point (see «Golden files») |
 | fuzz `dev`, `heldout` | a PDF crashes, or the split's **mean** total drops more than 1 point, or so does a direction's (`ltr`, `rtl`) mean total or the `rtl` column's mean over the right-to-left files (a loss on the 44 right-to-left files alone barely moves the split's mean); an older baseline without them gives a note |
+| real held-out | the held-out real-producer documents (`scripts/heldout.js`, [`docs/HELDOUT.md`](../../docs/HELDOUT.md)), scored by `run-import.js --real-heldout` as one mean: a crash, or the mean total dropping more than 1 point (compared only over the same documents and count) |
 | inline markup (`mkup`) | bold, italic, strike or inline code the importer wrote in HTML that a CommonMark parser no longer finds in its Markdown (`markup.js`: «بود**.**» stays literal asterisks) — any rise, on a corpus file or summed over a fuzz split; it should stay 0 |
 
 A metric that drops while the total holds (headings −3, tables +3) is printed as a note, not failed.
@@ -459,7 +474,7 @@ The fuzz splits are gated on their means only: per file would read held-out file
 groups per style value are too small (fewer than 15 files in most) to tell a change from noise.
 
 ```sh
-node scripts/run-import.js && node scripts/golden.js && node scripts/run-fuzz.js dev && node scripts/run-fuzz.js heldout && node scripts/run-meta.js
+node scripts/run-import.js && node scripts/run-import.js --real-heldout && node scripts/golden.js && node scripts/run-fuzz.js dev && node scripts/run-fuzz.js heldout && node scripts/run-meta.js
 node scripts/gate.js                       # against baseline.json
 node scripts/gate.js --update              # this run becomes the baseline (refused if the gate fails)
 node scripts/gate.js --update --partial    # a filtered run: its files merged into the baseline, the others kept
@@ -513,7 +528,7 @@ node scripts/snapshot.js ~/private-pdfs ~/snap/after --against ~/snap/before
 ```
 
 Each problem such a file shows is then rebuilt as a lab PDF of our own (`make-*.js`, like `word-print`),
-so that it is tested in public from then on.
+so that it is tested in public from then on. This is the held-out protocol's third, reference-free guard ([`docs/HELDOUT.md`](../../docs/HELDOUT.md)): the private files kept in `real/` (gitignored), snapshotted before and after a rule change.
 
 ## Inspection tools
 
