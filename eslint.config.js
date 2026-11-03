@@ -136,6 +136,9 @@ module.exports = [
   { files: ['lib/msOfficeWordHtmlTemplate.js'], languageOptions: { globals: { createMsoTemplate: 'off' } } },
   { files: ['tests/test-corpus.js'], languageOptions: { globals: { CORPUS: 'off' } } },
 
+  // The importer's stages stay split into one function per step (plan P3.1; map in lib/pdfimport/README.md).
+  { files: ['lib/pdfimport/**/*.js'], rules: { 'max-lines-per-function': ['error', { max: 150 }] } },
+
   // ---- Browser: the UI-check probes injected into a page under test ---------------------------------------------
   {
     files: ['.claude/skills/**/*.js'],
