@@ -134,6 +134,13 @@
             jspdf: { src: 'vendor/jspdf.umd.min_4.2.1.js', global: 'jspdf' },
             mammoth: { src: 'vendor/mammoth.browser.min_1.12.3.js', global: 'mammoth' },
             pdfjs: { src: ['vendor/pdfjs/pdf_6.4.299.js', 'vendor/pdfjs/pdf.worker_6.4.299.js'], global: 'pdfjsLib' },
+            // the PDF importer: its core, then its parts in PdfImporter.PARTS order (tests/unit/app.test.js checks it)
+            pdfimport: {
+                src: ['lib/PdfImporter.js', 'lib/pdfimport/thresholds.js', 'lib/pdfimport/calibration.js',
+                    'lib/pdfimport/extract.js', 'lib/pdfimport/lines.js', 'lib/pdfimport/regions.js',
+                    'lib/pdfimport/order.js', 'lib/pdfimport/blocks.js'],
+                global: 'PdfImporter'
+            },
             jszip: { src: 'vendor/jszip.min_3.10.2.js', global: 'JSZip' }
         },
 
