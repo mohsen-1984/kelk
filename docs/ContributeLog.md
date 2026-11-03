@@ -746,9 +746,11 @@ review session of 1405-08-09 — versions 1.0 and 1.5, the "Add files via upload
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 16 | P4.1 review findings applied: the corpus and samples generators normalise line ends on read (CRLF gone from corpus.js and about-kelk-and-samples.js); strip-meta.js clears author, last editor, company and local paths from the Office sources and the Office Save as PDF files, page content streams checked unchanged (dev real Markdown byte-identical, held-out content hashes equal), make-real.ps1 runs it and fixes the sheets' separators; what remaking needs (Office 2024, Print to PDF, Edge, Firefox, B Nazanin, Traditional Arabic) in real-src README and Prerequisites; Testing and TODO.md brought to 188 PDFs; profile.js names no held-out document; Chromium named for chrome-- files. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 3 | P4.1 review fixes applied on the branch, unit tests and line ends checked. |
 | 1405-08-12 | 2.0-rc1 | Zarrabi | 7 | P4.1 report written (docs/reports/P4.1-real-producers.md): the 8 sources, the Office / browser paths and the 44 PDFs, metadata stripping, corpus 144 to 188 (94.6), dev real PDFs and the held-out documents as one mean, review findings, what stays open. |
+| 1405-08-12 | 2.0-rc1 | Zarrabi | 8 | P4.3 report written (docs/reports/P4.3-heldout.md): the four guards and the opened log, the held-out documents after the fixes, the lab before and after as means, review findings, what stays open. |
+| 1405-08-12 | 2.0-rc1 | Zarrabi | 4 | P4.2 merged into P4.3: the gate's golden comparison (compareGolden) joined with the held-out golden mean and the README rows; unit tests 177, goldens and gate rerun. |
 
 <!-- generated:totals -->
-**Entries: 159 · Total: 2162 min (36.03 hours) — Zarrabi 2162 min (152 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
+**Entries: 161 · Total: 2174 min (36.23 hours) — Zarrabi 2174 min (154 rows), Hasan Nejad — (7 rows, no logs).** (7 rows without logs carry no figure.)
 <!-- /generated:totals -->
 
 ---
