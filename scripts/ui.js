@@ -310,12 +310,19 @@
                     dlg.oncancel = function (e) { e.preventDefault(); cancel(); };       // Esc
                 }
                 const timer = dlg ? setTimeout(function () { if (!dlg.open) dlg.showModal(); }, o.delay == null ? 200 : o.delay) : 0;
-                const done = function () { clearTimeout(timer); if (dlg && dlg.open) dlg.close(); };
+                // done: the dialog's handlers go too (they would keep this task's scope, and what it read, alive)
+                const done = function () {
+                    clearTimeout(timer);
+                    if (dlg) { if (dlg.open) dlg.close(); btn.onclick = null; dlg.oncancel = null; }
+                };
                 return Promise.race([Promise.resolve().then(function () { return fn(api); }), aborted])
                     .then(function (v) { done(); return v; }, function (e) { done(); throw e; });
             };
             const p = (self._tasks || Promise.resolve()).then(run, run);
-            self._tasks = p.catch(function () {});
+            // the queue waits for the task, not for its value: resolving to undefined, it holds no result alive
+            // (an import's text, a PDF's bytes) after the caller has taken it
+            const settle = function () {};
+            self._tasks = p.then(settle, settle);
             return p;
         },
 
