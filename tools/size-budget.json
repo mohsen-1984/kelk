@@ -1,4 +1,4 @@
 {
-  "_about": "Startup JS + CSS budget of index.html in bytes, checked by tools/check-size.js (definition in its header). Set for 2.0 at the measured 1,569,203 bytes rounded up to the next 5 kB: the PDF importer loads on demand, the PowerPoint output (lib/PptxBuilder.js, scripts/slides.js) and the other builders still load at startup. Lazy-loading the builders (TODO.md, High) lowers it.",
-  "maxBytes": 1570000
+  "_about": "Startup JS + CSS budget of index.html in bytes, checked by tools/check-size.js (definition in its header). 2.0 was 1,569,203 bytes; 2.1 adds 11,962 (the import progress through every step, the report's collapse and toggle, the version beside the name, their strings and icons): 1,581,165, rounded up to the next 5 kB. The PDF importer loads on demand; the builders (PowerPoint included) still load at startup — loading them on first use (TODO.md, High) lowers it.",
+  "maxBytes": 1585000
 }
