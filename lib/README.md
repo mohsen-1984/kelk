@@ -107,7 +107,7 @@ language (justify; a paragraph holding a long URL or path starts instead), and t
 contents layout (after the opening H1: `<hr>`, contents, `<hr>`, an empty line).
 
 File properties: `configure({ meta: { title, author, subject, keywords, creator } })` (or `setMeta`) — PDF Info,
-the .docx core properties, HTML `<meta name="author">`; the creator is "Kelk " + `BuilderBase.version` (2.0 now) unless set, the title the
+the .docx core properties, HTML `<meta name="author">`; the creator is "Kelk " + `BuilderBase.version` (2.1 now) unless set, the title the
 header's or the first H1 when left out.
 
 ## The builders

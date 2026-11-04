@@ -4,6 +4,10 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+## [2.1] — 2026-11-04
+
+The import's progress and report made clearer, the version beside the name, and a new prompt for slides.
+
 ### Changed
 
 - **PDF import progress:** the bar runs through every step — reading the pages, repairing fonts, building lines,
