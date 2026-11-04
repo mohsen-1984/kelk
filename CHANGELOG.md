@@ -4,6 +4,27 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+### Changed
+
+- **PDF import progress:** the bar runs through every step — reading the pages, repairing fonts, building lines,
+  laying out, writing the Markdown — instead of standing on the last page for most of a large file's time.
+- **The import report** comes with every PDF import, the same panel whatever the file (a clean one in the calm
+  color, without the safe-mode button); it collapses to its head after 3 seconds (`config.reportOpenMs`) and its
+  toggle opens it again. It belongs to its text: Clear, a sample or another import hides it, Undo brings it back.
+- The version beside the name, linking to its release notes.
+- Settings → Slides: the prompt for AI models plans the deck first and chooses each slide's form from its content
+  (tables for comparisons, charts for numbers, cards for parallel ideas).
+- The link preview image (`assets/og-image.png`) shows PowerPoint and PDF import.
+
+### Fixed
+
+- Settings beside a maximized panel at 901–1100 px (a zoomed window) had its label lying flat: it stays below the
+  panel there, as the layout around it.
+
+### Documentation
+
+- `docs/RELEASING.md`: the release checklist.
+
 ## [2.0] — 2026-11-03
 
 The third release. Kelk reads **PDF** — a PDF becomes Markdown again — and writes a fifth output, **PowerPoint**:
