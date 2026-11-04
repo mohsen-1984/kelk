@@ -1,4 +1,4 @@
-# Three Persian pages as Word prints them (Kelk 2.2's rounds) — built by hand, glyph by glyph, each habit on purpose,
+# Four Persian pages as Word prints them (Kelk 2.2's rounds) — built by hand, glyph by glyph, each habit on purpose,
 # with our own text:
 #   · word-frame--frame-table-fa: a page inside an art border (a ring of rules near the page's edges) and a ruled
 #     table a few points wider than the text on its start (right) side, its outer rule drawn a piece a row and each
@@ -8,12 +8,15 @@
 #   · word-form--form-box-fa: a table whose first row is one cell across it, a box of «label: value» pairs in three
 #     columns and two rows, then the header and the rows. Read as a form (each pair an item, row by row), its rows
 #     came after the table: the box inside the table's frame, the XY-cut could not part them
+#   · word-form--form-row-fa: the same box drawn a run a row, the pairs at their tab stops and the gaps between them
+#     drawn as spaces (as a payslip's box is), the heading in a box of its own over the table. Taken for the table's
+#     title, the rows came back as one paragraph; they are its preamble: each pair a paragraph, column by column
 #   · word-nitro--scrambled-fa: a Word subset of a Persian font through another PDF program whose ToUnicode names
 #     almost every Arabic glyph by a wrong letter (the cmap, which names the glyphs by their joining forms, is right):
 #     read through the ToUnicode the text is gibberish; the forms of touching letters fit only through the cmap
-# The Markdown that must come back is corpus/frame-table-fa.md, corpus/form-box-fa.md, corpus/scrambled-fa.md.
+# The Markdown that must come back is corpus/frame-table-fa.md, form-box-fa.md, form-row-fa.md, scrambled-fa.md.
 #   python3 scripts/make-word22-rtl.py    → pdf/producers/word-frame--frame-table-fa.pdf, word-form--form-box-fa.pdf,
-#                                           word-nitro--scrambled-fa.pdf and the three corpus files
+#                                           word-form--form-row-fa.pdf, word-nitro--scrambled-fa.pdf and their corpus files
 import os, sys
 sys.dont_write_bytecode = True
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -131,6 +134,66 @@ corpus('form-box-fa.md', '''# کتابخانه مرکزی شهر
 | 1 | سووشون | سیمین دانشور | 1404/07/18 | 1404/08/02 |
 | 2 | شازده احتجاب | هوشنگ گلشیری | 1404/08/05 | 1404/08/20 |
 | 3 | جای خالی سلوچ | محمود دولت‌آبادی | 1404/08/27 | 1404/09/11 |
+''')
+
+# ---- 2b. the same box as one run a row: the pairs at their tab stops, the gaps between them drawn as spaces --------
+C = Doc({'F1': Font(REG, 'AAAAAA+DemoNazanin'), 'F2': Font(BOLD, 'AAAAAB+DemoNazanin-Bold')}, w=841.89, h=595.28)
+# the heading in a box of its own over the table
+C.line(1, 'کتابخانه مرکزی شهر', 545, 15, 470, 'F2')
+C.line(1, 'کارنامه امانت کتاب - زمستان 1404', 522, 11, 478)
+seg(C, 1, L2, 565, R2, 565); seg(C, 1, L2, 508, R2, 508); seg(C, 1, L2, 565, L2, 508); seg(C, 1, R2, 565, R2, 508)
+XS = [L2, 180, 330, 470, 620, R2]
+top = 508
+pairs = [[('نام عضو:', 'رضا کریمی'), ('شماره عضویت:', '51734'), ('کد شعبه:', '21')],
+         [('نوع عضویت:', 'آزاد'), ('شماره کارت:', '220418'), ('تلفن:', '6630')]]
+F1 = C.fonts['F1']
+# (the pairs' tab stops: each column 2 em left of the widest pair in the column before it)
+pw = lambda lab, val: C.width(visual(lab), 11, 'F1') + 3 + C.width(visual(val), 11, 'F1')
+PX = [R2 - 6]
+for k in range(2): PX.append(PX[-1] - max(pw(*row[k]) for row in pairs) - 22)
+y = top - 17
+for row in pairs:
+    lefts = []
+    for (lab, val), right in zip(row, PX):
+        lefts.append(C.runs(1, [(lab, 'F1'), ('gap', 3), (val, 'F1')], y, 11, right))
+    # (the gaps between the pairs drawn as spaces — one run a row, as a tab's fill is)
+    for k in range(len(row) - 1):
+        x0, x1 = PX[k + 1], lefts[k]
+        sw = F1.adv(0x20, 11); n = max(1, int((x1 - x0) / sw))
+        C.put(1, [(0x20, ' ')] * n, x0, y, 11, 'F1', (x1 - x0 - n * sw) / n)
+    y -= 19
+box_bottom = y + 2
+for yv in (top, box_bottom): seg(C, 1, XS[0], yv, XS[-1], yv)
+for xv in (XS[0], XS[-1]): seg(C, 1, xv, top, xv, box_bottom)
+head = ['تاریخ بازگشت', 'تاریخ امانت', 'نویسنده', 'عنوان کتاب', 'ردیف']
+rows = [['1404/10/12', '1404/09/28', 'صادق هدایت', 'سه قطره خون', '1'],
+        ['1404/11/03', '1404/10/19', 'جلال آل احمد', 'مدیر مدرسه', '2']]
+ys = [box_bottom - 22 * k for k in range(len(rows) + 2)]
+for yv in ys: seg(C, 1, XS[0], yv, XS[-1], yv)
+for xv in XS: seg(C, 1, xv, ys[0], xv, ys[-1])
+for vals, yv, f in [(head, ys[0] - 15, 'F2')] + [(r, ys[k + 1] - 15, 'F1') for k, r in enumerate(rows)]:
+    for k, v in enumerate(vals): C.line(1, v, yv, 11, XS[k + 1] - 5, f)
+C.write(out('word-form--form-row-fa.pdf'), WORD, 'form-row-fa')
+corpus('form-row-fa.md', '''**کتابخانه مرکزی شهر**
+
+کارنامه امانت کتاب - زمستان 1404
+
+نام عضو: رضا کریمی
+
+نوع عضویت: آزاد
+
+شماره عضویت: 51734
+
+شماره کارت: 220418
+
+کد شعبه: 21
+
+تلفن: 6630
+
+| ردیف | عنوان کتاب | نویسنده | تاریخ امانت | تاریخ بازگشت |
+| --- | --- | --- | --- | --- |
+| 1 | سه قطره خون | صادق هدایت | 1404/09/28 | 1404/10/12 |
+| 2 | مدیر مدرسه | جلال آل احمد | 1404/10/19 | 1404/11/03 |
 ''')
 
 # ---- 3. a ToUnicode scrambled throughout -----------------------------------------------------------------------------
