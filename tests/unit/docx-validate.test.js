@@ -1,5 +1,5 @@
 /**
- * The checks of tests/docx-validate.js on crafted input (plan P2.3, review findings): Markup Compatibility errors,
+ * The checks of tests/docx-validate.js on crafted input (review findings): Markup Compatibility errors,
  * pictures that are not what their type says, an xmllint that says nothing or crashes, a soffice that fails while
  * an old PDF is lying in the output folder. The real tools are not needed: fake ones are written to a temp folder.
  */

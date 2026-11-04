@@ -60,7 +60,7 @@ test('step 6a: a glyph named by its ligature, its form\'s base glyph, its cmap; 
   assert.deepEqual(run(glyph(99)), [false, 'c', false], 'a glyph the program does not name stays');
 });
 
-// (review of P3.3: rv33's cid-unicode.pdf — CIDs are the Unicode values, a CIDToGIDMap stream, no ToUnicode — plain and packed)
+// (review of rv33's cid-unicode.pdf — CIDs are the Unicode values, a CIDToGIDMap stream, no ToUnicode — plain and packed)
 function rawFile(dict, packed, table) {
   const x = PdfImporter.create();
   x._fire = function () {};

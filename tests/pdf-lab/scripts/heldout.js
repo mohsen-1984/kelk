@@ -6,7 +6,7 @@
 //   node scripts/heldout.js opened <what>       add a line to tests/pdf-lab/heldout-opened.log by hand (a held-out
 //                                               file was opened: <what> = real:<document> or fuzz:heldout)
 //
-// The real-producer split (plan P4.3) is by DOCUMENT, never by file: the document of a lab PDF is the part of its
+// The real-producer split is by DOCUMENT, never by file: the document of a lab PDF is the part of its
 // name after the producer's '--' (a name without '--' is no document), and every PDF of a held-out document is held
 // out wherever it lies in pdf/ — so a rule written for a document seen through Word is never measured on the same
 // document through Edge, or through a producer in another folder.
@@ -23,8 +23,8 @@ const path = require('path');
 const REAL_SALT = 'kelk-real-heldout-1';
 const REAL_SHARE = 0.3;
 const REAL_MIN = 4;
-// the held-out documents, committed 1405-08-12 (P4.3): real-deck-fa, real-memo-fa, real-report-fa by their hash,
-// real-letter-ar by P4.3's first fill to 4 — kept, as the list changes only by a new document or an opening
+// the held-out documents, committed 1405-08-12: real-deck-fa, real-memo-fa, real-report-fa by their hash,
+// real-letter-ar by the first fill to 4 — kept, as the list changes only by a new document or an opening
 const HELD_DOCS = ['real-deck-fa', 'real-letter-ar', 'real-memo-fa', 'real-report-fa'];
 // documents moved to dev because one of their held-out files was opened (tests/pdf-lab/HELDOUT.md, "When a held-out file was
 // opened"): add the document here, with the date, in the change that records it in the log

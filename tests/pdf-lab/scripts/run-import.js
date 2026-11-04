@@ -6,7 +6,7 @@
 //                                               per-file score and no Markdown is printed or written
 // The held-out real-producer PDFs are left out of the normal run (and so of the corpus gate, file by file).
 // --mode: the importer's options.mode (lib/pdfimport/ladder.js; default auto). Run safe mode into a LAB_OUT of its own —
-// its scores are not the gate's (plan P3.4: safe mode on the corpus keeps words and order ≥ 70); the means are printed.
+// its scores are not the gate's (safe mode on the corpus keeps words and order ≥ 70); the means are printed.
 const { pdfPath, fileUrl } = require('./env.js');
 const fs = require('fs'), path = require('path');
 const { chromium } = require('./env.js').req('playwright');

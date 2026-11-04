@@ -1,5 +1,5 @@
 /**
- * DOCX validation (plan P2.3): every case of tests/test-corpus.js (and the three about/guide documents) through
+ * DOCX validation: every case of tests/test-corpus.js (and the three about/guide documents) through
  * DocxBuilder in headless Chromium, then, per .docx:
  *
  *   1. package   JSZip opens it; every part has a content type ([Content_Types].xml) and, for the parts Kelk

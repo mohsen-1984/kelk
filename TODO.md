@@ -71,7 +71,7 @@ HTML), pandoc, Kelk (corpus scores 97–100; what is left is lost in the PDFs th
 - A Word file with real SmartArt (the lab's `.docx` holds a drawn diagram instead), through Word "Save as PDF" and
   Microsoft Print to PDF
 - ~~Word "Save as PDF" and Microsoft Print to PDF of `corpus/word-*.docx`; Excel's own export and Microsoft Print to
-  PDF of `corpus/xl-border-*.xlsx`~~ — done in plan P4.1 (1405-08-12): `tests/pdf-lab/pdf/real-producers/`
+  PDF of `corpus/xl-border-*.xlsx`~~ — done: `tests/pdf-lab/pdf/real-producers/`
   (`word2024-save--`, `msprint-word--`, `excel2024--`, `msprint-excel--`, made by `scripts/make-real.ps1`), with
   PowerPoint, Edge, Chromium and Firefox and the lab's own `corpus/real-*` documents
 - WeasyPrint (the free alternative to Prince): `pip install weasyprint`, then the corpus's HTML through it

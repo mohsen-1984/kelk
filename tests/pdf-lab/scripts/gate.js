@@ -82,7 +82,7 @@ const dropHeld = (o) => { if (o) Object.keys(o).filter(heldReal.has).forEach((n)
 function load(dir) {
   const corpus = read(path.join(dir, '_scores.json'));
   // (a held-out document's PDF never enters the corpus part, nor its rules: an older run's row of one, from before
-  // P4.3 or a split that changed since, is dropped here — so no note or failure below names it)
+  // this protocol or a split that changed since, is dropped here — so no note or failure below names it)
   const run = { corpus: null, fuzz: {}, rules: dropHeld(rulesLib.fired(dir)) };
   if (corpus) {
     run.corpus = {};

@@ -1,6 +1,6 @@
 # real-src — the real-producer corpus's source documents
 
-The documents behind `tests/pdf-lab/pdf/real-producers/` (plan P4.1): a Persian memo, a Persian report that mixes
+The documents behind `tests/pdf-lab/pdf/real-producers/`: a Persian memo, a Persian report that mixes
 English terms and two tables, an Arabic letter, an English readme, two Excel sheets (Persian and English cells, one
 ruled and one without borders) and two PowerPoint decks (one right to left, one left to right).
 

@@ -1,4 +1,4 @@
-// The real-producer corpus (plan P4.1), the browsers' half: the documents of make-real.ps1 as web pages
+// The real-producer corpus, the browsers' half: the documents of make-real.ps1 as web pages
 // (corpus/real-src/real-<doc>.html, from corpus/real-<doc>.md through the vendored marked, in a plain office-like
 // style, right to left where the document is), printed by the browsers people print with on Windows:
 //   edge--<doc>.pdf      Microsoft Edge, headless --print-to-pdf (no header and footer), A4

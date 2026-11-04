@@ -1,5 +1,5 @@
 /**
- * The structure diff of the golden files (plan P4.2, tests/pdf-lab/scripts/structdiff.js): heading tree, table
+ * The structure diff of the golden files (tests/pdf-lab/scripts/structdiff.js): heading tree, table
  * shapes, list nesting — pure functions on Markdown.
  */
 'use strict';
@@ -8,7 +8,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { shape, align, structDiff, cell } = require('../pdf-lab/scripts/structdiff.js');
 
-test('P4.2: shape reads the heading levels, the table shapes and the list depths in order', function () {
+test('shape reads the heading levels, the table shapes and the list depths in order', function () {
   const md = [
     '# Title', '', 'Text.', '', '## One', '', '| a | b | c |', '|---|---|---|', '| 1 | 2 | 3 |', '| 4 | 5 | 6 |', '',
     '- top', '  - inner', '    1. deeper', '- top again', '', '### Two', '', '| x | y |', '|---|---|', '| 1 | 2 |', '',
@@ -20,13 +20,13 @@ test('P4.2: shape reads the heading levels, the table shapes and the list depths
   assert.deepEqual(s.lists, [0, 1, 2, 0, 0]);
 });
 
-test('P4.2: shape of an empty or plain text is three empty sequences', function () {
+test('shape of an empty or plain text is three empty sequences', function () {
   assert.deepEqual(shape(''), { headings: [], tables: [], lists: [] });
   assert.deepEqual(shape('Just a paragraph.\n\nAnd another.'), { headings: [], tables: [], lists: [] });
   assert.deepEqual(shape(undefined), { headings: [], tables: [], lists: [] });
 });
 
-test('P4.2: align counts the fewest edits — missing, extra, changed', function () {
+test('align counts the fewest edits — missing, extra, changed', function () {
   assert.deepEqual(align([1, 2, 2], [1, 2, 2]), { same: 3, missing: 0, extra: 0, changed: 0 });
   assert.deepEqual(align([1, 2, 3, 2], [1, 2, 2]), { same: 3, missing: 1, extra: 0, changed: 0 });
   assert.deepEqual(align([1, 2], [1, 2, 2, 3]), { same: 2, missing: 0, extra: 2, changed: 0 });
@@ -38,7 +38,7 @@ test('P4.2: align counts the fewest edits — missing, extra, changed', function
   assert.deepEqual(align(['3x2', '2x2'], ['3x2', '4x2']), { same: 1, missing: 0, extra: 0, changed: 1 });
 });
 
-test('P4.2: structDiff — the same document is 0 edits; each kind of loss counts in its part', function () {
+test('structDiff — the same document is 0 edits; each kind of loss counts in its part', function () {
   const golden = '# A\n\n## B\n\n| h | i |\n|---|---|\n| 1 | 2 |\n\n- x\n  - y\n- z\n\n## C\n';
   const same = structDiff(golden, golden);
   assert.equal(same.edits, 0);
@@ -60,7 +60,7 @@ test('P4.2: structDiff — the same document is 0 edits; each kind of loss count
   assert.deepEqual(cut.lists, { want: 2, got: 0, missing: 2, extra: 0, changed: 0 });
 });
 
-test('P4.2: cell prints a part as want/got −missing +extra ~changed, «-» when neither side has any', function () {
+test('cell prints a part as want/got −missing +extra ~changed, «-» when neither side has any', function () {
   assert.equal(cell({ want: 0, got: 0, missing: 0, extra: 0, changed: 0 }), '-');
   assert.equal(cell(undefined), '-');
   assert.equal(cell({ want: 6, got: 6, missing: 0, extra: 0, changed: 0 }), '6/6');

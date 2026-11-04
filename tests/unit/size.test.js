@@ -1,5 +1,5 @@
 /**
- * tools/check-size.js (plan P2.4): which files count as startup bytes, and the exit code against the budget.
+ * tools/check-size.js: which files count as startup bytes, and the exit code against the budget.
  */
 'use strict';
 

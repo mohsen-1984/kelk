@@ -1,5 +1,5 @@
 /**
- * The importer's threshold registry and rule telemetry (plan P3.2, lib/pdfimport/thresholds.js).
+ * The importer's threshold registry and rule telemetry (lib/pdfimport/thresholds.js).
  */
 'use strict';
 
@@ -10,7 +10,7 @@ require('../../lib/pdfimport/thresholds.js');
 
 const T = PdfImporter._thresholds;
 
-test('P3.2: every entry is frozen, with a numeric def, a unit and its uses; a name defined twice throws', function () {
+test('every entry is frozen, with a numeric def, a unit and its uses; a name defined twice throws', function () {
   assert.throws(function () { PdfImporter._defineThresholds({ wordGapEm: { def: 1, unit: 'em', used: ['x'] } }); }, /defined twice/);
   assert.throws(function () { PdfImporter._defineThresholds({ zzNoUnit: { def: 1, used: ['x'] } }); }, /needs def, unit and used/);
   Object.keys(T).forEach(function (k) {
@@ -26,7 +26,7 @@ test('P3.2: every entry is frozen, with a numeric def, a unit and its uses; a na
   assert.equal(T.checkboxMinPt.fixed, true);
 });
 
-test('P3.2: _t returns def, with or without a calibration; an unknown name throws', function () {
+test('_t returns def, with or without a calibration; an unknown name throws', function () {
   const imp = PdfImporter.create();
   const cal = { gaps: { wordEm: 0.3, letterEm: 0.02, n: 500 }, body: { size: 11, n: 4000 } };
   Object.keys(T).forEach(function (k) {
@@ -39,7 +39,7 @@ test('P3.2: _t returns def, with or without a calibration; an unknown name throw
   assert.throws(function () { imp._t('nope', { cal: cal }); }, /unknown threshold/);
 });
 
-test('P3.2: _fire counts per rule with its pages; _rulesFinish writes r.rules, and r.calibration with debug', function () {
+test('_fire counts per rule with its pages; _rulesFinish writes r.rules, and r.calibration with debug', function () {
   const imp = PdfImporter.create();
   imp._rulesStart();
   imp._fire('a.rule', 2);
@@ -63,7 +63,7 @@ test('P3.2: _fire counts per rule with its pages; _rulesFinish writes r.rules, a
   assert.equal(d.calibration.thresholds.checkboxMinPt.from, 'fixed');
 });
 
-test('P3.2: a line as ctx resolves to its page, not its list number', function () {
+test('a line as ctx resolves to its page, not its list number', function () {
   const imp = PdfImporter.create();
   PdfImporter._defineThresholds({ zzPageProbe: { def: 1, unit: 'em', used: ['test'], on: true, calib: function (c, page) { return page; }, n: function () { return 99; } } });
   imp._cal = { regions: {} };
@@ -74,7 +74,7 @@ test('P3.2: a line as ctx resolves to its page, not its list number', function (
   assert.equal(imp._t('zzPageProbe', { num: 5, page: { _pageIndex: 4 } }), 5);
 });
 
-test('P3.3 review: r.rules pages are page numbers, also when a page record or the walk state is passed', function () {
+test('r.rules pages are page numbers, also when a page record or the walk state is passed', function () {
   const imp = PdfImporter.create();
   imp._rulesStart();
   imp._fire('zz.pageRecord', { num: 2, page: { _pageIndex: 1 } });

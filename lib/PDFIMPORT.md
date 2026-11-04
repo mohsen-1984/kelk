@@ -785,7 +785,7 @@ a jump of 0.07 em or more to three or more gaps of 0.1 em or more (under 1.2 em)
 between the two. A few ZWNJ gaps in a word are no such line; the ZWNJ-from-a-gap rule does not apply on it.
 Four real letters from Prince: recall 45–77 → 91–94. `chrome-positioned` (`make-positioned.js`) is the lab's.
 
-**Runs placed from their untracked widths** (P3.3). A producer that moves each word to its place by `Td` and then
+**Runs placed from their untracked widths**. A producer that moves each word to its place by `Td` and then
 condenses (`Tz`) or tracks (`Tc`) the text — a tool applied after layout; the metamorphic `tz85` / `trackTight` /
 `trackLoose` — leaves words that overlap or stand apart by their drift: «DesigningResilient», lines cut as columns.
 `_calibrate` reads it (`tracking.drift`, per page `regions[p].drift`): at each place one run (one operator, or
@@ -991,10 +991,10 @@ its numbered clauses became nested quotes). And the right edge is mirrored only 
 or more show, or one left-to-right line starting there** (`regColMirrorSrcLines`): a slide's one right-to-left line
 drawn past the page's left edge gave no left margin — the right edge stayed — but scaled to 80 % (the metamorphic
 `scale80`) it gave one, and the right edge mirrored from it set every right-to-left line in: the slide's paragraphs
-read as quotes (P3.3). The left edge is mirrored from any right edge, one line's too: a short document's single line
+read as quotes. The left edge is mirrored from any right edge, one line's too: a short document's single line
 or caption is all that shows its margin — required twice, «متن فارسی با setDirection.» alone in a left-to-right
 document became the whole column and read backwards, and a borderless table under a one-line caption had its
-columns merged (the builder round trip, P3.3 fix); one English line at the left margin, likewise, gives the right
+columns merged (the builder round trip); one English line at the left margin, likewise, gives the right
 edge (a right-to-left list item ending short of it split a tight list).
 
 - **Running heads, feet, side panels, page numbers**: gone before this step (§6a) — the edges above are
@@ -1235,7 +1235,7 @@ structure tree disagrees with (`_treeVote`, from 3 votes; 0.15), gaps between a 
 
 | Mode | When | What the page gets |
 |---|---|---|
-| `ocr` | no text at all (a caption, a page number left after the furniture is text) over a picture covering half the page or more | its pictures (the scan) and the note `ocrNeeded`; conf 0 — the hook for an OCR runtime (plan P7) |
+| `ocr` | no text at all (a caption, a page number left after the furniture is text) over a picture covering half the page or more | its pictures (the scan) and the note `ocrNeeded`; conf 0 — the hook for an OCR runtime (later) |
 | `textContent` | its extraction or its lines failed; 20 % or more of its glyphs lost (`ladLostTextContent`) *and* pdf.js's text demonstrably fewer lost (`_ladTcBetter`: at most half their lost share, 80 % of their characters kept) | pdf.js's own text (`getTextContent()`), read as glyphs (below); note `pageTextOnly` |
 | `simplified` | 20 % or more of its glyphs lost otherwise (pdf.js's text is where their letters came from and loses the same: 74 U+FFFD either way on `t3-glued--lost25`); `suspectSpaces` and `lostGlyphs` together; conf under `pageConfSimplified` (0.45); its layout failed; `safe` mode | headings and paragraphs only: a table's rows, a list's items and a quote's blocks become paragraphs (`_ladFlatten`); after a failed layout, the lines by size and gap (`_ladSimpleBlocks`); note `pageSimplified` (not in safe mode) |
 | `full` | otherwise | the layout as it is |
@@ -1530,7 +1530,7 @@ page's every line at the left — `_startFlush`, the share of long lines at thei
 By size: three lines at most, larger than the body by 0.4 pt and bold, or 1.4 × the body size at least;
 levels by distinct size, largest first. A bold line at body size (within 0.6 pt, measured on the sizes as drawn — the median of the line's letters against the
 body's unrounded size, `_metrics.bodyExact` —, not their half points: an iText circular's bold caption 1.2 pt under its
-9.6-pt body, scaled to 80 %, rounded to 9 against 9.5 and read as a heading, P3.3), short, not ending in ":" or "." is a **minor heading** below the real ones — not
+9.6-pt body, scaled to 80 %, rounded to 9 against 9.5 and read as a heading), short, not ending in ":" or "." is a **minor heading** below the real ones — not
 a piece of a line cut at two cell gaps or more (`rowCell`, lines.js: a borderless table's bold header row, round 26);
 a short line at body size **in a heading font family** — one that larger headings use, that the body
 does not, and that few body-size lines use — is a heading too, one level below the bold ones

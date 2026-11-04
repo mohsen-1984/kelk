@@ -518,7 +518,7 @@ CORPUS.push({ name: 'single-line', md: 'فقط یک سطر.' });
 CORPUS.push({ name: 'code-span-rtl', md: 'تصویر را با `![نام](نام)` در متن می‌گذارد؛ نیز `(متن)` و `f({ a: \'متن فارسی\' })`.\n\nEnglish with `![name](نام)` too.\n' });
 CORPUS.push({ name: 'code-in-list-item', md: '- مورد ششم:\n  ```javascript\n  // کد درون لیست\n  const array = [1, 2, 3];\n  ```\n' });
 
-// ── P1.3 (bug B1): Arabic shaping round trip ─────────────────────────────────────────────────────
+// ── Arabic shaping round trip ─────────────────────────────────────────────────────
 // Markdown → PDF → PdfImporter → the same words, exactly (`exact`: the PDF → MD cell needs 100% recall
 // and order). Each letter in its four positions around beh: alone, final, initial, medial. U+0649 has
 // presentation forms (FEEF FEF0 FBE8 FBE9); the other letters have none in Unicode: they keep their
@@ -529,7 +529,7 @@ CORPUS.push({ name: 'code-in-list-item', md: '- مورد ششم:\n  ```javascrip
   var L = function (cp) { return String.fromCharCode(cp); }, BEH = L(0x0628), NL = String.fromCharCode(10);
   var positions = function (cp) { var x = L(cp); return [x, BEH + x, x + BEH, BEH + x + BEH].join(' '); };
   // one paragraph per letter, no Latin label: each letter's shapes are checked alone (ؠ ػ-ؿ ٮ ٯ are strong RTL letters
-  // in BidiCore since P1.3 — they had been placed as neutrals next to Latin text — but a label would still test the
+  // in BidiCore — they had been placed as neutrals next to Latin text — but a label would still test the
   // bidi run order, not the shaping)
   var lines = function (cps) { return cps.map(positions).join(NL + NL); };
   var amk = L(0x0649);
@@ -691,8 +691,8 @@ CORPUS.push({ name: 'code-in-list-item', md: '- مورد ششم:\n  ```javascrip
 </table>`, pdfCheck: columnCheck('left', { zz: 0, r1: 1, r2: 1, r3: 1 }) });
 })();
 
-// ── P2.3: builders in CI — the features the goldens (tests/golden/) and the DOCX validation
-// (tests/docx-validate.js) must cover that no earlier case had. Rowspan: the P1.3 table-rowspan-* cases above.
+// ── builders in CI — the features the goldens (tests/golden/) and the DOCX validation
+// (tests/docx-validate.js) must cover that no earlier case had. Rowspan: the table-rowspan-* cases above.
 //   links-internal       #links to headings with ids, and an external link
 //   images               a PNG data URI inline, alone in a paragraph, in a table cell and in list items, and a
 //                        second, different PNG (the goldens keep each picture's size and, when an output carries
@@ -701,7 +701,7 @@ CORPUS.push({ name: 'code-in-list-item', md: '- مورد ششم:\n  ```javascrip
 //                        out: it prints today's date, which a golden cannot hold)
 //   toc-*                setToc: three levels with the title given for both directions; a right-to-left document
 //   page-breaks          page-break-before / break-after: page (PdfBuilder breaks the page, the .html and .doc
-//                        keep the CSS, DocxBuilder drops them: see the P2.3 report, Open issues)
+//                        keep the CSS, DocxBuilder drops them: a known limit)
 //   hr-in-list-and-cell  horizontal rules at the top level, inside a list item and inside a table cell — the
 //                        .docx's rule comes back through MarkdownImporter's HR_TOKEN (plan §2.3: it leaked as text)
 (function () {

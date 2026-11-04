@@ -30,7 +30,7 @@ const DYNAMIC = [
     { file: 'scripts/importer.js', prefix: 'pdf_' },
     // PptxBuilder's warnings → the slides pane: WARN_KEYS holds each key in full
     { file: 'scripts/slides.js', prefix: 'sw_' },
-    // the import report (plan P3.5): its tables hold each note / flag (pdf_) and mode / why / label (rep_) key in full
+    // the import report: its tables hold each note / flag (pdf_) and mode / why / label (rep_) key in full
     { file: 'scripts/report.js', prefix: 'pdf_' },
     { file: 'scripts/report.js', prefix: 'rep_' },
     // Kelk.i18n.apply(): the markup's own keys, checked above from index.html

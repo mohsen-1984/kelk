@@ -1,5 +1,5 @@
 /**
- * Golden snapshots of the builders (plan P2.3): every case of tests/test-corpus.js (not the about/guide
+ * Golden snapshots of the builders: every case of tests/test-corpus.js (not the about/guide
  * documents: see below), built in headless Chromium (tests/golden/build.js), normalised
  * (tests/golden/normalize.js) and compared with tests/golden/expected/<case>/:
  *

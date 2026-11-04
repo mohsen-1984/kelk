@@ -1,4 +1,4 @@
-// PDFs the fallback ladder must demote (lib/pdfimport/ladder.js, plan P3.4) — not corpus files: they live in
+// PDFs the fallback ladder must demote (lib/pdfimport/ladder.js) — not corpus files: they live in
 // tests/pdf-lab/ladder/ (no corpus/<doc>.md scores them; run-stress.js checks the mode each page is given in).
 //   node scripts/make-ladder.js
 //   ladder/scan--article.pdf     the page images make-ocr.js reads (chrome-plain-hf--article.pdf rendered, here by

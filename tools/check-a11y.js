@@ -1,5 +1,5 @@
 /**
- * Accessibility check of the app page (plan P2.4): axe-core (devDependency, `npm ci`) on index.html in Chromium
+ * Accessibility check of the app page: axe-core (devDependency, `npm ci`) on index.html in Chromium
  * (the repository's pinned Playwright), in the fa, en and ar interfaces, light and dark theme — 6 runs.
  *
  *   node tools/check-a11y.js [--json <file>]        (npm run check:a11y)
@@ -14,7 +14,7 @@
  * - Rules: the WCAG 2.0 and 2.1 level A and AA tags (wcag2a, wcag2aa, wcag21a, wcag21aa). Scanned per run: the
  *   whole page with the settings pane open and every settings group (<details>) expanded — including the sample
  *   document in the preview — then each <dialog id> opened on its own (its nodes printed as "[#id] selector"),
- *   then the PDF import report panel (#import-report, plan P3.5) opened by Kelk.ui.report with tools/report-sample.js
+ *   then the PDF import report panel (#import-report) opened by Kelk.ui.report with tools/report-sample.js
  *   (every page mode, why, flag and note code); the run fails when the panel does not open, does not take the
  *   focus, or lacks a row for a page or a code of the sample.
  * - Prints every violation per run: impact, rule id, the target selector of each node.

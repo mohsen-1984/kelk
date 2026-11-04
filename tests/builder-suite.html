@@ -265,7 +265,7 @@
             try {
               const t1 = performance.now(), q = await pdfRoundTrip(blob, html);
               const pct = function (x) { return (x * 100).toFixed(1) + '%'; };
-              // c.exact (the P1.3 shaping cases): every word back, in order — anything less is red
+              // c.exact (the shaping cases): every word back, in order — anything less is red
               const cls = c.exact ? (q.recall === 1 && q.order === 1 ? 'ok' : 'err')
                 : q.recall >= 0.97 && q.order >= 0.95 ? 'ok' : q.recall >= 0.85 && q.order >= 0.85 ? 'skip' : 'err';
               cell(rt, pct(q.recall) + ' · order ' + pct(q.order) + ' · ' + q.n + ' words · ' + Math.round(performance.now() - t1) + ' ms', cls,

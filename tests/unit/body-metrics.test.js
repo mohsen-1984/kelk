@@ -1,5 +1,5 @@
 /**
- * The body size and the text column of regions.js _bodyMetrics (plan P3.3): the unrounded body size, and margins
+ * The body size and the text column of regions.js _bodyMetrics: the unrounded body size, and margins
  * mirrored only from a side that lines show (the right edge: from two lines at the left, or one left-to-right line
  * starting there; the left edge from any right edge).
  */
@@ -26,7 +26,7 @@ const run = function (lines, view) {
   return { body: body, m: imp._metrics };
 };
 
-test('P3.3: _metrics.bodyExact is the body size as drawn, the rounded one is kept as body', function () {
+test('_metrics.bodyExact is the body size as drawn, the rounded one is kept as body', function () {
   const lines = [];
   for (let k = 0; k < 12; k++) lines.push(line(72, 40, 9.6));
   const r = run(lines, [0, 0, 595, 842]);
@@ -34,7 +34,7 @@ test('P3.3: _metrics.bodyExact is the body size as drawn, the rounded one is kep
   assert.equal(r.m.bodyExact, 9.6);
 });
 
-test('P3.3: a margin is mirrored only from a side two lines or more show', function () {
+test('a margin is mirrored only from a side two lines or more show', function () {
   // a slide: one line starting at 40, four right-to-left lines ending at 616, a centred agenda
   const lines = [line(40, 40, 14.5, true)];
   for (let k = 0; k < 4; k++) lines.push(line(416, 40, 14.5, true));
@@ -46,7 +46,7 @@ test('P3.3: a margin is mirrored only from a side two lines or more show', funct
   assert.equal(run(lines).m.right, 680);
 });
 
-test('P3.3 fix: one left-to-right line starting at the left margin gives the right edge its mirror', function () {
+test('one left-to-right line starting at the left margin gives the right edge its mirror', function () {
   // the builder's «images» case: an English paragraph at 43, one right-to-left list item ending at 526 (its mark
   // beyond); without the mirror the item set the column's right edge and the list read as a loose one, split
   const lines = [line(43, 16, 11.5), line(406, 24, 11.5, true), line(245, 23, 11.5)];
@@ -57,7 +57,7 @@ test('P3.3 fix: one left-to-right line starting at the left margin gives the rig
   assert.equal(run(slide).m.right, 616);
 });
 
-test('P3.3 fix: the left edge is mirrored from the right one even when a single line shows it', function () {
+test('the left edge is mirrored from the right one even when a single line shows it', function () {
   // «متن فارسی با setDirection.» in a left-to-right document: its only line, flush right at 552 — not the whole column
   assert.equal(run([line(422, 26, 11.5)], [0, 0, 595, 842]).m.left, 43);
   // a borderless table under a one-line right-to-left caption: its LTR cells at 175 are not the column's left edge

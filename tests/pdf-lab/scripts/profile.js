@@ -96,7 +96,7 @@ const PREFIX = [[/^calc--/, { engine: 'libreoffice', app: 'Calc' }], [/^impress-
   [/^msprint-/, { engine: 'gdi', path: 'print' }], [/^edge--/, { engine: 'skia', app: 'Edge' }], [/^firefox--/, { engine: 'cairo', app: 'Firefox' }], [/^wk-|-wk--/, { engine: 'qt', app: 'wkhtmltopdf' }], [/^kelk--/, { engine: 'jspdf' }], [/^ocr-tesseract--/, { engine: 'ocr', path: 'ocr' }]];
 // the held-out real-producer documents (tests/pdf-lab/HELDOUT.md): their PDFs are checked like every other, but never named —
 // a failure says "a held-out real file", --all and the headings table leave them out, the tallies count them. The same list as
-// scripts/heldout.js's split (P4.3), hard-coded here until that module is on this branch; then read it from there
+// scripts/heldout.js's split, hard-coded here until that module is on this branch; then read it from there
 const HELD_OUT_REAL = ['real-deck-fa', 'real-letter-ar', 'real-memo-fa', 'real-report-fa'];
 const heldOut = (dir, f) => path.basename(dir) === 'real-producers' && HELD_OUT_REAL.includes((f.match(/--([\w-]+)\.pdf$/) || [])[1]);
 (async () => {

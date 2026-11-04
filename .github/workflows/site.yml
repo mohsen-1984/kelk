@@ -1,4 +1,4 @@
-# Site quality on every push and pull request (plan P2.4): links, generated files, accessibility, startup size.
+# Site quality on every push and pull request: links, generated files, accessibility, startup size.
 # Four jobs, run side by side, each red on its own failure:
 #   links      lychee 0.24.2 over every *.md and index.html (.github/lychee.toml) — relative links and #anchors. Offline on
 #              push / PR: external URLs depend on other people's servers (rate limits, 403s to bots, timeouts) and a

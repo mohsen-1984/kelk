@@ -33,7 +33,7 @@ exclude_path = [
   '(^|[/\\])vendor[/\\]',                          # third-party files, not ours to fix
   '(^|[/\\])tests[/\\]pdf-lab[/\\]out[/\\]',       # lab results
   '(^|[/\\])tests[/\\]pdf-lab[/\\]corpus[/\\]',    # lab fixtures: their links are document content the lab scores, not navigation
-  '(^|[/\\])tests[/\\]golden[/\\]expected[/\\]',   # golden snapshots (P2.3): recorded builder output, e.g. a .docx read back with #bm_ links
+  '(^|[/\\])tests[/\\]golden[/\\]expected[/\\]',   # golden snapshots: recorded builder output, e.g. a .docx read back with #bm_ links
 ]
 
 # headings that start with an emoji carrying U+FE0F (⚠️, 🏗️): GitHub keeps the selector in the anchor
@@ -49,7 +49,7 @@ exclude = [
   '^file://[^/]',
   # the slides samples show the image frame PowerPoint gets for a picture not there yet: ![…](placeholder)
   '/docs/placeholder$',
-  # online run: a known 404 (Known Issues: the 2.0 zip is not under releases/latest); P8.1 links the tagged release
+  # online run: a known 404 (Known Issues: the 2.0 zip is not under releases/latest); drop this line once the release link resolves
   # and removes this line
   '^https://github\.com/mohsen-1984/kelk/releases/latest/download/kelk_2\.0\.zip$',
 ]

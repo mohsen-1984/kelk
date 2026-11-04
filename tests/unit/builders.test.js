@@ -1,5 +1,5 @@
 /**
- * Builder cleanups (plan P1.3, B6–B8): one named-color table for every builder, downloads that revoke their
+ * Builder cleanups (B6–B8): one named-color table for every builder, downloads that revoke their
  * blob URL only after a delay, and the importer's URI filter without its dead data: branch.
  */
 'use strict';

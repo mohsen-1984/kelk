@@ -1,5 +1,5 @@
 /**
- * pdf.js getTextContent items — [str, dir, x, y, size, width] — of two Chrome pages, for ladder.test.js (P3.4 review H1),
+ * pdf.js getTextContent items — [str, dir, x, y, size, width] — of two Chrome pages, for ladder.test.js,
  * each as pdf.js 6.4.299 gives it (one glyph or one run, its string reordered by pdf.js's own bidi):
  *   MIXED    the review's probe mixed-fa.pdf (Chrome, A4), page 1: its title, its first paragraph's first line and its
  *            first list item («۱۴۰۳», «نرم‌افزار», «2024-05-12», «۱۲٪», «سریع‌تر», «مورد اول با Google Chrome»)

@@ -1,5 +1,5 @@
 /**
- * MarkdownImporter (plan P2.3): .docx → Markdown through its own zip reader, the equation / horizontal-rule tokens
+ * MarkdownImporter: .docx → Markdown through its own zip reader, the equation / horizontal-rule tokens
  * and mammoth's style map, and the HTML path for rules inside tables. Node's test runner + jsdom: the vendor
  * libraries (DOMPurify, turndown + GFM, mammoth) and lib/MathCore.js + lib/MarkdownImporter.js run in a jsdom
  * window, as in the page; the .docx fixtures are written here with JSZip (the smallest package mammoth opens).
