@@ -10,17 +10,53 @@ importer split into steps with a threshold registry and calibration, the fallbac
 page rotation and watermarks, real Word / Excel / PowerPoint / Print to PDF files in the lab, golden files and a
 held-out protocol (`tests/pdf-lab/HELDOUT.md`).
 
-**2.3 — PDF import, from real files (found in 2.2's review; each fix with a lab PDF of our own)**
+**2.3 / 2.4 — PDF import, from real files (found in 2.2's review).** The files themselves are not kept; each case
+below is reproduced by a lab PDF of our own (failing on purpose until fixed: its score is the case's measure).
+Order and risk in this order; a decision still open is marked **decide**.
 
-- A designed booklet (Chromium, cards and badges): its table of contents — a number badge, then the title and dot
-  leaders, no page number — comes back as headings with each number a bold paragraph after its title, not a
-  numbered list; heading levels jump (`####` then `######`); a diagram's boxes and signs («+», «=») become
-  headings; a space inside a paragraph's first word
-- Word reports' tables: line breaks inside a cell are lost (a cell's dash items run together; `<br>` expected); a
-  table continued on the next page whose repeated header gains an empty column is not joined to the part above;
-  cells merged over rows (Markdown has no `rowspan`: repeat the value, or a note)
-- Forms: two conventions for the same «label: value» pairs — a form's rows as list items row by row (`_formRows`),
-  a table's preamble as paragraphs column by column (`_tablePreamble`): one of them, or say why
+*2.3 — Word tables and forms (contained in the table and form code; Word reports)*
+
+1. **Cells: line breaks and numbered items** — **lab:** `word-longcells--long-cells-fa` (59.0). A cell of «- …»
+   items, one a line, comes back as one run-on line (each item should keep its line: `<br>`, as `_cellItems` does
+   for «•» and «o» today). A cell of numbered items («1) …», the number at the cell's edge, its lines hanging 16 pt
+   in) breaks the table: the items leave it and come after it as list items, each number a bold item of its own
+   (read «(1»). In the real report the numbers made a column of their own, so the table's part on the next page
+   (its header repeated) had a column more than the part above and was not joined to it; the row cut by the page
+   break, its first cell empty on the next page, should join the row above. Risk: low–medium (cell text and the
+   join across pages; the lab's Word tables and Prince tables cover it)
+2. **Merged cells** — **lab:** `word-merged--merged-cells-fa` (61.3). A cell merged over rows stands in its first
+   row only, the rows under it empty (they read as missing values); a header band over some columns above the header
+   row is placed in one column of a header row; a band across columns between two groups of rows becomes a bold
+   cell in the middle of a row. **decide**: proposed — a merged value repeated in each of its rows; a band inside
+   the table a row of its own, its text bold in the first cell; a band over the header a paragraph over the table
+   (as a merged title row is today). The corpus file follows the proposal. Risk: medium (the grid's spans; Excel's
+   merged title row stays a heading, as decided)
+3. **Forms: one order** — **decide** row by row or column by column. Two conventions today for the same pairs:
+   `_formRows` (a form's rows: list items, row by row; `word-form--form-box-fa`) and `_tablePreamble` (a box in a
+   table's first row: paragraphs, column by column; `word-form--form-row-fa`, `chrome-form--form`). Proposed: row
+   by row, each pair a list item, for both. Risk: low–medium (the expected Markdown of those lab files changes)
+4. **A header's title between its pairs** reads after the first pair — **lab:** `chrome-form--form`, `--form-fa`
+   (order 98). Risk: low
+5. A Persian report in B Nazanin whose amounts read «3.004» (the file's text has a period between the thousands;
+   the page shows a comma-like mark): **to examine** whether the font draws «.» as a separator — a reader takes
+   «3.004» for three and a bit. Optional
+
+*2.4 — designed documents from browsers (heading, box and figure rules shared by every Chromium file in the lab)*
+
+6. **A designed booklet** — **lab:** `chrome-booklet--booklet-cards-fa` (45.4). Cards, badges and coloured boxes:
+   - a table of contents — a number badge, the title, dot leaders drawn as a dashed rule, no page number — comes
+     back as headings or a table with each number a bold paragraph after its title; expected a numbered list
+   - a chapter's head — a number badge beside the title, a small coloured subtitle under it: the badge a bold
+     paragraph before the title, the title a bold paragraph on one page and a heading on the next, the levels
+     jumping (`####` then `######`); expected «## 1. title» on every chapter, the subtitle bold under it
+   - a drop cap (the first letter large, beside the first lines) splits the first word («ب یشتر») and the paragraph
+   - a callout — a tinted box, a small square icon and a bold label over its text — comes back as a task item
+     («- [ ] **label** …»): the icon read as a checkbox; expected a quote with its bold label
+   - a formula drawn as boxes with «+» and «=» between them, each box a word and its English gloss: each word a
+     heading, «+» and «=» headings; expected one line, «**نشانه** (cue) + **کار** (routine) = **عادت** (habit)»
+   - two cards side by side, each a bold title over its text, become a two-column table (or headings): expected
+     each card's title in bold over its text, the start side first
+   Risk: high (the size and box rules decide headings and quotes for every web page in the lab)
 
 **High (2.1)**
 
@@ -32,7 +68,10 @@ held-out protocol (`tests/pdf-lab/HELDOUT.md`).
 - Startup: the builders (≈ 1.3 MB with PowerPoint) load before the first paint — load them on first use, as the
   importer already is; drop the unused `vendor/lucide.min_1.48.0.js` and the duplicate highlight.js stylesheet
 - Release: a build script with an include list (two zips: the app, and the app with `tests/pdf-lab`), and GitHub Pages
-  served from that set rather than from the whole repository (no `.nojekyll`, no cache-busting today)
+  served from that set rather than from the whole repository (no `.nojekyll`, no cache-busting today). The 2.1 and
+  2.2 zips, made by hand, both under `kelk/`: `kelk-with-pdf-lab_x.y.zip` is `git archive` of `main`; `kelk_x.y.zip`
+  is the same without the dotfiles, `.github/`, `eslint.config.js`, `package*.json`, `tests/docx-validate.js`,
+  `tests/golden/`, `tests/ooxml-xsd/`, `tests/unit/` and `tests/pdf-lab/` but its `corpus.js` (289 files in 2.2)
 
 **Medium (2.2)**
 

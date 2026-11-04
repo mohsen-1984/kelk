@@ -9,13 +9,13 @@ seconds, so it can be run after every change. The why of the importer is in
 ```text
 corpus/    the sources: Markdown documents and the office files (.docx, .xlsx, .csv, .pptx) — each with
            the Markdown it should come back as
-pdf/       the PDFs made from them: <producer>--<doc>.pdf (192 files), in six folders by what they test:
+pdf/       the PDFs made from them: <producer>--<doc>.pdf (195 files), in six folders by what they test:
              en/         the English corpus through every producer we run (60)
              rtl/        the right-to-left corpus through the same producers (30)
              office/     the office files — sheets, a deck, Word documents — through LibreOffice (13)
-             pages/      one document a layout problem: web layouts, layers, forms, templates, pictures, a letterhead (24)
+             pages/      one document a layout problem: web layouts, layers, forms, templates, pictures, a letterhead, a booklet (25)
              producers/  producers we cannot run here, imitated glyph by glyph: Word, PowerPoint, Prince,
-                         iText, Acrobat, Adobe PDF Library (21)
+                         iText, Acrobat, Adobe PDF Library (23)
              real-producers/  the real programs on Windows (make-real.ps1, make-real.js): Word, Excel, PowerPoint
                          2024 "Save as PDF", Microsoft Print to PDF, Edge, Chromium (chrome--: Playwright's, not a desktop Chrome), Firefox — our own CC0 documents
                          (corpus/real-*, sources in corpus/real-src/) and the lab's Word and Excel files (44)
@@ -85,6 +85,7 @@ runs and the tools need none of those — only Node and Playwright.
 | `math.md`, `fa-math.md` | formulas in a short report (English) and in Persian text: inline ones between words, display ones alone (a fraction under a root, `cases`), in list items and table cells, money that stays text («from $5 to $10») — `make-math.js` prints them with Kelk's PdfBuilder; the files are their own expected Markdown |
 | `plan-box-fa.md` | a Word form's framed boxes of bold «label: value» fields, one value a sentence long wrapped over two lines (its second line under the label), then a short field — the third file of `make-plan-rtl.py` |
 | `frame-table-fa.md`, `form-box-fa.md`, `form-row-fa.md`, `scrambled-fa.md` | Kelk 2.2's rounds: a ruled table a few points wider than the text inside a page's art border, its outer rule drawn a piece a row (its first column was lost with the border); a box of «label: value» pairs as a table's first row, inside its frame (the pairs read after the table) and the same box a run a row (its rows read as one paragraph); a bilingual reader whose Persian font's ToUnicode names every letter wrong (read as gibberish) |
+| `long-cells-fa.md`, `merged-cells-fa.md`, `booklet-cards-fa.md` | Kelk 2.3's cases, failing on purpose until fixed (`TODO.md`): a Word table over two pages with cells of dash items and of hanging numbered items; a Word table with cells merged over rows and bands across columns; a designed booklet from Chromium — a table of contents with number badges, chapter badges, a drop cap, a callout with an icon, a formula of boxes, two cards side by side |
 | `sides-fa.md` | a Persian Word report: a justified paragraph, a signer's name centred at the far side, its caption on one baseline with the next table's title at the start side (one line of glyphs, a run of spaces between), a ruled table — the Markdown `make-sides-rtl.py` writes with its PDF |
 | `shapes-fa.md` | a Persian letter in a modern font as Prince prints it: two paragraphs in the regular face, two bold lines each with «توسعه‌های», no ZWNJ drawn — the Markdown `make-shapes-rtl.py` writes with its PDF |
 | `fa-weights.md` | a short Persian page in Vazirmatn[wght] at 400, 700 and 800: a title, a section heading, bold words, a bold label, two paragraphs wrapping once each at `line-height: 1.8` — the Markdown `make-varfont.js` writes with its PDF |
@@ -133,6 +134,7 @@ runs and the tools need none of those — only Node and Playwright.
 | `word-report`, `word365-report` | `make-report-rtl.py` (with `rtl_pdf.py`): Word's report habits — a cover band with a bold white line a size over the body under the title; footnote marks small and raised after a word, the notes at the page's foot under a short rule at the start side, set at 9 pt and opened by their marks, one mark drawn as a small picture (at one place on two pages); endnotes on the last page under their rule, raised roman marks «i», «ii»; a bracketed Persian phrase, its brackets named logically; the twin `word365-report` the same file with its dictionaries in object streams (qpdf), as Word for Microsoft 365 writes; the page's last paragraph cut by the page break, its last line full; a signature bold and a size up at the far side | the cover's line no heading; the notes after the paragraph they would have cut, that paragraph whole |
 | `word-plan` (box) | `make-plan-rtl.py`: a frame of bold fields as Word prints it, one value wrapped under its label | the previous importer read the frame as a quote (75) |
 | `word-frame`, `word-form`, `word-nitro` | `make-word22-rtl.py` (with `rtl_pdf.py`): the four files of `frame-table-fa`, `form-box-fa`, `form-row-fa` and `scrambled-fa` — Word's double frame drawn cell by cell, a form's box in a table's frame, a ToUnicode scrambled throughout (the cmap names the joining forms) |
+| `word-longcells`, `word-merged` | `make-word23-rtl.py` (with `rtl_pdf.py`): the files of `long-cells-fa` and `merged-cells-fa` (2.3's cases) |
 | `word-sides` | `make-sides-rtl.py` (with `rtl_pdf.py`): a signature's caption at the far side and the next table's title at the start side, one baseline, one line of glyphs with spaces across the gap; the signer's name over the caption | the previous importer put the title between the name and its caption (96.7 order) |
 | `prince-shapes` | `make-shapes-rtl.py`: Prince's simple TrueType subsets (one-byte codes, base letters in the ToUnicode, no ZWNJ drawn) of a font whose codes keep no order of forms (shuffled, no glyph names — a modern font, its forms from GSUB); the regular face used enough to learn by use, the bold face for two lines only | the previous importer read «توسعههای» (98.5) |
 | `chrome-rtl-varfont` | `make-varfont.js`: Chromium with Vazirmatn[wght] from `assets/fonts`: Skia's Type 3 fonts, one subset tag per instance, every one named `Vazirmatn-Regular` | the previous importer read no bold, no headings below the title (91.7) |
@@ -614,6 +616,8 @@ python3 scripts/make-flyer-rtl.py     # word-flyer--flyer-fa (and corpus/flyer-f
 python3 scripts/make-acrobat-rtl.py   # acrobat-word--booklet-fa (and corpus/booklet-fa.md)
 python3 scripts/make-cells-rtl.py     # word-cells--cells-fa (and corpus/cells-fa.md)
 python3 scripts/make-word22-rtl.py    # word-frame--frame-table-fa, word-form--form-box-fa, word-form--form-row-fa, word-nitro--scrambled-fa (and their corpus files)
+python3 scripts/make-word23-rtl.py    # word-longcells--long-cells-fa, word-merged--merged-cells-fa (and their corpus files)
+node scripts/make-booklet.js          # chrome-booklet--booklet-cards-fa (and corpus/booklet-cards-fa.md)
 python3 scripts/make-book-toc.py      # pdflib-book--book-front (corpus/book-front.md is kept by hand)
 python3 scripts/make-report-rtl.py    # word-report--report-fa and word365-report--report-fa (qpdf; corpus/report-fa.md is kept by hand)
 node scripts/make-letter-ltr.js        # chrome-letterhead--letter-ltr (corpus/letter-ltr.md is kept by hand)
