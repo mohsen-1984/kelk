@@ -10,6 +10,18 @@ importer split into steps with a threshold registry and calibration, the fallbac
 page rotation and watermarks, real Word / Excel / PowerPoint / Print to PDF files in the lab, golden files and a
 held-out protocol (`tests/pdf-lab/HELDOUT.md`).
 
+**2.3 — PDF import, from real files (found in 2.2's review; each fix with a lab PDF of our own)**
+
+- A designed booklet (Chromium, cards and badges): its table of contents — a number badge, then the title and dot
+  leaders, no page number — comes back as headings with each number a bold paragraph after its title, not a
+  numbered list; heading levels jump (`####` then `######`); a diagram's boxes and signs («+», «=») become
+  headings; a space inside a paragraph's first word
+- Word reports' tables: line breaks inside a cell are lost (a cell's dash items run together; `<br>` expected); a
+  table continued on the next page whose repeated header gains an empty column is not joined to the part above;
+  cells merged over rows (Markdown has no `rowspan`: repeat the value, or a note)
+- Forms: two conventions for the same «label: value» pairs — a form's rows as list items row by row (`_formRows`),
+  a table's preamble as paragraphs column by column (`_tablePreamble`): one of them, or say why
+
 **High (2.1)**
 
 - PDF import, right to left: RTL fuzz files score well below English ones (RTL ≈ 77–81 against LTR ≈ 92–93; tables

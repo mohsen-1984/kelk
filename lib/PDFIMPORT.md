@@ -597,6 +597,15 @@ of its Arabic letters (20 or more, four in five) and disagrees on a few, the few
 the cmap's letter wins (twins aside — ي ی, ك ک, ة ۀ, and Arial's heh, which its cmap names ھ), for a glyph with an
 advance (`arTrust` in `_gsubRepair`).
 
+**Wrong throughout** (Kelk 2.2, `_gsubFormPairs`): a Word subset of a Persian font through another PDF program names
+almost every Arabic glyph by a wrong letter or a mark («ثٝ» for «به») — the cmap disagrees on most letters, so the
+rule above cannot tell which side is right, and the Latin text in the same font keeps the ToUnicode from being thrown
+out whole (`_gsubBogus`). The font tells it itself when its cmap names its glyphs by their joining forms: read through
+the cmap, touching letters on one baseline must fit — a letter that joins on to the next is followed by one joined to
+(initial or medial, then medial or final), the others by one that is not. A wrong reading fits about half the time; a
+right one on nearly every pair (92 % of 40 pairs or more, read either way: a producer may draw right-to-left words in
+either order). Then the cmap names all its letters. Lab: `word-nitro--scrambled-fa` (a bilingual reader).
+
 ### Shapes by use
 
 Where a font's glyphs are all named by their base letters (Prince's ToUnicode: «ه» for every form of heh, no
@@ -978,7 +987,12 @@ from its edge — rules, fills, vector parts, small shapes, pictures — goes, w
 of the four edges (seven tenths): a ring, not a rule over a page's first table, a web page's bands, or a bar under
 its last line. Nor a table's outer rule (round 22): a rule beyond the text on which two rules or more of what is drawn
 among the text end stays — a landscape page's table, its right edge a few points past its first column's cells and
-inside the page's double frame, lost that column. The text's edge is taken 2 pt out.
+inside the page's double frame, lost that column. The text's edge is taken 2 pt out. A rule drawn in pieces is one
+rule (Kelk 2.2): Word draws a table's double frame cell by cell — the outer rule a piece a row, each row rule carried
+on to it by a short piece of its own beyond the text. Pieces in line that touch make a run; a run a piece of which
+lies among the text is no border, and a piece out there meets the rules among the text where they, or their runs,
+end. Each piece still answers for itself: a payslip's page frame keeps the sides its table's rules meet, not those
+beside its title box. Lab: `word-frame--frame-table-fa`.
 
 
 `_metrics`: body size; the text column's edges are the 3rd and 97th percentiles of the body lines'
@@ -1090,7 +1104,9 @@ edge (a right-to-left list item ending short of it split a tight list).
 **A picture that draws nothing** (round 22, `_hiddenPictures`): its soft mask transparent throughout — Word's empty
 anchor picture, 43 × 57 pixels, black under an all-zero mask, by a booklet's quote — is no picture. Cropped from the
 page it was a square of the paper's texture, and as an atom in the line it cut a word. Read where pdf.js decoded it,
-drawn at 16 × 16; where it cannot be read it stays.
+drawn at 16 × 16; where it has not, it stays — no waiting for it (Kelk 2.2: the 300 ms wait for a picture not yet
+decoded never got one, in the lab or on long Word files, and ran one after another — about 80 s on a 137-page book,
+the import bar standing still at «Building lines»).
 
 Text drawn on the page stays text. Slides exported to PDF and designed reports lay their words over
 pictures — a title on a panel that is itself a PNG with a shadow, a cover's coloured band, a hero image
@@ -1196,7 +1212,9 @@ at the text's start), three such rows one under another (3 em apart at most), or
 x (a header's «Date:», «Invoice number:»). Each row a run of pairs in reading order: a label opens a pair, the
 segments after it to the next label are its value. A row of one value right over the next form row (within an
 em) fills the empty pair beside it (an invoice set one number 6 pt above its label). Each pair a list item; the
-run's rules are the frame's (no thematic breaks). **A frame of fields is no quote** (order.js): every line in it a
+run's rules are the frame's (no thematic breaks). Form rows in a box inside a ruled table's frame, over every line
+of the table's own, come before the table (Kelk 2.2): the table's box begins under them — the two boxes one inside
+the other, the XY-cut could not part them, and the pairs read after the table. Lab: `word-form--form-box-fa`. **A frame of fields is no quote** (order.js): every line in it a
 bold «label: value» — or the wrap of the field above (round 26): a line under a field's line that filled the frame,
 a line's pitch down, with no label of its own («هدف طرح: …» over two lines, its second under the label — the
 frame had been read as a quote). Lab: `word-plan--plan-box-fa`. A section's **title band** — one short line in a fill or frame
@@ -1459,7 +1477,11 @@ matter:
   lines — the table's first row (it had been a paragraph, its two names in left-to-right order);
 - **a ruled table's title in two sizes** (a company's name over «payslip — month») is two paragraphs; and
   **rows between the title and the first row cut into every column**, merged across columns and holding
-  «label: value» pairs (a payslip's block over its table, in columns of its own the grid's columns cut through),
+  «label: value» pairs (a payslip's block over its table, in columns of its own the grid's columns cut through;
+  and a first row merged across the table holding two pairs or more — a box of them in the table's frame — is no
+  title but such a block, Kelk 2.2: joined as a title its rows ran into one paragraph; a line of two pairs or more,
+  drawn as one run with spaces at its tab stops, is cut between them where the widest gap between two colons is
+  over an em; lab: `word-form--form-row-fa`),
   are text above the table: each pair a paragraph, column by column from the start side, a line with no colon
   going on from the one before;
 - **a shaded band across a gutter, with a line on its baseline at each side**, is a table's header row, and

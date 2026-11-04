@@ -4,6 +4,28 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+## [2.2] — 2026-11-04
+
+PDF import: faster on long files, Persian text from fonts with a scrambled character map, a table's first column
+inside a page border, and a form's fields over a table.
+
+### Fixed
+
+- **Long PDFs no longer stall at «Building lines»:** the import waited up to 300 ms for every picture pdf.js had
+  not decoded yet, one after another, and none ever arrived. A 137-page Word book imports in about 16 s instead of
+  100 s, a 46-page report in 7 s instead of 43 — the same Markdown.
+- **Persian text read as gibberish** (a Word font through another PDF program whose ToUnicode names almost every
+  letter wrong, «ثٝ» for «به»): the font's own joining forms show which reading is right, and the text comes back.
+- **A table's first column lost** when the table is a few points wider than the text inside a page's art border:
+  Word draws its frame a piece a row, and the pieces were taken for the border.
+- **A form's «label: value» fields over a table:** a box of them in the table's frame came back as one paragraph,
+  or after the table; each pair is now its own paragraph or item, before the table.
+
+### PDF lab
+
+- Four new Persian Word pages, one for each fix (`make-word22-rtl.py`): 94.5, 97.0, 80.5 and 72.8 before, 100 now.
+  The gate passed with no file worse: corpus 95.6 → 95.7 (192 PDFs), golden 92.7, held out 86.0, real held-out 84.5.
+
 ## [2.1] — 2026-11-04
 
 The import's progress and report made clearer, the version beside the name, and a new prompt for slides.
