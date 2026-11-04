@@ -15,7 +15,11 @@
  *                                     should).
  *   Kelk.importReport.text(entries)   the report as plain text (Copy report).
  *   Kelk.ui.report(rep | [{ name, report }] | null, { name, onSafe })
- *     shows #import-report (or hides it: null, or nothing worth telling). The focus moves into the panel and
+ *     shows #import-report for every PDF import, the same way whatever the file: a clean one too (its summary, the
+ *     calm color), one with something to tell in the warning color (worth). Open for config.reportOpenMs, then
+ *     collapsed to its head (summary and a toggle: open again, collapse again); 0 keeps it open. Its × closes it
+ *     for good. It belongs to the document it reports on (Kelk.editor.doc()): replacing the text (Clear, a sample,
+ *     another import) hides it, an undo back to that document shows it again (collapsed). null: hidden. The focus moves into the panel and
  *     goes back where it was when it closes (its ×, Escape, or a clean import that closes it). onSafe: the
  *     "Re-import in safe mode" button's action, its explanation shown under it (no button without it, nor for a
  *     report that already ran in safe mode). Kelk.ui.report.release(): a new import starts — onSafe (and the
@@ -164,8 +168,8 @@
     }
 
     function entriesOf(rep, o) {
-        if (Array.isArray(rep)) return rep.filter(function (e) { return e && worth(e.report); });
-        return worth(rep) ? [{ name: (o && o.name) || '', report: rep }] : [];
+        if (Array.isArray(rep)) return rep.filter(function (e) { return e && e.report; });
+        return rep ? [{ name: (o && o.name) || '', report: rep }] : [];
     }
 
     function text(entries) {
@@ -196,7 +200,8 @@
     K.importReport = { fromResult: fromResult, worth: worth, text: text, FLAGS: FLAGS, NOTES: NOTES, MODES: MODES, MODE_KEYS: MODE_KEYS, WHY: WHY_KEYS };
 
     // ---- the panel ---------------------------------------------------------------------------------------------
-    const state = { entries: [], o: {}, back: null };
+    const state = { entries: [], o: {}, back: null, doc: null, timer: 0 };
+    const docNow = function () { return K.editor && K.editor.doc ? K.editor.doc() : null; };
     const el = function (tag, cls, txt) {
         const e = document.createElement(tag);
         if (cls) e.className = cls;
@@ -240,19 +245,68 @@
             }
         });
         const safe = K.$('#report-safe'), hint = K.$('#report-safe-hint');
-        const noSafe = !state.o.onSafe || state.entries.every(function (e) { return e.report.mode === 'safe'; });
+        // (a clean import has nothing safe mode would do better: no button)
+        const noSafe = !state.o.onSafe || state.entries.every(function (e) { return e.report.mode === 'safe' || !worth(e.report); });
         if (safe) safe.hidden = noSafe;
         if (hint) hint.hidden = noSafe;
         const name = K.$('#import-report-name');
         if (name) name.textContent = state.entries.length === 1 ? state.entries[0].name : '';
+        // the head's own line, read while the panel is collapsed: the summary of one file, or how many files
+        const brief = K.$('#import-report-brief');
+        if (brief) brief.textContent = state.entries.length === 1 ? summaryText(state.entries[0].report) : t('rep_files', state.entries.length);
+        box.classList.toggle('clean', !state.entries.some(function (e) { return worth(e.report); }));
+        toggleButton();
+    }
+
+    /** open (the body shown) or collapsed (the head only) */
+    function collapse(on) {
+        const box = K.$('#import-report');
+        if (!box) return;
+        clearTimeout(state.timer); state.timer = 0;
+        if (on && box.contains(document.activeElement) && document.activeElement !== box) {
+            const tg = K.$('#import-report-toggle'); if (tg) tg.focus();       // the focus never left in a hidden part
+        }
+        box.classList.toggle('collapsed', !!on);
+        toggleButton();
+    }
+    function toggleButton() {
+        const box = K.$('#import-report'), tg = K.$('#import-report-toggle');
+        if (!box || !tg) return;
+        const shut = box.classList.contains('collapsed'), label = t(shut ? 'rep_expand' : 'rep_collapse');
+        tg.setAttribute('aria-expanded', shut ? 'false' : 'true');
+        tg.title = label; tg.setAttribute('aria-label', label);
+        K.ui.setIcon(tg, shut ? 'chevron-down' : 'chevron-up');
+    }
+    /** collapse after config.reportOpenMs — later while the pointer is over it or the focus on one of its controls */
+    function collapseLater(ms) {
+        clearTimeout(state.timer); state.timer = 0;
+        const wait = ms == null ? +K.config.reportOpenMs : ms;
+        if (!(wait > 0)) return;
+        state.timer = setTimeout(function () {
+            const box = K.$('#import-report');
+            if (!box || box.hidden) return;
+            const a = document.activeElement, busy = box.matches(':hover') || (box.contains(a) && a !== box && a.id !== 'import-report-toggle');
+            if (busy) collapseLater(1000); else collapse(true);
+        }, wait);
+    }
+
+    /** the text was replaced or an undo / redo moved it: the panel shows only on the document it reports on */
+    function follow() {
+        const box = K.$('#import-report');
+        if (!box || !state.entries.length) return;
+        const mine = state.doc === docNow();
+        if (!mine && !box.hidden) { const inside = box.contains(document.activeElement); box.hidden = true; clearTimeout(state.timer); if (inside) { const ed = K.$('#editor'); if (ed) ed.focus(); } }
+        else if (mine && box.hidden) { collapse(true); box.hidden = false; }
     }
 
     function close(restore) {
         const box = K.$('#import-report');
-        if (!box || box.hidden) return;
+        if (!box) return;
+        if (box.hidden) { clearTimeout(state.timer); state.entries = []; state.o = {}; state.doc = null; return; }
         const inside = box.contains(document.activeElement);
         box.hidden = true;
-        state.entries = []; state.o = {};                   // the kept file bytes go with it (onSafe holds them)
+        clearTimeout(state.timer); state.timer = 0;
+        state.entries = []; state.o = {}; state.doc = null;  // the kept file bytes go with it (onSafe holds them)
         const back = state.back; state.back = null;
         if (restore !== false && inside) {
             const to = back && back.isConnected && !back.disabled && !back.closest('[hidden]') ? back : K.$('#editor');
@@ -267,14 +321,16 @@
         // nothing to tell: an open panel closes (the focus, when it was inside, back where it was before it opened)
         if (!entries.length) { close(); return false; }
         const was = !box.hidden;
-        state.entries = entries; state.o = o || {};
+        state.entries = entries; state.o = o || {}; state.doc = docNow();
         if (!was || !box.contains(document.activeElement)) {
             const a = document.activeElement;
             state.back = a && a !== document.body && !box.contains(a) ? a : state.back;
         }
         render();
+        collapse(false);
         box.hidden = false;
         box.focus();
+        collapseLater();
         return true;
     }
     report.close = close;
@@ -291,6 +347,8 @@
     };
     /** the language changed: the panel's words again */
     report.refresh = function () { if (state.entries.length) render(); };
+    report.collapse = collapse;
+    report.follow = follow;
     report.text = function () { return text(state.entries); };
 
     function copy() {
@@ -309,6 +367,9 @@
         if (!box || box._wired) return;
         box._wired = true;
         K.$('#import-report-close').addEventListener('click', function () { close(); });
+        K.$('#import-report-toggle').addEventListener('click', function () { const shut = box.classList.contains('collapsed'); collapse(!shut); if (shut) collapseLater(0); });
+        const ed = K.$('#editor');
+        if (ed) ed.addEventListener('kelk:replaced', follow);
         K.$('#report-copy').addEventListener('click', copy);
         K.$('#report-safe').addEventListener('click', function () {
             const run = state.o.onSafe;

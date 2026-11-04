@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Kelk — Markdown to Word, PowerPoint, PDF and HTML and back, right-to-left first</title>
     <meta name="description" content="Kelk: convert Markdown (GFM) to Word DOCX, Word DOC (MHTML), PowerPoint PPTX slides, PDF and standalone HTML — and Word, HTML and PDF back to Markdown — entirely client-side in your browser. Right-to-left first (Persian, Arabic, Hebrew, Urdu) and every left-to-right language; LaTeX formulas; offline, no upload, open source.">
-    <meta name="keywords" content="markdown to docx, markdown to pptx, markdown to powerpoint, markdown slides, markdown to pdf, markdown to word, markdown to html, docx to markdown, LaTeX, MathJax, Word equations, GFM, RTL, bidi, Persian, Farsi, Arabic, Hebrew, Urdu, client-side, offline">
+    <meta name="keywords" content="markdown to docx, markdown to pptx, markdown to powerpoint, markdown slides, markdown to pdf, markdown to word, markdown to html, docx to markdown, pdf to markdown, LaTeX, MathJax, Word equations, GFM, RTL, bidi, Persian, Farsi, Arabic, Hebrew, Urdu, client-side, offline">
     <meta name="author" content="mhn.com@gmail.com">
     <meta name="contributor" content="Anthropic Claude Opus 5.5">
     <meta name="theme-color" content="#1f6f5c">
@@ -65,7 +65,11 @@
                 <span class="brand-tip" id="brand-tip" role="tooltip" data-i18n="logoTip"></span>
             </span>
             <div>
-                <h1 data-i18n="appName">کِلک</h1>
+                <div class="title-row">
+                    <h1 data-i18n="appName">کِلک</h1>
+                    <!-- the version (K.config.version), a link to its release notes -->
+                    <a class="app-version" id="app-version" dir="ltr" target="_blank" rel="noopener noreferrer" data-i18n-attr="title:versionTip"></a>
+                </div>
                 <div class="sub" data-i18n="tagline"></div>
             </div>
         </div>
@@ -114,6 +118,8 @@
                     <div class="report-head">
                         <h3 id="import-report-title"><i data-lucide="file-text"></i><span data-i18n="rep_title"></span></h3>
                         <span class="report-name" id="import-report-name" dir="auto"></span>
+                        <span class="report-brief" id="import-report-brief"></span>
+                        <button class="btn ghost icon" id="import-report-toggle" type="button" aria-controls="import-report-body" aria-expanded="true"><i data-lucide="chevron-up"></i></button>
                         <button class="btn ghost icon" id="import-report-close" type="button" data-i18n-attr="title:rep_close;aria-label:rep_close"><i data-lucide="x"></i></button>
                     </div>
                     <div class="report-body" id="import-report-body" role="group" aria-labelledby="import-report-title" tabindex="0"></div>

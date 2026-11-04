@@ -8,10 +8,15 @@
     'use strict';
 
     K.config = {
-        version: '2.0',
+        version: '2.1',
         repoUrl: 'https://github.com/mohsen-1984/kelk',   // the footer link (hidden when empty)
         storagePrefix: 'kelk.',
         maxFileMB: 20,                  // the default of Settings → App → Largest file to import (ui.importer.maxMB)
+        // a PDF import's progress bar: each step's share of the bar (they add up to 1), measured on large files —
+        // after the last page is read, the font repairs, the layout and the Markdown still take about two thirds of the time
+        importProgress: { read: 0.33, fonts: 0.17, lines: 0.08, layout: 0.37, markdown: 0.05 },
+        // the PDF import report: open this long (ms) after an import, then collapsed to its head; 0: stays open
+        reportOpenMs: 3000,
         maxImageMB: 5,
         maxLogoPx: 256,                 // uploaded logos are scaled down to this height
         autosaveMs: 600,

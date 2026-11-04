@@ -312,10 +312,14 @@ test('the panel: focus in on open, back on close (×, Escape); Copy report; Re-i
   K.ui.report(Object.assign(clone(SAMPLE), { mode: 'safe' }), { name: 'a.pdf', onSafe: () => safe++ });
   assert.equal(d.getElementById('report-safe').hidden, true);
   assert.ok(box.textContent.includes(K.i18n.t('rep_safeMode')));
-  // nothing to tell: no panel (and an open one closes)
-  assert.equal(K.ui.report({ mode: 'auto', summary: { pages: 2, full: 2 }, pages: [], flags: [], notes: [] }), false);
-  assert.equal(box.hidden, true);
+  // a clean report: shown too (every PDF import has one), in the calm color, with no safe-mode button
+  assert.equal(K.ui.report({ mode: 'auto', summary: { pages: 2, full: 2 }, pages: [], flags: [], notes: [] }, { name: 'a.pdf', onSafe: () => safe++ }), true);
+  assert.equal(box.hidden, false);
+  assert.ok(box.classList.contains('clean'), 'the calm color');
+  assert.equal(d.getElementById('report-safe').hidden, true, 'nothing safe mode would do better');
   assert.equal(d.getElementById('report-safe-hint').hidden, true, 'no hint without the button');
+  K.ui.report.close();
+  assert.equal(box.hidden, true);
   // a panel that closes by itself (a clean import) with the focus inside: the focus goes back, not to <body>
   from.focus();
   K.ui.report(clone(SAMPLE), { name: 'a.pdf' });
@@ -410,7 +414,55 @@ test('a PDF import opens the report instead of toasts; Re-import in safe mode re
   });
   await K.importer.fromFile(pdfFile(w, 'clean.pdf'));
   assert.equal(K.editor.value(), '# Clean\n');
-  assert.equal(box.hidden, true);
+  assert.equal(box.hidden, false, 'a clean import has its report too: the same panel for every PDF');
+  assert.ok(box.classList.contains('clean'));
+  assert.equal(d.getElementById('import-report-name').textContent, 'clean.pdf');
+  assert.equal(d.getElementById('report-safe').hidden, true);
+  assert.deepEqual(errors, []);
+  w.close();
+});
+
+test('the report follows its document (Clear hides it, Undo brings it back collapsed, Redo hides it); it collapses after config.reportOpenMs; its toggle opens it', async function () {
+  const { window: w, errors } = await appWindow(OPENED);
+  const K = w.Kelk,
+    d = w.document,
+    box = d.getElementById('import-report'),
+    tg = d.getElementById('import-report-toggle');
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  K.config.reportOpenMs = 30;
+  K.editor.set('# Imported\n', 'a.pdf');
+  K.ui.report(clone(SAMPLE), { name: 'a.pdf' });
+  assert.equal(box.hidden, false);
+  assert.ok(!box.classList.contains('collapsed'), 'open at first');
+  assert.equal(tg.getAttribute('aria-expanded'), 'true');
+  await wait(90);
+  assert.ok(box.classList.contains('collapsed'), 'collapsed after reportOpenMs');
+  assert.equal(tg.getAttribute('aria-expanded'), 'false');
+  assert.ok(d.getElementById('import-report-brief').textContent.length > 3, 'the summary in its head');
+  tg.click();
+  assert.ok(!box.classList.contains('collapsed'), 'the toggle opens it');
+  await wait(90);
+  assert.ok(!box.classList.contains('collapsed'), 'opened by hand: it stays open');
+  tg.click();
+  assert.ok(box.classList.contains('collapsed'), 'and collapses it again');
+  K.editor.set('', '');
+  assert.equal(box.hidden, true, 'Clear (another document): hidden');
+  K.editor.undo();
+  assert.equal(K.editor.value(), '# Imported\n');
+  assert.equal(box.hidden, false, 'Undo back to its document: shown again');
+  assert.ok(box.classList.contains('collapsed'), 'collapsed');
+  K.editor.redo();
+  assert.equal(box.hidden, true, 'Redo: hidden again');
+  K.editor.undo();
+  assert.equal(box.hidden, false);
+  K.ui.report.close();
+  K.editor.redo();
+  K.editor.undo();
+  assert.equal(box.hidden, true, 'closed with its ×: gone for good');
+  K.config.reportOpenMs = 0;
+  K.ui.report(clone(SAMPLE), { name: 'a.pdf' });
+  await wait(60);
+  assert.ok(!box.classList.contains('collapsed'), 'reportOpenMs 0: stays open');
   assert.deepEqual(errors, []);
   w.close();
 });

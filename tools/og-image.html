@@ -41,12 +41,22 @@
   h1 .fa { color: var(--accent); margin-left: 14px; font-weight: 700; }
   .meaning { margin-top: 12px; font-size: 21px; color: var(--muted); }
   .meaning b { color: var(--accent); font-weight: 700; }
-  .tag { margin-top: 44px; font-size: 31px; font-weight: 700; line-height: 1.35; }
+  .tag { margin-top: 40px; font-size: 28px; font-weight: 700; line-height: 1.4; white-space: nowrap; }
   .tag-fa { margin-top: 10px; font-size: 25px; font-weight: 600; color: var(--muted); direction: rtl; text-align: left; }
-  .chips { margin-top: 40px; display: flex; gap: 12px; }
-  .chip { padding: 9px 20px; border-radius: 10px; font-size: 22px; font-weight: 800; color: var(--accent);
+  .chips { margin-top: 36px; display: flex; gap: 10px; align-items: center; }
+  .chip { padding: 8px 16px; border-radius: 10px; font-size: 20px; white-space: nowrap; font-weight: 800; color: var(--accent);
           background: var(--paper); border: 2px solid var(--line); }
   .chip.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .chip.back { margin-left: 8px; border-style: dashed; color: var(--ink); }
+  /* a slide of a deck (the PowerPoint output), in front of the page */
+  .slide { position: absolute; right: 250px; top: 415px; width: 300px; height: 169px; background: var(--paper); border-radius: 10px;
+           box-shadow: 0 20px 40px -20px rgba(20, 40, 34, .5), 0 0 0 1px var(--line); transform: rotate(3deg); overflow: hidden; direction: rtl; }
+  .slide .bar { height: 40px; background: var(--accent); color: #fff; font-size: 16px; font-weight: 800; padding: 9px 16px; }
+  .slide .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 14px 14px 0; }
+  .slide .card { height: 82px; border-radius: 7px; background: var(--accent-soft); border-top: 4px solid var(--accent); padding: 8px; font-size: 12.5px; font-weight: 700; color: var(--ink); }
+  .slide .card span { display: block; margin-top: 6px; height: 5px; border-radius: 3px; background: #b9d3ca; }
+  .slide .card span + span { width: 70%; }
+  .slide .tag-pptx { position: absolute; left: 10px; bottom: 8px; font: 800 11px 'Vazirmatn'; color: var(--accent); direction: ltr; }
 
   /* right: a page of a finished document — right to left, a formula, a table */
   .page { position: absolute; right: 72px; top: 112px; width: 420px; background: var(--paper); border-radius: 14px;
@@ -82,9 +92,9 @@
         <div class="meaning"><b>kelk</b> — the reed pen of Persian calligraphy</div>
       </div>
     </div>
-    <div class="tag">Markdown → Word, PDF and HTML,<br>right-to-left first — in your browser</div>
-    <div class="tag-fa">از مارک‌داون تا سند آماده، با فرمول‌های LaTeX</div>
-    <div class="chips"><span class="chip on">DOCX</span><span class="chip">PDF</span><span class="chip">HTML</span><span class="chip">DOC</span></div>
+    <div class="tag">Markdown → Word, PowerPoint, PDF, HTML<br>PDF → Markdown — in your browser</div>
+    <div class="tag-fa">راست‌به‌چپ، با فرمول‌های LaTeX؛ بدون اینترنت</div>
+    <div class="chips"><span class="chip on">DOCX</span><span class="chip">PPTX</span><span class="chip">PDF</span><span class="chip">HTML</span><span class="chip back">PDF → MD</span></div>
   </div>
 
   <div class="page" aria-hidden="true">
@@ -99,6 +109,15 @@
       <tr><td>زمان پاسخ</td><td class="n">120 ms</td></tr>
       <tr><td>نمونه‌ها</td><td class="n">12,500</td></tr>
     </table>
+  </div>
+  <div class="slide" aria-hidden="true">
+    <div class="bar">سه گام تا گزارش</div>
+    <div class="cards">
+      <div class="card">نوشتن<span></span><span></span></div>
+      <div class="card">بازبینی<span></span><span></span></div>
+      <div class="card">ارائه<span></span><span></span></div>
+    </div>
+    <div class="tag-pptx">PPTX</div>
   </div>
 </body>
 </html>

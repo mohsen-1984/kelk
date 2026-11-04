@@ -183,7 +183,23 @@
                         } catch (err) { return uri; }
                     }
                 };
-                const hooks = { onProgress: function (i, n) { t.progress(i, n, K.i18n.t('taskPage', i, n)); } };
+                // the bar runs through every step (config.importProgress), not only the pages: after the last page
+                // is read the font repairs, the layout and the Markdown still take most of the time
+                const W = K.config.importProgress, ORDER = ['read', 'fonts', 'lines', 'layout', 'markdown'];
+                const hooks = {
+                    onStage: function (stage, done, total) {
+                        const k = ORDER.indexOf(stage);
+                        if (k < 0) return;
+                        let before = 0;
+                        for (let j = 0; j < k; j++) before += W[ORDER[j]];
+                        const share = before + W[stage] * (total > 0 ? Math.min(done, total) / total : 0);
+                        const label = stage === 'read' ? K.i18n.t('taskPage', done, total)
+                            : stage === 'fonts' ? K.i18n.t('taskFonts')
+                            : stage === 'lines' ? K.i18n.t('taskLines', done, total)
+                            : stage === 'layout' ? K.i18n.t('taskLayout', done, total) : K.i18n.t('taskMarkdown');
+                        t.progress(Math.round(share * 1000), 1000, label);
+                    }
+                };
                 if (mode) opts.mode = hooks.mode = mode;
                 const r = await PdfImporter.create(opts).fromArrayBuffer(buf, hooks);
                 if (r.messages && r.messages.length) console.info('PdfImporter:', r.messages);
