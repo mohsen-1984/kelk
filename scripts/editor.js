@@ -18,11 +18,17 @@
      */
     const history = { steps: [], at: -1, timer: 0 };
     const LIMIT = 200, CHARS = 20e6;
-    function snapshot() { return { text: area.value, s: area.selectionStart, e: area.selectionEnd, name: fileName }; }
+    /**
+     * Which document the text is: a whole-text replacement (import, sample, clear) starts a new one, typing keeps it,
+     * undo and redo go back to the document of their step. What belongs to one document follows it (Kelk.editor.doc():
+     * the import report shows while its document is on screen, also after an undo back to it).
+     */
+    let docSeq = 0, docId = 0;
+    function snapshot() { return { text: area.value, s: area.selectionStart, e: area.selectionEnd, name: fileName, doc: docId }; }
     function record() {
         clearTimeout(history.timer); history.timer = 0;
         const cur = history.steps[history.at];
-        if (cur && cur.text === area.value) { cur.s = area.selectionStart; cur.e = area.selectionEnd; cur.name = fileName; return; }
+        if (cur && cur.text === area.value) { cur.s = area.selectionStart; cur.e = area.selectionEnd; cur.name = fileName; cur.doc = docId; return; }
         history.steps.length = history.at + 1;                    // a new change drops the redo steps
         history.steps.push(snapshot());
         let total = history.steps.reduce(function (n, x) { return n + x.text.length; }, 0);
@@ -40,6 +46,7 @@
     function restore(st) {
         area.value = st.text;
         fileName = st.name || '';
+        docId = st.doc || 0;
         area.focus();
         area.setSelectionRange(Math.min(st.s, st.text.length), Math.min(st.e, st.text.length));
         persist(st.text);
@@ -234,9 +241,13 @@
 
         value: function () { return area ? area.value : ''; },
 
+        /** The document on screen (a number): a whole-text replacement starts a new one, undo / redo return to theirs. */
+        doc: function () { return docId; },
+
         /** Replace the whole text (import, sample, clear). */
         set: function (text, name) {
             record();                                        // typing in progress: its own step first
+            docId = ++docSeq;                                // a new document
             area.value = text;
             fileName = name || '';
             persist(text);

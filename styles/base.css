@@ -79,6 +79,14 @@ a { color: var(--accent); }
 .glyph:focus + .brand-tip { transition-delay: 0s; }
 .brand .glyph svg { width: 28px; height: 28px; }
 .brand h1 { margin: 0; font-size: 18px; font-weight: 700; line-height: 1.2; }
+/* the version beside the name: a quiet pill, Latin digits, the release notes behind it */
+.title-row { display: flex; align-items: center; gap: 8px; }
+.app-version {
+  font: 600 11px/1 var(--font-latin); letter-spacing: .02em; padding: 3px 7px; border-radius: 999px;
+  color: var(--accent-ink); background: var(--accent-soft); text-decoration: none; white-space: nowrap;
+}
+.app-version:hover, .app-version:focus-visible { background: var(--accent); color: var(--on-accent); }
+.app-version:not([href]) { pointer-events: none; }
 .brand .sub { color: var(--muted); font-size: 12.5px; }
 
 .topbar .spacer { flex: 1; }
@@ -184,6 +192,13 @@ footer.note a { color: inherit; }
 .workspace.max-editor { grid-template-areas: "editor settings"; }
 .workspace.max-preview { grid-template-areas: "preview settings"; }
 .workspace.max-editor .preview-panel, .workspace.max-preview .editor-panel { display: none; }
+/* 901–1100px (also a window zoomed into that width while a panel is maximized): Settings stays below the panel, a
+   bar as in the layout around it — not the side column of a wide screen, where its label would lie flat */
+@media (min-width: 901px) and (max-width: 1100px) {
+  .workspace.max-editor, .workspace.max-preview { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto; }
+  .workspace.max-editor { grid-template-areas: "editor" "settings"; }
+  .workspace.max-preview { grid-template-areas: "preview" "settings"; }
+}
 @media (max-width: 900px) {
   .workspace.max-editor, .workspace.max-preview { grid-template-columns: minmax(0, 1fr); grid-template-areas: none; }
   .btn.btn-max { display: none; }                     /* one column: nothing to step aside */

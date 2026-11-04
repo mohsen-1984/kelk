@@ -66,7 +66,18 @@
 .report-head h3 { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 13.5px; font-weight: 700; white-space: nowrap; }
 .report-head h3 svg, .report-head h3 i { width: 16px; height: 16px; color: var(--warn); flex: none; }
 .report-name { flex: 1; min-width: 0; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.report-head .btn { flex: none; margin-inline-start: auto; }
+.report-head .btn { flex: none; }
+#import-report-toggle { margin-inline-start: auto; }
+/* every PDF import has its report: a clean one in the calm color, one with something to tell in the warning color */
+.import-report.clean { border-color: var(--accent); }
+.import-report.clean .report-head h3 svg, .import-report.clean .report-head h3 i { color: var(--accent); }
+/* collapsed (config.reportOpenMs after it opened, or its toggle): the head only, with the summary in it */
+.report-brief { display: none; color: var(--muted); font-size: 12.5px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.import-report.collapsed { padding-bottom: 8px; }
+.import-report.collapsed .report-body, .import-report.collapsed .report-actions { display: none; }
+.import-report.collapsed .report-brief { display: block; flex: 0 1 auto; }
+.import-report.collapsed .report-name { flex: 0 1 auto; }
+@media (max-width: 600px) { .import-report.collapsed .report-name { display: none; } }
 /* tall enough for the summary, a few findings and three page rows on a desktop screen (800 px high: 308), the
    text below it shorter while the report is open (still on screen with the editor's foot); one column (phones):
    the page scrolls, a share of the screen. Shadows at an edge where more content is (scroll-shadow: the covers

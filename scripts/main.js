@@ -92,6 +92,12 @@
 
         const repo = K.$('#repo-link');
         if (repo) { if (K.config.repoUrl) repo.href = K.config.repoUrl; else repo.hidden = true; }
+        // the version beside the name; its release notes on GitHub (none without a repository)
+        const ver = K.$('#app-version');
+        if (ver) {
+            ver.textContent = 'v' + K.config.version;
+            if (K.config.repoUrl) ver.href = K.config.repoUrl + '/releases/tag/v' + K.config.version;
+        }
 
         // top bar
         // language: one button for each OTHER interface language, named in its own language

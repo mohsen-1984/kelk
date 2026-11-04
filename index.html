@@ -65,7 +65,11 @@
                 <span class="brand-tip" id="brand-tip" role="tooltip" data-i18n="logoTip"></span>
             </span>
             <div>
-                <h1 data-i18n="appName">کِلک</h1>
+                <div class="title-row">
+                    <h1 data-i18n="appName">کِلک</h1>
+                    <!-- the version (K.config.version), a link to its release notes -->
+                    <a class="app-version" id="app-version" dir="ltr" target="_blank" rel="noopener noreferrer" data-i18n-attr="title:versionTip"></a>
+                </div>
                 <div class="sub" data-i18n="tagline"></div>
             </div>
         </div>
@@ -114,6 +118,8 @@
                     <div class="report-head">
                         <h3 id="import-report-title"><i data-lucide="file-text"></i><span data-i18n="rep_title"></span></h3>
                         <span class="report-name" id="import-report-name" dir="auto"></span>
+                        <span class="report-brief" id="import-report-brief"></span>
+                        <button class="btn ghost icon" id="import-report-toggle" type="button" aria-controls="import-report-body" aria-expanded="true"><i data-lucide="chevron-up"></i></button>
                         <button class="btn ghost icon" id="import-report-close" type="button" data-i18n-attr="title:rep_close;aria-label:rep_close"><i data-lucide="x"></i></button>
                     </div>
                     <div class="report-body" id="import-report-body" role="group" aria-labelledby="import-report-title" tabindex="0"></div>
