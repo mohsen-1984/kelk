@@ -1495,8 +1495,9 @@ matter:
   title but such a block, Kelk 2.2: joined as a title its rows ran into one paragraph; a line of two pairs or more,
   drawn as one run with spaces at its tab stops, is cut between them where the widest gap between two colons is
   over an em; lab: `word-form--form-row-fa`),
-  are text above the table: each pair a paragraph, column by column from the start side, a line with no colon
-  going on from the one before;
+  are text above the table: each pair a list item, row by row (a row from the start side), a line with no colon
+  going on from the one above it in its column — one order with a form's rows (`_formRows`; the owner's decision,
+  Kelk 2.3: before, each pair a paragraph, column by column; `word-form--form-row-fa` 88.0 → 100.0);
 - **a shaded band across a gutter, with a line on its baseline at each side**, is a table's header row, and
   the region beside it is read as rows even with cells of up to eight words (a bare table's are four at most):
   the signature table at a contract's end — «مهر و امضای طرف اول | مهر و امضای طرف دوم» on grey, a bare row under
