@@ -147,7 +147,7 @@ counts the reasons a paragraph group was opened.
 | ↳ `_tableRowSplit` | `_tableBlock` | step 4: grid rows that hold rows drawn without rules, split at their baselines |
 | ↳ `_tableTitle` | `_tableBlock` | step 5: a merged first row over the whole table, its title |
 | ↳ `_tablePreamble` | `_tableBlock` | step 6: «label: value» rows between the title and the first fully celled row |
-| ↳ `_cellItems` | `_tableBlock` | a list inside a table cell: each item keeps its line and its marker as «•» |
+| ↳ `_cellItems` | `_tableBlock` | a list inside a table cell: each item keeps its line; a bullet written «•», a dash or an item's number kept |
 | `_codeBlock` | `_pbBlocks`, `_pbUnframedCode`, `_joinPageBreak` | a code box's lines as a code block |
 
 ## ladder.js — 4.9 each page's confidence and the fallback ladder (PDFIMPORT.md §7a)

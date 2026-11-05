@@ -1202,7 +1202,14 @@ mostly the OCR's own reading («65h» for «6.5 h»), and what only the scan sho
 **Lists in table cells** (round 23, `_cellItems`). Markdown's cells hold no list: a cell whose lines open with a
 marker — «•», «▪», «◦», Word's level-two «o» in Courier New, a Wingdings «§» — and a gap after it, two items or more,
 keeps a line break before each item (`<br>`) and writes its marker «•»; a line without one is the item above
-wrapped. Joined as prose, a Word plan's cell of eleven items came back as one line, every «o» inline code.
+wrapped. Joined as prose, a Word plan's cell of eleven items came back as one line, every «o» inline code. A dash
+«-» and an item's number — «1)», «(1», «2.»: a few touching glyphs with a bracket or a point, then the gap — are
+markers too, kept as they are (not bold unless its text is too: a bold number before plain text reads «1) …», a bold title stays «**1) title**»; Kelk 2.3). A lone item on a cell's
+first line is an item: the rest of a list cut by a page break — when the row cut by the break joins the row above
+(`_joinTables`, its first cell empty on the new page), an item opening the rest goes on on a line of its own. A row
+opened by an item's number alone, its text hanging after a gap, is no form row (`_formRows`): a cell's items
+«1) title: …» in a column of their own were read as a form and left the table, each number a bold item of its own,
+and the table's part on the next page was not joined to it. Lab: `word-longcells--long-cells-fa` (59.0 → 80.0).
 
 ### Forms
 
