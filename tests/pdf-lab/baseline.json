@@ -1,5 +1,5 @@
 {
- "written": "2026-11-05T10:47:44.441Z",
+ "written": "2026-11-05T11:26:34.384Z",
  "note": "scripts/gate.js --update; the fuzz means hold only for their env",
  "corpus": {
   "acrobat-word--booklet-fa": {
@@ -311,12 +311,12 @@
    "pic": 0,
    "mix": 0,
    "recall": 1,
-   "order": 0.9899,
+   "order": 1,
    "headings": 1,
    "lists": 0.9565,
    "tables": 1,
    "code": 1,
-   "total": 0.9911,
+   "total": 0.9928,
    "rtl": 1,
    "zwnj": 1,
    "yehKaf": 1,
@@ -329,12 +329,12 @@
    "pic": 0,
    "mix": 0,
    "recall": 1,
-   "order": 0.9889,
+   "order": 1,
    "headings": 1,
    "lists": 0.9565,
    "tables": 1,
    "code": 1,
-   "total": 0.9909,
+   "total": 0.9928,
    "links": 1
   },
   "chrome-github-bg--article": {
@@ -3303,6 +3303,7 @@
    "order.columnRule",
    "order.formFramed",
    "order.formLabelsApart",
+   "order.formTitleFirst",
    "order.formValueAlone",
    "order.hrFrameEdge",
    "order.quoteBarFrameEdge",
@@ -3335,6 +3336,7 @@
    "order.columnRule",
    "order.formFramed",
    "order.formLabelsApart",
+   "order.formTitleFirst",
    "order.formValueAlone",
    "order.hrFrameEdge",
    "order.quoteBarFrameEdge",
@@ -9019,12 +9021,12 @@
   "chrome-form--form-fa": {
    "error": null,
    "recall": 1,
-   "order": 0.9899,
+   "order": 1,
    "headings": 0.8889,
    "lists": 0,
    "tables": 0.1316,
    "code": 1,
-   "total": 0.6684,
+   "total": 0.6701,
    "rtl": 1,
    "zwnj": 1,
    "yehKaf": 1,
@@ -9585,7 +9587,7 @@
   }
  },
  "realHeldout": {
-  "at": "2026-11-05T10:46:19.668Z",
+  "at": "2026-11-05T11:25:33.186Z",
   "n": 17,
   "errors": 0,
   "docs": [

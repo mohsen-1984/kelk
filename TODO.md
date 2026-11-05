@@ -24,15 +24,13 @@ table; a band between rows is a row of its own, bold in its first cell (`_tableM
 setting, Settings → Import → *Cells merged over rows*: `repeat` (default) | `empty` (first row only, as 2.2 did);
 column spans are written once either way; the same for Word, HTML and PDF import (`importer.mergedRows`).
 
-1. **A header's title between its pairs** reads after the first pair — **lab:** `chrome-form--form`, `--form-fa`
-   (order 98). Risk: low
-2. A Persian report in B Nazanin whose amounts read «3.004» (the file's text has a period between the thousands;
+1. A Persian report in B Nazanin whose amounts read «3.004» (the file's text has a period between the thousands;
    the page shows a comma-like mark): **to examine** whether the font draws «.» as a separator — a reader takes
    «3.004» for three and a bit. Optional
 
 *2.4 — designed documents from browsers (heading, box and figure rules shared by every Chromium file in the lab)*
 
-3. **A designed booklet** — **lab:** `chrome-booklet--booklet-cards-fa` (45.4). Cards, badges and coloured boxes:
+2. **A designed booklet** — **lab:** `chrome-booklet--booklet-cards-fa` (45.4). Cards, badges and coloured boxes:
    - a table of contents — a number badge, the title, dot leaders drawn as a dashed rule, no page number — comes
      back as headings or a table with each number a bold paragraph after its title; expected a numbered list
    - a chapter's head — a number badge beside the title, a small coloured subtitle under it: the badge a bold

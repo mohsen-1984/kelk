@@ -1227,7 +1227,12 @@ segments after it to the next label are its value. A row of one value right over
 em) fills the empty pair beside it (an invoice set one number 6 pt above its label). Each pair a list item; the
 run's rules are the frame's (no thematic breaks). Form rows in a box inside a ruled table's frame, over every line
 of the table's own, come before the table (Kelk 2.2): the table's box begins under them — the two boxes one inside
-the other, the XY-cut could not part them, and the pairs read after the table. Lab: `word-form--form-box-fa`. **A frame of fields is no quote** (order.js): every line in it a
+the other, the XY-cut could not part them, and the pairs read after the table. Lab: `word-form--form-box-fa`.
+**A header's title beside its pairs comes first** (`_formTitleFirst`, Kelk 2.3): a line set 1.3 times the body or
+larger, apart from the pairs across, beside form rows whose top is over its own (their row within its height),
+is read before them — its row key just over the highest pair's. An invoice's title in the middle of its header, its
+date and number at the far side, the date's baseline a little higher: by height the title had come between the
+two pairs. Lab: `chrome-form--form`, `--form-fa` (order 98 → 100). **A frame of fields is no quote** (order.js): every line in it a
 bold «label: value» — or the wrap of the field above (round 26): a line under a field's line that filled the frame,
 a line's pitch down, with no label of its own («هدف طرح: …» over two lines, its second under the label — the
 frame had been read as a quote). Lab: `word-plan--plan-box-fa`. A section's **title band** — one short line in a fill or frame
