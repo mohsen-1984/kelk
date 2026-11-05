@@ -11,6 +11,9 @@ Sections 1–5 go into the release's pull request; section 6 is the owner's, cli
       `package.json` (`x.y.0`), `lib/*.js` headers, `BuilderBase.version`, `MathCore`, `BidiView`, `lib/README.md`,
       `tools/bidi-lab.html`, the README download links (`kelk_x.y.zip`), the newest CHANGELOG heading.
       (`PdfImporter` and `PptxBuilder` keep their own versions.)
+- [ ] `node tests/golden/run.js --update`: the builders' snapshots carry the version (generator, creator); check
+      `git diff tests/golden` shows nothing but `x.y` and the shared sections' new names (2.3: CI's *builders*
+      failed on the old version until then).
 
 ## 2. What the exported files say about themselves
 
