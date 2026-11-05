@@ -43,7 +43,7 @@ const PDF_GROUPS = [
   ['real-producers', /^(word2024-save|msprint-(word|excel|ppt)|excel2024|ppt2024|edge|chrome|firefox)--/],
   ['producers', /^(word\d*-|pptx-|prince-|itext-|acrobat-|pdflib-)/],
   ['office', /^(calc--|impress--|lowriter--word-)/],
-  ['pages', /^(chrome-(layout|layers|template|web-rtl|headtable|positioned|float-tagged|pictures|card|fa-links|form|letterhead)--|wk-pictures--|lowriter--merged)/],
+  ['pages', /^(chrome-(layout|layers|template|web-rtl|headtable|positioned|float-tagged|pictures|card|fa-links|form|letterhead|booklet)--|wk-pictures--|lowriter--merged)/],
   ['rtl', /^(chrome-rtl-|wk-rtl--|lohtml-rtl--)|--(fa|ar)-/],
   ['en', /./]
 ];

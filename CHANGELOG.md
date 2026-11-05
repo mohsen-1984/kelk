@@ -4,6 +4,12 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+### PDF lab
+
+- Five cases for 2.3 and 2.4 from real files, failing on purpose until fixed (`TODO.md`): cells of dash and
+  numbered items in a table over two pages, merged cells and bands, and a designed booklet from Chromium
+  (`make-word23-rtl.py`, `make-booklet.js`); `baseline.json` updated (corpus 95.0 with them).
+
 ## [2.2] — 2026-11-04
 
 PDF import: faster on long files, Persian text from fonts with a scrambled character map, a table's first column
