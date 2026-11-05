@@ -252,7 +252,12 @@ A `.docx` read here and built again with `DocxBuilder` is a simple **clean-up of
 the meaning (headings by style, lists, tables, bold, italic, links, images; `fromDocx` turns Word's equations into
 LaTeX first) and drops direct formatting, and the builder decides every block's direction and alignment itself and
 writes one set of real Word styles. What Markdown does not hold — page layout, text boxes, the file's own header and
-footer, comments, tracked changes, complex merged cells — does not come back.
+footer, comments, tracked changes — does not come back.
+
+Merged cells: Markdown has no spans, so a table's grid is filled out — a cell merged over columns is written once,
+the cells after it empty; a cell merged over rows is repeated in each of its rows (`mergedRows: 'repeat'`, the
+default) or left to its first row (`'empty'`). Settings → Import → *Cells merged over rows*; the PDF importer reads
+the same setting (`PdfImporter.create({ mergedRows })`).
 
 ## Import: `PdfImporter`
 

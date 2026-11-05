@@ -18,9 +18,11 @@ Order and risk in this order. Both open questions are decided (2026-11-05, the o
 
 **Decided, done in 2.3 (kept here as standing rules):** any «جدول N» / «Table N» title next to a table is bold,
 whatever it looks like in the PDF (`_tableTitles`); Excel's merged title row is the sheet's title and stays a
-heading, unless it starts «جدول N» or «Table N». Merged cells: a value merged over rows is repeated in each; a band
-over the header is a paragraph over the table; a band between rows is a row of its own, bold in its first cell
-(`_tableMerges`).
+heading, unless it starts «جدول N» or «Table N». Merged cells: a value merged over rows is repeated down its rows
+and written once across its columns (`pq` in `table-rowspan-colspan`); a band over the header is a paragraph over the
+table; a band between rows is a row of its own, bold in its first cell (`_tableMerges`). The row behaviour is a
+setting, Settings → Import → *Cells merged over rows*: `repeat` (default) | `empty` (first row only, as 2.2 did);
+column spans are written once either way; the same for Word, HTML and PDF import (`importer.mergedRows`).
 
 1. **Forms: one order** — **Decided:** row by row, each pair a list item, everywhere. Two conventions today for
    the same pairs: `_formRows` (a form's rows: list items, row by row — already so; `word-form--form-box-fa`) and
