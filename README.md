@@ -105,15 +105,16 @@ const pdf = await PdfBuilder.create()
 index.html     the page            scripts/, styles/   the page's code (window.Kelk)
 lib/           the library         assets/             icons and web fonts
 vendor/        third-party libraries (pinned versions; THIRD-PARTY-NOTICES.md)
-docs/          about + guide + samples (en / fa / ar), screenshots, RELEASING.md (the release checklist)
+docs/          about + guide + samples (en / fa / ar), screenshots, WORKING.md (how we work: start here),
+               RELEASING.md (the release checklist)
 tests/         builder-suite.html — every test case through the four document builders, in the browser ·
                slides-suite.html — the slides: layouts, notes, warnings, the .pptx read back ·
                pdf-import-suite.html — PDFs you pick, scored offline ·
                pdf-lab/ — 195 PDFs (our generators and real Windows producers), scored, fuzzed and gated (Node + Playwright)
 tools/         bidi-lab.html (every direction rule) · build_pdf_fonts.py · build-icons.js · build-samples.js · og-image.html (source of assets/og-image.png)
-               · check-*.js (version, interface strings, accessibility, startup size)
+               · check-*.js (version, interface strings, accessibility, startup size) · build-release.sh (the two zips)
 .github/       CI on every push: the PDF lab and its gate, the builders against golden snapshots, .docx checked
-               against the OOXML schemas, unit tests, lint, links, accessibility
+               against the OOXML schemas, unit tests, lint, links, accessibility; the release zips, attached to each release
 package.json   the dev tools CI installs (npm ci) — the app itself has no build step and no dependencies to install
 ```
 

@@ -4,6 +4,13 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+### Development
+
+- `docs/WORKING.md`: how we work — where a new session starts reading, the agreements (the owner merges and
+  releases; private files never in the repository), the release steps click by click, a few words on git and CI.
+- The release zips are built by CI: `tools/build-release.sh`, run by `.github/workflows/release.yml` on a
+  published release (attached to it) or by hand (Actions → release → Run workflow).
+
 ### PDF lab
 
 - Five cases for 2.3 and 2.4 from real files, failing on purpose until fixed (`TODO.md`): cells of dash and

@@ -1,6 +1,8 @@
 # Releasing Kelk — checklist
 
 Go through it top to bottom for every release (x.y). A step that does not apply is ticked with a word why.
+Sections 1–5 go into the release's pull request; section 6 is the owner's, click by click in
+[`docs/WORKING.md`](WORKING.md#publishing-a-release).
 
 ## 1. Version
 
@@ -44,12 +46,14 @@ Go through it top to bottom for every release (x.y). A step that does not apply 
       freshness. `node tests/run-slides-suite.js` for the slides.
 - [ ] A PDF import change: the lab's gate passed with no file worse — the numbers go into the CHANGELOG.
 
-## 6. Publishing
+## 6. Publishing (the owner)
 
 - [ ] Merge the pull request.
-- [ ] Release on GitHub: tag `vx.y` on `main`'s last commit, title `Kelk x.y`, the release notes, two files:
-      `kelk_x.y.zip` (the app) and `kelk-with-pdf-lab_x.y.zip` (with `tests/pdf-lab`). Not a pre-release (the
-      README links `releases/latest`).
+- [ ] Release on GitHub: tag `vx.y` on `main`'s last commit (made from the release page), title `Kelk x.y`, the
+      release notes. Not a pre-release (the README links `releases/latest`).
+- [ ] The two files appear on the release by themselves: the *release* workflow builds `kelk_x.y.zip` (the app)
+      and `kelk-with-pdf-lab_x.y.zip` (with `tests/pdf-lab`) from the tag and attaches them
+      (`tools/build-release.sh`; it fails if the tag is not `scripts/config.js`'s version).
 - [ ] The repository's *About* and topics, if the features changed.
 - [ ] Delete the merged branches.
 - [ ] Open the site (GitHub Pages) and the downloaded zip from `file://`: the version beside the name, an import, an
