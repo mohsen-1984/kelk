@@ -1550,6 +1550,13 @@ or that ends a sentence is emphasised text: a paragraph, its lines apart.
 large and centred over a letter, often in calligraphy, are a paragraph (a Word circular's came back as `#`); and
 calligraphy draws «باسمه» and «تعالی» touching, where a ZWNJ was read: the two words get their space.
 
+**A table's title is no heading.** A line «جدول 2- …», «Table 3: …» — the word, a number, then a dash, a colon,
+a point or a space — right over or under a table is bold text, never `#`: a document's outline lists its sections,
+not its tables (the owner's decision, Kelk 2.3; a Word report's titles, set large and bold, came back as `#` and
+`##`). A title read as a paragraph is left as it is; «جدول زیر …» (no number) and a heading «جدول …» away from any
+table are untouched. Lab: `word-longcells--long-cells-fa` 80.0 → 100.0, `word-merged--merged-cells-fa` 61.3 → 76.6;
+`frame-table-fa` writes its title bold now.
+
 **A heading starts at the column's start edge, or is centred.** Lines pushed to the far side — the start side's gap
 a fifth of the column or more, and two fifths more than the far side's — are no heading whatever their face: a
 letter's signature, name over title, bold and a size up at the left of a Persian page, stays bold text. (Not where
