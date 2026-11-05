@@ -12,7 +12,7 @@ held-out protocol (`tests/pdf-lab/HELDOUT.md`).
 
 **2.3 / 2.4 — PDF import, from real files (found in 2.2's review).** The files themselves are not kept; each case
 below is reproduced by a lab PDF of our own (failing on purpose until fixed: its score is the case's measure).
-Order and risk in this order; a decision still open is marked **decide**.
+Order and risk in this order. Both open questions are decided (2026-11-05, the owner's call): nothing to ask first.
 
 *2.3 — Word tables and forms (contained in the table and form code; Word reports)*
 
@@ -27,14 +27,17 @@ Order and risk in this order; a decision still open is marked **decide**.
 2. **Merged cells** — **lab:** `word-merged--merged-cells-fa` (61.3). A cell merged over rows stands in its first
    row only, the rows under it empty (they read as missing values); a header band over some columns above the header
    row is placed in one column of a header row; a band across columns between two groups of rows becomes a bold
-   cell in the middle of a row. **decide**: proposed — a merged value repeated in each of its rows; a band inside
-   the table a row of its own, its text bold in the first cell; a band over the header a paragraph over the table
-   (as a merged title row is today). The corpus file follows the proposal. Risk: medium (the grid's spans; Excel's
-   merged title row stays a heading, as decided)
-3. **Forms: one order** — **decide** row by row or column by column. Two conventions today for the same pairs:
-   `_formRows` (a form's rows: list items, row by row; `word-form--form-box-fa`) and `_tablePreamble` (a box in a
-   table's first row: paragraphs, column by column; `word-form--form-row-fa`, `chrome-form--form`). Proposed: row
-   by row, each pair a list item, for both. Risk: low–medium (the expected Markdown of those lab files changes)
+   cell in the middle of a row. **Decided:** a merged value is repeated in each of its rows (not HTML, not left
+   to its first row); a band inside the table is a row of its own, its text bold in the first cell, the others
+   empty; a band over the header is a paragraph over the table (as a merged title row is today). The corpus file
+   already says so. Risk: medium (the grid's spans; Excel's merged title row stays a heading, as decided)
+3. **Forms: one order** — **Decided:** row by row, each pair a list item, everywhere. Two conventions today for
+   the same pairs: `_formRows` (a form's rows: list items, row by row — already so; `word-form--form-box-fa`) and
+   `_tablePreamble` (a box in a table's first row: paragraphs, column by column — to change;
+   `word-form--form-row-fa`, `chrome-form--form`). In the same pull request: those files' corpus Markdown rewritten
+   to row-by-row list items (their scores drop with the old code and rise with the new; say so in the PR, as the
+   gate counts a lower score as worse until the code lands with it), and `lib/PDFIMPORT.md`'s payslip rule
+   («each pair a paragraph, column by column») changed with it. Risk: low–medium
 4. **A header's title between its pairs** reads after the first pair — **lab:** `chrome-form--form`, `--form-fa`
    (order 98). Risk: low
 5. A Persian report in B Nazanin whose amounts read «3.004» (the file's text has a period between the thousands;

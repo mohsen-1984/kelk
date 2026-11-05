@@ -8,8 +8,8 @@
 #     band over the last three columns above the header row, and a band across the last three columns between two
 #     groups of rows. The merged cell's value stands in its first row only (the rows under it look empty), the
 #     header band becomes a paragraph over the table, the inner band one bold cell in the middle of a row
-#     (the corpus file follows the proposal in TODO.md: a merged value repeated in each of its rows, a band a row of
-#     its own with its text in the first cell — to be confirmed)
+#     (the corpus file follows the decision in TODO.md: a merged value repeated in each of its rows, a band a row of
+#     its own with its text bold in the first cell, a band over the header a paragraph over the table)
 # The Markdown that must come back is corpus/long-cells-fa.md and corpus/merged-cells-fa.md.
 #   python3 scripts/make-word23-rtl.py    → pdf/producers/word-longcells--long-cells-fa.pdf,
 #                                           word-merged--merged-cells-fa.pdf and their corpus files
