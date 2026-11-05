@@ -18,6 +18,14 @@ All notable changes to Kelk. Dates are those of the release tags.
 - **Merged cells** (Word): a value merged over rows is repeated in each of its rows (the rows under it came back
   empty); a band over some columns above the header row is a paragraph over the table (it took a column of the
   header); a band between two groups of rows is a row of its own, its text bold in the first cell.
+- **Merged cells in Word and HTML import**: a row with a cell merged into it from above came back one cell short,
+  its cells shifted a column. The table is now filled out as for PDF: a cell merged over rows repeated in each of
+  them, one merged over columns written once.
+
+### Added
+
+- Settings → Import → **Cells merged over rows**: *Repeat in each row* (default) or *First row only*; for Word, HTML
+  and PDF import (`importer.mergedRows`; `MarkdownImporter` and `PdfImporter` option `mergedRows`).
 
 ### Development
 

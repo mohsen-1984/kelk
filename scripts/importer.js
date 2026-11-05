@@ -17,6 +17,7 @@
         const o = K.store.getUi('importer');
         return MarkdownImporter.create({
             nestedTables: o.nestedTables,
+            mergedRows: o.mergedRows === 'empty' ? 'empty' : 'repeat',
             images: o.images,
             labels: labels()
         });
@@ -164,7 +165,8 @@
                 const opts = {
                     images: set.images === 'drop' ? 'drop' : 'markdown',
                     asciiNumbers: set.asciiNumbers !== false, persianLetters: set.persianLetters !== false,
-                    markdownImporter: { nestedTables: set.nestedTables, images: set.images, labels: labels() },
+                    mergedRows: set.mergedRows === 'empty' ? 'empty' : 'repeat',
+                    markdownImporter: { nestedTables: set.nestedTables, mergedRows: set.mergedRows === 'empty' ? 'empty' : 'repeat', images: set.images, labels: labels() },
                     wasmBase: 'vendor/pdfjs/wasm/',
                     loadScript: K.ui.loadScript,
                     signal: t.signal,
