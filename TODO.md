@@ -10,27 +10,25 @@ importer split into steps with a threshold registry and calibration, the fallbac
 page rotation and watermarks, real Word / Excel / PowerPoint / Print to PDF files in the lab, golden files and a
 held-out protocol (`tests/pdf-lab/HELDOUT.md`).
 
-**2.3 / 2.4 — PDF import, from real files (found in 2.2's review).** The files themselves are not kept; each case
-below is reproduced by a lab PDF of our own (failing on purpose until fixed: its score is the case's measure).
-Order and risk in this order. Both open questions are decided (2026-11-05, the owner's call): nothing to ask first.
+**Standing rules from 2.3** (the owner's decisions; done — `CHANGELOG.md` 2.3): any «جدول N» / «Table N» title next
+to a table is bold, whatever it looks like in the PDF (`_tableTitles`); Excel's merged title row is the sheet's title
+and stays a heading, unless it starts «جدول N» or «Table N». Merged cells: a value merged over rows is repeated down
+its rows and written once across its columns (`pq` in `table-rowspan-colspan`); a band over the header is a
+paragraph over the table; a band between rows is a row of its own, bold in its first cell (`_tableMerges`). The row
+behaviour is a setting, Settings → Import → *Cells merged over rows*: `repeat` (default) | `empty` (first row only,
+as 2.2 did); column spans are written once either way; the same for Word, HTML and PDF import
+(`importer.mergedRows`). A form's pairs are list items, row by row, everywhere (`_formRows`, `_tablePreamble`).
 
-*2.3 — Word tables and forms (contained in the table and form code; Word reports)*
+**2.4 — PDF import, from real files.** Each case is reproduced by a lab PDF of our own (failing on purpose until
+fixed: its score is the case's measure), in this order.
 
-**Decided, done in 2.3 (kept here as standing rules):** any «جدول N» / «Table N» title next to a table is bold,
-whatever it looks like in the PDF (`_tableTitles`); Excel's merged title row is the sheet's title and stays a
-heading, unless it starts «جدول N» or «Table N». Merged cells: a value merged over rows is repeated down its rows
-and written once across its columns (`pq` in `table-rowspan-colspan`); a band over the header is a paragraph over the
-table; a band between rows is a row of its own, bold in its first cell (`_tableMerges`). The row behaviour is a
-setting, Settings → Import → *Cells merged over rows*: `repeat` (default) | `empty` (first row only, as 2.2 did);
-column spans are written once either way; the same for Word, HTML and PDF import (`importer.mergedRows`).
-
-1. A Persian report in B Nazanin whose amounts read «3.004» (the file's text has a period between the thousands;
-   the page shows a comma-like mark): **to examine** whether the font draws «.» as a separator — a reader takes
-   «3.004» for three and a bit. Optional
-
-*2.4 — designed documents from browsers (heading, box and figure rules shared by every Chromium file in the lab)*
-
-2. **A designed booklet** — **lab:** `chrome-booklet--booklet-cards-fa` (45.4). Cards, badges and coloured boxes:
+1. **Numbers in Persian report fonts** — B Nazanin, B Mitra and B Titr: a report's amounts read «3.004» (the file's
+   text has a period between the thousands; the page shows a comma-like mark): **to examine** whether these fonts
+   draw «.» as a thousands separator — a reader takes «3.004» for three and a bit. The owner attaches the three
+   fonts and a sample PDF when the item starts; a lab file of our own follows from them (the fonts themselves stay
+   out of the repository unless their licence allows it)
+2. **A designed booklet** (designed documents from browsers: heading, box and figure rules shared by every Chromium
+   file in the lab) — **lab:** `chrome-booklet--booklet-cards-fa` (45.4). Cards, badges and coloured boxes:
    - a table of contents — a number badge, the title, dot leaders drawn as a dashed rule, no page number — comes
      back as headings or a table with each number a bold paragraph after its title; expected a numbered list
    - a chapter's head — a number badge beside the title, a small coloured subtitle under it: the badge a bold
