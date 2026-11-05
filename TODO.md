@@ -70,11 +70,8 @@ Order and risk in this order. Both open questions are decided (2026-11-05, the o
   rule hurts those files
 - Startup: the builders (≈ 1.3 MB with PowerPoint) load before the first paint — load them on first use, as the
   importer already is; drop the unused `vendor/lucide.min_1.48.0.js` and the duplicate highlight.js stylesheet
-- Release: a build script with an include list (two zips: the app, and the app with `tests/pdf-lab`), and GitHub Pages
-  served from that set rather than from the whole repository (no `.nojekyll`, no cache-busting today). The 2.1 and
-  2.2 zips, made by hand, both under `kelk/`: `kelk-with-pdf-lab_x.y.zip` is `git archive` of `main`; `kelk_x.y.zip`
-  is the same without the dotfiles, `.github/`, `eslint.config.js`, `package*.json`, `tests/docx-validate.js`,
-  `tests/golden/`, `tests/ooxml-xsd/`, `tests/unit/` and `tests/pdf-lab/` but its `corpus.js` (289 files in 2.2)
+- Release: GitHub Pages served from the app's set (`tools/build-release.sh`) rather than from the whole repository
+  (no `.nojekyll`, no cache-busting today)
 
 **Medium (2.2)**
 

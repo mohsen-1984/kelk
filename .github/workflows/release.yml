@@ -1,0 +1,54 @@
+# The release zips (tools/build-release.sh): kelk_<v>.zip, the app, and kelk-with-pdf-lab_<v>.zip, the whole tree.
+#   · a release published on GitHub → both built from its tag and attached to it (a minute or two after publishing;
+#     a file already attached under the same name is replaced)
+#   · Actions → release → Run workflow → both built from main, downloadable from the run's page (artifact
+#     release-zips) — to look at them before publishing
+#   · a pull request that changes this file or the script → both built, as a check
+# Same conventions as the other workflows: actions pinned to commit SHAs (the tag in the comment), bash -euo
+# pipefail. The token may write only when a release is published (to attach the files).
+name: release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+  pull_request:
+    paths: ['.github/workflows/release.yml', 'tools/build-release.sh']
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash --noprofile --norc -euo pipefail {0}
+
+jobs:
+  zips:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: ${{ github.event_name == 'release' && github.event.release.tag_name || '' }}
+      - name: Build the zips
+        run: bash tools/build-release.sh dist | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: The version agrees with the tag
+        if: github.event_name == 'release'
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          ls dist/kelk_"${TAG#v}".zip > /dev/null || { echo "the tag $TAG is not scripts/config.js's version" | tee -a "$GITHUB_STEP_SUMMARY"; exit 1; }
+      - name: Upload (the run's artifact)
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: release-zips
+          path: dist/*.zip
+          compression-level: 0
+      - name: Attach to the release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$TAG" dist/*.zip --clobber --repo "$GITHUB_REPOSITORY"
