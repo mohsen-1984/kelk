@@ -1,5 +1,5 @@
 {
- "written": "2026-11-05T05:37:49.946Z",
+ "written": "2026-11-05T06:26:55.660Z",
  "note": "scripts/gate.js --update; the fuzz means hold only for their env",
  "corpus": {
   "acrobat-word--booklet-fa": {
@@ -2429,14 +2429,14 @@
    "markup": 0,
    "pic": 0,
    "mix": 0,
-   "recall": 0.9219,
-   "order": 0.9063,
-   "tables": 0.2368,
+   "recall": 1,
+   "order": 1,
+   "tables": 1,
    "code": 1,
-   "total": 0.7662,
-   "rtl": 0.8895,
-   "zwnj": 0.8,
-   "yehKaf": 0.8684,
+   "total": 1,
+   "rtl": 1,
+   "zwnj": 1,
+   "yehKaf": 1,
    "digits": 1
   },
   "word-nitro--scrambled-fa": {
@@ -2522,6 +2522,21 @@
    "recall": 1,
    "order": 1,
    "headings": 1,
+   "tables": 1,
+   "code": 1,
+   "total": 1,
+   "rtl": 1,
+   "zwnj": 1,
+   "yehKaf": 1,
+   "digits": 1
+  },
+  "word-titlerow--title-row-fa": {
+   "error": null,
+   "markup": 0,
+   "pic": 0,
+   "mix": 0,
+   "recall": 1,
+   "order": 1,
    "tables": 1,
    "code": 1,
    "total": 1,
@@ -7353,6 +7368,7 @@
    "regions.bodyFromAllLines",
    "regions.cellPiecesJoined",
    "regions.columnLeftMirrored",
+   "regions.mergeBandRow",
    "regions.preamblePairsCut",
    "regions.tableDirByLetters",
    "regions.tablePreamble",
@@ -7458,6 +7474,9 @@
    "order.ruledTable",
    "regions.bodyFromAllLines",
    "regions.columnLeftMirrored",
+   "regions.mergeBandRow",
+   "regions.mergeHeaderBand",
+   "regions.mergeRepeatDown",
    "regions.tableDirByLetters",
    "regions.tableRuled",
    "regions.tableSpanAcross",
@@ -7628,6 +7647,23 @@
    "regions.columnRightMirrored",
    "regions.tableDirByLetters",
    "regions.tableRuled"
+  ],
+  "word-titlerow--title-row-fa": [
+   "blocks.tableTitleBold",
+   "extract.formFromCmap",
+   "lines.cutCell",
+   "lines.furnitureHeadRowKept",
+   "lines.rowCell",
+   "order.hrFrameEdge",
+   "order.rtlPage",
+   "order.ruledTable",
+   "regions.bodyFromAllLines",
+   "regions.columnLeftMirrored",
+   "regions.columnRightMirrored",
+   "regions.tableDirByLetters",
+   "regions.tableRuled",
+   "regions.tableSpanAcross",
+   "regions.tableTitle"
   ],
   "word2024-save--real-readme-en": [
    "blocks.breakBigGap",
@@ -9548,7 +9584,7 @@
   }
  },
  "realHeldout": {
-  "at": "2026-11-05T05:37:42.776Z",
+  "at": "2026-11-05T06:26:04.840Z",
   "n": 17,
   "errors": 0,
   "docs": [

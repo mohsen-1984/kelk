@@ -143,6 +143,7 @@ counts the reasons a paragraph group was opened.
 | `_tableBlock` | `_pbBlocks` | a ruled table as a block (steps 1 to 6) |
 | ↳ `_tableDir` | `_tableBlock` | step 1: the reading direction of the table's columns |
 | ↳ `_tableSpans` | `_tableBlock` | step 2: merged cells, joined where no rule parts them |
+| ↳ `_tableMerges` | `_tableBlock` | merged cells in Markdown: repeated down its rows; a band over the header a paragraph, between rows a row of its own |
 | ↳ `_cellLinesIn` | `_tableBlock` | step 3 (per cell): the lines whose glyphs fall in a cell's box |
 | ↳ `_tableRowSplit` | `_tableBlock` | step 4: grid rows that hold rows drawn without rules, split at their baselines |
 | ↳ `_tableTitle` | `_tableBlock` | step 5: a merged first row over the whole table, its title |

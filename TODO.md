@@ -16,32 +16,28 @@ Order and risk in this order. Both open questions are decided (2026-11-05, the o
 
 *2.3 — Word tables and forms (contained in the table and form code; Word reports)*
 
-1. **Merged cells** — **lab:** `word-merged--merged-cells-fa` (76.6). A cell merged over rows stands in its first
-   row only, the rows under it empty (they read as missing values); a header band over some columns above the header
-   row is placed in one column of a header row; a band across columns between two groups of rows becomes a bold
-   cell in the middle of a row. **Decided:** a merged value is repeated in each of its rows (not HTML, not left
-   to its first row); a band inside the table is a row of its own, its text bold in the first cell, the others
-   empty; a band over the header is a paragraph over the table (as a merged title row is today). The corpus file
-   already says so. Risk: medium (the grid's spans). **Decided (table titles):** Excel's merged title row is the
-   sheet's title and stays a heading — unless it starts «جدول N» or «Table N»: then it is a table's title, bold
-   text. Any «جدول N» / «Table N» title next to a table is bold, whatever it looks like in the PDF (done in 2.3:
-   `_tableTitles`; `sides-fa`'s plain title now bold)
-2. **Forms: one order** — **Decided:** row by row, each pair a list item, everywhere. Two conventions today for
+**Decided, done in 2.3 (kept here as standing rules):** any «جدول N» / «Table N» title next to a table is bold,
+whatever it looks like in the PDF (`_tableTitles`); Excel's merged title row is the sheet's title and stays a
+heading, unless it starts «جدول N» or «Table N». Merged cells: a value merged over rows is repeated in each; a band
+over the header is a paragraph over the table; a band between rows is a row of its own, bold in its first cell
+(`_tableMerges`).
+
+1. **Forms: one order** — **Decided:** row by row, each pair a list item, everywhere. Two conventions today for
    the same pairs: `_formRows` (a form's rows: list items, row by row — already so; `word-form--form-box-fa`) and
    `_tablePreamble` (a box in a table's first row: paragraphs, column by column — to change;
    `word-form--form-row-fa`, `chrome-form--form`). In the same pull request: those files' corpus Markdown rewritten
    to row-by-row list items (their scores drop with the old code and rise with the new; say so in the PR, as the
    gate counts a lower score as worse until the code lands with it), and `lib/PDFIMPORT.md`'s payslip rule
    («each pair a paragraph, column by column») changed with it. Risk: low–medium
-3. **A header's title between its pairs** reads after the first pair — **lab:** `chrome-form--form`, `--form-fa`
+2. **A header's title between its pairs** reads after the first pair — **lab:** `chrome-form--form`, `--form-fa`
    (order 98). Risk: low
-4. A Persian report in B Nazanin whose amounts read «3.004» (the file's text has a period between the thousands;
+3. A Persian report in B Nazanin whose amounts read «3.004» (the file's text has a period between the thousands;
    the page shows a comma-like mark): **to examine** whether the font draws «.» as a separator — a reader takes
    «3.004» for three and a bit. Optional
 
 *2.4 — designed documents from browsers (heading, box and figure rules shared by every Chromium file in the lab)*
 
-5. **A designed booklet** — **lab:** `chrome-booklet--booklet-cards-fa` (45.4). Cards, badges and coloured boxes:
+4. **A designed booklet** — **lab:** `chrome-booklet--booklet-cards-fa` (45.4). Cards, badges and coloured boxes:
    - a table of contents — a number badge, the title, dot leaders drawn as a dashed rule, no page number — comes
      back as headings or a table with each number a bold paragraph after its title; expected a numbered list
    - a chapter's head — a number badge beside the title, a small coloured subtitle under it: the badge a bold
