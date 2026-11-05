@@ -22,7 +22,10 @@ Order and risk in this order. Both open questions are decided (2026-11-05, the o
    cell in the middle of a row. **Decided:** a merged value is repeated in each of its rows (not HTML, not left
    to its first row); a band inside the table is a row of its own, its text bold in the first cell, the others
    empty; a band over the header is a paragraph over the table (as a merged title row is today). The corpus file
-   already says so. Risk: medium (the grid's spans; Excel's merged title row stays a heading, as decided)
+   already says so. Risk: medium (the grid's spans). **Decided (table titles):** Excel's merged title row is the
+   sheet's title and stays a heading — unless it starts «جدول N» or «Table N»: then it is a table's title, bold
+   text. Any «جدول N» / «Table N» title next to a table is bold, whatever it looks like in the PDF (done in 2.3:
+   `_tableTitles`; `sides-fa`'s plain title now bold)
 2. **Forms: one order** — **Decided:** row by row, each pair a list item, everywhere. Two conventions today for
    the same pairs: `_formRows` (a form's rows: list items, row by row — already so; `word-form--form-box-fa`) and
    `_tablePreamble` (a box in a table's first row: paragraphs, column by column — to change;

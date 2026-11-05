@@ -442,6 +442,9 @@ and text. The owner checks the Persian ones.
 - *Headings as they look.* The largest text is the top heading and the rest follow by relative size and weight
   (`itext-word--circular-fa`: the office's name `#`, the circular's title `##`); blocks drawn alike take one role
   (`chrome-form--form-fa`: the four identical grey title bands are four `##` headings, the goods table's included).
+- *A table's title is bold.* «جدول N …», «Table N …» right over or under a table is `**…**`, never a heading,
+  whatever it looks like on the page (`word-sides--sides-fa`: drawn plain); a sheet's title over its table that does
+  not start so stays a heading (the owner's decision, Kelk 2.3).
 - *Tables as drawn.* A bordered box of «label: value» pairs is a GFM table with the page's rows and columns, one pair
   to a cell, a row with fewer pairs padded with empty cells and a full-width remark in the first cell of its row
   (`chrome-form--form-fa`: 3 × 3 for each box); a note merged over a table's last row goes after the table, as
