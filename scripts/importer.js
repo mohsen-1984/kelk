@@ -177,6 +177,7 @@
                     },
                     // figures and formulas become registered images (short names, not data URIs in the text)
                     onImage: async function (uri, at) {
+                        if (!/^data:/i.test(uri)) return uri;   // only a page's own canvas data URI is ever fetched here
                         try {
                             const blob = await (await fetch(uri)).blob();
                             return await K.images.add(new File([blob], base + '-p' + at.page + '-' + at.index + '.png', { type: 'image/png' }));
