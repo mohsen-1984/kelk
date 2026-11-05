@@ -1058,6 +1058,12 @@ edge (a right-to-left list item ending short of it split a tight list).
   neighbour's text a second time (a row number cell read as «9» + its row's title, beside that title), so they stay single
   cells. **A first row that is one cell across the whole table**, over rows that have cells of their own, is
   the table's title (Excel's merged title row): Markdown has no span — it is written before the table.
+  **Other merged cells** (`_tableMerges`, Kelk 2.3; the owner's decisions): a cell merged over rows is
+  repeated in each of its rows (left to its first row, the rows under it read as missing values) — not where
+  the rows under it hold nothing else; a band over some columns above the header row, the header row's other
+  cells merged down into it, is a paragraph over the table and those cells' text the header row's; a band over
+  some columns between rows, the rest of its row empty, is a row of its own, its text bold in the table's first
+  cell (it stood in the middle of the row). Lab: `word-merged--merged-cells-fa` 76.6 → 100.0.
   **Rows drawn without rules** (a payslip: one ruled band whose columns hold an item a line): a grid row whose
   cells hold three lines or more, at the same baselines from cell to cell, the two fullest about as many, is
   that many rows. Not wrapped text: a cell whose lines but the last fill its width (letters, not figures — a
@@ -1555,7 +1561,8 @@ a point or a space — right over or under a table is bold text, never `#`, what
 bold too: a document's outline lists its sections, not its tables (the owner's decision, Kelk 2.3; a Word report's
 titles, set large and bold, came back as `#` and `##`). «جدول زیر …» (no number), a line «جدول …» away from any
 table, and a sheet's title over its table (Excel's merged title row, a heading) that does not start «جدول N» or
-«Table N» are untouched. Lab: `word-longcells--long-cells-fa` 80.0 → 100.0, `word-merged--merged-cells-fa` 61.3 → 76.6;
+«Table N» are untouched; a table's own merged title row or header band that does is bold too
+(`word-titlerow--title-row-fa`). Lab: `word-longcells--long-cells-fa` 80.0 → 100.0, `word-merged--merged-cells-fa` 61.3 → 76.6;
 `frame-table-fa` writes its title bold now.
 
 **A heading starts at the column's start edge, or is centred.** Lines pushed to the far side — the start side's gap

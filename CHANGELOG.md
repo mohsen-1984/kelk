@@ -11,7 +11,11 @@ All notable changes to Kelk. Dates are those of the release tags.
   breaks the table: the items stay in their cell, each on its line, and a row cut by a page break joins the row
   above, its next item on a line of its own.
 - **A table's title is no heading**: «جدول 2- …», «Table 3: …» over or under its table comes back as bold text, not
-  `#`, so it stays out of the document's outline — and bold even when the PDF draws it plain.
+  `#`, so it stays out of the document's outline — and bold even when the PDF draws it plain, also as a table's
+  merged first row.
+- **Merged cells** (Word): a value merged over rows is repeated in each of its rows (the rows under it came back
+  empty); a band over some columns above the header row is a paragraph over the table (it took a column of the
+  header); a band between two groups of rows is a row of its own, its text bold in the first cell.
 
 ### Development
 
@@ -32,6 +36,9 @@ All notable changes to Kelk. Dates are those of the release tags.
   100.0, `word-merged` 61.3 → 76.6, no other file's Markdown changed; corpus 95.1 → 95.3, real held-out 84.5.
 - `sides-fa` (corpus, golden and `make-sides-rtl.py`) writes its plain table title bold; the golden files' rules
   (`tests/pdf-lab/README.md`) say so. Still 100.0; no other file's Markdown changed.
+- Merged cells: `word-merged--merged-cells-fa` 76.6 → 100.0; new `word-titlerow--title-row-fa` (a merged title row
+  «جدول 4- …» set plain; 100.0 — the score does not count bold: with the old code it came back plain). No other
+  file's Markdown changed; corpus 95.3 → 95.5, real held-out 84.5.
 
 ## [2.2] — 2026-11-04
 

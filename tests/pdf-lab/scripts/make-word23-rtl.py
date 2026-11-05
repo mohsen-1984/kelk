@@ -10,9 +10,12 @@
 #     header band becomes a paragraph over the table, the inner band one bold cell in the middle of a row
 #     (the corpus file follows the decision in TODO.md: a merged value repeated in each of its rows, a band a row of
 #     its own with its text bold in the first cell, a band over the header a paragraph over the table)
-# The Markdown that must come back is corpus/long-cells-fa.md and corpus/merged-cells-fa.md.
+#   · word-titlerow--title-row-fa: a table whose first row is one merged cell across it, «جدول 4- …» set plain
+#     (Excel's merged title row; the owner's decision: a «جدول N» title is bold, whatever it looks like)
+# The Markdown that must come back is corpus/long-cells-fa.md, merged-cells-fa.md and title-row-fa.md.
 #   python3 scripts/make-word23-rtl.py    → pdf/producers/word-longcells--long-cells-fa.pdf,
-#                                           word-merged--merged-cells-fa.pdf and their corpus files
+#                                           word-merged--merged-cells-fa.pdf, word-titlerow--title-row-fa.pdf
+#                                           and their corpus files
 import os, sys
 sys.dont_write_bytecode = True
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -156,3 +159,25 @@ for g in body2:
     for r in rs: rowsmd += '| %s | %s | %s | %s |\n' % (label, r[2], r[1], r[0])
 corpus('merged-cells-fa.md', '**جدول 3- روش اندازه‌گیری دارایی‌های کتابخانه**\n\n**اندازه‌گیری**\n\n| گروه | نوع دارایی | پایه | روش اندازه‌گیری |\n| --- | --- | --- | --- |\n' +
        rowsmd + '\nارزش کتاب‌های کمیاب هر سال به قیمت روز بازنگری می‌شود.\n')
+
+# ---- 3. a merged title row ---------------------------------------------------------------------------------------------
+C = Doc(fonts())
+XS = [62, 240, 400, 533]                      # تعداد | شعبه | ردیف (left to right)
+C.line(1, 'کتاب‌های امانت داده‌شده در فصل گذشته در سه شعبه کتابخانه شهر به شرح زیر بوده است.', 770, 11, 533)
+P = 22
+TITLE = 'جدول 4- امانت کتاب به تفکیک شعبه'
+rows3 = [('ردیف', 'شعبه', 'تعداد'), ('1', 'مرکزی', '1240'), ('2', 'شمال', '860'), ('3', 'باغ ملی', '515')]
+y = 740
+seg(C, 1, XS[0], y, XS[-1], y)
+C.line(1, TITLE, y - 15, 10, (XS[0] + XS[-1]) / 2 + C.width(visual(TITLE), 10, 'F1') / 2)   # one cell across, set plain
+for x in (XS[0], XS[-1]): seg(C, 1, x, y, x, y - P)
+y -= P
+seg(C, 1, XS[0], y, XS[-1], y)
+for k, r in enumerate(rows3):
+    for j, v in enumerate(r): C.line(1, v, y - 15, 10, XS[3 - j] - 5, 'F2' if k == 0 else 'F1')
+    for x in XS: seg(C, 1, x, y, x, y - P)
+    y -= P
+    seg(C, 1, XS[0], y, XS[-1], y)
+C.write(out('word-titlerow--title-row-fa.pdf'), WORD, 'title-row-fa')
+corpus('title-row-fa.md', 'کتاب‌های امانت داده‌شده در فصل گذشته در سه شعبه کتابخانه شهر به شرح زیر بوده است.\n\n**' + TITLE + '**\n\n' +
+       '| ردیف | شعبه | تعداد |\n| --- | --- | --- |\n' + ''.join('| %s | %s | %s |\n' % r for r in rows3[1:]))
