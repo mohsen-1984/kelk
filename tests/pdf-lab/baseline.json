@@ -1,5 +1,5 @@
 {
- "written": "2026-11-05T03:17:45.217Z",
+ "written": "2026-11-05T05:14:46.219Z",
  "note": "scripts/gate.js --update; the fuzz means hold only for their env",
  "corpus": {
   "acrobat-word--booklet-fa": {
@@ -2401,10 +2401,9 @@
    "mix": 0,
    "recall": 1,
    "order": 1,
-   "headings": 0,
    "tables": 1,
    "code": 1,
-   "total": 0.8,
+   "total": 1,
    "rtl": 1,
    "zwnj": 1,
    "yehKaf": 1,
@@ -2432,10 +2431,9 @@
    "mix": 0,
    "recall": 0.9219,
    "order": 0.9063,
-   "headings": 0,
    "tables": 0.2368,
    "code": 1,
-   "total": 0.613,
+   "total": 0.7662,
    "rtl": 0.8895,
    "zwnj": 0.8,
    "yehKaf": 0.8684,
@@ -7367,6 +7365,7 @@
    "blocks.breakFromFar",
    "blocks.breakStyle",
    "blocks.headingSize",
+   "blocks.tableTitleNotHeading",
    "extract.formFromCmap",
    "lines.cutCell",
    "lines.cutDigits",
@@ -7391,6 +7390,7 @@
    "blocks.joinTableRowCut",
    "blocks.joinTableRowCutItem",
    "blocks.justified",
+   "blocks.tableTitleNotHeading",
    "extract.bracketByOutline",
    "extract.formFromCmap",
    "lines.cutCell",
@@ -7449,6 +7449,7 @@
   ],
   "word-merged--merged-cells-fa": [
    "blocks.headingSize",
+   "blocks.tableTitleNotHeading",
    "extract.formFromCmap",
    "lines.cutWideGap",
    "lines.furnitureHeadRowKept",
@@ -9546,7 +9547,7 @@
   }
  },
  "realHeldout": {
-  "at": "2026-11-05T03:17:34.166Z",
+  "at": "2026-11-05T05:14:35.111Z",
   "n": 17,
   "errors": 0,
   "docs": [

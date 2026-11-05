@@ -10,6 +10,8 @@ All notable changes to Kelk. Dates are those of the release tags.
   keeps its line, as «•» items did. A cell of numbered items («1) …», the text hanging after the number) no longer
   breaks the table: the items stay in their cell, each on its line, and a row cut by a page break joins the row
   above, its next item on a line of its own.
+- **A table's title is no heading**: «جدول 2- …», «Table 3: …» over or under its table comes back as bold text, not
+  `#`, so it stays out of the document's outline.
 
 ### Development
 
@@ -26,6 +28,8 @@ All notable changes to Kelk. Dates are those of the release tags.
 - `word-longcells--long-cells-fa` now breaks its page inside the row of numbered items, as the real file did (text
   above the table, ours): 53.2 with the old code, 80.0 with the fix. The gate passed with no file worse: corpus
   95.0 → 95.1, real held-out 84.5.
+- `frame-table-fa` writes its table title bold (`make-word22-rtl.py`). With the title rule: `word-longcells` 80.0 →
+  100.0, `word-merged` 61.3 → 76.6, no other file's Markdown changed; corpus 95.1 → 95.3, real held-out 84.5.
 
 ## [2.2] — 2026-11-04
 
