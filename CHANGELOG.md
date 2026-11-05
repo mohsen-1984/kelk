@@ -6,6 +6,8 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Fixed
 
+- **Forms: one order.** A block of «label: value» pairs over a table (a payslip's, a library card's) came back as
+  paragraphs, column by column; it is now a list, row by row, as a form's pairs already were.
 - **Lists in a table's cells** (Word): a cell of «- …» items, one a line, came back as one run-on line; each item now
   keeps its line, as «•» items did. A cell of numbered items («1) …», the text hanging after the number) no longer
   breaks the table: the items stay in their cell, each on its line, and a row cut by a page break joins the row
@@ -29,6 +31,8 @@ All notable changes to Kelk. Dates are those of the release tags.
 - Five cases for 2.3 and 2.4 from real files, failing on purpose until fixed (`TODO.md`): cells of dash and
   numbered items in a table over two pages, merged cells and bands, and a designed booklet from Chromium
   (`make-word23-rtl.py`, `make-booklet.js`); `baseline.json` updated (corpus 95.0 with them).
+- Forms: `form-row-fa`'s expected Markdown (and `make-word22-rtl.py`) written as list items row by row — 88.0 with
+  the old code, 100.0 with the new; no other file's Markdown changed; corpus 95.5.
 - `word-longcells--long-cells-fa` now breaks its page inside the row of numbered items, as the real file did (text
   above the table, ours): 53.2 with the old code, 80.0 with the fix. The gate passed with no file worse: corpus
   95.0 → 95.1, real held-out 84.5.
