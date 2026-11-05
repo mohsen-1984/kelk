@@ -4,30 +4,38 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
-### Fixed
+## [2.3] — 2026-11-05
 
-- **A form's header**: an invoice's title set in the middle of its header, its date and number at the far side,
-  came back between the two pairs; it now comes first.
-- **Forms: one order.** A block of «label: value» pairs over a table (a payslip's, a library card's) came back as
-  paragraphs, column by column; it is now a list, row by row, as a form's pairs already were.
-- **Lists in a table's cells** (Word): a cell of «- …» items, one a line, came back as one run-on line; each item now
-  keeps its line, as «•» items did. A cell of numbered items («1) …», the text hanging after the number) no longer
-  breaks the table: the items stay in their cell, each on its line, and a row cut by a page break joins the row
-  above, its next item on a line of its own.
-- **A table's title is no heading**: «جدول 2- …», «Table 3: …» over or under its table comes back as bold text, not
-  `#`, so it stays out of the document's outline — and bold even when the PDF draws it plain, also as a table's
-  merged first row.
-- **Merged cells** (Word): a value merged over rows is repeated in each of its rows (the rows under it came back
-  empty); a band over some columns above the header row is a paragraph over the table (it took a column of the
-  header); a band between two groups of rows is a row of its own, its text bold in the first cell.
-- **Merged cells in Word and HTML import**: a row with a cell merged into it from above came back one cell short,
-  its cells shifted a column. The table is now filled out as for PDF: a cell merged over rows repeated in each of
-  them, one merged over columns written once.
+Word tables and forms: lists and merged cells in a table's cells, a table's title, and a form's pairs in one order.
 
 ### Added
 
-- Settings → Import → **Cells merged over rows**: *Repeat in each row* (default) or *First row only*; for Word, HTML
-  and PDF import (`importer.mergedRows`; `MarkdownImporter` and `PdfImporter` option `mergedRows`).
+- Settings → Import → **Cells merged over rows**: *Repeat in each row* (default) or *First row only*, for Word,
+  HTML and PDF import (`importer.mergedRows`; the `mergedRows` option of `MarkdownImporter` and `PdfImporter`). A
+  cell merged over columns is written once either way.
+
+### Changed
+
+- **A table's title is bold text, not a heading**: «جدول 2- …», «Table 3: …» over or under its table — set as a
+  heading, set plain, or as the table's merged first row — comes back bold and stays out of the outline. A sheet's
+  title row that does not start so stays a heading.
+- **A form's pairs in one order**: a block of «label: value» pairs over a table (a payslip's, a library card's) is a
+  list, row by row, as a form's pairs elsewhere already were (before: paragraphs, column by column).
+
+### Fixed
+
+- **Lists in a table's cells** (Word PDFs): a cell of «- …» items came back as one run-on line; each item now keeps
+  its line. A cell of numbered items («1) …», the text hanging after the number) broke the table — the items left
+  it as bold list items and its part on the next page was not joined; they now stay in their cell, each on its
+  line, and the row cut by the page break joins the row above.
+- **Merged cells in PDF tables** (Word): a value merged over rows came back in its first row only (now repeated,
+  as set); a band over some columns above the header row took a column of the header (now a paragraph over the
+  table); a band between two groups of rows stood in the middle of a row (now a row of its own, bold in its first
+  cell).
+- **Merged cells in Word and HTML import**: a row with a cell merged into it from above came back one cell short,
+  its cells shifted a column; the table is now filled out, as for PDF.
+- **A form's header**: an invoice's title set in the middle of its header, its date and number at the far side,
+  came back between the two pairs; it now comes first.
 
 ### Development
 
@@ -35,26 +43,21 @@ All notable changes to Kelk. Dates are those of the release tags.
   releases; private files never in the repository), the release steps click by click, a few words on git and CI.
 - The release zips are built by CI: `tools/build-release.sh`, run by `.github/workflows/release.yml` on a
   published release (attached to it) or by hand (Actions → release → Run workflow).
+- A pull request from an automated scanner (CWE-918 in `scripts/importer.js`) was reviewed and closed: the image
+  URI there is made by Kelk itself (`canvas.toDataURL`), never taken from the PDF.
 
 ### PDF lab
 
-- Five cases for 2.3 and 2.4 from real files, failing on purpose until fixed (`TODO.md`): cells of dash and
-  numbered items in a table over two pages, merged cells and bands, and a designed booklet from Chromium
-  (`make-word23-rtl.py`, `make-booklet.js`); `baseline.json` updated (corpus 95.0 with them).
-- A header's title: `chrome-form--form`, `--form-fa` order 98 → 100 (total 99.1 → 99.3); no other file's Markdown
-  changed.
-- Forms: `form-row-fa`'s expected Markdown (and `make-word22-rtl.py`) written as list items row by row — 88.0 with
-  the old code, 100.0 with the new; no other file's Markdown changed; corpus 95.5.
-- `word-longcells--long-cells-fa` now breaks its page inside the row of numbered items, as the real file did (text
-  above the table, ours): 53.2 with the old code, 80.0 with the fix. The gate passed with no file worse: corpus
-  95.0 → 95.1, real held-out 84.5.
-- `frame-table-fa` writes its table title bold (`make-word22-rtl.py`). With the title rule: `word-longcells` 80.0 →
-  100.0, `word-merged` 61.3 → 76.6, no other file's Markdown changed; corpus 95.1 → 95.3, real held-out 84.5.
-- `sides-fa` (corpus, golden and `make-sides-rtl.py`) writes its plain table title bold; the golden files' rules
-  (`tests/pdf-lab/README.md`) say so. Still 100.0; no other file's Markdown changed.
-- Merged cells: `word-merged--merged-cells-fa` 76.6 → 100.0; new `word-titlerow--title-row-fa` (a merged title row
-  «جدول 4- …» set plain; 100.0 — the score does not count bold: with the old code it came back plain). No other
-  file's Markdown changed; corpus 95.3 → 95.5, real held-out 84.5.
+- Three new Persian Word pages for 2.3 (`make-word23-rtl.py`): cells of dash and numbered items in a table over two
+  pages (its page now breaks inside the numbered row, as the real file's did), merged cells and bands, a merged
+  title row; and a designed booklet from Chromium for 2.4
+  (`make-booklet.js`, 45.4, failing on purpose until then). 196 PDFs.
+- `word-longcells--long-cells-fa` 59.0 → 100.0, `word-merged--merged-cells-fa` 61.3 → 100.0,
+  `word-titlerow--title-row-fa` 100.0; `chrome-form--form`, `--form-fa` order 98 → 100.
+- Expected Markdown changed with the decisions above: table titles bold (`frame-table-fa`, `sides-fa`, corpus and
+  golden), a table's preamble as a list row by row (`form-row-fa`: 88.0 with the old code, 100.0 with the new).
+- The gate passed at every step with no file worse: corpus 95.0 → 95.5 (with the new cases; 2.2 ended at 95.7
+  without them), real held-out 84.5.
 
 ## [2.2] — 2026-11-04
 
