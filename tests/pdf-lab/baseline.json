@@ -1,5 +1,5 @@
 {
- "written": "2026-11-05T05:14:46.219Z",
+ "written": "2026-11-05T05:37:49.946Z",
  "note": "scripts/gate.js --update; the fuzz means hold only for their env",
  "corpus": {
   "acrobat-word--booklet-fa": {
@@ -7613,6 +7613,7 @@
    "blocks.breakStopRoom",
    "blocks.breakStyle",
    "blocks.headingSize",
+   "blocks.tableTitleBold",
    "extract.formFromCmap",
    "lines.cutCell",
    "lines.cutWideGap",
@@ -9547,7 +9548,7 @@
   }
  },
  "realHeldout": {
-  "at": "2026-11-05T05:14:35.111Z",
+  "at": "2026-11-05T05:37:42.776Z",
   "n": 17,
   "errors": 0,
   "docs": [

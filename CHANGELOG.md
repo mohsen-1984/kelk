@@ -11,7 +11,7 @@ All notable changes to Kelk. Dates are those of the release tags.
   breaks the table: the items stay in their cell, each on its line, and a row cut by a page break joins the row
   above, its next item on a line of its own.
 - **A table's title is no heading**: «جدول 2- …», «Table 3: …» over or under its table comes back as bold text, not
-  `#`, so it stays out of the document's outline.
+  `#`, so it stays out of the document's outline — and bold even when the PDF draws it plain.
 
 ### Development
 
@@ -30,6 +30,8 @@ All notable changes to Kelk. Dates are those of the release tags.
   95.0 → 95.1, real held-out 84.5.
 - `frame-table-fa` writes its table title bold (`make-word22-rtl.py`). With the title rule: `word-longcells` 80.0 →
   100.0, `word-merged` 61.3 → 76.6, no other file's Markdown changed; corpus 95.1 → 95.3, real held-out 84.5.
+- `sides-fa` (corpus, golden and `make-sides-rtl.py`) writes its plain table title bold; the golden files' rules
+  (`tests/pdf-lab/README.md`) say so. Still 100.0; no other file's Markdown changed.
 
 ## [2.2] — 2026-11-04
 
