@@ -16,14 +16,10 @@ Order and risk in this order. Both open questions are decided (2026-11-05, the o
 
 *2.3 — Word tables and forms (contained in the table and form code; Word reports)*
 
-1. **Cells: line breaks and numbered items** — **lab:** `word-longcells--long-cells-fa` (59.0). A cell of «- …»
-   items, one a line, comes back as one run-on line (each item should keep its line: `<br>`, as `_cellItems` does
-   for «•» and «o» today). A cell of numbered items («1) …», the number at the cell's edge, its lines hanging 16 pt
-   in) breaks the table: the items leave it and come after it as list items, each number a bold item of its own
-   (read «(1»). In the real report the numbers made a column of their own, so the table's part on the next page
-   (its header repeated) had a column more than the part above and was not joined to it; the row cut by the page
-   break, its first cell empty on the next page, should join the row above. Risk: low–medium (cell text and the
-   join across pages; the lab's Word tables and Prince tables cover it)
+1. **Cells: line breaks and numbered items** — done (`CHANGELOG.md`, `[Unreleased]`): 59.0 → 80.0. Left, **to
+   decide**: the table's title above it («**جدول 2- …**» in the corpus file) comes back as a heading (`#`) — the
+   whole of the score still lost. `frame-table-fa` writes the same kind of title as a heading (`## جدول 1- …`):
+   one convention for both, then the corpus file or the code changed with it
 2. **Merged cells** — **lab:** `word-merged--merged-cells-fa` (61.3). A cell merged over rows stands in its first
    row only, the rows under it empty (they read as missing values); a header band over some columns above the header
    row is placed in one column of a header row; a band across columns between two groups of rows becomes a bold
