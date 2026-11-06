@@ -19,14 +19,43 @@ behaviour is a setting, Settings → Import → *Cells merged over rows*: `repea
 as 2.2 did); column spans are written once either way; the same for Word, HTML and PDF import
 (`importer.mergedRows`). A form's pairs are list items, row by row, everywhere (`_formRows`, `_tablePreamble`).
 
-**2.4 — PDF import, from real files.** Each case is reproduced by a lab PDF of our own (failing on purpose until
+**2.4 — fonts in Word and PowerPoint files, and the page's settings** (the owner's list, 2026-11-06; small pull
+requests, the safest first).
+
+1. **Font embedding** in the .docx and the .pptx, as a step after the builder: open the file with JSZip, embed only
+   the fonts the document uses (regular and bold — never the generated oblique italics), save. An option, on by
+   default; the size it adds is reported. Font data: the base64 TTFs of `lib/pdf-base64-ttf-fonts/pdf-font-*.js`
+   (global `PdfFonts`), loaded on first use by a script tag (no `fetch()` under file://).
+   - DOCX (ECMA-376): `word/fonts/*.odttf`, obfuscated (the first 32 bytes XORed with the GUID key);
+     `w:embedRegular` / `w:embedBold` with `w:fontKey` in `fontTable.xml` and its rels; the odttf content type;
+     `w:embedTrueTypeFonts` in `settings.xml`.
+   - PPTX: `p:embeddedFontLst` in `presentation.xml`, `ppt/fonts/*.fntdata` — the format and content type taken
+     from a file PowerPoint saved with embedded fonts, never guessed.
+   - The B fonts declare only the Arabic code page: charset 178 (`w:charset` `B2` in DOCX, `charset="-78"` in
+     PPTX), or Windows substitutes another font.
+   - The B fonts (B Nazanin, B Mitra, B Titr; © Borna Rayaneh, no published licence) come in with this item, under
+     the owner's rules of 2026-11-06: their own folder `borna-rayaneh/` with `NOTICE.txt` beside every copy;
+     regular and bold byte-identical to the originals; the README line «(c) Borna Rayaneh, no published license,
+     see borna-rayaneh/NOTICE.txt» — never «free», «open» or «OFL»; removable in one commit.
+   - Sahel's PDF font is dehinted: whether that matters for Word and PowerPoint on Windows — to answer.
+   - Test: both files opened on a computer without these fonts.
+2. **Mobile preview scroll**: in the narrow one-column layout, with *About Kelk* and the samples open, the editor
+   scrolls with a finger but the preview does not, even empty. Find why, fix.
+3. **Word settings: fonts** — both font fields a select the user can also type into: complex scripts Vazirmatn
+   (default), Sahel, B Nazanin, B Mitra; Latin text, in every language, Calibri, Arial, Tahoma, Times New Roman.
+4. **Word settings header**: the soft accent the PowerPoint settings header has when a slide is selected, when the
+   Word preview is selected.
+5. **Font download**: one button (all fonts are in one zip), its label fixed (it still names Vazirmatn and Sahel);
+   the font website link as two links, Vazirmatn and Sahel.
+
+**2.5 — PDF import, from real files.** Each case is reproduced by a lab PDF of our own (failing on purpose until
 fixed: its score is the case's measure), in this order.
 
 1. **Numbers in Persian report fonts** — B Nazanin, B Mitra and B Titr: a report's amounts read «3.004» (the file's
    text has a period between the thousands; the page shows a comma-like mark): **to examine** whether these fonts
-   draw «.» as a thousands separator — a reader takes «3.004» for three and a bit. The owner attaches the three
-   fonts and a sample PDF when the item starts; a lab file of our own follows from them (the fonts themselves stay
-   out of the repository unless their licence allows it)
+   draw «.» as a thousands separator — a reader takes «3.004» for three and a bit. The three fonts come into the
+   repository with 2.4 (item 1); the owner attaches a sample PDF when the item starts, and a lab file of our own
+   follows from it
 2. **A designed booklet** (designed documents from browsers: heading, box and figure rules shared by every Chromium
    file in the lab) — **lab:** `chrome-booklet--booklet-cards-fa` (45.4). Cards, badges and coloured boxes:
    - a table of contents — a number badge, the title, dot leaders drawn as a dashed rule, no page number — comes
