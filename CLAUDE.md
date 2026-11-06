@@ -1,6 +1,7 @@
-# Working on Kelk — how we work
+# Kelk — how we work
 
-For anyone (person or AI assistant) picking up work on this repository. The owner is
+For anyone (person or AI assistant) picking up work on this repository — the place for working instructions;
+the release checklist is [`docs/RELEASING.md`](docs/RELEASING.md). The owner is
 [@mohsen-1984](https://github.com/mohsen-1984); work is done on branches and pull requests, the owner merges and
 releases.
 
@@ -8,16 +9,16 @@ releases.
 
 Read only what the task needs, in this order:
 
-1. **This file**, all of it.
-2. **[`TODO.md`](../TODO.md), its top section** — the release being worked on, its items in order, their lab files
+1. **This file** (`CLAUDE.md`), all of it.
+2. **[`TODO.md`](TODO.md), its top section** — the release being worked on, its items in order, their lab files
    and the decisions already taken. Its decisions are final: start without asking again.
-3. **[`CHANGELOG.md`](../CHANGELOG.md)**: `[Unreleased]` and the newest release — what changed last.
+3. **[`CHANGELOG.md`](CHANGELOG.md)**: `[Unreleased]` and the newest release — what changed last.
 4. For the task at hand only:
-   - PDF import: the matching section of [`lib/PDFIMPORT.md`](../lib/PDFIMPORT.md) (about 2,000 lines — find the
+   - PDF import: the matching section of [`lib/PDFIMPORT.md`](lib/PDFIMPORT.md) (about 2,000 lines — find the
      section by searching for the rule's or the function's name; never read it whole) and
-     [`tests/pdf-lab/README.md`](../tests/pdf-lab/README.md) (how a lab file and its expected Markdown are made);
-   - the library: [`lib/README.md`](../lib/README.md); slides: [`lib/SLIDES.md`](../lib/SLIDES.md);
-   - a release: [`docs/RELEASING.md`](RELEASING.md).
+     [`tests/pdf-lab/README.md`](tests/pdf-lab/README.md) (how a lab file and its expected Markdown are made);
+   - the library: [`lib/README.md`](lib/README.md); slides: [`lib/SLIDES.md`](lib/SLIDES.md);
+   - a release: [`docs/RELEASING.md`](docs/RELEASING.md).
 
 ## The agreements
 
@@ -25,7 +26,7 @@ Read only what the task needs, in this order:
    and tell the owner the PR is ready to merge** (its number and one line on what it does). Never merge, never
    push to `main`.
 2. **Tags, releases and deleting branches are the owner's steps** (an assistant's environment usually cannot do
-   them). For a release, give the owner: the release notes ready to paste (the format below), and the steps of
+   them). For a release, give the owner the release notes ready to paste and the steps of
    [Publishing a release](#publishing-a-release). The zips are built by CI (`release.yml`) — no zip to hand over.
 3. **Private files stay private.** Files the owner shares to show a problem never go into the repository — not
    the file, not its name, not its text, not a quote from it — nor into commit messages, PR texts or issues.
@@ -41,6 +42,22 @@ Read only what the task needs, in this order:
    purpose is said so in the PR.
 7. **Write like the repository**: the house style is plain, short sentences; English in code, comments and docs;
    the README in three languages kept in step (`fa`, `en`, `ar`).
+8. **Third-party fonts without a licence — the B fonts** (B Nazanin, B Mitra, B Titr, © Borna Rayaneh; the
+   owner's decision, 2026-11-06). Their files set no embedding restriction (OS/2 `fsType` 0) but no licence is
+   published; the owner chose to publish them with attribution and accept that a takedown may be needed. So:
+   - they live in their own folder, `borna-rayaneh/`, never mixed with the OFL fonts (Vazirmatn, Sahel) or
+     their licence files;
+   - `NOTICE.txt` (the publisher, the source, «all rights belong to Borna Rayaneh») travels with every copy: in
+     the font zip, next to `pdf-font-b-*.js`, and wherever the TTFs are committed;
+   - regular and bold are shipped byte-identical to the originals — no dehinting, subsetting or renaming; only
+     the generated oblique italics are modified, and their header says so;
+   - the README's fonts / third-party section says «(c) Borna Rayaneh, no published license, see
+     borna-rayaneh/NOTICE.txt» — never «free», «open» or «OFL»;
+   - embedding into a .docx or .pptx follows the same rule as any font: only the fonts the document uses;
+   - the B-font files and every reference to them stay removable in one commit (no other change mixed into
+     theirs, the references listed in that commit's message).
+9. **No AI-specific documents in the README or `TODO.md`**: this file is the place for working instructions;
+   the README and `TODO.md` do not mention it.
 
 ## A change, step by step
 
@@ -60,35 +77,9 @@ is available.
 
 ## Publishing a release
 
-The checklist is [`docs/RELEASING.md`](RELEASING.md); its last part is the owner's, click by click:
-
-1. **Merge** the release PR: the PR's page → **Merge pull request** → **Confirm merge**.
-2. **Publish**: the repository's page → **Releases** (right side) → **Draft a new release** →
-   **Choose a tag** → type `v2.3` (the new version) → **Create new tag: v2.3 on publish**; *Target*: `main` →
-   *Release title*: `Kelk 2.3` → paste the notes → leave *Set as a pre-release* unticked → **Publish release**.
-3. **Wait a minute or two**: the *release* workflow builds `kelk_2.3.zip` and `kelk-with-pdf-lab_2.3.zip` and
-   attaches them to the release (refresh the release's page: they appear under *Assets*). If they don't:
-   **Actions** → *release* → the failed run → read its summary, and tell the assistant.
-4. **Delete the merged branch**: on the merged PR's page → **Delete branch** (or **Code** → **Branches** → the
-   bin icon beside it).
-5. **Check**: open the site, and the downloaded `kelk_2.3.zip` from your disk (`index.html`): the version beside
-   the name, one import, one export of each kind.
-
-To look at the zips **before** publishing: **Actions** → *release* → **Run workflow** (branch `main`) → when it
-finishes, its page → *Artifacts* → `release-zips`.
-
-**Release notes format** (as 2.1 and 2.2): one sentence on what the release is about; five or so bullets, each a
-change a user notices («Fixed: …» for fixes); one bullet for the PDF lab with its numbers when the importer
-changed; then:
-
-```text
-Downloads:
-
-- kelk_x.y.zip — the app: unzip and open index.html
-- kelk-with-pdf-lab_x.y.zip — the same plus the PDF import lab (N test PDFs), for development
-
-Full notes: CHANGELOG.md
-```
+Follow [`docs/RELEASING.md`](docs/RELEASING.md): sections 1–5 in the release's pull request; then give the owner
+the release notes ready to paste (its *Release notes format*) and point to its section 6, the owner's steps click
+by click. If the *release* workflow fails, the owner says so: read its summary and fix on a branch.
 
 ## Words
 

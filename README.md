@@ -105,8 +105,7 @@ const pdf = await PdfBuilder.create()
 index.html     the page            scripts/, styles/   the page's code (window.Kelk)
 lib/           the library         assets/             icons and web fonts
 vendor/        third-party libraries (pinned versions; THIRD-PARTY-NOTICES.md)
-docs/          about + guide + samples (en / fa / ar), screenshots, WORKING.md (how we work: start here),
-               RELEASING.md (the release checklist)
+docs/          about + guide + samples (en / fa / ar), screenshots, RELEASING.md (the release checklist)
 tests/         builder-suite.html — every test case through the four document builders, in the browser ·
                slides-suite.html — the slides: layouts, notes, warnings, the .pptx read back ·
                pdf-import-suite.html — PDFs you pick, scored offline ·

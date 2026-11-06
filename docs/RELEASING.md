@@ -1,8 +1,7 @@
 # Releasing Kelk — checklist
 
 Go through it top to bottom for every release (x.y). A step that does not apply is ticked with a word why.
-Sections 1–5 go into the release's pull request; section 6 is the owner's, click by click in
-[`docs/WORKING.md`](WORKING.md#publishing-a-release).
+Sections 1–5 go into the release's pull request; section 6 is the owner's, click by click.
 
 ## 1. Version
 
@@ -51,13 +50,35 @@ Sections 1–5 go into the release's pull request; section 6 is the owner's, cli
 
 ## 6. Publishing (the owner)
 
-- [ ] Merge the pull request.
-- [ ] Release on GitHub: tag `vx.y` on `main`'s last commit (made from the release page), title `Kelk x.y`, the
-      release notes. Not a pre-release (the README links `releases/latest`).
-- [ ] The two files appear on the release by themselves: the *release* workflow builds `kelk_x.y.zip` (the app)
-      and `kelk-with-pdf-lab_x.y.zip` (with `tests/pdf-lab`) from the tag and attaches them
-      (`tools/build-release.sh`; it fails if the tag is not `scripts/config.js`'s version).
-- [ ] The repository's *About* and topics, if the features changed.
-- [ ] Delete the merged branches.
-- [ ] Open the site (GitHub Pages) and the downloaded zip from `file://`: the version beside the name, an import, an
-      export of each kind.
+On GitHub's web pages, click by click:
+
+1. **Merge** the release PR: the PR's page → **Merge pull request** → **Confirm merge**.
+2. **Publish**: the repository's page → **Releases** (right side) → **Draft a new release** →
+   **Choose a tag** → type `vx.y` (the new version) → **Create new tag: vx.y on publish**; *Target*: `main` →
+   *Release title*: `Kelk x.y` → paste the notes → leave *Set as a pre-release* unticked (the README links
+   `releases/latest`) → **Publish release**.
+3. **Wait a minute or two**: the *release* workflow builds `kelk_x.y.zip` (the app) and
+   `kelk-with-pdf-lab_x.y.zip` (with `tests/pdf-lab`) from the tag and attaches them to the release
+   (`tools/build-release.sh`; it fails if the tag is not `scripts/config.js`'s version). Refresh the release's
+   page: they appear under *Assets*. If they don't: **Actions** → *release* → the failed run → read its summary.
+4. **Delete the merged branch**: on the merged PR's page → **Delete branch** (or **Code** → **Branches** → the
+   bin icon beside it).
+5. **Check**: open the site (GitHub Pages), and the downloaded `kelk_x.y.zip` from your disk (`index.html`): the
+   version beside the name, one import, one export of each kind.
+6. The repository's *About* and topics, if the features changed.
+
+To look at the zips **before** publishing: **Actions** → *release* → **Run workflow** (branch `main`) → when it
+finishes, its page → *Artifacts* → `release-zips`.
+
+**Release notes format** (as 2.1–2.3): one sentence on what the release is about; five or so bullets, each a
+change a user notices («Fixed: …» for fixes); one bullet for the PDF lab with its numbers when the importer
+changed; then:
+
+```text
+Downloads:
+
+- kelk_x.y.zip — the app: unzip and open index.html
+- kelk-with-pdf-lab_x.y.zip — the same plus the PDF import lab (N test PDFs), for development
+
+Full notes: CHANGELOG.md
+```

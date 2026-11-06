@@ -4,6 +4,11 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+### Development
+
+- The working instructions moved from `docs/WORKING.md` to `CLAUDE.md` at the root; the owner's release steps,
+  click by click, and the release notes format are now in `docs/RELEASING.md` (section 6).
+
 ## [2.3] — 2026-11-05
 
 Word tables and forms: lists and merged cells in a table's cells, a table's title, and a form's pairs in one order.
