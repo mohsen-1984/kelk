@@ -4,6 +4,7 @@
  *                  DejaVu Sans (symbols), the code font, Noto Emoji when the
  *                  text has emoji. Resolves when window.PdfFonts is ready.
  *   forHtml(text)  the web fonts (base64) the standalone HTML export embeds.
+ *   fromPdf(f)     a text font shown from its PDF font file (config.fontsFromPdf), on first use.
  *   installed(f)   is a font available to this page (system or web font)?
  */
 (function (K) {
@@ -18,22 +19,54 @@
     }
 
     let canvas = null;
+    const fromPdf = {};
 
     K.fonts = {
         forPdf: function (text) {
-            const s = K.store.settings();
-            const need = [s.fonts.bidi, s.fonts.latin, 'DejaVu Sans', s.code.font];
+            const f = K.settings.fontsFor('pdf');
+            const need = [f.bidi, f.latin, 'DejaVu Sans', f.code];
             if (EMOJI.test(text || '')) need.push('Noto Emoji');
             return load(K.config.pdfFonts, need);
         },
 
         forHtml: function (text) {
-            const s = K.store.settings();
-            const need = [s.fonts.bidi, s.fonts.latin];
-            if (HAS_CODE.test(text || '')) need.push(s.code.font);
-            return load(K.config.webFonts, need).then(function () {
-                return Array.from(new Set(need)).filter(function (f) { return window.KelkWebFonts && KelkWebFonts[f]; });
+            const f = K.settings.fontsFor('html');
+            const need = [f.bidi, f.latin];                  // a system Latin font (Calibri …) has no web font: not embedded
+            if (HAS_CODE.test(text || '')) need.push(f.code);
+            const fromPdf = need.filter(function (x) { return K.config.fontsFromPdf.indexOf(x) >= 0; }).map(K.fonts.fromPdf);
+            return Promise.all([load(K.config.webFonts, need)].concat(fromPdf)).then(function () {
+                return Array.from(new Set(need)).filter(function (x) { return window.KelkWebFonts && KelkWebFonts[x]; });
             });
+        },
+
+        /**
+         * A text font shown from its PDF font file (config.fontsFromPdf): its regular and bold TTFs, as they are,
+         * become the page's web font (FontFace) and the HTML export's (KelkWebFonts). Loaded once, on first use.
+         */
+        fromPdf: function (family) {
+            if (fromPdf[family]) return fromPdf[family];
+            fromPdf[family] = K.ui.loadScript(K.config.pdfFonts[family]).then(function () {
+                const all = window.PdfFonts || {};
+                const e = Object.keys(all).map(function (k) { return all[k]; })
+                    .find(function (x) { return x && x.family === family; });
+                if (!e) return;
+                const faces = [['normal', '400'], ['bold', '700']].filter(function (w) { return e.styles[w[0]]; }).map(function (w) {
+                    return { weight: w[1], style: 'normal', format: 'truetype', data: e.styles[w[0]].data };
+                });
+                (window.KelkWebFonts = window.KelkWebFonts || {})[family] = faces;
+                if (typeof FontFace === 'undefined' || !document.fonts) return;
+                return Promise.all(faces.map(function (x) {
+                    const bin = atob(x.data), buf = new Uint8Array(bin.length);
+                    for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+                    const ff = new FontFace(family, buf.buffer, { weight: x.weight });
+                    document.fonts.add(ff);
+                    return ff.load().catch(function () {});
+                })).then(function () {
+                    K.settings.checkWordFonts();
+                    if (K.slides && K.slides.active()) K.preview.render();     // the slides measure their text
+                });
+            }).catch(function () { fromPdf[family] = null; });
+            return fromPdf[family];
         },
 
         /**

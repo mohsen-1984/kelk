@@ -35,7 +35,6 @@
             paneOpen: false,            // settings pane: closed on the first visit
             editorOpen: true,           // editor panel (side layout)
             scrollSync: true,
-            previewWordFont: false,     // preview with the Word fonts when installed
             sampleSeen: false,
             sampleLang: null,           // the about/sample document on screen (its language), if any
             view: 'document',           // the preview: document | slides (Kelk.slides)
@@ -47,7 +46,7 @@
         /** Export profile (Kelk.store.settings; stored: what differs from these, and schemaVersion). */
         defaults: {
             // the profile's schema: Kelk.store.migrate brings an older stored profile or settings file up to it
-            schemaVersion: 1,
+            schemaVersion: 2,
             document: { title: null, edition: null, author: '', link: '' },   // null → automatic (first H1 / words; Draft / پیش‌نویس)
             logoHeight: '1cm',
             headerFooter: {
@@ -56,10 +55,12 @@
                 header: null,           // custom header/footer HTML; null → the sample below
                 footer: null
             },
+            // Settings → Fonts: one choice for the preview and every builder (Kelk.settings.fontsFor)
             fonts: {
-                bidi: 'Vazirmatn',      // PDF + page: Complex scripts (Persian, Arabic …)
-                latin: 'Vazirmatn',     // PDF + page: Latin text
-                wordBidi: null,         // Word (.doc/.docx); null → by interface language (wordFontDefaults)
+                bidi: 'Vazirmatn',      // Complex scripts (Persian, Arabic …): fontsBidi
+                latin: '',              // Latin text: fontsLatin, '' → the bidi font's own Latin letters
+                wordOwn: false,         // DOCX, DOC and PPTX take the fonts below instead (any installed font may be typed)
+                wordBidi: null,         // null → the font above
                 wordLatin: null,
                 bidiSize: 12,           // pt
                 latinSize: 11.5
@@ -93,17 +94,18 @@
             ar: { page: 'صفحة', from: 'من', toc: 'المحتويات' }
         },
 
-        /** Fonts shipped with Kelk (PDF + page). DejaVu Sans has no Arabic script: Latin only. */
-        fontsBidi: ['Vazirmatn', 'Sahel'],
-        fontsLatin: ['Vazirmatn', 'Sahel', 'DejaVu Sans'],
+        /**
+         * Settings → Fonts. The text fonts are shipped with Kelk (PDF, the preview, HTML); the Latin fonts are the
+         * system's — the PDF, which carries its fonts, writes their text with the text font's Latin letters (or,
+         * for a text font without Latin letters, fontsNoLatin, with DejaVu Sans; Word and PowerPoint: noLatinWord).
+         */
+        fontsBidi: ['Vazirmatn', 'Sahel', 'B Nazanin', 'B Mitra'],
+        fontsLatin: ['Calibri', 'Arial', 'Tahoma', 'Times New Roman'],
         fontsCode: ['Vazir Code Hack', 'DejaVu Sans Mono'],
-
-        /** Word fonts until the user types their own (↺ brings them back), by interface language. */
-        wordFontDefaults: {
-            fa: { bidi: 'Vazirmatn', latin: 'Calibri' },    // Vazirmatn: the ttf pack under Settings → Word (assets/fonts/download)
-            en: { bidi: 'Arial', latin: 'Calibri' },       // Arial has Arabic script on every Windows
-            ar: { bidi: 'Arial', latin: 'Calibri' }
-        },
+        fontsNoLatin: ['B Nazanin', 'B Mitra', 'B Titr'],
+        noLatinWord: 'Times New Roman',
+        /** Text fonts the page shows from their PDF font file (regular and bold, as web fonts): loaded on first choice. */
+        fontsFromPdf: ['B Nazanin', 'B Mitra'],
 
         /** Fonts to install for Word, by language: a zip of .ttf files and { font: web page }; shown when zip is set. */
         wordFontPacks: {
@@ -115,7 +117,7 @@
             ar: { zip: '', sites: {} }
         },
 
-        /** Suggestions for the Word font fields (any installed font may be typed). */
+        /** Suggestions for the DOCX / PPTX font fields (any installed font may be typed). */
         wordFonts: ['Vazirmatn', 'Sahel', 'B Nazanin', 'B Lotus', 'B Mitra', 'Tahoma', 'Segoe UI',
                     'Calibri', 'Cambria', 'Arial', 'Times New Roman'],
         wordCodeFonts: ['Consolas', 'Cascadia Mono', 'Courier New', 'Vazir Code Hack', 'DejaVu Sans Mono'],
@@ -124,6 +126,10 @@
         pdfFonts: {
             Vazirmatn: 'lib/pdf-base64-ttf-fonts/pdf-font-vazirmatn.js',
             Sahel: 'lib/pdf-base64-ttf-fonts/pdf-font-sahel.js',
+            // © Borna Rayaneh, no published license: kept apart with their NOTICE.txt (THIRD-PARTY-NOTICES.md)
+            'B Nazanin': 'lib/pdf-base64-ttf-fonts/borna-rayaneh/pdf-font-b-nazanin.js',
+            'B Mitra': 'lib/pdf-base64-ttf-fonts/borna-rayaneh/pdf-font-b-mitra.js',
+            'B Titr': 'lib/pdf-base64-ttf-fonts/borna-rayaneh/pdf-font-b-titr.js',
             'DejaVu Sans': 'lib/pdf-base64-ttf-fonts/pdf-font-dejavu-sans.js',
             'DejaVu Sans Mono': 'lib/pdf-base64-ttf-fonts/pdf-font-dejavu-sans-mono.js',
             'Vazir Code Hack': 'lib/pdf-base64-ttf-fonts/pdf-font-vazir-code-hack.js',

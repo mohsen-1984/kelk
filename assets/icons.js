@@ -50,6 +50,7 @@
         "panel-left-open": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\"/><path d=\"M9 3v18\"/><path d=\"m14 9 3 3-3 3\"/>",
         "panel-right-close": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\"/><path d=\"M15 3v18\"/><path d=\"m8 9 3 3-3 3\"/>",
         "pencil-line": "<path d=\"M13 21h8\"/><path d=\"m15 5 4 4\"/><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"/>",
+        "pilcrow": "<path d=\"M13 4v16\"/><path d=\"M17 4v16\"/><path d=\"M19 4H9.5a4.5 4.5 0 0 0 0 9H13\"/>",
         "presentation": "<path d=\"M2 3h20\"/><path d=\"M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3\"/><path d=\"m7 21 5-5 5 5\"/>",
         "redo-2": "<path d=\"m15 14 5-5-5-5\"/><path d=\"M20 9H9.5A5.5 5.5 0 0 0 4 14.5A5.5 5.5 0 0 0 9.5 20H13\"/>",
         "replace-all": "<path d=\"M14 14a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1\"/><path d=\"M14 4a1 1 0 0 1 1-1\"/><path d=\"M15 10a1 1 0 0 1-1-1\"/><path d=\"M19 14a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1\"/><path d=\"M21 4a1 1 0 0 0-1-1\"/><path d=\"M21 9a1 1 0 0 1-1 1\"/><path d=\"m3 7 3 3 3-3\"/><path d=\"M6 10V5a2 2 0 0 1 2-2h2\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\"/>",

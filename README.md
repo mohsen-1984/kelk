@@ -52,8 +52,8 @@ Free and open source (MIT).
   colored header, zebra stripes, both), three colors and a total row — the same in every output;
   code blocks and quotes have their own colors.
 - Maximize the editor or the preview; *Clear & paste* turns the clipboard into the document; light and dark theme.
-- Header and footer (structured, simple or custom HTML), automatic title and edition, fonts chosen
-  apart for PDF and Word, A3–A5/Letter/Legal pages, a monospace code font made for Persian and Arabic.
+- Header and footer (structured, simple or custom HTML), automatic title and edition, one font choice for
+  every output (or other fonts for DOCX and PPTX), A3–A5/Letter/Legal pages, a monospace code font made for Persian and Arabic.
 
 | Output | Best for | Fonts |
 |---|---|---|
@@ -129,6 +129,8 @@ Code: **MIT** ([`LICENSE`](LICENSE)); libraries and fonts keep their own license
 ([`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md)).
 Vazirmatn, Vazir Code and Sahel are the work of the late
 [Saber Rastikerdar](https://github.com/rastikerdar) — in his memory.
+B Nazanin, B Mitra and B Titr: (c) Borna Rayaneh, no published license, see borna-rayaneh/NOTICE.txt
+([`lib/pdf-base64-ttf-fonts/borna-rayaneh/NOTICE.txt`](lib/pdf-base64-ttf-fonts/borna-rayaneh/NOTICE.txt)).
 
 ---
 
@@ -168,7 +170,7 @@ English و العربية است. رایگان و متن‌باز (MIT).
 - **فرمول‌های LaTeX** (`$…$`، `$$…$$`، `\(…\)` و `\[…\]`) در پیش‌نمایش و هر چهار خروجی: **معادلهٔ قابل ویرایش Word** در DOCX و DOC، برداری (vector) در PDF، و SVG یا MathML در HTML؛ معادله‌های Word هنگام ورود به LaTeX برمی‌گردند. MathJax محلی، بدون اینترنت.
 - **سبک جدول (Table style):** خطوط (بدون خط، زیر عنوان، افقی، عمودی، قاب، شبکه‌ای) × پس‌زمینه (بدون رنگ، عنوان رنگی، راه‌راه یا هر دو)، سه رنگ و سطر جمع؛ در همهٔ خروجی‌ها یکسان. بلوک کد و نقل‌قول هم رنگ‌های خودشان را دارند.
 - بزرگ‌کردن ویرایشگر یا پیش‌نمایش؛ «پاک کردن و چسباندن» (Clear & paste) محتوای کلیپ‌بورد را سند می‌کند؛ پوستهٔ روشن و تیره.
-- سربرگ و پانویس (ساختاریافته، ساده یا HTML دلخواه)، عنوان و نسخهٔ خودکار، قلم جدا برای PDF و Word، صفحه‌های A3 تا A5، Letter و Legal، و قلم کد هم‌عرض (monospace) که برای فارسی و عربی ساخته شده.
+- سربرگ و پانویس (ساختاریافته، ساده یا HTML دلخواه)، عنوان و نسخهٔ خودکار، یک انتخاب فونت برای همهٔ خروجی‌ها (یا فونت دیگری برای DOCX و PPTX)، صفحه‌های A3 تا A5، Letter و Legal، و قلم کد هم‌عرض (monospace) که برای فارسی و عربی ساخته شده.
 
 | خروجی | مناسب برای | قلم‌ها |
 |---|---|---|
@@ -200,6 +202,8 @@ English و العربية است. رایگان و متن‌باز (MIT).
 پرسش و پیشنهاد: **[mhn.com@gmail.com](mailto:mhn.com@gmail.com)** (بهترین راه ارتباط ایمیل است).
 کد با **مجوز MIT** منتشر شده؛ کتابخانه‌ها و قلم‌ها مجوز خودشان را دارند (`THIRD-PARTY-NOTICES.md`).
 Vazirmatn، Vazir Code و Sahel کار زنده‌یاد [صابر راستی‌کردار](https://github.com/rastikerdar) است؛ یادش گرامی.
+بی‌نازنین، بی‌میترا و بی‌تیتر: (c) Borna Rayaneh, no published license, see borna-rayaneh/NOTICE.txt
+([`lib/pdf-base64-ttf-fonts/borna-rayaneh/NOTICE.txt`](lib/pdf-base64-ttf-fonts/borna-rayaneh/NOTICE.txt)).
 
 </div>
 
@@ -240,7 +244,7 @@ Vazirmatn، Vazir Code و Sahel کار زنده‌یاد [صابر راستی‌
 - **صيغ LaTeX** (`$…$` و`$$…$$` و`\(…\)` و`\[…\]`) في المعاينة والمخرجات الأربعة: **معادلات Word قابلة للتحرير** في DOCX وDOC، ومتجهات (vector) في PDF، وSVG أو MathML في HTML؛ وتعود معادلات Word إلى LaTeX عند الاستيراد. MathJax محلي، بلا إنترنت.
 - **نمط الجدول (Table style):** الخطوط (بلا خطوط، تحت الرأس، أفقية، عمودية، إطار، شبكي) × التعبئة (بلا تعبئة، رأس ملوَّن، تخطيط أو كلاهما)، وثلاثة ألوان، وصف مجموع؛ واحد في كل المخرجات. ولكتل الشيفرة والاقتباسات ألوانها أيضًا.
 - تكبير المحرّر أو المعاينة؛ و«مسح ولصق» يجعل محتوى الحافظة هو المستند؛ ومظهر فاتح وداكن.
-- رأس وتذييل (منظَّم، أو بسيط، أو HTML حرّ)، وعنوان وإصدار تلقائيان، وخط مستقل لكل من PDF وWord، وصفحات من A3 إلى A5 وLetter وLegal، وخط شيفرة ثابت العرض (monospace) مصمَّم للعربية والفارسية.
+- رأس وتذييل (منظَّم، أو بسيط، أو HTML حرّ)، وعنوان وإصدار تلقائيان، واختيار خط واحد لكل المخرجات (أو خطوط أخرى لـ DOCX وPPTX)، وصفحات من A3 إلى A5 وLetter وLegal، وخط شيفرة ثابت العرض (monospace) مصمَّم للعربية والفارسية.
 - **الخطوط:** Vazirmatn، الخط الافتراضي، يدعم العربية؛ ويمكن تجهيز خطوط عربية مثل Cairo وAmiri وNoto Naskh Arabic لملفات PDF.
 
 | الصيغة | الأنسب لـ | الخطوط |
@@ -273,5 +277,7 @@ Vazirmatn، Vazir Code و Sahel کار زنده‌یاد [صابر راستی‌
 للأسئلة والاقتراحات: **[mhn.com@gmail.com](mailto:mhn.com@gmail.com)** (البريد الإلكتروني أفضل وسيلة للتواصل).
 الشيفرة بترخيص **MIT**؛ وللمكتبات والخطوط تراخيصها الخاصة (`THIRD-PARTY-NOTICES.md`).
 Vazirmatn وVazir Code وSahel من عمل الراحل [صابر راستي كردار](https://github.com/rastikerdar)، رحمه الله.
+B Nazanin وB Mitra وB Titr: (c) Borna Rayaneh, no published license, see borna-rayaneh/NOTICE.txt
+([`lib/pdf-base64-ttf-fonts/borna-rayaneh/NOTICE.txt`](lib/pdf-base64-ttf-fonts/borna-rayaneh/NOTICE.txt)).
 
 </div>

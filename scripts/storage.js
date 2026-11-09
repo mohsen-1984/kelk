@@ -109,6 +109,13 @@
             // line spacing: automatic by default (an early 1.1 was the paragraphs' value only)
             if (!s._lh && isObj(s.text) && s.text.lineHeight === '110%') s.text.lineHeight = '';
         }
+        if (v < 2) {
+            // 2.5, Settings → Fonts: one choice for every output. The Latin font is a system font or '' (the text
+            // font's own letters); the Word fonts typed before are kept, as fonts of their own for DOCX and PPTX.
+            const f = isObj(s.fonts) ? s.fonts : {}, typed = function (x) { return x != null && String(x).trim() !== ''; };
+            if (f.latin !== undefined && K.config.fontsLatin.indexOf(f.latin) < 0) f.latin = '';
+            if (typed(f.wordBidi) || typed(f.wordLatin) || (isObj(s.code) && typed(s.code.wordFont))) { f.wordOwn = true; s.fonts = f; }
+        }
         // Slides themes got general names during 2.0 (kelk → modern-emerald …): a renamed value, never a default
         if (isObj(s.slides) && s.slides.theme) {
             const renamed = { kelk: 'modern-emerald', pasargad: 'scholarly-blue', ocean: 'ocean-teal', graphite: 'minimal-mono' }[s.slides.theme];

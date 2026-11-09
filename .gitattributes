@@ -12,6 +12,7 @@
 *.woff binary
 *.woff2 binary
 *.ttf binary
+*.TTF binary
 *.otf binary
 *.pfb binary
 *.png binary

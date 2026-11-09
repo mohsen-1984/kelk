@@ -346,9 +346,6 @@
             try {
                 const pb = K.exporter._configure(PreviewBuilder.create(), 'html');
                 pb._config.previewLabels = { copy: K.i18n.t('copy') };
-                // "Preview with the Word fonts": the document's stylesheet takes them (where installed)
-                const f = K.settings && K.settings.previewFonts ? K.settings.previewFonts() : null;
-                if (f && f.word) pb.configure({ fonts: { bidi: f.bidi, latin: f.latin, code: f.code } });
                 if (document.documentElement.getAttribute('data-theme') === 'dark') darkPaper(pb);
                 return pb;
             } catch (e) { return null; }

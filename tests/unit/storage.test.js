@@ -58,9 +58,9 @@ test('only the differences from the defaults are stored, with schemaVersion', fu
   const w = storageWindow();
   w.Kelk.store.set('page.size', 'Letter');
   w.Kelk.store.set('code.size', 9);
-  assert.deepEqual(stored(w, 'settings'), { page: { size: 'Letter' }, code: { size: 9 }, schemaVersion: 1 });
+  assert.deepEqual(stored(w, 'settings'), { page: { size: 'Letter' }, code: { size: 9 }, schemaVersion: 2 });
   w.Kelk.store.set('page.size', 'A4'); // back to the default: gone from the store
-  assert.deepEqual(stored(w, 'settings'), { code: { size: 9 }, schemaVersion: 1 });
+  assert.deepEqual(stored(w, 'settings'), { code: { size: 9 }, schemaVersion: 2 });
 });
 
 test('a changed default reaches every value the user never set', function () {
@@ -80,7 +80,7 @@ test('Reset drops the stored profile; Undo stores it back as differences', funct
   w.Kelk.store.resetSettings();
   assert.equal(w.Kelk.store.get('fonts.bidi'), 'Vazirmatn');
   w.Kelk.store.replaceSettings(JSON.parse(before));
-  assert.deepEqual(stored(w, 'settings'), { fonts: { bidi: 'Sahel' }, schemaVersion: 1 });
+  assert.deepEqual(stored(w, 'settings'), { fonts: { bidi: 'Sahel' }, schemaVersion: 2 });
 });
 
 // a profile stored by a version before schemaVersion: the whole merge of that day's defaults, no markers
@@ -108,7 +108,7 @@ test('a legacy profile is migrated as before, once, and stored as differences', 
   assert.equal(s.page.tableWidth, 'auto');
   assert.equal(s.code.font, 'Vazir Code Hack');
   assert.equal(s.document.author, 'A');
-  assert.deepEqual(stored(w, 'settings'), { document: { author: 'A' }, schemaVersion: 1 });
+  assert.deepEqual(stored(w, 'settings'), { document: { author: 'A' }, schemaVersion: 2 });
   // the same choices made again now are kept
   w.Kelk.store.set('code.font', 'DejaVu Sans Mono');
   assert.equal(reload(w).Kelk.store.get('code.font'), 'DejaVu Sans Mono');
@@ -135,6 +135,7 @@ test('a legacy profile the old code had already migrated (markers) keeps its val
   assert.equal(s.code.font, 'DejaVu Sans Mono');
   assert.equal(s.fonts.bidi, 'Sahel');
   assert.equal(s.fonts.wordLatin, 'Calibri');
+  assert.equal(s.fonts.wordOwn, true); // 2.5: a typed Word font → fonts of their own for DOCX and PPTX
   assert.equal(s.page.tableWidth, '98%');
   assert.equal(s.headerFooter.direction, 'rtl');
   assert.equal(s.text.lineHeight, '110%');
@@ -142,7 +143,7 @@ test('a legacy profile the old code had already migrated (markers) keeps its val
   ['_auto', '_vch', '_vz', '_auto2', '_hfauto', '_lh'].forEach(function (m) {
     assert.equal(st[m], undefined, m + ' dropped');
   });
-  assert.equal(st.schemaVersion, 1);
+  assert.equal(st.schemaVersion, 2);
 });
 
 test('settings saved before the ui/profile split: the page parts move to kelk.ui', function () {
@@ -169,7 +170,7 @@ test('a settings file goes through the same migrate()', function () {
   assert.equal(w.Kelk.store.get('code.font'), 'Vazir Code Hack');
   assert.equal(stored(w, 'settings').ui, undefined);
   // a file of this version: values as they are
-  w.Kelk.store.replaceSettings({ schemaVersion: 1, document: { title: '' }, code: { font: 'DejaVu Sans Mono' } });
+  w.Kelk.store.replaceSettings({ schemaVersion: 2, document: { title: '' }, code: { font: 'DejaVu Sans Mono' } });
   assert.equal(w.Kelk.store.get('document.title'), '');
   assert.equal(w.Kelk.store.get('code.font'), 'DejaVu Sans Mono');
 });
@@ -179,12 +180,22 @@ test('migrate() is pure and brings any input to the current schema', function ()
   const input = JSON.parse(JSON.stringify(LEGACY));
   const out = w.Kelk.store.migrate(input);
   assert.deepEqual(input, LEGACY, 'input unchanged');
-  assert.equal(out.schemaVersion, 1);
-  assert.deepEqual(plain(w.Kelk.store.migrate(null)), { schemaVersion: 1 });
-  assert.deepEqual(plain(w.Kelk.store.migrate({ schemaVersion: 1, code: { font: 'DejaVu Sans Mono' } })), {
-    schemaVersion: 1,
+  assert.equal(out.schemaVersion, 2);
+  assert.deepEqual(plain(w.Kelk.store.migrate(null)), { schemaVersion: 2 });
+  assert.deepEqual(plain(w.Kelk.store.migrate({ schemaVersion: 2, code: { font: 'DejaVu Sans Mono' } })), {
+    schemaVersion: 2,
     code: { font: 'DejaVu Sans Mono' }
   });
+});
+
+test('schema 2 (Settings → Fonts): a Latin font Kelk lists stays, another becomes the text font\'s own; typed Word fonts turn on fonts of their own', function () {
+  const w = storageWindow();
+  const m = (p) => plain(w.Kelk.store.migrate(Object.assign({ schemaVersion: 1 }, p)));
+  assert.deepEqual(m({ fonts: { latin: 'Sahel' } }), { schemaVersion: 2, fonts: { latin: '' } });
+  assert.deepEqual(m({ fonts: { latin: 'Arial' } }), { schemaVersion: 2, fonts: { latin: 'Arial' } });
+  assert.deepEqual(m({ fonts: { wordBidi: 'B Nazanin' } }), { schemaVersion: 2, fonts: { wordBidi: 'B Nazanin', wordOwn: true } });
+  assert.deepEqual(m({ fonts: { bidiSize: 13 }, code: { wordFont: 'Consolas' } }), { schemaVersion: 2, fonts: { bidiSize: 13, wordOwn: true }, code: { wordFont: 'Consolas' } });
+  assert.deepEqual(m({ fonts: { bidi: 'Sahel' } }), { schemaVersion: 2, fonts: { bidi: 'Sahel' } });
 });
 
 test('a profile of a newer schema (another tab of a later version) is read as it is', function () {
@@ -213,11 +224,11 @@ test('a returned profile is a copy: changing it never changes the defaults', fun
 });
 
 test('a tab of an older version writes one value into a newer profile, keeping the rest', function () {
-  const newer = { schemaVersion: 2, page: { size: 'A4' }, code: { font: 'DejaVu Sans Mono' } };
+  const newer = { schemaVersion: 3, page: { size: 'A4' }, code: { font: 'DejaVu Sans Mono' } };
   const w = storageWindow({ 'kelk.settings': JSON.stringify(newer) });
   w.Kelk.store.set('code.size', 9);
   assert.deepEqual(stored(w, 'settings'), {
-    schemaVersion: 2,
+    schemaVersion: 3,
     page: { size: 'A4' },
     code: { font: 'DejaVu Sans Mono', size: 9 }
   });
