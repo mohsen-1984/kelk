@@ -8,6 +8,11 @@
  * text that is plainly a document fails: no ## heading at all, one slide holding a long text, most slides far
  * longer than a slide holds, or a long text before the first slide. A failing finding has `fail: true`; the others
  * are notes. Words are counted outside fenced code, front matter, HTML comments, link targets and table rules.
+ *
+ *   KelkSlideCheck.show(res, onAnyway)   (in the page) the report panel says why the Slides view did not open
+ *       (Kelk.ui.report.custom): the findings, «Make slides anyway» (onAnyway) and «Copy the prompt».
+ *   KelkSlideCheck.STRINGS               its words (sc_*), fa / en / ar: added to Kelk.i18n's tables when it loads,
+ *       so the page's startup carries none of them (tools/check-i18n.js reads them from here).
  */
 (function (root) {
     'use strict';
@@ -66,7 +71,78 @@
         };
     }
 
-    const api = { check: check, LIMIT: LIMIT };
+    const STRINGS = {
+        fa: {
+            sc_title: 'متن در قالب اسلاید نیست',
+            sc_brief: 'نمای سند ماند؛ متن قالب اسلاید ندارد',
+            sc_summary: 'کِلک در نمای سند ماند: این متن قالب اسلاید ندارد. در این قالب هر عنوان ## یک اسلاید است و زیر آن متن کوتاهی می‌آید.',
+            sc_noSlides: 'هیچ عنوان ## ندارد؛ هر اسلاید با یک عنوان ## آغاز می‌شود.',
+            sc_oneSlide: 'فقط یک اسلاید دارد، با {0} کلمه؛ این اندازه متن در یک اسلاید جا نمی‌شود.',
+            sc_longSlides: '{0} اسلاید از {1} بیش از 250 کلمه دارد؛ متنی به این درازی در اسلاید جا نمی‌شود.',
+            sc_longIntro: 'پیش از نخستین عنوان ## متنی {0} کلمه‌ای آمده است.',
+            sc_prompt: 'متنی که با پرامپت اسلاید (تنظیمات ← اسلایدها) آماده شود اسلایدهای قابل‌قبولی می‌دهد. می‌توانید همین متن را هم اسلاید کنید.',
+            sc_anyway: 'با این حال اسلاید بساز',
+        },
+        en: {
+            sc_title: 'Not in slide format',
+            sc_brief: 'stayed in the document view; the text is not in slide format',
+            sc_summary: 'Kelk stayed in the document view: this text is not in slide format. In that format each ## heading is a slide, with a short text under it.',
+            sc_noSlides: 'It has no ## heading; each slide starts at a ## heading.',
+            sc_oneSlide: 'It has one slide, of {0} words; that much text does not fit a slide.',
+            sc_longSlides: '{0} of {1} slides have more than 250 words; text that long does not fit a slide.',
+            sc_longIntro: 'Before the first ## heading there are {0} words of text.',
+            sc_prompt: 'A text prepared with the slide prompt (Settings → Slides) gives acceptable slides. You can also make slides of this text as it is.',
+            sc_anyway: 'Make slides anyway',
+        },
+        ar: {
+            sc_title: 'النص ليس بتنسيق الشرائح',
+            sc_brief: 'بقي عرض المستند؛ النص ليس بتنسيق الشرائح',
+            sc_summary: 'بقي كِلك في عرض المستند: هذا النص ليس بتنسيق الشرائح. في هذا التنسيق كل عنوان ## شريحة، وتحته نص قصير.',
+            sc_noSlides: 'لا يحتوي على أي عنوان ##؛ تبدأ كل شريحة بعنوان ##.',
+            sc_oneSlide: 'فيه شريحة واحدة من {0} كلمة؛ هذا القدر من النص لا يتسع في شريحة.',
+            sc_longSlides: 'في {0} من {1} شرائح أكثر من 250 كلمة؛ نص بهذا الطول لا يتسع في شريحة.',
+            sc_longIntro: 'قبل أول عنوان ## نص من {0} كلمة.',
+            sc_prompt: 'النص المُعدّ بموجّه الشرائح (الإعدادات ← الشرائح) يعطي شرائح مقبولة. ويمكنك أيضًا إنشاء شرائح من هذا النص كما هو.',
+            sc_anyway: 'أنشئ الشرائح مع ذلك',
+        }
+    };
+    /** the findings' keys, each written in full */
+    const KEYS = { noSlides: 'sc_noSlides', oneSlide: 'sc_oneSlide', longSlides: 'sc_longSlides', longIntro: 'sc_longIntro' };
+
+    function show(res, onAnyway) {
+        const K = root.Kelk, t = function () { return K.i18n.t.apply(K.i18n, arguments); };
+        const add = function (box, tag, cls, txt) {
+            const e = box.appendChild(document.createElement(tag));
+            e.className = cls;
+            if (txt != null) e.textContent = txt;
+            return e;
+        };
+        return K.ui.report.custom({
+            icon: 'presentation',
+            title: function () { return t('sc_title'); },
+            brief: function () { return t('sc_brief'); },
+            body: function (box) {
+                add(box, 'p', 'report-summary', t('sc_summary'));
+                const ul = add(box, 'ul', 'report-findings');
+                res.findings.forEach(function (f) {
+                    add(ul, 'li', f.fail ? 'warn' : 'info', t(KEYS[f.code], f.n, f.of)).setAttribute('data-code', f.code);
+                });
+                add(box, 'p', 'report-summary', t('sc_prompt'));
+            },
+            buttons: [
+                { icon: 'presentation', label: function () { return t('sc_anyway'); }, run: function () { K.ui.report.close(false); onAnyway(); } },
+                { icon: 'copy', label: function () { return t('slidesPrompt'); }, run: function () { const b = K.$('#btn-slides-prompt'); if (b) b.click(); } }
+            ]
+        });
+    }
+
+    // in the page: its words join Kelk.i18n's tables
+    if (root.Kelk && root.Kelk.i18n && root.Kelk.i18n._strings) {
+        const all = root.Kelk.i18n._strings;
+        Object.keys(STRINGS).forEach(function (l) { if (all[l]) Object.assign(all[l], STRINGS[l]); });
+    }
+
+    const api = { check: check, show: show, LIMIT: LIMIT, STRINGS: STRINGS };
     root.KelkSlideCheck = api;
     if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

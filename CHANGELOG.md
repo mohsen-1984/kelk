@@ -30,6 +30,9 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Development
 
+- The slide-format check's words and its report content load with it, on the first switch to the Slides view
+  (`scripts/slidecheck.js`): the report panel shows another module's content (`Kelk.ui.report.custom`), and
+  `tools/check-i18n.js` reads the words of modules loaded on demand.
 - The working instructions moved from `docs/WORKING.md` to `CLAUDE.md` at the root; the owner's release steps,
   click by click, and the release notes format are now in `docs/RELEASING.md` (section 6).
 

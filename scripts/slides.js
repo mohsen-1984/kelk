@@ -206,14 +206,14 @@
             // that says why and offers to make slides anyway (scripts/slidecheck.js, loaded on the first switch)
             if (slides && !force && !s && K.editor.value().trim()) {
                 const self = this;
-                let res = null;
-                try { res = (await K.libs.need('slidecheck')).check(K.editor.value()); } catch (e) { res = null; }
+                let sc = null, res = null;
+                try { sc = await K.libs.need('slidecheck'); res = sc.check(K.editor.value()); } catch (e) { res = null; }
                 if (res && !res.ok) {
-                    K.ui.report.slides(res, { onAnyway: function () { self.setView('slides', true); } });
+                    sc.show(res, function () { self.setView('slides', true); });
                     return;
                 }
             }
-            if (K.ui.report.isSlides()) K.ui.report.close(false);
+            if (K.ui.report.isCustom()) K.ui.report.close(false);
             K.store.setUi('view', slides ? 'slides' : 'document');
             this.applyView();
             if (s && s.set === (slides ? 'about' : 'slides')) {
