@@ -6,6 +6,8 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Changed
 
+- The export buttons follow the view: DOCX, PDF, HTML and DOC in the document view, PPTX alone in the Slides view;
+  Ctrl+Enter exports the view's own format (DOCX or PPTX).
 - Settings → Word: its heading stands out in the document view, as Settings → Slides' does in the Slides view.
 - The tagline draws the two-way conversion with an icon (Markdown ⇆ Word, PowerPoint, PDF and HTML), the same in
   every font; the page title and its meta tags keep it as text, with en dashes (less room in a browser tab).

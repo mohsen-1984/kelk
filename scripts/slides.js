@@ -219,11 +219,10 @@
             const doc = K.$('#preview'), sl = K.$('#slides');
             if (doc) doc.hidden = on;
             if (sl) sl.hidden = !on;
-            const pptx = K.$('[data-export="pptx"]'), docx = K.$('[data-export="docx"]');
-            if (pptx && docx) {
-                pptx.classList.toggle('primary', on); pptx.classList.toggle('soft', !on);
-                docx.classList.toggle('primary', !on); docx.classList.toggle('soft', on);
-            }
+            // the export buttons of the view only: PPTX for slides; DOCX, PDF, HTML and DOC for the document
+            K.$$('.export-bar [data-export]').forEach(function (b) { b.hidden = (b.getAttribute('data-export') === 'pptx') !== on; });
+            const sep = K.$('.export-bar .sep');
+            if (sep) sep.hidden = on;
             if (K.names && K.names.setExt) K.names.setExt(on ? 'pptx' : 'docx');
         },
 
