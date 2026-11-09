@@ -246,6 +246,15 @@
             K.$('.preview-scroll').scrollTop = 0;
         },
 
+        /** After a paste or an import: in Slides, the slide check may switch to the document (scripts/slidecheck.js). */
+        checkIncoming: function () {
+            if (this.active()) K.libs.need('slidecheck').then(function (sc) { return sc.incoming(); }).catch(function () {});
+        },
+        /** Before a PPTX export: false when the text no longer fits and the report offers to export anyway. */
+        exportOk: function (anyway) {
+            return K.libs.need('slidecheck').then(function (sc) { return sc.beforeExport(anyway); }, function () { return true; });
+        },
+
         /** The toggle, the panes, the primary export button and the name box follow the view. */
         applyView: function () {
             const on = this.active();

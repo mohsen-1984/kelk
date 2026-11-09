@@ -4,6 +4,14 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+### Changed
+
+- **The slide check also runs when text comes in while the Slides view is on**: a paste (Ctrl+V or the Paste
+  buttons) or an import that is plainly not in slide format switches to the document view, with the same report
+  (its button makes slides anyway). Editing — typing, deleting, cut, undo and redo, replace — never switches the
+  view; a PPTX export checks the text again and, when it no longer fits, shows the report with «Export PPTX
+  anyway».
+
 ### Development
 
 - Publishing a release comes only after the release PR (the one that changes the version) is merged:

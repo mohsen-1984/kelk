@@ -165,6 +165,7 @@
                     insertImages(imgs);
                     return;
                 }
+                setTimeout(function () { if (K.slides) K.slides.checkIncoming(); }, 0);    // after the paste: in Slides, the slide check
                 if (shift || !K.store.getUi('importer.richPaste')) return;
                 const md = K.importer.fromPaste(dt);
                 if (md == null) return;                      // plain text: the browser pastes it
