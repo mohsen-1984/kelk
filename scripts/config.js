@@ -59,6 +59,7 @@
             fonts: {
                 bidi: 'Vazirmatn',      // Complex scripts (Persian, Arabic …): fontsBidi
                 latin: '',              // Latin text: fontsLatin, '' → the bidi font's own Latin letters
+                embed: true,            // DOCX and PPTX carry the fonts they use that Kelk ships (Kelk.fonts.embed)
                 wordOwn: false,         // DOCX, DOC and PPTX take the fonts below instead (any installed font may be typed)
                 wordBidi: null,         // null → the font above
                 wordLatin: null,
@@ -106,6 +107,8 @@
         noLatinWord: 'Times New Roman',
         /** Text fonts the page shows from their PDF font file (regular and bold, as web fonts): loaded on first choice. */
         fontsFromPdf: ['B Nazanin', 'B Mitra'],
+        /** The Windows character set a font declares, when not ANSI (the DOCX font table, the PPTX embedded font). */
+        fontCharset: {},
 
         /** Fonts to install for Word, by language: a zip of .ttf files and { font: web page }; shown when zip is set. */
         wordFontPacks: {
@@ -168,6 +171,7 @@
                 global: 'PdfImporter'
             },
             jszip: { src: 'vendor/jszip.min_3.10.2.js', global: 'JSZip' },
+            fontembed: { src: 'lib/FontEmbed.js', global: 'FontEmbed' },           // Settings → Fonts → Embed fonts
             slidecheck: { src: 'scripts/slidecheck.js', global: 'KelkSlideCheck' },      // on the first switch to slides
             pptx: { src: ['vendor/jszip.min_3.10.2.js', 'vendor/pptxgen.min_4.0.1.js'], global: 'PptxGenJS' }
         },

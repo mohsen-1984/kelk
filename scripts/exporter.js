@@ -165,8 +165,11 @@
                 return;
             }
             K.ui.busy(btn, true);
+            let added = 0;
             try {
                 const blob = await K.ui.task(K.i18n.t('taskExport', kind.toUpperCase()), async function (t) {
+                    // DOCX, PPTX: the fonts they use, embedded (Settings → Fonts)
+                    const embed = async function (b) { const r = await K.fonts.embed(kind, await b, md); added = r.added; return r.blob; };
                     await K.ui.paint();                        // the dialog is up before the builder holds the page
                     K.preview.flush();                         // typed while the dialog came up (nothing waiting: no-op)
                     const html = K.preview.html();
@@ -174,7 +177,7 @@
                     if (kind !== 'html' && /data-tex="[^"]*[֐-ࣿ]/.test(html)) await K.fonts.forHtml(md);
                     if (kind === 'docx') {
                         await K.libs.need('docx');
-                        return configure(DocxBuilder.create(), 'docx').addFromHtml(html).toBlob();
+                        return embed(configure(DocxBuilder.create(), 'docx').addFromHtml(html).toBlob());
                     }
                     if (kind === 'doc') return configure(WordHtmlBuilder.create(), 'doc').addFromHtml(html).toBlob();
                     if (kind === 'pdf') {
@@ -182,7 +185,7 @@
                         await K.ui.paint();
                         return configure(PdfBuilder.create(), 'pdf').addFromHtml(html).toBlob();
                     }
-                    if (kind === 'pptx') return K.slides.blob(t);
+                    if (kind === 'pptx') return embed(K.slides.blob(t));
                     if (kind === 'html') {
                         await K.fonts.forHtml(md);
                         return configure(HtmlBuilder.create(), 'html').addFromHtml(html).toBlob();
@@ -190,7 +193,7 @@
                     throw new Error('unknown output ' + kind);
                 }, { delay: 120 });
                 K.ui.download(blob, blob.type, K.ui.fileName(kind));
-                K.ui.toast(K.i18n.t('exported', kind.toUpperCase()));
+                K.ui.toast(K.i18n.t('exported', kind.toUpperCase()) + (added ? ' · ' + K.i18n.t('fontsEmbedded', Math.round(added / 1024)) : ''));
             } catch (e) {
                 if (e && e.code === 'aborted') { K.ui.toast(K.i18n.t('cancelled')); return; }
                 console.error(e);

@@ -65,7 +65,7 @@
     const SCOPES = {
         'direction': 'PHFW', 'document.title': 'HFW', 'document.author': 'HFW', 'document.edition': 'HFW', 'document.link': 'HFW',
         'logoHeight': 'HFW', 'headerFooter.mode': 'HFW', 'headerFooter.header': 'HFW', 'headerFooter.footer': 'HFW', 'headerFooter.direction': 'HFW',
-        'fonts.bidi': 'PHFW', 'fonts.latin': 'PHFW', 'fonts.bidiSize': 'PHFW', 'fonts.latinSize': 'PHFW', 'fonts.wordOwn': 'W', 'fonts.wordBidi': 'W', 'fonts.wordLatin': 'W',
+        'fonts.bidi': 'PHFW', 'fonts.latin': 'PHFW', 'fonts.bidiSize': 'PHFW', 'fonts.latinSize': 'PHFW', 'fonts.wordOwn': 'W', 'fonts.embed': 'W', 'fonts.wordBidi': 'W', 'fonts.wordLatin': 'W',
         'toc.enabled': 'PHFW', 'toc.levels': 'PHFW', 'page.size': 'HFW', 'page.orientation': 'HFW', 'page.margin': 'HFW',
         'text.align': 'PHFW', 'text.lineHeight': 'PHFW', 'text.breaks': 'PHFW',
         'page.tableWidth': 'PHFW', 'page.tableMinWidth': 'PHFW', 'page.tableAlign': 'PHFW',
@@ -328,7 +328,8 @@
                 const note = K.$(el.getAttribute('data-font-check'));
                 const v = el.value.trim();
                 if (!note) return;
-                if (!v) { note.hidden = true; return; }
+                // a DOCX / PPTX font Kelk ships is embedded (Settings → Fonts → Embed fonts): the reader needs nothing
+                if (!v || (el.closest('#word-fonts') && K.store.settings().fonts.embed && K.config.pdfFonts[v])) { note.hidden = true; return; }
                 K.fonts.installed(v).then(function (yes) { if (el.value.trim() === v) note.hidden = yes; });
             });
         },

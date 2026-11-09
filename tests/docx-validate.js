@@ -164,6 +164,7 @@ const CONTENT_TYPES = [
   [/^docProps\/app\.xml$/, 'application/vnd.openxmlformats-officedocument.extended-properties+xml'],
   [/^docProps\/custom\.xml$/, 'application/vnd.openxmlformats-officedocument.custom-properties+xml'],
   [/\.rels$/, 'application/vnd.openxmlformats-package.relationships+xml'],
+  [/^word\/fonts\/.*\.odttf$/, 'application/vnd.openxmlformats-officedocument.obfuscatedFont'],
   [/\.png$/i, 'image/png'], [/\.jpe?g$/i, 'image/jpeg'], [/\.gif$/i, 'image/gif'], [/\.bmp$/i, 'image/bmp'], [/\.svg$/i, 'image/svg+xml']
 ];
 
@@ -377,6 +378,33 @@ async function main() {
     u.errors.forEach((e) => console.log('FAIL  ' + name + ': ' + e));
     fail += u.errors.length;
     u.stripped.forEach((n, k) => stripped.set(k, (stripped.get(k) || 0) + n));
+    cases.push({ name, file, parts: u.parts });
+  }
+  // the fonts embedded after the builder (Settings → Fonts → Embed fonts: lib/FontEmbed.js), in the first case:
+  // Vazirmatn regular and bold, and a font only described (its charset); LibreOffice (step 3) opens it too
+  if (cases.length) {
+    const FE = require('../lib/FontEmbed.js');
+    global.window = global;
+    global.PdfFonts = global.PdfFonts || {};
+    require('../lib/pdf-base64-ttf-fonts/pdf-font-vazirmatn.js');
+    const v = Object.values(global.PdfFonts).find((x) => x.family === 'Vazirmatn');
+    const ttf = (st) => new Uint8Array(Buffer.from(v.styles[st].data, 'base64'));
+    const buf = Buffer.from(await FE.docx(fs.readFileSync(cases[0].file),
+      [{ name: 'Vazirmatn', regular: ttf('normal'), bold: ttf('bold'), charset: 0 }, { name: 'Described Only', charset: 178 }], { type: 'uint8array' }));
+    const name = 'embedded-fonts', file = path.join(work, 'docx', name + '.docx');
+    fs.writeFileSync(file, buf);
+    const u = await unpack(buf, path.join(work, 'parts', name));
+    const zip = await JSZip.loadAsync(buf);
+    const ft = await zip.file('word/fontTable.xml').async('string');
+    const keys = [...ft.matchAll(/r:id="(rId\d+)" w:fontKey="([^"]+)"/g)];
+    if (keys.length !== 2) u.errors.push('word/fontTable.xml: ' + keys.length + ' embedded faces, expected 2');
+    for (const [, id, key] of keys) {
+      const rel = new RegExp('Id="' + id + '"[^>]*Target="([^"]+)"').exec(await zip.file('word/_rels/fontTable.xml.rels').async('string'));
+      const font = rel && zip.file('word/' + rel[1]) ? FE.obfuscate(await zip.file('word/' + rel[1]).async('uint8array'), key) : null;
+      if (!font || Buffer.from(font).readUInt32BE(0) !== 0x00010000) u.errors.push('font ' + id + ': not a TrueType file once its key is applied');
+    }
+    u.errors.forEach((e) => console.log('FAIL  ' + name + ': ' + e));
+    fail += u.errors.length;
     cases.push({ name, file, parts: u.parts });
   }
   // what Markup Compatibility removed without a check of its own (see CHECKED): listed so a new one shows

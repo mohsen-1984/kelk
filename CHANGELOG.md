@@ -4,6 +4,15 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+### Added
+
+- **Fonts embedded in DOCX and PPTX** (Settings → Fonts → «Embed fonts in DOCX and PPTX», on by default): the
+  text, Latin and code fonts a file uses that Kelk ships (Vazirmatn, Sahel, Vazir Code Hack …), regular and bold,
+  go into the file, so it shows them on a computer without them; Word's and PowerPoint's «Embed fonts in the
+  file» is on. The DOCX holds them obfuscated (ECMA-376 §17.8.1), the PPTX in the Embedded OpenType format
+  PowerPoint uses. The export's message says how much they added. A font typed under «Other fonts for DOCX and
+  PPTX» that Kelk does not ship is named only, as before.
+
 ### Changed
 
 - **One Fonts pane** (Settings → «فونت (قلم)» / Fonts / الخطوط): every font setting in one place — the text font,
