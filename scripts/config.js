@@ -8,7 +8,7 @@
     'use strict';
 
     K.config = {
-        version: '2.4',
+        version: '2.5',
         repoUrl: 'https://github.com/mohsen-1984/kelk',   // the footer link (hidden when empty)
         storagePrefix: 'kelk.',
         maxFileMB: 20,                  // the default of Settings → App → Largest file to import (ui.importer.maxMB)

@@ -11,7 +11,7 @@ Kurdish** mixed with English — and works just as well for **every left-to-righ
 Free and open source (MIT).
 
 **▶ [Open Kelk online](https://mohsen-1984.github.io/kelk/)** ·
-**⬇ [Download kelk_2.4.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.4.zip)** ·
+**⬇ [Download kelk_2.5.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.5.zip)** ·
 [فارسی ↓](#fa) · [العربية ↓](#ar) · Contact: [mhn.com@gmail.com](mailto:mhn.com@gmail.com)
 
 ![Kelk — Markdown to DOCX and PDF converter, English interface](docs/screenshots/kelk-en.png)
@@ -53,7 +53,7 @@ Free and open source (MIT).
   code blocks and quotes have their own colors.
 - Maximize the editor or the preview; *Clear & paste* turns the clipboard into the document; light and dark theme.
 - Header and footer (structured, simple or custom HTML), automatic title and edition, one font choice for
-  every output (or other fonts for DOCX and PPTX), A3–A5/Letter/Legal pages, a monospace code font made for Persian and Arabic.
+  every output (or other fonts for DOCX and PPTX), fonts embedded in DOCX and PPTX, A3–A5/Letter/Legal pages, a monospace code font made for Persian and Arabic.
 
 | Output | Best for | Fonts |
 |---|---|---|
@@ -76,7 +76,7 @@ Free and open source (MIT).
 ## Use it
 
 - **Online:** [mohsen-1984.github.io/kelk](https://mohsen-1984.github.io/kelk/).
-- **On your computer:** [download kelk_2.4.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.4.zip),
+- **On your computer:** [download kelk_2.5.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.5.zip),
   unpack it and open `index.html` — offline, for personal use or inside a company network.
 - **On your own host:** upload the folder to any static web host.
 
@@ -118,7 +118,7 @@ tools/         bidi-lab.html (every direction rule) · build_pdf_fonts.py · bui
 package.json   the dev tools CI installs (npm ci) — the app itself has no build step and no dependencies to install
 ```
 
-Release downloads: `kelk_2.4.zip` is the app (what most people want); `kelk-with-pdf-lab_2.4.zip` adds
+Release downloads: `kelk_2.5.zip` is the app (what most people want); `kelk-with-pdf-lab_2.5.zip` adds
 `tests/pdf-lab/` (196 PDFs, about 25 MB) for working on the PDF importer.
 
 ## Contact, credits, license
@@ -150,7 +150,7 @@ B Nazanin, B Mitra and B Titr: (c) Borna Rayaneh, no published license, see born
 English و العربية است. رایگان و متن‌باز (MIT).
 
 **▶ [کِلک برخط](https://mohsen-1984.github.io/kelk/)** ·
-**⬇ [دریافت kelk_2.4.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.4.zip)** ·
+**⬇ [دریافت kelk_2.5.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.5.zip)** ·
 تماس: [mhn.com@gmail.com](mailto:mhn.com@gmail.com)
 
 ![کِلک — رابط فارسی](docs/screenshots/kelk-fa.png)
@@ -170,7 +170,7 @@ English و العربية است. رایگان و متن‌باز (MIT).
 - **فرمول‌های LaTeX** (`$…$`، `$$…$$`، `\(…\)` و `\[…\]`) در پیش‌نمایش و هر چهار خروجی: **معادلهٔ قابل ویرایش Word** در DOCX و DOC، برداری (vector) در PDF، و SVG یا MathML در HTML؛ معادله‌های Word هنگام ورود به LaTeX برمی‌گردند. MathJax محلی، بدون اینترنت.
 - **سبک جدول (Table style):** خطوط (بدون خط، زیر عنوان، افقی، عمودی، قاب، شبکه‌ای) × پس‌زمینه (بدون رنگ، عنوان رنگی، راه‌راه یا هر دو)، سه رنگ و سطر جمع؛ در همهٔ خروجی‌ها یکسان. بلوک کد و نقل‌قول هم رنگ‌های خودشان را دارند.
 - بزرگ‌کردن ویرایشگر یا پیش‌نمایش؛ «پاک کردن و چسباندن» (Clear & paste) محتوای کلیپ‌بورد را سند می‌کند؛ پوستهٔ روشن و تیره.
-- سربرگ و پانویس (ساختاریافته، ساده یا HTML دلخواه)، عنوان و نسخهٔ خودکار، یک انتخاب فونت برای همهٔ خروجی‌ها (یا فونت دیگری برای DOCX و PPTX)، صفحه‌های A3 تا A5، Letter و Legal، و قلم کد هم‌عرض (monospace) که برای فارسی و عربی ساخته شده.
+- سربرگ و پانویس (ساختاریافته، ساده یا HTML دلخواه)، عنوان و نسخهٔ خودکار، یک انتخاب فونت برای همهٔ خروجی‌ها (یا فونت دیگری برای DOCX و PPTX)، فونت‌های جاسازی‌شده در DOCX و PPTX، صفحه‌های A3 تا A5، Letter و Legal، و قلم کد هم‌عرض (monospace) که برای فارسی و عربی ساخته شده.
 
 | خروجی | مناسب برای | قلم‌ها |
 |---|---|---|
@@ -189,7 +189,7 @@ English و العربية است. رایگان و متن‌باز (MIT).
 ### استفاده
 
 - **برخط:** [mohsen-1984.github.io/kelk](https://mohsen-1984.github.io/kelk/)
-- **روی رایانه:** [kelk_2.4.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.4.zip) را دریافت کنید، باز کنید و `index.html` را باز کنید؛ بدون اینترنت، برای استفادهٔ شخصی یا در شبکهٔ داخلی شرکت.
+- **روی رایانه:** [kelk_2.5.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.5.zip) را دریافت کنید، باز کنید و `index.html` را باز کنید؛ بدون اینترنت، برای استفادهٔ شخصی یا در شبکهٔ داخلی شرکت.
 - **روی میزبان خودتان:** پوشه را روی هر میزبان وب ایستا بارگذاری کنید.
 
 سند معرفی و راهنما در نخستین بازدید به زبان رابط کاربری باز می‌شود:
@@ -224,7 +224,7 @@ Vazirmatn، Vazir Code و Sahel کار زنده‌یاد [صابر راستی‌
 الواجهة بالعربية والفارسية والإنجليزية. مجاني ومفتوح المصدر (MIT).
 
 **▶ [كِلك على الإنترنت](https://mohsen-1984.github.io/kelk/)** ·
-**⬇ [تنزيل kelk_2.4.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.4.zip)** ·
+**⬇ [تنزيل kelk_2.5.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.5.zip)** ·
 للتواصل: [mhn.com@gmail.com](mailto:mhn.com@gmail.com)
 
 ![كِلك — الواجهة العربية](docs/screenshots/kelk-ar.png)
@@ -244,7 +244,7 @@ Vazirmatn، Vazir Code و Sahel کار زنده‌یاد [صابر راستی‌
 - **صيغ LaTeX** (`$…$` و`$$…$$` و`\(…\)` و`\[…\]`) في المعاينة والمخرجات الأربعة: **معادلات Word قابلة للتحرير** في DOCX وDOC، ومتجهات (vector) في PDF، وSVG أو MathML في HTML؛ وتعود معادلات Word إلى LaTeX عند الاستيراد. MathJax محلي، بلا إنترنت.
 - **نمط الجدول (Table style):** الخطوط (بلا خطوط، تحت الرأس، أفقية، عمودية، إطار، شبكي) × التعبئة (بلا تعبئة، رأس ملوَّن، تخطيط أو كلاهما)، وثلاثة ألوان، وصف مجموع؛ واحد في كل المخرجات. ولكتل الشيفرة والاقتباسات ألوانها أيضًا.
 - تكبير المحرّر أو المعاينة؛ و«مسح ولصق» يجعل محتوى الحافظة هو المستند؛ ومظهر فاتح وداكن.
-- رأس وتذييل (منظَّم، أو بسيط، أو HTML حرّ)، وعنوان وإصدار تلقائيان، واختيار خط واحد لكل المخرجات (أو خطوط أخرى لـ DOCX وPPTX)، وصفحات من A3 إلى A5 وLetter وLegal، وخط شيفرة ثابت العرض (monospace) مصمَّم للعربية والفارسية.
+- رأس وتذييل (منظَّم، أو بسيط، أو HTML حرّ)، وعنوان وإصدار تلقائيان، واختيار خط واحد لكل المخرجات (أو خطوط أخرى لـ DOCX وPPTX)، وخطوط مضمَّنة في DOCX وPPTX، وصفحات من A3 إلى A5 وLetter وLegal، وخط شيفرة ثابت العرض (monospace) مصمَّم للعربية والفارسية.
 - **الخطوط:** Vazirmatn، الخط الافتراضي، يدعم العربية؛ ويمكن تجهيز خطوط عربية مثل Cairo وAmiri وNoto Naskh Arabic لملفات PDF.
 
 | الصيغة | الأنسب لـ | الخطوط |
@@ -264,7 +264,7 @@ Vazirmatn، Vazir Code و Sahel کار زنده‌یاد [صابر راستی‌
 ### الاستخدام
 
 - **على الإنترنت:** [mohsen-1984.github.io/kelk](https://mohsen-1984.github.io/kelk/)
-- **على حاسوبك:** نزّل [kelk_2.4.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.4.zip) وافتحه ثم افتح `index.html`؛ يعمل دون إنترنت، للاستخدام الشخصي أو داخل شبكة المؤسسة.
+- **على حاسوبك:** نزّل [kelk_2.5.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.5.zip) وافتحه ثم افتح `index.html`؛ يعمل دون إنترنت، للاستخدام الشخصي أو داخل شبكة المؤسسة.
 - **على استضافتك:** ارفع المجلد إلى أي استضافة ويب ثابتة.
 
 يُفتح مستند التعريف والدليل في الزيارة الأولى بلغة الواجهة:
