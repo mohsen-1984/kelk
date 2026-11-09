@@ -32,6 +32,7 @@ const DYNAMIC = [
     { file: 'scripts/slides.js', prefix: 'sw_' },
     // the PowerPoint export's steps (slides.js blob): pptx_ + the step's name
     { file: 'scripts/slides.js', prefix: 'pptx_' },
+    { file: 'scripts/slides.js', prefix: 'sp_' },
     // the import report: its tables hold each note / flag (pdf_) and mode / why / label (rep_) key in full
     { file: 'scripts/report.js', prefix: 'pdf_' },
     { file: 'scripts/report.js', prefix: 'rep_' },

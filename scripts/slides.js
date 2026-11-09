@@ -11,7 +11,7 @@
 (function (K) {
     'use strict';
 
-    let gen = 0, model = null, icons = null, iconsLoading = null, observer = null, store = null, deckMeta = {};
+    let gen = 0, model = null, icons = null, iconsLoading = null, observer = null, store = null, deckMeta = {}, progress = null;
     const EAGER = 2;                 // slides drawn at once; the rest as they near the view (IntersectionObserver)
 
     const pascal = function (n) { return n.split('-').map(function (p) { return p.charAt(0).toUpperCase() + p.slice(1); }).join(''); };
@@ -20,8 +20,29 @@
      * Icons (:name: before a lead): the full Lucide set (vendor), loaded on the first icon. The page's own
      * icons (assets/icons.js) keep window.lucide: the full library is read and the page's object put back.
      */
+    /**
+     * Steps → a progress bar and its detail line (t: Kelk.ui.task's api, or Kelk.ui.bar's): W { step: share }, in order
+     * — the shares of the steps given are scaled to fill the bar; KEY { step: string key }; the step `count` reads
+     * «N of M» ({0} of {1}).
+     */
+    function stepper(t, W, KEY, count) {
+        const order = Object.keys(W), sum = order.reduce(function (n, k) { return n + W[k]; }, 0);
+        let shown = -1;
+        return function (name, done, total) {
+            if (!t || !(name in W)) return;
+            const before = order.slice(0, order.indexOf(name)).reduce(function (n, k) { return n + W[k]; }, 0);
+            const per = Math.round((before + W[name] * (total ? Math.min(1, done / total) : 0)) / sum * 1000);
+            if (per === shown) return;
+            shown = per;
+            t.progress(per, 1000, name === count ? K.i18n.t(KEY[name], Math.min(done + 1, total), total) : K.i18n.t(KEY[name]));
+        };
+    }
+
+    /** the text names a Lucide icon and the icon set is not loaded yet (its first use) */
+    function iconsWanted(md) { return !icons && /(^|\n)\s*(?:[-*+]|\d+[.)])\s+:[a-z0-9-]+:/.test(md); }
+
     function needIcons(md) {
-        if (icons || !/(^|\n)\s*(?:[-*+]|\d+[.)])\s+:[a-z0-9-]+:/.test(md)) return Promise.resolve();
+        if (!iconsWanted(md)) return Promise.resolve();
         if (!iconsLoading) {
             const keep = window.lucide;
             iconsLoading = K.ui.loadScript(K.config.slides.icons).then(function () {
@@ -251,16 +272,28 @@
             const my = ++gen;
             const count = K.$('#slides-count');
             if (!md.trim()) {
+                if (progress) progress.end();
                 box.innerHTML = ''; box.setAttribute('dir', K.i18n.lang === 'en' ? 'ltr' : 'rtl'); model = null;
                 if (count) count.textContent = '';
                 deckMeta = {}; deckNote();
                 K.names.refresh(); return;
             }
+            // the work's steps in a bar over the slides, shown only when it takes longer than a moment (Kelk.ui.bar):
+            // the icon set on its first use, formulas, pictures and icons, then each slide's layout
+            const bar = progress || (progress = K.ui.bar(K.$('#slides-busy')));
+            const KEY = { libs: 'sp_libs', math: 'sp_math', images: 'sp_images', layout: 'sp_layout' };
+            const W = Object.assign({}, K.config.slidesProgress);
+            if (!iconsWanted(md)) delete W.libs;
+            const step = stepper(bar, W, KEY, 'layout');
+            const live = function (name, done, total) { if (my === gen) step(name, done, total); return K.ui.paint(); };
+            bar.start();
             try {
+                if (W.libs) step('libs', 0, 1);
                 await needIcons(md);
                 const b = builder();
-                const m = await b.model();
+                const m = await b.model({ onProgress: live });
                 if (my !== gen) return;
+                bar.end();
                 model = m;
                 const opts = { notesLabel: K.i18n.t('speakerNotes'), warnText: warnText, uiDir: K.i18n.lang === 'en' ? 'ltr' : 'rtl' };
                 box.innerHTML = PptxBuilder.previewHtml(m, Object.assign({ eager: EAGER }, opts));
@@ -292,29 +325,20 @@
                 K.names.refresh();
             } catch (e) {
                 if (my !== gen) return;
+                bar.end();
                 console.error(e);
                 box.innerHTML = '<p class="slides-error">' + String(e && e.message || e).replace(/[<&]/g, '') + '</p>';
             }
         },
 
-        /** The .pptx of the text on screen. */
         /**
-         * The .pptx. t: the export's task (Kelk.ui.task) — its bar and detail line follow the steps, each its share
+         * The .pptx of the text on screen. t: the export's task (Kelk.ui.task) — its bar and detail line follow the steps, each its share
          * of the bar (config.pptxProgress, measured on large decks).
          */
         blob: async function (t) {
             const md = K.editor.value();
-            const W = K.config.pptxProgress, ORDER = ['model', 'build', 'write', 'slides', 'zip'];
             const KEY = { model: 'pptx_model', build: 'pptx_build', write: 'pptx_write', slides: 'pptx_slides', zip: 'pptx_zip' };
-            let shown = -1;
-            const step = function (name, done, total) {
-                if (!t) return;
-                const at = ORDER.indexOf(name), before = ORDER.slice(0, at).reduce(function (n, k) { return n + W[k]; }, 0);
-                const share = before + W[name] * (total ? Math.min(1, done / total) : 0), per = Math.round(share * 1000);
-                if (per === shown) return;
-                shown = per;
-                t.progress(per, 1000, name === 'slides' ? K.i18n.t(KEY.slides, done + 1, total) : K.i18n.t(KEY[name]));
-            };
+            const step = stepper(t, K.config.pptxProgress, KEY, 'slides');
             step('model', 0, 1);
             await Promise.all([K.libs.need('pptx'), needIcons(md)]);
             const b = builder();
