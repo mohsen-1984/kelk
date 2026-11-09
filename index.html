@@ -240,8 +240,7 @@
                 <details class="group" id="fonts-group">
                     <summary><i data-lucide="type"></i><span data-i18n="gFonts"></span></summary>
                     <div class="fields">
-                        <label class="field"><span data-i18n="fontBidi"></span><select data-setting="fonts.bidi" data-font-check="#nf-bidi"></select></label>
-                        <div class="field" id="nf-bidi" hidden><span class="hint warn" data-i18n="notInstalled"></span></div>
+                        <label class="field"><span data-i18n="fontBidi"></span><select data-setting="fonts.bidi"></select></label>
                         <label class="field"><span data-i18n="fontLatin"></span><select data-setting="fonts.latin" data-font-check="#nf-latin"></select></label>
                         <div class="field" id="nf-latin" hidden><span class="hint warn" data-i18n="notInstalled"></span></div>
                         <label class="field"><span data-i18n="codeFont"></span><select data-setting="code.font"></select></label>
@@ -256,14 +255,14 @@
                             <div class="field"><span class="label-row"><label for="f-word-bidi" data-i18n="fontBidi"></label>
                                 <button class="mini" type="button" data-reset="fonts.wordBidi" hidden data-i18n-attr="title:resetDefault;aria-label:resetDefault"><i data-lucide="rotate-ccw"></i></button></span>
                                 <input type="text" id="f-word-bidi" dir="auto" list="dl-word-fonts" data-setting="fonts.wordBidi" data-font-check="#nf-word-bidi"></div>
-                            <div class="field" id="nf-word-bidi" hidden><span class="hint warn" data-i18n="notInstalled"></span></div>
+                            <div class="field" id="nf-word-bidi" hidden><span class="hint danger" data-i18n="notInstalledWord"></span></div>
                             <div class="field"><span class="label-row"><label for="f-word-latin" data-i18n="fontLatin"></label>
                                 <button class="mini" type="button" data-reset="fonts.wordLatin" hidden data-i18n-attr="title:resetDefault;aria-label:resetDefault"><i data-lucide="rotate-ccw"></i></button></span>
                                 <input type="text" id="f-word-latin" dir="auto" list="dl-word-fonts" data-setting="fonts.wordLatin" data-font-check="#nf-word-latin"></div>
-                            <div class="field" id="nf-word-latin" hidden><span class="hint warn" data-i18n="notInstalled"></span></div>
+                            <div class="field" id="nf-word-latin" hidden><span class="hint danger" data-i18n="notInstalledWord"></span></div>
                             <label class="field"><span data-i18n="codeFont"></span>
                                 <input type="text" dir="auto" list="dl-word-code-fonts" data-setting="code.wordFont" data-font-check="#nf-word-code" data-i18n-attr="placeholder:fontsAsAbove"></label>
-                            <div class="field" id="nf-word-code" hidden><span class="hint warn" data-i18n="notInstalled"></span></div>
+                            <div class="field" id="nf-word-code" hidden><span class="hint danger" data-i18n="notInstalledWord"></span></div>
                             <div class="field"><span class="hint" data-i18n="fontsWordHint"></span></div>
                         </div>
                         <!-- fonts to install for Word and PowerPoint (Kelk.config.wordFontPacks, by interface language) -->

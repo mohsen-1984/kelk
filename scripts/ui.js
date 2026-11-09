@@ -126,16 +126,17 @@
          * Progress for work that runs while the page stays usable (the slides preview: typing goes on), in the
          * same window as a task's (#task), shown without making it modal: no Cancel (styles: dialog.task.quiet), no focus taken from the editor
          * (the open attribute is set, which moves no focus), clicks pass through it. start(label) shows it only when
-         * the work lasts longer than config.progressDelayMs (a quick render never flashes it); progress(done, total,
+         * the work lasts longer than config.progressDelayMs (a quick render never flashes it); start(label, true) at
+         * once (the first slides build, known to be long); progress(done, total,
          * detail) as a task's; end(). A task (an export) takes the window over: this one steps aside meanwhile.
          */
         bar: function () {
             const self = this;
             let timer = 0, shown = false;
             const q = {
-                start: function (label) {
+                start: function (label, now) {
                     if (shown || timer) return;
-                    timer = setTimeout(function () {
+                    const open = function () {
                         timer = 0;
                         const dlg = $('#task');
                         if (!dlg || dlg.open || self._taskOn) return;
@@ -144,7 +145,8 @@
                         dlg.classList.add('quiet');
                         dlg.setAttribute('open', '');
                         shown = true; self._quiet = q;
-                    }, K.config.progressDelayMs);
+                    };
+                    if (now) open(); else timer = setTimeout(open, K.config.progressDelayMs);
                 },
                 progress: function (done, total, detail) {
                     if (!shown) return;

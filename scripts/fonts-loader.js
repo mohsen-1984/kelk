@@ -19,7 +19,7 @@
     }
 
     let canvas = null;
-    const fromPdf = {};
+    const fromPdf = {}, onSystem = {};
 
     K.fonts = {
         forPdf: function (text) {
@@ -73,16 +73,31 @@
          * Width test against three generic families: a font that is not
          * available leaves every width unchanged. A web font counts once loaded.
          */
+        /**
+         * Is the font installed on this computer? The page's own web fonts do not count (Vazirmatn, and B Nazanin
+         * once chosen, are drawn by the page whether installed or not), so it asks for the system font by name
+         * (CSS local(): the full name, also tried with « Regular»); without FontFace, a width test. A promise.
+         */
         installed: function (family) {
-            if (!family) return false;
-            canvas = canvas || document.createElement('canvas').getContext('2d');
-            const t = 'mmmmmmmmmmlli WwQq 0123 سلام ابجد پژوهش';
-            return ['monospace', 'serif', 'sans-serif'].some(function (base) {
-                canvas.font = '40px ' + base;
-                const w0 = canvas.measureText(t).width;
-                canvas.font = '40px "' + family.replace(/"/g, '') + '", ' + base;
-                return canvas.measureText(t).width !== w0;
-            });
+            const name = String(family || '').replace(/["\\]/g, '').trim();
+            if (!name) return Promise.resolve(false);
+            if (name in onSystem) return onSystem[name];
+            if (typeof FontFace === 'undefined') return Promise.resolve(widthTest(name));
+            const probe = function (n) { return new FontFace('kelk-probe', 'local("' + n + '")').load().then(function () { return true; }); };
+            onSystem[name] = probe(name).catch(function () { return probe(name + ' Regular'); }).catch(function () { return false; });
+            return onSystem[name];
         }
     };
+
+    /** The width test: the font changes a text's width against the generic families (web fonts count too). */
+    function widthTest(family) {
+        canvas = canvas || document.createElement('canvas').getContext('2d');
+        const t = 'mmmmmmmmmmlli WwQq 0123 سلام ابجد پژوهش';
+        return ['monospace', 'serif', 'sans-serif'].some(function (base) {
+            canvas.font = '40px ' + base;
+            const w0 = canvas.measureText(t).width;
+            canvas.font = '40px "' + family + '", ' + base;
+            return canvas.measureText(t).width !== w0;
+        });
+    }
 })(window.Kelk = window.Kelk || {});

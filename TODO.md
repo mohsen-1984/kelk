@@ -47,7 +47,7 @@ fonts**. What a new session needs to know of them:
   interface language, where 2.4 named Arial or Calibri for English and Arabic: item 1 below is what makes such a
   file whole on a computer without these fonts. 2.5 is not released before it.
 
-The rest of 2.5, in this order:
+The rest of 2.5:
 
 1. **Font embedding** in the .docx and the .pptx, as a step after the builder: open the file with JSZip, embed only
    the fonts the document uses (`fontsFor('docx' | 'pptx')`, and only the faces used: regular, bold — never the
@@ -66,12 +66,17 @@ The rest of 2.5, in this order:
      whenever a B font is named.
    - Sahel: the dehinted font of `pdf-font-sahel.js` (the owner's choice, 2026-11-06; judged in the Windows test).
    - Test: both files opened on a computer without these fonts (the owner, on Windows).
-2. **The slides view on demand**: PptxBuilder and `scripts/slides.js` (about 185 KB) load with the page, though a
-   user who writes documents never needs them; load them on the first switch to Slides (and for a PPTX export),
-   as the PDF importer is (`config.libs`, `Kelk.libs.need`). Its startup bytes come back to the budget (the owner's
-   item, 2026-11-09). `scripts/slidecheck.js` already loads on demand.
+**2.6 — the slides view on demand, then PDF import from real files.**
 
-**2.6 — PDF import, from real files.** Each case is reproduced by a lab PDF of our own (failing on purpose until
+**The slides view on demand** (moved from 2.5, the owner's decision of 2026-11-09): PptxBuilder (170 KB) and
+`scripts/slides.js` (30 KB) load with the page, though a user who writes documents never needs them; load them on
+the first switch to Slides (and for a PPTX export, the Slides settings' theme lists, a deck sample), as the PDF
+importer is (`config.libs`, `Kelk.libs.need`). Already on demand: PptxGenJS and JSZip (`libs.pptx`), the slide
+check (`scripts/slidecheck.js`), the icon set. Still at startup: `lib/PptxBuilder.js` (`scripts/settings.js` reads
+its theme lists to fill Settings → Slides) and `scripts/slides.js` (the view toggle, the export hooks). Its startup
+bytes come back to the budget.
+
+**PDF import, from real files.** Each case is reproduced by a lab PDF of our own (failing on purpose until
 fixed: its score is the case's measure), in this order.
 
 1. **Numbers in Persian report fonts** — B Nazanin, B Mitra and B Titr: a report's amounts read «3.004» (the file's

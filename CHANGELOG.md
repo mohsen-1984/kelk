@@ -22,11 +22,25 @@ All notable changes to Kelk. Dates are those of the release tags.
   (its button makes slides anyway). Editing — typing, deleting, cut, undo and redo, replace — never switches the
   view; a PPTX export checks the text again and, when it no longer fits, shows the report with «Export PPTX
   anyway».
+- Settings → Fonts: one button, «وب‌سایت Vazirmatn و Sahel», for both fonts' page (rastikerdar.github.io).
+
+### Fixed
+
+- The document view no longer builds slides: a slides build still under way when the view changes (or overtaken
+  by a newer one) stops at its next step, and its progress window closes; nothing builds slides outside Slides.
+- The first slides build opens its progress window at once (it waited 300 ms, which a long first build — the
+  libraries, the formulas, every slide's layout — stretched to a second or two); later builds still wait 300 ms.
+- Settings → Fonts: with «Other fonts for DOCX and PPTX» ticked, a font not installed on this computer is said
+  so again, in red (as Word's settings did). The check asks for the system font itself (CSS `local()`): the page's
+  own web fonts — Vazirmatn, a B font once chosen — no longer pass for installed ones. The text font list has no
+  such note (Kelk ships those fonts); the Latin list keeps it.
 
 ### Development
 
 - Publishing a release comes only after the release PR (the one that changes the version) is merged:
   `CLAUDE.md` and `docs/RELEASING.md` section 6 say so, and that the request to publish is a message of its own.
+- Every pull request targets `main`; one that builds on another unmerged one says so at the top, with the merge
+  order and the button to use (`CLAUDE.md`).
 
 ## [2.4] — 2026-11-09
 

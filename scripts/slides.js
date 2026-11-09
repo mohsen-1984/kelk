@@ -11,7 +11,8 @@
 (function (K) {
     'use strict';
 
-    let gen = 0, model = null, icons = null, iconsLoading = null, observer = null, store = null, deckMeta = {}, progress = null;
+    const STALE = {};                                   // thrown by a build's step once a newer build or the document view took over
+    let gen = 0, built = false, model = null, icons = null, iconsLoading = null, observer = null, store = null, deckMeta = {}, progress = null;
     const EAGER = 2;                 // slides drawn at once; the rest as they near the view (IntersectionObserver)
 
     const pascal = function (n) { return n.split('-').map(function (p) { return p.charAt(0).toUpperCase() + p.slice(1); }).join(''); };
@@ -237,6 +238,7 @@
                 }
             }
             if (K.ui.report.isCustom()) K.ui.report.close(false);
+            if (!slides) { gen++; if (progress) progress.end(); }   // a slides build under way stops: the document builds none
             K.store.setUi('view', slides ? 'slides' : 'document');
             this.applyView();
             if (s && s.set === (slides ? 'about' : 'slides')) {
@@ -276,7 +278,7 @@
          */
         render: async function () {
             const box = K.$('#slides');
-            if (!box || typeof PptxBuilder === 'undefined') return;
+            if (!box || typeof PptxBuilder === 'undefined' || !this.active()) return;     // the document view builds no slides
             const md = K.editor.value();
             const my = ++gen;
             const count = K.$('#slides-count');
@@ -294,16 +296,19 @@
             const W = Object.assign({}, K.config.slidesProgress);
             if (!iconsWanted(md)) delete W.libs;
             const step = stepper(bar, W, KEY, 'layout');
-            const live = function (name, done, total) { if (my === gen) step(name, done, total); return K.ui.paint(); };
-            bar.start(K.i18n.t('sp_busy'));
+            // a build overtaken by a newer one, or by the switch to the document view, stops at its next step
+            const live = function (name, done, total) { if (my !== gen) throw STALE; step(name, done, total); return K.ui.paint(); };
+            // the first build is long (the libraries, the formulas, every slide's layout): its window opens at once
+            bar.start(K.i18n.t('sp_busy'), !built);
             try {
+                if (!built) await K.ui.paint();
                 if (W.libs) step('libs', 0, 1);
                 await needIcons(md);
                 const b = builder();
                 const m = await b.model({ onProgress: live });
                 if (my !== gen) return;
                 bar.end();
-                model = m;
+                model = m; built = true;
                 const opts = { notesLabel: K.i18n.t('speakerNotes'), warnText: warnText, uiDir: K.i18n.lang === 'en' ? 'ltr' : 'rtl' };
                 box.innerHTML = PptxBuilder.previewHtml(m, Object.assign({ eager: EAGER }, opts));
                 box.setAttribute('dir', m.dir);
@@ -333,7 +338,7 @@
                 deckNote();
                 K.names.refresh();
             } catch (e) {
-                if (my !== gen) return;
+                if (my !== gen || e === STALE) return;
                 bar.end();
                 console.error(e);
                 box.innerHTML = '<p class="slides-error">' + String(e && e.message || e).replace(/[<&]/g, '') + '</p>';
