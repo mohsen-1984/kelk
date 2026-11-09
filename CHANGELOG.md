@@ -19,6 +19,9 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Changed
 
+- The slides preview shows its steps and a bar over the slides (the icon set on first use, formulas, pictures,
+  laying out slide N of M) when its work lasts longer than a moment (300 ms); it never flashes while typing a short
+  deck, and the page stays usable.
 - PowerPoint export shows its steps and a progress bar (preparing, writing the file, slide N of M, compressing):
   a large deck takes seconds.
 - The export buttons follow the view: DOCX, PDF, HTML and DOC in the document view, PPTX alone in the Slides view;

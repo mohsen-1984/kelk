@@ -122,6 +122,21 @@
             }
         },
 
+        /**
+         * A progress bar in a pane, not modal (the slides preview: typing goes on): el holds a .task-detail and a
+         * <progress>, as the task dialog does. start() shows it only when the work lasts longer than
+         * config.progressDelayMs (a quick render never flashes it); progress(done, total, detail) as a task's; end().
+         */
+        bar: function (el) {
+            let timer = 0;
+            const bar = el && el.querySelector('progress'), det = el && el.querySelector('.task-detail');
+            return {
+                start: function () { if (!el || !el.hidden || timer) return; timer = setTimeout(function () { timer = 0; el.hidden = false; }, K.config.progressDelayMs); },
+                progress: function (done, total, detail) { if (!el) return; bar.max = total; bar.value = done; det.textContent = detail || ''; },
+                end: function () { clearTimeout(timer); timer = 0; if (el) el.hidden = true; }
+            };
+        },
+
         /** Set a button's icon (lucide name). */
         setIcon: function (btn, name) {
             if (!btn) return;
