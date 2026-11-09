@@ -26,45 +26,50 @@ is checked too and switches to the document; editing never switches the view; a 
 offers to export anyway); slides work shows its progress in one progress
 window across the app (the preview's after 300 ms, not modal, taking no focus from the editor).
 
-**2.5 — fonts in every format** (the owner's items of 2026-11-06 and 2026-11-09, designed together; small pull
-requests).
+**2.5 — fonts in every format** (the owner's items of 2026-11-06 and 2026-11-09). Done (`CHANGELOG.md`
+[Unreleased]): the slide check after a paste or an import and before a PPTX export; **the Fonts pane** and **the B
+fonts**. What a new session needs to know of them:
 
-1. **One Fonts pane** (replaces «Word settings: fonts»; designed with item 2):
-   - everything about fonts in one pane of Settings; in Persian «فونت (قلم)», not «قلم» alone;
-   - by default one font choice for the preview and every builder (HTML, PDF, DOC, DOCX, PPTX); a checkbox lets
-     the user choose another font for DOCX and PPTX, and only then type a font outside the list — a difference
-     between preview / PDF / HTML and DOCX / PPTX is the user's choice, never the default;
-   - the list: Vazirmatn (default), Sahel, B Nazanin, B Mitra for the text; Latin text Calibri, Arial, Tahoma,
-     Times New Roman, in every language;
-   - the check that shows whether a font is installed stays;
-   - the preview's B Nazanin and B Mitra: the original TTFs as web fonts, as they are (byte-identical), loaded on
-     first choice only;
-   - the B fonts come into the repository in one commit of their own: the zip's `borna-rayaneh/` folder, the
-     `pdf-font-b-*.js` files and their notice, the build script, every reference (the owner's rules of 2026-11-06:
-     their own folder with `NOTICE.txt` beside every copy; regular and bold byte-identical to the originals; the
-     README line «(c) Borna Rayaneh, no published license, see borna-rayaneh/NOTICE.txt» — never «free», «open»
-     or «OFL»; removable in one commit). The owner's files for it (the font zip with `borna-rayaneh/`, the
-     `pdf-font-b-*.js` files, their notice and `build_pdf_fonts.py`) say where the fonts come from as
-     «downloadable from Borna Rayaneh's website» («از وب‌سایت شرکت برنا رایانه قابل دریافت‌اند») — never «free
-     download» or «دریافت رایگان»: in `NOTICE.txt`, `BORNA-RAYANEH-NOTICE.txt`, the zip's `README.txt`, the
-     `pdf-font-b-*.js` headers and the build script's `license_text` (the owner's decision, 2026-11-09).
-2. **Font embedding** in the .docx and the .pptx, as a step after the builder: open the file with JSZip, embed only
-   the fonts the document uses (regular and bold — never the generated oblique italics), save. An option, on by
-   default; the size it adds is reported. Font data: the base64 TTFs of `lib/pdf-base64-ttf-fonts/pdf-font-*.js`
-   (global `PdfFonts`), loaded on first use by a script tag (no `fetch()` under file://).
+- Settings → Fonts («فونت (قلم)»): `fonts.bidi` (Vazirmatn default, Sahel, B Nazanin, B Mitra), `fonts.latin`
+  ('' = the text font's own Latin letters, default; or Calibri, Arial, Tahoma, Times New Roman), `code.font`,
+  sizes; `fonts.wordOwn` gives DOCX, DOC and PPTX fonts of their own (`fonts.wordBidi`, `fonts.wordLatin`,
+  `code.wordFont`, any installed font). One function resolves the fonts of every output:
+  `Kelk.settings.fontsFor(kind)` (`scripts/settings.js`). The PDF writes a system Latin font's text with the text
+  font's letters; a text font without Latin letters (`config.fontsNoLatin`: the B fonts) takes Times New Roman
+  (`config.noLatinWord`), DejaVu Sans in the PDF. Schema 2 migrates older profiles (`scripts/storage.js`).
+- The B fonts (the owner's rules of 2026-11-06 and 2026-11-09) are in **one commit** («The B fonts: B Nazanin, B Mitra,
+  B Titr»), which lists every file and reference; reverting it removes them. Files:
+  `lib/pdf-base64-ttf-fonts/borna-rayaneh/` (the TTFs, `NOTICE.txt`, `pdf-font-b-*.js`, built by
+  `tools/build_pdf_fonts.py`, the `dir` field) and `borna-rayaneh/` in `assets/fonts/download/persian-fonts-ttf.zip`.
+  The page shows B Nazanin and B Mitra from their PDF font files' regular and bold (the TTFs as they are), loaded
+  on first choice (`config.fontsFromPdf`, `Kelk.fonts.fromPdf`); the HTML export embeds the same.
+- Since the default is now one choice, a DOCX or PPTX names Vazirmatn (and the code font Vazir Code Hack) in every
+  interface language, where 2.4 named Arial or Calibri for English and Arabic: item 1 below is what makes such a
+  file whole on a computer without these fonts. 2.5 is not released before it.
+
+The rest of 2.5, in this order:
+
+1. **Font embedding** in the .docx and the .pptx, as a step after the builder: open the file with JSZip, embed only
+   the fonts the document uses (`fontsFor('docx' | 'pptx')`, and only the faces used: regular, bold — never the
+   generated oblique italics), save. An option in Settings → Fonts, on by default; the size it adds is reported
+   (the export's toast). Only fonts Kelk ships can be embedded (a typed font of `fonts.wordOwn` that Kelk does not
+   ship is named only, as now). Font data: the base64 TTFs of `lib/pdf-base64-ttf-fonts/pdf-font-*.js` and
+   `borna-rayaneh/pdf-font-b-*.js` (global `PdfFonts`, `styles.normal` / `styles.bold`), loaded on first use by a
+   script tag (no `fetch()` under file://: `Kelk.ui.loadScript`, as `Kelk.fonts.forPdf` does).
    - DOCX (ECMA-376): `word/fonts/*.odttf`, obfuscated (the first 32 bytes XORed with the GUID key);
      `w:embedRegular` / `w:embedBold` with `w:fontKey` in `fontTable.xml` and its rels; the odttf content type;
-     `w:embedTrueTypeFonts` in `settings.xml`.
+     `w:embedTrueTypeFonts` in `settings.xml`. CI's *builders* checks the .docx against the OOXML schemas.
    - PPTX: `p:embeddedFontLst` in `presentation.xml`, `ppt/fonts/*.fntdata` — the format and content type taken
-     from a file PowerPoint saved with embedded fonts, never guessed.
+     from a file PowerPoint saved with embedded fonts (ask the owner for one), never guessed.
    - The B fonts declare only the Arabic code page: charset 178 (`w:charset` `B2` in DOCX, `charset="-78"` in
-     PPTX), or Windows substitutes another font.
-   - The B fonts are embedded as any other: only those the document uses.
+     PPTX), or Windows substitutes another font. This also matters without embedding: write it in `fontTable.xml`
+     whenever a B font is named.
    - Sahel: the dehinted font of `pdf-font-sahel.js` (the owner's choice, 2026-11-06; judged in the Windows test).
-   - Test: both files opened on a computer without these fonts.
-3. **The slides view on demand**: PptxBuilder and `scripts/slides.js` (about 185 KB) load with the page, though a
+   - Test: both files opened on a computer without these fonts (the owner, on Windows).
+2. **The slides view on demand**: PptxBuilder and `scripts/slides.js` (about 185 KB) load with the page, though a
    user who writes documents never needs them; load them on the first switch to Slides (and for a PPTX export),
-   as the PDF importer is. Its startup bytes come back to the budget (the owner's item, 2026-11-09).
+   as the PDF importer is (`config.libs`, `Kelk.libs.need`). Its startup bytes come back to the budget (the owner's
+   item, 2026-11-09). `scripts/slidecheck.js` already loads on demand.
 
 **2.6 — PDF import, from real files.** Each case is reproduced by a lab PDF of our own (failing on purpose until
 fixed: its score is the case's measure), in this order.
