@@ -88,6 +88,7 @@ a { color: var(--accent); }
 .app-version:hover, .app-version:focus-visible { background: var(--accent); color: var(--on-accent); }
 .app-version:not([href]) { pointer-events: none; }
 .brand .sub { color: var(--muted); font-size: 12.5px; }
+.brand .sub .tag-arrows { width: 1.15em; height: 1.15em; vertical-align: -0.2em; }
 
 .topbar .spacer { flex: 1; }
 .top-tools { display: flex; align-items: center; gap: 2px; flex-wrap: nowrap; margin-inline-start: auto; }

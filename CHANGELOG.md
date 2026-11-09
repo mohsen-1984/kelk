@@ -6,6 +6,8 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Changed
 
+- The tagline draws the two-way conversion with an icon (Markdown ⇆ Word, PowerPoint, PDF and HTML), the same in
+  every font; the page title and its meta tags keep it as text, with en dashes (less room in a browser tab).
 - Settings → Word: the font download is one zip of every Persian font, `persian-fonts-ttf.zip` (was
   `vazirmatn-sahel-ttf.zip`), its button no longer naming two fonts; the fonts' web pages are two links, Vazirmatn
   and Sahel.

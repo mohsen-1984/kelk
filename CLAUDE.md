@@ -60,6 +60,9 @@ Read only what the task needs, in this order:
      theirs, the references listed in that commit's message).
 9. **No AI-specific documents in the README or `TODO.md`**: this file is the place for working instructions;
    the README and `TODO.md` do not mention it.
+10. **The startup size budget** (`tools/size-budget.json`, CI's *size* check): never move or squeeze code just to fit
+    it. Code goes where it belongs (loaded on demand when that is its right place); when a change needs room, ask
+    the owner for an increase and note the reason in the file's `_about` (the owner's rule, 2026-11-09).
 
 ## A change, step by step
 
