@@ -12,6 +12,8 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Fixed
 
+- The Slides view no longer requests a file named `placeholder` for each picture written `![…](placeholder)` (the
+  slides sample's).
 - On a phone (one column), the preview did not scroll with a finger, and a finger on it did not scroll the page
   either, even with the preview empty.
 

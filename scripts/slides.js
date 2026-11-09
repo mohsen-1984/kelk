@@ -69,7 +69,9 @@
     function builder() {
         const md = K.editor.value();
         const r = PptxBuilder.markdownToHtml(md, { breaks: K.store.get('text.breaks') !== false });
-        const box = document.createElement('div');
+        // (a document of its own, with no window: its pictures are not fetched — the slides sample's
+        // ![…](placeholder) was requested as a file named placeholder on every render)
+        const box = document.implementation.createHTMLDocument('').createElement('div');
         box.innerHTML = typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(r.html, { ADD_ATTR: ['target', 'dir', 'align', 'data-kelk-comment'] }) : r.html;
         if (typeof hljs !== 'undefined') {
             K.$$('pre code', box).forEach(function (code) {
