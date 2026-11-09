@@ -52,7 +52,9 @@ Read only what the task needs, in this order:
    - regular and bold are shipped byte-identical to the originals — no dehinting, subsetting or renaming; only
      the generated oblique italics are modified, and their header says so;
    - the README's fonts / third-party section says «(c) Borna Rayaneh, no published license, see
-     borna-rayaneh/NOTICE.txt» — never «free», «open» or «OFL»;
+     borna-rayaneh/NOTICE.txt» — never «free», «open» or «OFL»; where a file says where the fonts come from, it
+     says «downloadable from Borna Rayaneh's website» («از وب‌سایت شرکت برنا رایانه قابل دریافت‌اند»), never «free
+     download» or «دریافت رایگان», so nothing reads as a free licence (2026-11-09);
    - embedding into a .docx or .pptx follows the same rule as any font: only the fonts the document uses;
    - the B-font files and every reference to them stay removable in one commit (no other change mixed into
      theirs, the references listed in that commit's message).

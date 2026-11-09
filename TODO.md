@@ -19,8 +19,7 @@ behaviour is a setting, Settings → Import → *Cells merged over rows*: `repea
 as 2.2 did); column spans are written once either way; the same for Word, HTML and PDF import
 (`importer.mergedRows`). A form's pairs are list items, row by row, everywhere (`_formRows`, `_tablePreamble`).
 
-**2.4 — fonts in every format, and a simpler page** (the owner's list of 2026-11-06, revised 2026-11-09; small pull
-requests, in this order).
+**2.4 — a simpler page** (the owner's list of 2026-11-06, revised 2026-11-09; small pull requests, in this order).
 
 1. **Font download**: one button (all fonts are in one zip, `persian-fonts-ttf.zip`), its label fixed; the font
    website as two links, Vazirmatn and Sahel.
@@ -35,7 +34,11 @@ requests, in this order).
 6. **Slide mode check**: switching to slides, if the editor's text does not broadly follow the PowerPoint prompt's
    format, stay in document mode and show a report like the PDF import report: the text is not in slide format,
    and preparing it with the prompt gives acceptable slides; a button makes slides anyway. Lenient.
-7. **One Fonts pane** (replaces «Word settings: fonts»; designed with item 8):
+
+**2.5 — fonts in every format** (the owner's items of 2026-11-06 and 2026-11-09, designed together; small pull
+requests).
+
+1. **One Fonts pane** (replaces «Word settings: fonts»; designed with item 2):
    - everything about fonts in one pane of Settings; in Persian «فونت (قلم)», not «قلم» alone;
    - by default one font choice for the preview and every builder (HTML, PDF, DOC, DOCX, PPTX); a checkbox lets
      the user choose another font for DOCX and PPTX, and only then type a font outside the list — a difference
@@ -49,8 +52,12 @@ requests, in this order).
      `pdf-font-b-*.js` files and their notice, the build script, every reference (the owner's rules of 2026-11-06:
      their own folder with `NOTICE.txt` beside every copy; regular and bold byte-identical to the originals; the
      README line «(c) Borna Rayaneh, no published license, see borna-rayaneh/NOTICE.txt» — never «free», «open»
-     or «OFL»; removable in one commit).
-8. **Font embedding** in the .docx and the .pptx, as a step after the builder: open the file with JSZip, embed only
+     or «OFL»; removable in one commit). The owner's files for it (the font zip with `borna-rayaneh/`, the
+     `pdf-font-b-*.js` files, their notice and `build_pdf_fonts.py`) say where the fonts come from as
+     «downloadable from Borna Rayaneh's website» («از وب‌سایت شرکت برنا رایانه قابل دریافت‌اند») — never «free
+     download» or «دریافت رایگان»: in `NOTICE.txt`, `BORNA-RAYANEH-NOTICE.txt`, the zip's `README.txt`, the
+     `pdf-font-b-*.js` headers and the build script's `license_text` (the owner's decision, 2026-11-09).
+2. **Font embedding** in the .docx and the .pptx, as a step after the builder: open the file with JSZip, embed only
    the fonts the document uses (regular and bold — never the generated oblique italics), save. An option, on by
    default; the size it adds is reported. Font data: the base64 TTFs of `lib/pdf-base64-ttf-fonts/pdf-font-*.js`
    (global `PdfFonts`), loaded on first use by a script tag (no `fetch()` under file://).
@@ -65,13 +72,13 @@ requests, in this order).
    - Sahel: the dehinted font of `pdf-font-sahel.js` (the owner's choice, 2026-11-06; judged in the Windows test).
    - Test: both files opened on a computer without these fonts.
 
-**2.5 — PDF import, from real files.** Each case is reproduced by a lab PDF of our own (failing on purpose until
+**2.6 — PDF import, from real files.** Each case is reproduced by a lab PDF of our own (failing on purpose until
 fixed: its score is the case's measure), in this order.
 
 1. **Numbers in Persian report fonts** — B Nazanin, B Mitra and B Titr: a report's amounts read «3.004» (the file's
    text has a period between the thousands; the page shows a comma-like mark): **to examine** whether these fonts
    draw «.» as a thousands separator — a reader takes «3.004» for three and a bit. The three fonts come into the
-   repository with 2.4 (item 1); the owner attaches a sample PDF when the item starts, and a lab file of our own
+   repository with 2.5 (item 1); the owner attaches a sample PDF when the item starts, and a lab file of our own
    follows from it
 2. **A designed booklet** (designed documents from browsers: heading, box and figure rules shared by every Chromium
    file in the lab) — **lab:** `chrome-booklet--booklet-cards-fa` (45.4). Cards, badges and coloured boxes:
