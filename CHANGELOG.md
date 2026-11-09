@@ -4,6 +4,11 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+### Fixed
+
+- On a phone (one column), the preview did not scroll with a finger, and a finger on it did not scroll the page
+  either, even with the preview empty.
+
 ### Changed
 
 - The export buttons follow the view: DOCX, PDF, HTML and DOC in the document view, PPTX alone in the Slides view;

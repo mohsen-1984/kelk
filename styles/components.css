@@ -113,6 +113,9 @@
 /* what the safe-mode button does: visible beside the buttons (the button's description, aria-describedby) */
 .report-safe-hint { flex: 1 1 240px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
 .editor-wrap { position: relative; flex: 1; min-height: 240px; display: flex; }
+/* (before the narrow layouts' rules below, which change it: after them, it undid their fixed height on a phone —
+   the preview grew to the document's length, and its overscroll-behavior kept a finger on it from scrolling the page) */
+.preview-scroll { flex: 1; overflow: auto; min-height: 240px; overscroll-behavior: contain; }
 .stack .editor-wrap { min-height: 90px; }
 .stack .preview-scroll { min-height: 100px; }
 /* one above the other (stack, or one column): the page scrolls and each panel gets a fixed share
@@ -124,7 +127,8 @@
 }
 @media (max-width: 900px) {
   .editor-wrap { flex: none; height: 38vh; height: 38dvh; min-height: 200px; }
-  .preview-scroll { flex: none; height: 72vh; height: 72dvh; min-height: 280px; }
+  /* the page scrolls on past the preview's end (an empty preview passes a finger's scroll to the page) */
+  .preview-scroll { flex: none; height: 72vh; height: 72dvh; min-height: 280px; overscroll-behavior: auto; }
 }
 
 /* ── the two panels' bars ───────────────────────────────────────────────
@@ -202,7 +206,6 @@ html[dir="rtl"] input[dir="auto"]:placeholder-shown { direction: rtl; }
 .stats b { color: var(--ink); font-weight: 600; }
 
 /* ── preview panel ───────────────────────────────────────────────────── */
-.preview-scroll { flex: 1; overflow: auto; min-height: 240px; overscroll-behavior: contain; }
 /* the preview's content is painted apart from the page: a long document scrolls without the rest of the page repainting */
 .preview-scroll > .doc { contain: layout paint; }
 .export-foot { justify-content: space-between; }
