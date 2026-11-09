@@ -322,12 +322,14 @@
             });
         },
 
-        /** Font fields: a note when the chosen or typed font is not on this system. */
+        /** Font fields: a note, in red, when the chosen or typed font is not installed on this computer. */
         checkWordFonts: function () {
             K.$$('[data-font-check]').forEach(function (el) {
                 const note = K.$(el.getAttribute('data-font-check'));
                 const v = el.value.trim();
-                if (note) note.hidden = !v || K.fonts.installed(v);
+                if (!note) return;
+                if (!v) { note.hidden = true; return; }
+                K.fonts.installed(v).then(function (yes) { if (el.value.trim() === v) note.hidden = yes; });
             });
         },
 
