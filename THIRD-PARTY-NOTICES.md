@@ -35,9 +35,15 @@ The license text of each library is in its file header or at its source.
 | Vazir Code (Hack variant) | 1.1.2 | changes in the public domain; Hack glyphs MIT; Bitstream Vera license | web font; PDF font | `assets/fonts/vazir-code/VAZIR-CODE-LICENSE.txt`, `lib/pdf-base64-ttf-fonts/VAZIR-CODE-LICENSE.txt` |
 | DejaVu Sans, DejaVu Sans Mono | 2.37 | Bitstream Vera and Arev licenses (DejaVu changes in the public domain) | web fonts; PDF fonts | `assets/fonts/dejavu/DEJAVU-LICENSE.txt`, `lib/pdf-base64-ttf-fonts/DEJAVU-LICENSE.txt` |
 | Noto Emoji | — | SIL Open Font License 1.1 | PDF font (monochrome) | `lib/pdf-base64-ttf-fonts/NOTO-EMOJI-LICENSE-OFL.txt` |
+| B Nazanin, B Mitra, B Titr | 2.01 | (c) Borna Rayaneh, no published license, see borna-rayaneh/NOTICE.txt | preview font (B Nazanin, B Mitra: the TTFs as they are); PDF font; .ttf to install for Word | `lib/pdf-base64-ttf-fonts/borna-rayaneh/NOTICE.txt`, `borna-rayaneh/NOTICE.txt` in the zip |
 
 Vazirmatn, Sahel and Vazir Code are the work of the late Saber Rastikerdar
 (https://github.com/rastikerdar).
+
+**B Nazanin, B Mitra, B Titr** belong to Borna Rayaneh (https://www.bornaray.com/) and are downloadable from
+Borna Rayaneh's website. They are kept apart, in `borna-rayaneh/` folders with their `NOTICE.txt`; regular and bold
+are byte-identical to the publisher's files, and only the generated oblique styles of their PDF font files are
+modified (each file's header says so).
 
 **Modified versions.** The PDF fonts (`lib/pdf-base64-ttf-fonts/pdf-font-*.js`) are modified as
 their licenses allow: hinting removed, some cut down to Unicode subsets, oblique styles generated,

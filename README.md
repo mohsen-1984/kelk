@@ -129,6 +129,8 @@ Code: **MIT** ([`LICENSE`](LICENSE)); libraries and fonts keep their own license
 ([`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md)).
 Vazirmatn, Vazir Code and Sahel are the work of the late
 [Saber Rastikerdar](https://github.com/rastikerdar) — in his memory.
+B Nazanin, B Mitra and B Titr: (c) Borna Rayaneh, no published license, see borna-rayaneh/NOTICE.txt
+([`lib/pdf-base64-ttf-fonts/borna-rayaneh/NOTICE.txt`](lib/pdf-base64-ttf-fonts/borna-rayaneh/NOTICE.txt)).
 
 ---
 
@@ -200,6 +202,8 @@ English و العربية است. رایگان و متن‌باز (MIT).
 پرسش و پیشنهاد: **[mhn.com@gmail.com](mailto:mhn.com@gmail.com)** (بهترین راه ارتباط ایمیل است).
 کد با **مجوز MIT** منتشر شده؛ کتابخانه‌ها و قلم‌ها مجوز خودشان را دارند (`THIRD-PARTY-NOTICES.md`).
 Vazirmatn، Vazir Code و Sahel کار زنده‌یاد [صابر راستی‌کردار](https://github.com/rastikerdar) است؛ یادش گرامی.
+بی‌نازنین، بی‌میترا و بی‌تیتر: (c) Borna Rayaneh, no published license, see borna-rayaneh/NOTICE.txt
+([`lib/pdf-base64-ttf-fonts/borna-rayaneh/NOTICE.txt`](lib/pdf-base64-ttf-fonts/borna-rayaneh/NOTICE.txt)).
 
 </div>
 
@@ -273,5 +277,7 @@ Vazirmatn، Vazir Code و Sahel کار زنده‌یاد [صابر راستی‌
 للأسئلة والاقتراحات: **[mhn.com@gmail.com](mailto:mhn.com@gmail.com)** (البريد الإلكتروني أفضل وسيلة للتواصل).
 الشيفرة بترخيص **MIT**؛ وللمكتبات والخطوط تراخيصها الخاصة (`THIRD-PARTY-NOTICES.md`).
 Vazirmatn وVazir Code وSahel من عمل الراحل [صابر راستي كردار](https://github.com/rastikerdar)، رحمه الله.
+B Nazanin وB Mitra وB Titr: (c) Borna Rayaneh, no published license, see borna-rayaneh/NOTICE.txt
+([`lib/pdf-base64-ttf-fonts/borna-rayaneh/NOTICE.txt`](lib/pdf-base64-ttf-fonts/borna-rayaneh/NOTICE.txt)).
 
 </div>

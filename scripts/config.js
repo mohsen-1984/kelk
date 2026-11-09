@@ -99,13 +99,13 @@
          * system's — the PDF, which carries its fonts, writes their text with the text font's Latin letters (or,
          * for a text font without Latin letters, fontsNoLatin, with DejaVu Sans; Word and PowerPoint: noLatinWord).
          */
-        fontsBidi: ['Vazirmatn', 'Sahel'],
+        fontsBidi: ['Vazirmatn', 'Sahel', 'B Nazanin', 'B Mitra'],
         fontsLatin: ['Calibri', 'Arial', 'Tahoma', 'Times New Roman'],
         fontsCode: ['Vazir Code Hack', 'DejaVu Sans Mono'],
-        fontsNoLatin: [],
+        fontsNoLatin: ['B Nazanin', 'B Mitra', 'B Titr'],
         noLatinWord: 'Times New Roman',
         /** Text fonts the page shows from their PDF font file (regular and bold, as web fonts): loaded on first choice. */
-        fontsFromPdf: [],
+        fontsFromPdf: ['B Nazanin', 'B Mitra'],
 
         /** Fonts to install for Word, by language: a zip of .ttf files and { font: web page }; shown when zip is set. */
         wordFontPacks: {
@@ -126,6 +126,10 @@
         pdfFonts: {
             Vazirmatn: 'lib/pdf-base64-ttf-fonts/pdf-font-vazirmatn.js',
             Sahel: 'lib/pdf-base64-ttf-fonts/pdf-font-sahel.js',
+            // © Borna Rayaneh, no published license: kept apart with their NOTICE.txt (THIRD-PARTY-NOTICES.md)
+            'B Nazanin': 'lib/pdf-base64-ttf-fonts/borna-rayaneh/pdf-font-b-nazanin.js',
+            'B Mitra': 'lib/pdf-base64-ttf-fonts/borna-rayaneh/pdf-font-b-mitra.js',
+            'B Titr': 'lib/pdf-base64-ttf-fonts/borna-rayaneh/pdf-font-b-titr.js',
             'DejaVu Sans': 'lib/pdf-base64-ttf-fonts/pdf-font-dejavu-sans.js',
             'DejaVu Sans Mono': 'lib/pdf-base64-ttf-fonts/pdf-font-dejavu-sans-mono.js',
             'Vazir Code Hack': 'lib/pdf-base64-ttf-fonts/pdf-font-vazir-code-hack.js',

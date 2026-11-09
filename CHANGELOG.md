@@ -13,6 +13,10 @@ All notable changes to Kelk. Dates are those of the release tags.
   Tahoma and Times New Roman in every language, or the text font's own Latin letters (the default); the PDF, which
   carries its fonts, writes a system Latin font's text with the text font's letters. The Word group and «Preview
   with the Word fonts» are gone; a profile with Word fonts typed keeps them as fonts of its own (schema 2).
+- **B Nazanin and B Mitra** in the text font list, for the preview (their TTFs as they are, loaded on first choice),
+  PDF, HTML, DOCX and PPTX; B Titr for PDF. They have no Latin letters: Latin text takes Times New Roman (DejaVu
+  Sans in the PDF) unless a Latin font is chosen. The font download adds them in `borna-rayaneh/`, with its
+  `NOTICE.txt`. (c) Borna Rayaneh, no published license, see borna-rayaneh/NOTICE.txt.
 - **The slide check also runs when text comes in while the Slides view is on**: a paste (Ctrl+V or the Paste
   buttons) or an import that is plainly not in slide format switches to the document view, with the same report
   (its button makes slides anyway). Editing — typing, deleting, cut, undo and redo, replace — never switches the
