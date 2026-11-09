@@ -111,7 +111,7 @@
         wordFontPacks: {
             fa: {
                 zip: 'assets/fonts/download/persian-fonts-ttf.zip',
-                sites: { Vazirmatn: 'https://github.com/rastikerdar/vazirmatn', Sahel: 'https://github.com/rastikerdar/sahel-font' }
+                sites: { 'Vazirmatn و Sahel': 'https://rastikerdar.github.io/' }      // { the name in «وب‌سایت {font}»: its page }
             },
             en: { zip: '', sites: {} },
             ar: { zip: '', sites: {} }

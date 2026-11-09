@@ -22,6 +22,7 @@ All notable changes to Kelk. Dates are those of the release tags.
   (its button makes slides anyway). Editing — typing, deleting, cut, undo and redo, replace — never switches the
   view; a PPTX export checks the text again and, when it no longer fits, shows the report with «Export PPTX
   anyway».
+- Settings → Fonts: one button, «وب‌سایت Vazirmatn و Sahel», for both fonts' page (rastikerdar.github.io).
 
 ### Fixed
 
