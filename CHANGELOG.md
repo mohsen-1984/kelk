@@ -4,6 +4,11 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+### Development
+
+- Publishing a release comes only after the release PR (the one that changes the version) is merged:
+  `CLAUDE.md` and `docs/RELEASING.md` section 6 say so, and that the request to publish is a message of its own.
+
 ## [2.4] — 2026-11-09
 
 A simpler page: the export buttons follow the view, a check before making slides, progress for slides work, and a
