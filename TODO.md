@@ -21,7 +21,9 @@ as 2.2 did); column spans are written once either way; the same for Word, HTML a
 
 **Standing rules from 2.4** (the owner's decisions; done — `CHANGELOG.md` 2.4): the export buttons follow the view
 (DOCX, PDF, HTML, DOC in the document view; PPTX alone in Slides); switching to Slides checks the text leniently and
-stays a document, with a report, when it is plainly not in slide format; slides work shows its progress in one progress
+stays a document, with a report, when it is plainly not in slide format (2.5: a paste or an import while in Slides
+is checked too and switches to the document; editing never switches the view; a PPTX export checks again and
+offers to export anyway); slides work shows its progress in one progress
 window across the app (the preview's after 300 ms, not modal, taking no focus from the editor).
 
 **2.5 — fonts in every format** (the owner's items of 2026-11-06 and 2026-11-09, designed together; small pull

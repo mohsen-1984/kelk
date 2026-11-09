@@ -161,12 +161,14 @@
         /**
          * One export. The page waits in Kelk.ui.task's dialog while the file is made (fonts and the libraries
          * load, formulas are drawn, the builder runs); Cancel drops the file. MD: the text with its images
-         * inside (Kelk.images.embed), so the file is whole on its own.
+         * inside (Kelk.images.embed), so the file is whole on its own. o.force: PPTX without the slide check.
          */
-        run: async function (kind, btn) {
+        run: async function (kind, btn, o) {
             K.preview.flush();                             // a keystroke of the last 250 ms is in the preview, title and name
             const md = K.editor.value();
             if (!md.trim()) { K.ui.toast(K.i18n.t('emptyDoc'), 'warn'); return; }
+            // PPTX: the text edited out of slide format → the slide check's report, which can export anyway (o.force)
+            if (kind === 'pptx' && !(o && o.force) && !(await K.slides.exportOk(function () { K.exporter.run('pptx', btn, { force: true }); }))) return;
             if (kind === 'md') {
                 const blob = new Blob([K.images.embed(md)], { type: 'text/markdown;charset=utf-8' });
                 K.ui.download(blob, blob.type, K.ui.fileName(kind));

@@ -317,6 +317,7 @@
             K.names.setSource(name);
             K.editor.set(md, name);
             K.editor.markConverted(parts.some(function (p) { return p.converted; }));
+            setTimeout(function () { if (K.slides) K.slides.checkIncoming(); }, 0);          // after the import's report: in Slides, the slide check
             K.ui.toast(parts.length > 1 ? K.i18n.t('loadedN', parts.length) : K.i18n.t('loaded', name));
             const reports = parts.filter(function (p) { return p.report; });
             const one = parts.length === 1 && reports.length === 1 ? parts[0] : null;
@@ -394,6 +395,7 @@
             } catch (e) {
                 K.ui.toast(K.i18n.t('failed', e.message), 'error');
             }
+            if ((html || text) && K.slides) K.slides.checkIncoming();                   // in Slides, the slide check
         }
     };
 })(window.Kelk = window.Kelk || {});

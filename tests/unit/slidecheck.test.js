@@ -67,3 +67,26 @@ test('a long opening before the first slide: not in slide format', function () {
   assert.equal(r.ok, false);
   assert.deepEqual(codes(r), ['longIntro']);
 });
+
+test('before a PPTX export: a text that fits exports; one that no longer does shows the report, which can export anyway', async function () {
+  const sc = require('../../scripts/slidecheck.js');
+  const shown = [];
+  let text = '# Deck\n\n## One\n\n- a\n\n## Two\n\n- b\n';
+  globalThis.Kelk = {
+    editor: { value: () => text },
+    i18n: { t: (k) => k },
+    ui: { report: { custom: (v) => { shown.push(v); }, close: () => {} } }
+  };
+  try {
+    assert.equal(await sc.beforeExport(() => {}), true);
+    assert.equal(shown.length, 0);
+    text = '# Report\n\n' + words(400) + '\n';
+    let anyway = 0;
+    assert.equal(await sc.beforeExport(() => { anyway++; }), false);
+    assert.equal(shown.length, 1);
+    assert.equal(shown[0].brief(), 'sc_exportBrief');
+    assert.equal(shown[0].buttons[0].label(), 'sc_exportAnyway');
+    shown[0].buttons[0].run();
+    assert.equal(anyway, 1);
+  } finally { delete globalThis.Kelk; }
+});

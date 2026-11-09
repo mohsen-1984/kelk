@@ -11,6 +11,11 @@
  *
  *   KelkSlideCheck.show(res, onAnyway)   (in the page) the report panel says why the Slides view did not open
  *       (Kelk.ui.report.custom): the findings, «Make slides anyway» (onAnyway) and «Copy the prompt».
+ *   KelkSlideCheck.incoming()            (in the page) after a paste or an import in the Slides view: a text plainly not
+ *       in slide format switches the view to the document, with the same report (a toast instead when an import's
+ *       report is on screen). Editing never switches the view.
+ *   KelkSlideCheck.beforeExport(anyway)  (in the page) before a PPTX export: true when the text fits; else the same
+ *       report, with «Export anyway» (anyway), and false.
  *   KelkSlideCheck.STRINGS               its words (sc_*), fa / en / ar: added to Kelk.i18n's tables when it loads,
  *       so the page's startup carries none of them (tools/check-i18n.js reads them from here).
  */
@@ -82,6 +87,11 @@
             sc_longIntro: 'پیش از نخستین عنوان ## متنی {0} کلمه‌ای آمده است.',
             sc_prompt: 'متنی که با پرامپت اسلاید (تنظیمات ← اسلایدها) آماده شود اسلایدهای قابل‌قبولی می‌دهد. می‌توانید همین متن را هم اسلاید کنید.',
             sc_anyway: 'با این حال اسلاید بساز',
+            sc_switched: 'کِلک به نمای سند رفت: متنی که آمد قالب اسلاید ندارد. در این قالب هر عنوان ## یک اسلاید است و زیر آن متن کوتاهی می‌آید.',
+            sc_switchedBrief: 'به نمای سند رفت؛ متن قالب اسلاید ندارد',
+            sc_export: 'این متن دیگر قالب اسلاید ندارد. در این قالب هر عنوان ## یک اسلاید است و زیر آن متن کوتاهی می‌آید.',
+            sc_exportBrief: 'متن دیگر قالب اسلاید ندارد',
+            sc_exportAnyway: 'با این حال PPTX بگیر',
         },
         en: {
             sc_title: 'Not in slide format',
@@ -93,6 +103,11 @@
             sc_longIntro: 'Before the first ## heading there are {0} words of text.',
             sc_prompt: 'A text prepared with the slide prompt (Settings → Slides) gives acceptable slides. You can also make slides of this text as it is.',
             sc_anyway: 'Make slides anyway',
+            sc_switched: 'Kelk switched to the document view: the text that came in is not in slide format. In that format each ## heading is a slide, with a short text under it.',
+            sc_switchedBrief: 'switched to the document view; the text is not in slide format',
+            sc_export: 'This text is no longer in slide format. In that format each ## heading is a slide, with a short text under it.',
+            sc_exportBrief: 'the text is no longer in slide format',
+            sc_exportAnyway: 'Export PPTX anyway',
         },
         ar: {
             sc_title: 'النص ليس بتنسيق الشرائح',
@@ -104,13 +119,24 @@
             sc_longIntro: 'قبل أول عنوان ## نص من {0} كلمة.',
             sc_prompt: 'النص المُعدّ بموجّه الشرائح (الإعدادات ← الشرائح) يعطي شرائح مقبولة. ويمكنك أيضًا إنشاء شرائح من هذا النص كما هو.',
             sc_anyway: 'أنشئ الشرائح مع ذلك',
+            sc_switched: 'انتقل كِلك إلى عرض المستند: النص الوارد ليس بتنسيق الشرائح. في هذا التنسيق كل عنوان ## شريحة، وتحته نص قصير.',
+            sc_switchedBrief: 'انتقل إلى عرض المستند؛ النص ليس بتنسيق الشرائح',
+            sc_export: 'لم يعد هذا النص بتنسيق الشرائح. في هذا التنسيق كل عنوان ## شريحة، وتحته نص قصير.',
+            sc_exportBrief: 'لم يعد النص بتنسيق الشرائح',
+            sc_exportAnyway: 'صدّر PPTX مع ذلك',
         }
     };
     /** the findings' keys, each written in full */
     const KEYS = { noSlides: 'sc_noSlides', oneSlide: 'sc_oneSlide', longSlides: 'sc_longSlides', longIntro: 'sc_longIntro' };
 
-    function show(res, onAnyway) {
+    /**
+     * The report. mode: '' (the switch to Slides did not happen), 'switched' (a paste or an import switched to the
+     * document view), 'export' (a PPTX export: its button exports anyway).
+     */
+    function show(res, onAnyway, mode) {
         const K = root.Kelk, t = function () { return K.i18n.t.apply(K.i18n, arguments); };
+        const W = { '': ['sc_summary', 'sc_brief', 'sc_anyway', 'presentation'], switched: ['sc_switched', 'sc_switchedBrief', 'sc_anyway', 'presentation'],
+            export: ['sc_export', 'sc_exportBrief', 'sc_exportAnyway', 'download'] }[mode || ''];
         const add = function (box, tag, cls, txt) {
             const e = box.appendChild(document.createElement(tag));
             e.className = cls;
@@ -120,9 +146,9 @@
         return K.ui.report.custom({
             icon: 'presentation',
             title: function () { return t('sc_title'); },
-            brief: function () { return t('sc_brief'); },
+            brief: function () { return t(W[1]); },
             body: function (box) {
-                add(box, 'p', 'report-summary', t('sc_summary'));
+                add(box, 'p', 'report-summary', t(W[0]));
                 const ul = add(box, 'ul', 'report-findings');
                 res.findings.forEach(function (f) {
                     add(ul, 'li', f.fail ? 'warn' : 'info', t(KEYS[f.code], f.n, f.of)).setAttribute('data-code', f.code);
@@ -130,10 +156,37 @@
                 add(box, 'p', 'report-summary', t('sc_prompt'));
             },
             buttons: [
-                { icon: 'presentation', label: function () { return t('sc_anyway'); }, run: function () { K.ui.report.close(false); onAnyway(); } },
+                { icon: W[3], label: function () { return t(W[2]); }, run: function () { K.ui.report.close(false); onAnyway(); } },
                 { icon: 'copy', label: function () { return t('slidesPrompt'); }, run: function () { const b = K.$('#btn-slides-prompt'); if (b) b.click(); } }
             ]
         });
+    }
+
+    /** The text on screen, unless it is empty or one of the samples (written for their view). */
+    async function screenText(K) {
+        const md = K.editor.value();
+        if (!md.trim() || (K.samples && await K.samples.of(md))) return null;
+        return md;
+    }
+
+    async function incoming() {
+        const K = root.Kelk;
+        if (!K.slides.active()) return;
+        const md = await screenText(K);
+        const res = md == null ? null : check(md);
+        if (!res || res.ok || !K.slides.active()) return;
+        const box = K.$('#import-report'), other = box && !box.hidden && !K.ui.report.isCustom();
+        await K.slides.setView('document');
+        if (other) { K.ui.toast(K.i18n.t('sc_switchedBrief'), 'warn'); return; }     // an import's report stays
+        show(res, function () { K.slides.setView('slides', true); }, 'switched');
+    }
+
+    async function beforeExport(anyway) {
+        const md = await screenText(root.Kelk);
+        const res = md == null ? null : check(md);
+        if (!res || res.ok) return true;
+        show(res, anyway, 'export');
+        return false;
     }
 
     // in the page: its words join Kelk.i18n's tables
@@ -142,7 +195,7 @@
         Object.keys(STRINGS).forEach(function (l) { if (all[l]) Object.assign(all[l], STRINGS[l]); });
     }
 
-    const api = { check: check, show: show, LIMIT: LIMIT, STRINGS: STRINGS };
+    const api = { check: check, show: show, incoming: incoming, beforeExport: beforeExport, LIMIT: LIMIT, STRINGS: STRINGS };
     root.KelkSlideCheck = api;
     if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

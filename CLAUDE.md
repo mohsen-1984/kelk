@@ -89,7 +89,13 @@ is available.
 
 Follow [`docs/RELEASING.md`](docs/RELEASING.md): sections 1–5 in the release's pull request; then give the owner
 the release notes ready to paste (its *Release notes format*) and point to its section 6, the owner's steps click
-by click. If the *release* workflow fails, the owner says so: read its summary and fix on a branch.
+by click.
+
+**Publishing comes only after the release PR is merged** (the owner's rule, 2026-11-09). The release PR is the one
+that changes the version; until it is merged, `main` has the old version and the *release* workflow fails on the
+tag. When that PR is green, say only that it is ready to merge. Once the owner says it is merged, say it in so many
+words: «the release PR is merged, now publish». Never mention publishing alongside any other PR.
+If the *release* workflow fails, the owner says so: read its summary and fix on a branch.
 
 ## Words
 

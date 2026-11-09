@@ -50,10 +50,17 @@ Sections 1–5 go into the release's pull request; section 6 is the owner's, cli
 
 ## 6. Publishing (the owner)
 
+**Publish only after the release PR is merged** (the owner's rule, 2026-11-09). The release PR is the one that
+changes the version in `scripts/config.js`; until it is merged, `main` still has the old version and the *release*
+workflow fails on the tag. So the assistant asks for publishing in one message of its own, after that merge, in so
+many words: «the release PR is merged, now publish» — and never mentions publishing alongside any other PR (not
+when one is ready to merge, not in the release PR's own «ready to merge» message). Release notes may be given
+earlier, marked as for later.
+
 On GitHub's web pages, click by click:
 
 1. **Merge** the release PR: the PR's page → **Merge pull request** → **Confirm merge**.
-2. **Publish**: the repository's page → **Releases** (right side) → **Draft a new release** →
+2. **Publish** — only now, with the release PR merged: the repository's page → **Releases** (right side) → **Draft a new release** →
    **Choose a tag** → type `vx.y` (the new version) → **Create new tag: vx.y on publish**; *Target*: `main` →
    *Release title*: `Kelk x.y` → paste the notes → leave *Set as a pre-release* unticked (the README links
    `releases/latest`) → **Publish release**.
