@@ -53,7 +53,7 @@
                 const st = (e && e.styles) || {}, code = name === f.code && name !== f.bidi && name !== f.latin;
                 return { name: name, charset: cs[name], regular: st.normal && bin(st.normal.data), bold: !code && st.bold ? bin(st.bold.data) : null };
             }).filter(function (x) { return x.regular; }).concat(described.map(function (name) { return { name: name, charset: cs[name] }; }));
-            const out = await FontEmbed[kind === 'pptx' ? 'pptx' : 'docx'](blob, fonts);
+            const out = await window.FontEmbed[kind === 'pptx' ? 'pptx' : 'docx'](blob, fonts);
             return { blob: out, added: shipped.length ? Math.max(0, out.size - blob.size) : 0 };
         },
 
