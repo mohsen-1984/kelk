@@ -43,7 +43,27 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
   `pdf-font-b-*.js`) and `borna-rayaneh/` in `assets/fonts/download/persian-fonts-ttf.zip`.
 - Every pull request targets `main`; the request to publish comes only after the release PR is merged.
 
-**2.6 — the slides view on demand, then PDF import from real files.**
+**2.6 — Excel** (the owner's decision of 2026-11-09): the standalone CSV / Markdown ⇄ XLSX page merged into Kelk, in
+three pull requests, one release:
+
+1. **Markdown → XLSX**: `lib/XlsxBuilder.js` (each table a sheet, named by the heading or bold line above it; the page's
+   Persian formatting step, `polish`), a third view, **Excel**, with its own preview (one block per sheet with its
+   name, rows and columns; the first 20 rows by default, Settings → Excel; wide sheets scroll inside the table, header
+   row fixed; touch scrolling both ways), the export buttons of the view (XLSX, CSV zip), Settings → Excel (its header
+   tinted in the Excel view, like Slides), the switch check (a text without tables stays where it is, with a report).
+   Fonts stay in Settings → Fonts: XLSX has fonts of its own, on by default — B Nazanin for Persian, Calibri for
+   Latin — since Excel cannot embed fonts (the view says so); DOCX and PPTX keep the shared font.
+   SheetJS writes the workbook (as the page did: tested), loaded on demand only; Tabulator is not taken.
+2. **Import**: CSV; a single XLSX (XLSX files inside a zip are ignored); a zip of CSVs, ordered like MD files, the
+   dialog showing each sheet's rows, columns, encoding and separator; a zip with CSV and MD files: the user picks
+   one kind, the other files are listed as ignored. Every import becomes Markdown in the editor: one `##` heading and
+   one table per sheet (`<br>` for a line break in a cell, `\|` for a bar). The import report's summary table for
+   the three flows. Largest import: a cell count where typing in the editor stays responsive (measured in PR 1).
+3. **Docs**: About Kelk and samples — an Excel section, the three flows as its subsections (from the page's «what this
+   page is for»); og-image.html and a new og-image.png; lib/README; the README in three languages; screenshots.
+
+**2.7 — the slides view on demand, then PDF import from real files** (moved from 2.6, the owner's decision of
+2026-11-09).
 
 **The slides view on demand** (moved from 2.5, the owner's decision of 2026-11-09): PptxBuilder (170 KB) and
 `scripts/slides.js` (30 KB) load with the page, though a user who writes documents never needs them; load them on
@@ -393,6 +413,12 @@ mixed-direction lists and tables)
 - More chart options: axis titles, a secondary axis, scatter with numeric X
 - Import: .pptx → Markdown in the same convention (titles, lists, tables, notes)
 - The slide preview drawn with the Word fonts when installed (now: the page's fonts)
+
+### Excel (`lib/XlsxBuilder.js`)
+
+- Low: write XLSX without SheetJS (its ~950 KB load on the first XLSX export): the polish step already rewrites the
+  sheets' views, columns and styles; the cells, shared strings and links are a small writer of our own on JSZip.
+  SheetJS would then load only to read an XLSX.
 
 ### Other
 
