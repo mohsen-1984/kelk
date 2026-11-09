@@ -176,7 +176,7 @@
             }
             K.ui.busy(btn, true);
             try {
-                const blob = await K.ui.task(K.i18n.t('taskExport', kind.toUpperCase()), async function () {
+                const blob = await K.ui.task(K.i18n.t('taskExport', kind.toUpperCase()), async function (t) {
                     await K.ui.paint();                        // the dialog is up before the builder holds the page
                     K.preview.flush();                         // typed while the dialog came up (nothing waiting: no-op)
                     const html = K.preview.html();
@@ -192,7 +192,7 @@
                         await K.ui.paint();
                         return configure(PdfBuilder.create(), 'pdf').addFromHtml(html).toBlob();
                     }
-                    if (kind === 'pptx') return K.slides.blob();
+                    if (kind === 'pptx') return K.slides.blob(t);
                     if (kind === 'html') {
                         await K.fonts.forHtml(md);
                         return configure(HtmlBuilder.create(), 'html').addFromHtml(html).toBlob();

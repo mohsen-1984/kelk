@@ -34,6 +34,8 @@ as 2.2 did); column spans are written once either way; the same for Word, HTML a
 6. **Slide mode check**: switching to slides, if the editor's text does not broadly follow the PowerPoint prompt's
    format, stay in document mode and show a report like the PDF import report: the text is not in slide format,
    and preparing it with the prompt gives acceptable slides; a button makes slides anyway. Lenient.
+7. **PowerPoint export progress**: a large deck takes seconds with no sign of work; show its steps and a bar, as the
+   PDF import does (the export's task dialog).
 
 **2.5 — fonts in every format** (the owner's items of 2026-11-06 and 2026-11-09, designed together; small pull
 requests).

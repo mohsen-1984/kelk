@@ -296,12 +296,29 @@
         },
 
         /** The .pptx of the text on screen. */
-        blob: async function () {
+        /**
+         * The .pptx. t: the export's task (Kelk.ui.task) — its bar and detail line follow the steps, each its share
+         * of the bar (config.pptxProgress, measured on large decks).
+         */
+        blob: async function (t) {
             const md = K.editor.value();
+            const W = K.config.pptxProgress, ORDER = ['model', 'build', 'write', 'slides', 'zip'];
+            const KEY = { model: 'pptx_model', build: 'pptx_build', write: 'pptx_write', slides: 'pptx_slides', zip: 'pptx_zip' };
+            let shown = -1;
+            const step = function (name, done, total) {
+                if (!t) return;
+                const at = ORDER.indexOf(name), before = ORDER.slice(0, at).reduce(function (n, k) { return n + W[k]; }, 0);
+                const share = before + W[name] * (total ? Math.min(1, done / total) : 0), per = Math.round(share * 1000);
+                if (per === shown) return;
+                shown = per;
+                t.progress(per, 1000, name === 'slides' ? K.i18n.t(KEY.slides, done + 1, total) : K.i18n.t(KEY[name]));
+            };
+            step('model', 0, 1);
             await Promise.all([K.libs.need('pptx'), needIcons(md)]);
             const b = builder();
             const m = await b.model();
-            return b.toBlob(m);
+            await K.ui.paint();
+            return b.toBlob(m, { onProgress: step });
         },
 
         /** The slides full screen: → / Space / PageDown next, ← / PageUp back, Home / End, Esc closes. */

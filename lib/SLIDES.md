@@ -175,6 +175,8 @@ const model = await b.model();                              // the laid-out deck
 el.innerHTML = PptxBuilder.previewHtml(model, { notesLabel: 'Speaker notes' });
 PptxBuilder.markOverflow(el);                               // indexes of slides whose text overflows
 const blob = await b.toBlob(model);                         // or toArrayBuffer(), toPptx() (PptxGenJS)
+// a large deck: toBlob(model, { onProgress(step, done, total) }) — 'build', 'write', 'slides' (done of the slides),
+// 'zip' (done of 100); most of the time is in write and zip
 ```
 
 `addFromMarkdown(md)` does the first two steps at once. A sanitizer between marked and the builder

@@ -17,6 +17,8 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Changed
 
+- PowerPoint export shows its steps and a progress bar (preparing, writing the file, slide N of M, compressing):
+  a large deck takes seconds.
 - The export buttons follow the view: DOCX, PDF, HTML and DOC in the document view, PPTX alone in the Slides view;
   Ctrl+Enter exports the view's own format (DOCX or PPTX).
 - Settings → Word: its heading stands out in the document view, as Settings → Slides' does in the Slides view.
