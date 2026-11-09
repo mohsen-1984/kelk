@@ -9,6 +9,9 @@
         fa: {
             appName: 'کِلک',
             tagline: 'مارک‌داون به Word، PowerPoint، PDF و HTML و برعکس — راست‌به‌چپ، کاملاً در مرورگر',
+            tagFrom: 'مارک‌داون',             // the header's tagline: tagFrom ⇆ tagTo (an icon between; tagBoth for readers)
+            tagBoth: 'به و از',
+            tagTo: 'Word، PowerPoint، PDF و HTML — راست‌به‌چپ، کاملاً در مرورگر',
             editor: 'متن مارک‌داون',
             preview: 'پیش‌نمایش',
             settings: 'تنظیمات',
@@ -432,6 +435,9 @@
         en: {
             appName: 'Kelk',
             tagline: 'Markdown to Word, PowerPoint, PDF and HTML — and back — RTL-first, entirely in your browser',
+            tagFrom: 'Markdown',
+            tagBoth: 'to and from',
+            tagTo: 'Word, PowerPoint, PDF and HTML — RTL-first, entirely in your browser',
             editor: 'Markdown',
             preview: 'Preview',
             settings: 'Settings',
@@ -855,6 +861,9 @@
         ar: {
             appName: 'كِلك',
             tagline: 'من ماركداون إلى Word وPowerPoint وPDF وHTML وبالعكس — من اليمين إلى اليسار أولًا، بالكامل في متصفحك',
+            tagFrom: 'ماركداون',
+            tagBoth: 'من وإلى',
+            tagTo: 'Word وPowerPoint وPDF وHTML — من اليمين إلى اليسار أولًا، بالكامل في متصفحك',
             editor: 'نص ماركداون',
             preview: 'المعاينة',
             settings: 'الإعدادات',
@@ -1313,7 +1322,7 @@
                     if (kv.length === 2) el.setAttribute(kv[0].trim(), self.t(kv[1].trim()));
                 });
             });
-            document.title = this.t('appName') + ' — ' + this.t('tagline');
+            document.title = (this.t('appName') + ' – ' + this.t('tagline')).replace(/ — /g, ' – ');   // en dashes: less room in a tab
         }
     };
 
