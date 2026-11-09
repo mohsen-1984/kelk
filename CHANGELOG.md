@@ -15,9 +15,10 @@ preview that scrolls on a phone.
   format (no `##` headings, or slides far too long for a slide) stays in the document view, with a report that says
   why, a button to make slides anyway and one to copy the slide prompt.
 - **Progress for slides work**: PowerPoint export shows its steps and a bar (preparing, writing the file, slide N of
-  M, compressing); the slides preview shows its steps in a bar over the slides (the icon set on first use, formulas,
-  pictures, laying out slide N of M) when the work lasts longer than 300 ms — never while typing a short deck, and
-  the page stays usable.
+  M, compressing); the slides preview shows its steps in the same progress window (the icon set on first use, formulas,
+  pictures, laying out slide N of M) when the work lasts longer than 300 ms — never while typing a short deck. For
+  the preview the window is not modal: it takes no focus from the editor, clicks pass through it, and the page
+  stays usable.
 
 ### Changed
 
@@ -44,7 +45,8 @@ preview that scrolls on a phone.
   `tools/check-i18n.js` reads the words of modules loaded on demand.
 - `PptxBuilder`: `model({ onProgress })` (formulas, pictures, the layout slide by slide, pausing every 20 slides)
   and `toBlob(model, { onProgress })` (build, write, slides, zip).
-- The startup size budget is 1,600,000 bytes (+15 KB over 2.3, for 2.4's page items), its reasons noted in
+- One progress window across the app: `Kelk.ui.bar()` shows the task window (`#task`) without making it
+  modal, and a task takes it over. The startup size budget is 1,601,000 bytes (+16 KB over 2.3, for 2.4's page items), its reasons noted in
   `tools/size-budget.json`; loading the whole slides view on demand is planned for 2.5.
 - The working instructions moved from `docs/WORKING.md` to `CLAUDE.md` at the root; the owner's release steps,
   click by click, and the release notes format are now in `docs/RELEASING.md` (section 6). Related low-risk items

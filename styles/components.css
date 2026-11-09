@@ -397,10 +397,10 @@ dialog.task .task-label { font-weight: 600; overflow-wrap: anywhere; }
 dialog.task .task-detail { color: var(--muted, #777); font-size: 12.5px; min-height: 1.4em; margin-top: 2px; }
 dialog.task progress { width: 100%; height: 8px; margin: 10px 0 12px; accent-color: var(--accent); }
 /* the same bar in a pane (the slides preview's work): over the slides, as long as it lasts */
-.busy-bar { position: sticky; top: 0; z-index: 2; padding: 8px 12px 4px; background: var(--panel); border-bottom: 1px solid var(--line); }
-.busy-bar .task-detail { color: var(--muted, #777); font-size: 12.5px; min-height: 1.4em; }
-.busy-bar progress { width: 100%; height: 6px; accent-color: var(--accent); }
 dialog.task .task-actions { display: flex; justify-content: flex-end; }
+/* the same window, not modal (Kelk.ui.bar: the slides preview): above everything, clicks pass through to the page */
+dialog.task.quiet { position: fixed; inset: 0; height: fit-content; margin: auto; z-index: 2147483000; pointer-events: none; box-shadow: var(--shadow); }
+dialog.task.quiet .task-actions { display: none; }
 /* the order dialog (Kelk.ui.order): the task dialog's look, with the documents to arrange */
 dialog.order { width: min(560px, calc(100vw - 32px)); }
 dialog.order .dlg-body { display: flex; flex-direction: column; max-height: calc(100vh - 48px); max-height: calc(100dvh - 48px); }
