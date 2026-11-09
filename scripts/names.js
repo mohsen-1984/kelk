@@ -184,7 +184,13 @@
             stem.addEventListener('input', function () { user = stem.value.trim() ? stem.value : null; });
             stem.addEventListener('blur', function () { if (user == null) self.refresh(); });
             stem.addEventListener('keydown', function (e) {
-                if (e.key === 'Enter') { e.preventDefault(); K.exporter.run(lastExt, K.$('[data-export="' + lastExt + '"]')); }
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    // the last format used, or the view's own when the view hides it (PPTX for slides, DOCX for the document)
+                    let ext = lastExt, b = K.$('[data-export="' + ext + '"]');
+                    if (!b || b.hidden) { ext = K.slides.active() ? 'pptx' : 'docx'; b = K.$('[data-export="' + ext + '"]'); }
+                    K.exporter.run(ext, b);
+                }
                 if (e.key === 'Escape') { user = null; self.refresh(); stem.blur(); }
             });
             // the extension follows the export button under the pointer / focus

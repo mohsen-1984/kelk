@@ -66,8 +66,13 @@ Read only what the task needs, in this order:
 
 ## A change, step by step
 
-1. A branch from `main`, named for the work (`pdf/2.3-cells`, `docs/…`).
-2. The change, small commits, each message saying what changed and why. Commit messages end with the
+**One pull request per batch, one commit per item** (the owner's rule, 2026-11-09): each pull request costs a CI
+wait, a merge by hand and a round trip, so related low-risk items go into one pull request, each item in a commit of
+its own (its CHANGELOG line with it) so any one can still be reverted alone. Risky work — the PDF importer, fonts —
+goes in pull requests of its own.
+
+1. A branch from `main`, named for the work (`pdf/2.3-cells`, `ui/2.4-page-items`, `docs/…`).
+2. The change, one commit per item, each message saying what changed and why. Commit messages end with the
    assistant's attribution lines when an assistant made them.
 3. A pull request to `main`: what it does, the lab numbers if the importer changed, anything the owner should
    check by eye.

@@ -178,7 +178,8 @@
                 <div class="export-bar" role="group" data-i18n-attr="aria-label:exportAs">
                     <button class="btn primary" type="button" data-export="docx" data-i18n-attr="title:docxHint"><i data-lucide="file-text"></i>DOCX</button>
                     <button class="btn soft" type="button" data-export="pdf" data-i18n-attr="title:pdfHint"><i data-lucide="file-type"></i>PDF</button>
-                    <button class="btn soft" type="button" data-export="pptx" data-i18n-attr="title:pptxHint"><i data-lucide="presentation"></i>PPTX</button>
+                    <!-- PPTX in the Slides view only (DOCX, PDF, HTML, DOC in the document view: slides.js applyView) -->
+                    <button class="btn primary" type="button" data-export="pptx" data-i18n-attr="title:pptxHint" hidden><i data-lucide="presentation"></i>PPTX</button>
                     <span class="sep" aria-hidden="true"></span>
                     <button class="btn" type="button" data-export="html" data-i18n-attr="title:htmlHint"><i data-lucide="code-xml"></i>HTML</button>
                     <button class="btn ghost" type="button" data-export="doc" data-i18n-attr="title:docHint"><i data-lucide="file"></i>DOC</button>
@@ -424,7 +425,7 @@
                     </div>
                 </details>
 
-                <details class="group">
+                <details class="group" id="word-group">
                     <summary><i data-lucide="file-type"></i><span data-i18n="gWord"></span></summary>
                     <div class="fields">
                         <div class="field"><span class="label-row"><label for="f-word-bidi" data-i18n="fontBidi"></label>

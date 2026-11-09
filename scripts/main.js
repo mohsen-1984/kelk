@@ -252,12 +252,13 @@
         });
 
         // shortcuts (Ctrl+Enter is free in every browser; Ctrl+S saves the Markdown)
-        const exp = function (kind) { K.exporter.run(kind, K.$('[data-export="' + kind + '"]')); };
+        // (a format the view hides is not exported: Ctrl+Enter is the view's own, DOCX or PPTX)
+        const exp = function (kind) { const b = K.$('[data-export="' + kind + '"]'); if (!b || !b.hidden) K.exporter.run(kind, b); };
         document.addEventListener('keydown', function (e) {
             const mod = e.ctrlKey || e.metaKey, k = e.key.toLowerCase();
             if (mod && !e.shiftKey && !e.altKey && k === 's') { e.preventDefault(); exp('md'); }
             else if (mod && e.altKey && e.key === 'Enter') { e.preventDefault(); exp('pptx'); }
-            else if (mod && e.key === 'Enter') { e.preventDefault(); exp(e.shiftKey ? 'pdf' : 'docx'); }
+            else if (mod && e.key === 'Enter') { e.preventDefault(); exp(e.shiftKey ? 'pdf' : K.slides.active() ? 'pptx' : 'docx'); }
             else if (e.key === 'F5' && K.slides.active() && !document.querySelector('.present')) { e.preventDefault(); K.slides.present(); }
             else if (mod && !e.shiftKey && k === 'o') { e.preventDefault(); K.$('#file-import').click(); }
             else if (mod && e.key === ',') { e.preventDefault(); togglePane(); }
