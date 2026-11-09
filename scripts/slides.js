@@ -69,7 +69,9 @@
     function builder() {
         const md = K.editor.value();
         const r = PptxBuilder.markdownToHtml(md, { breaks: K.store.get('text.breaks') !== false });
-        const box = document.createElement('div');
+        // (a document of its own, with no window: its pictures are not fetched — the slides sample's
+        // ![…](placeholder) was requested as a file named placeholder on every render)
+        const box = document.implementation.createHTMLDocument('').createElement('div');
         box.innerHTML = typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(r.html, { ADD_ATTR: ['target', 'dir', 'align', 'data-kelk-comment'] }) : r.html;
         if (typeof hljs !== 'undefined') {
             K.$$('pre code', box).forEach(function (code) {
@@ -196,14 +198,26 @@
         /**
          * Change the view. The two samples are written for their own view: with the about document on
          * screen (unchanged) the Slides view opens the slides sample, and the other way round — a toast
-         * says so, and Undo brings the text back.
+         * says so, and Undo brings the text back. force: into slides without the slide-format check.
          */
-        setView: async function (v) {
+        setView: async function (v, force) {
             const slides = v === 'slides';
             if (slides === this.active()) return;
+            const s = K.samples ? await K.samples.of(K.editor.value()) : null;
+            // into slides: a text that is plainly not in slide format (the prompt's) stays a document, with a report
+            // that says why and offers to make slides anyway (scripts/slidecheck.js, loaded on the first switch)
+            if (slides && !force && !s && K.editor.value().trim()) {
+                const self = this;
+                let sc = null, res = null;
+                try { sc = await K.libs.need('slidecheck'); res = sc.check(K.editor.value()); } catch (e) { res = null; }
+                if (res && !res.ok) {
+                    sc.show(res, function () { self.setView('slides', true); });
+                    return;
+                }
+            }
+            if (K.ui.report.isCustom()) K.ui.report.close(false);
             K.store.setUi('view', slides ? 'slides' : 'document');
             this.applyView();
-            const s = K.samples ? await K.samples.of(K.editor.value()) : null;
             if (s && s.set === (slides ? 'about' : 'slides')) {
                 await K.samples.load(slides ? 'slides' : 'about');
                 K.ui.toast(K.i18n.t(slides ? 'toSlidesSample' : 'toAboutSample'));
@@ -284,12 +298,29 @@
         },
 
         /** The .pptx of the text on screen. */
-        blob: async function () {
+        /**
+         * The .pptx. t: the export's task (Kelk.ui.task) — its bar and detail line follow the steps, each its share
+         * of the bar (config.pptxProgress, measured on large decks).
+         */
+        blob: async function (t) {
             const md = K.editor.value();
+            const W = K.config.pptxProgress, ORDER = ['model', 'build', 'write', 'slides', 'zip'];
+            const KEY = { model: 'pptx_model', build: 'pptx_build', write: 'pptx_write', slides: 'pptx_slides', zip: 'pptx_zip' };
+            let shown = -1;
+            const step = function (name, done, total) {
+                if (!t) return;
+                const at = ORDER.indexOf(name), before = ORDER.slice(0, at).reduce(function (n, k) { return n + W[k]; }, 0);
+                const share = before + W[name] * (total ? Math.min(1, done / total) : 0), per = Math.round(share * 1000);
+                if (per === shown) return;
+                shown = per;
+                t.progress(per, 1000, name === 'slides' ? K.i18n.t(KEY.slides, done + 1, total) : K.i18n.t(KEY[name]));
+            };
+            step('model', 0, 1);
             await Promise.all([K.libs.need('pptx'), needIcons(md)]);
             const b = builder();
             const m = await b.model();
-            return b.toBlob(m);
+            await K.ui.paint();
+            return b.toBlob(m, { onProgress: step });
         },
 
         /** The slides full screen: → / Space / PageDown next, ← / PageUp back, Home / End, Esc closes. */

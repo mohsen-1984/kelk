@@ -30,9 +30,13 @@ const DYNAMIC = [
     { file: 'scripts/importer.js', prefix: 'pdf_' },
     // PptxBuilder's warnings → the slides pane: WARN_KEYS holds each key in full
     { file: 'scripts/slides.js', prefix: 'sw_' },
+    // the PowerPoint export's steps (slides.js blob): pptx_ + the step's name
+    { file: 'scripts/slides.js', prefix: 'pptx_' },
     // the import report: its tables hold each note / flag (pdf_) and mode / why / label (rep_) key in full
     { file: 'scripts/report.js', prefix: 'pdf_' },
     { file: 'scripts/report.js', prefix: 'rep_' },
+    // the slide-format check (loaded on demand, its words with it): KEYS holds each finding's key in full
+    { file: 'scripts/slidecheck.js', prefix: 'sc_' },
     // Kelk.i18n.apply(): the markup's own keys, checked above from index.html
     { file: 'scripts/i18n.js', arg: "el.getAttribute('data-i18n')" },
     { file: 'scripts/i18n.js', arg: 'kv[1].trim()' }
@@ -44,12 +48,18 @@ const read = function (f) {
     return fs.readFileSync(path.join(root, f), 'utf8');
 };
 
-/** STRINGS of scripts/i18n.js, run in a sandbox with an empty window. */
+/**
+ * STRINGS of scripts/i18n.js, run in a sandbox with an empty window — and the words of the modules loaded on
+ * demand (LAZY: each adds its own table to Kelk.i18n's when it loads), run in the same window after it.
+ */
+const LAZY = ['scripts/slidecheck.js'];
 function tables() {
     const sandbox = { window: {} };
     vm.runInNewContext(read('scripts/i18n.js'), sandbox, { filename: 'scripts/i18n.js' });
     const i18n = sandbox.window.Kelk && sandbox.window.Kelk.i18n;
     if (!i18n || !i18n._strings) throw new Error('scripts/i18n.js: Kelk.i18n._strings not found');
+    sandbox.globalThis = sandbox.window;
+    LAZY.forEach(function (f) { vm.runInNewContext(read(f), sandbox.window, { filename: f }); });
     return i18n._strings;
 }
 

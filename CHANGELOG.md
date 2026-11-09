@@ -4,13 +4,23 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+### Added
+
+- Switching to the Slides view checks the text, leniently: a text plainly not in slide format (no ## headings, or
+  slides far too long for a slide) stays in the document view, with a report that says why, a button to make slides
+  anyway and one to copy the slide prompt.
+
 ### Fixed
 
+- The Slides view no longer requests a file named `placeholder` for each picture written `![…](placeholder)` (the
+  slides sample's).
 - On a phone (one column), the preview did not scroll with a finger, and a finger on it did not scroll the page
   either, even with the preview empty.
 
 ### Changed
 
+- PowerPoint export shows its steps and a progress bar (preparing, writing the file, slide N of M, compressing):
+  a large deck takes seconds.
 - The export buttons follow the view: DOCX, PDF, HTML and DOC in the document view, PPTX alone in the Slides view;
   Ctrl+Enter exports the view's own format (DOCX or PPTX).
 - Settings → Word: its heading stands out in the document view, as Settings → Slides' does in the Slides view.
@@ -22,6 +32,9 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Development
 
+- The slide-format check's words and its report content load with it, on the first switch to the Slides view
+  (`scripts/slidecheck.js`): the report panel shows another module's content (`Kelk.ui.report.custom`), and
+  `tools/check-i18n.js` reads the words of modules loaded on demand.
 - The working instructions moved from `docs/WORKING.md` to `CLAUDE.md` at the root; the owner's release steps,
   click by click, and the release notes format are now in `docs/RELEASING.md` (section 6).
 

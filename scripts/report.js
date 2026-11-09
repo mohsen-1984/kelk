@@ -25,6 +25,11 @@
  *     report that already ran in safe mode). Kelk.ui.report.release(): a new import starts — onSafe (and the
  *     file bytes it holds) goes. No live region of its
  *     own: the focus move announces the panel once (its name), the import's own toast says it loaded.
+ *   Kelk.ui.report.custom(view)
+ *     the same panel with content of another module (the slide-format check, scripts/slidecheck.js, loaded on
+ *     demand with its words): view = { icon, title(), brief(), body(el) — fills the panel's body, buttons:
+ *     [{ icon, label(), run }] } — the functions run again on a language change. It follows the document and
+ *     closes like an import's report; Copy and safe mode are not shown. report.isCustom(): it is open.
  * Every code has its key here, written in full (tools/check-i18n.js: DYNAMIC prefixes pdf_ and rep_).
  */
 (function (K) {
@@ -200,7 +205,7 @@
     K.importReport = { fromResult: fromResult, worth: worth, text: text, FLAGS: FLAGS, NOTES: NOTES, MODES: MODES, MODE_KEYS: MODE_KEYS, WHY: WHY_KEYS };
 
     // ---- the panel ---------------------------------------------------------------------------------------------
-    const state = { entries: [], o: {}, back: null, doc: null, timer: 0 };
+    const state = { entries: [], o: {}, back: null, doc: null, timer: 0, view: null };
     const docNow = function () { return K.editor && K.editor.doc ? K.editor.doc() : null; };
     const el = function (tag, cls, txt) {
         const e = document.createElement(tag);
@@ -209,9 +214,39 @@
         return e;
     };
 
+    /** the panel's title, icon and buttons: an import's report or another module's view (report.custom) */
+    function kind() {
+        const v = state.view, h = K.$('#import-report-title'), acts = K.$('#import-report .report-actions');
+        if (h) { h.querySelector('span').textContent = v ? v.title() : t('rep_title'); K.ui.setIcon(h, v ? v.icon : 'file-text'); }
+        const copyB = K.$('#report-copy'); if (copyB) copyB.hidden = !!v;
+        if (!acts) return;
+        acts.querySelectorAll('.report-custom').forEach(function (b) { b.remove(); });
+        if (v) (v.buttons || []).forEach(function (bt) {
+            const b = acts.insertBefore(el('button', 'btn report-custom'), copyB);
+            b.type = 'button';
+            b.appendChild(el('i')).setAttribute('data-lucide', bt.icon);
+            b.appendChild(el('span', null, bt.label()));
+            b.addEventListener('click', bt.run);
+        });
+        K.ui.icons(acts);
+    }
+
+    function renderCustom() {
+        const box = K.$('#import-report'), body = K.$('#import-report-body'), v = state.view;
+        body.textContent = '';
+        v.body(body);
+        ['#report-safe', '#report-safe-hint'].forEach(function (s) { const x = K.$(s); if (x) x.hidden = true; });
+        const name = K.$('#import-report-name'); if (name) name.textContent = '';
+        const brief = K.$('#import-report-brief'); if (brief) brief.textContent = v.brief();
+        box.classList.remove('clean');
+        toggleButton();
+    }
+
     function render() {
         const box = K.$('#import-report'), body = K.$('#import-report-body');
         if (!box || !body) return;
+        kind();
+        if (state.view) { renderCustom(); return; }
         body.textContent = '';
         state.entries.forEach(function (e) {
             const rep = e.report, sec = body.appendChild(el('div', 'report-entry'));
@@ -302,11 +337,11 @@
     function close(restore) {
         const box = K.$('#import-report');
         if (!box) return;
-        if (box.hidden) { clearTimeout(state.timer); state.entries = []; state.o = {}; state.doc = null; return; }
+        if (box.hidden) { clearTimeout(state.timer); state.entries = []; state.o = {}; state.doc = null; state.view = null; return; }
         const inside = box.contains(document.activeElement);
         box.hidden = true;
         clearTimeout(state.timer); state.timer = 0;
-        state.entries = []; state.o = {}; state.doc = null;  // the kept file bytes go with it (onSafe holds them)
+        state.entries = []; state.o = {}; state.doc = null; state.view = null;  // the kept file bytes go with it (onSafe holds them)
         const back = state.back; state.back = null;
         if (restore !== false && inside) {
             const to = back && back.isConnected && !back.disabled && !back.closest('[hidden]') ? back : K.$('#editor');
@@ -321,7 +356,7 @@
         // nothing to tell: an open panel closes (the focus, when it was inside, back where it was before it opened)
         if (!entries.length) { close(); return false; }
         const was = !box.hidden;
-        state.entries = entries; state.o = o || {}; state.doc = docNow();
+        state.entries = entries; state.o = o || {}; state.doc = docNow(); state.view = null;
         if (!was || !box.contains(document.activeElement)) {
             const a = document.activeElement;
             state.back = a && a !== document.body && !box.contains(a) ? a : state.back;
@@ -334,6 +369,18 @@
         return true;
     }
     report.close = close;
+    report.custom = function (view) {
+        const box = K.$('#import-report');
+        if (!box) return false;
+        if (!box.contains(document.activeElement)) { const a = document.activeElement; state.back = a && a !== document.body ? a : state.back; }
+        state.entries = [{ name: '', report: null }]; state.o = {}; state.doc = docNow(); state.view = view;
+        render();
+        collapse(false);
+        box.hidden = false;
+        box.focus();
+        return true;
+    };
+    report.isCustom = function () { const box = K.$('#import-report'); return !!state.view && !!box && !box.hidden; };
     /**
      * A new import starts: the file kept for "Re-import in safe mode" goes now (not only when its report is
      * replaced), and the button with it; the report on screen stays until the new one comes.
@@ -349,7 +396,7 @@
     report.refresh = function () { if (state.entries.length) render(); };
     report.collapse = collapse;
     report.follow = follow;
-    report.text = function () { return text(state.entries); };
+    report.text = function () { return state.view ? '' : text(state.entries); };
 
     function copy() {
         const s = text(state.entries);
