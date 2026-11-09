@@ -32,6 +32,8 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 - Publishing a release comes only after the release PR (the one that changes the version) is merged:
   `CLAUDE.md` and `docs/RELEASING.md` section 6 say so, and that the request to publish is a message of its own.
+- Every pull request targets `main`; one that builds on another unmerged one says so at the top, with the merge
+  order and the button to use (`CLAUDE.md`).
 
 ## [2.4] — 2026-11-09
 

@@ -72,6 +72,10 @@ its own (its CHANGELOG line with it) so any one can still be reverted alone. Ris
 goes in pull requests of its own.
 
 1. A branch from `main`, named for the work (`pdf/2.3-cells`, `ui/2.4-page-items`, `docs/…`).
+   **Every pull request targets `main`** (the owner's rule, 2026-11-09: #47, based on #46's branch, was merged into
+   that branch, not into `main`). When one has to build on another that is not merged yet, its text says so at the
+   top, with the order to merge them and the button to use («Create a merge commit»), and the owner is told the
+   same; its base is still `main`.
 2. The change, one commit per item, each message saying what changed and why. Commit messages end with the
    assistant's attribution lines when an assistant made them.
 3. A pull request to `main`: what it does, the lab numbers if the importer changed, anything the owner should
