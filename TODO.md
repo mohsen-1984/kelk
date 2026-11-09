@@ -73,6 +73,9 @@ requests).
    - The B fonts are embedded as any other: only those the document uses.
    - Sahel: the dehinted font of `pdf-font-sahel.js` (the owner's choice, 2026-11-06; judged in the Windows test).
    - Test: both files opened on a computer without these fonts.
+3. **The slides view on demand**: PptxBuilder and `scripts/slides.js` (about 185 KB) load with the page, though a
+   user who writes documents never needs them; load them on the first switch to Slides (and for a PPTX export),
+   as the PDF importer is. Its startup bytes come back to the budget (the owner's item, 2026-11-09).
 
 **2.6 — PDF import, from real files.** Each case is reproduced by a lab PDF of our own (failing on purpose until
 fixed: its score is the case's measure), in this order.
