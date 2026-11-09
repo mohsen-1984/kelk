@@ -356,6 +356,8 @@
             notInstalled: 'روی این رایانه نصب نیست: پیش‌نمایش فونت دیگری نشان می‌دهد و Word یا PowerPoint خواننده هم باید آن را داشته باشد.',
             notInstalledWord: 'روی این سیستم نصب نیست؛ Word یا PowerPoint گیرنده هم باید آن را داشته باشد.',
             fontsHint: 'PDF و HTML فونت را درون فایل دارند؛ Word و PowerPoint فقط نامش را. متن لاتین با فونت لاتین نوشته می‌شود؛ اگر «همان فونت فارسی» حروف لاتین نداشته باشد، با Times New Roman. فونت‌های لاتین همراه کِلک نیستند: PDF به‌جایشان حروف لاتین فونت فارسی یا DejaVu Sans را می‌گذارد.',
+            fontsEmbed: 'جاسازی فونت‌ها در DOCX و PPTX (تا روی رایانه‌ای که این فونت‌ها را ندارد هم دیده شوند)',
+            fontsEmbedded: 'فونت‌ها جاسازی شد: +{0} KB',
             fontsWordOwn: 'فونت دیگری برای DOCX و PPTX',
             fontsWordHint: 'هر فونت نصب‌شده‌ای را می‌توانید بنویسید؛ PDF، HTML و پیش‌نمایش همان فونت‌های بالا را می‌گیرند.',
             wordFontsGetHint: 'فونت‌های فارسی را برای Word و PowerPoint نصب کنید (نسخهٔ ttf، با راهنمای نصب):',
@@ -795,6 +797,8 @@
             notInstalled: 'Not installed on this computer: the preview shows another font, and the reader’s Word or PowerPoint needs it too.',
             notInstalledWord: 'Not installed on this system; the recipient’s Word or PowerPoint needs it too.',
             fontsHint: 'PDF and HTML carry their fonts; Word and PowerPoint only name them. Latin text is written in the Latin font; when «the same» font has no Latin letters, in Times New Roman. The Latin fonts are not shipped with Kelk: the PDF uses the Persian/Arabic font\'s Latin letters or DejaVu Sans.',
+            fontsEmbed: 'Embed fonts in DOCX and PPTX (so they show on a computer without them)',
+            fontsEmbedded: 'fonts embedded: +{0} KB',
             fontsWordOwn: 'Other fonts for DOCX and PPTX',
             fontsWordHint: 'Any installed font may be typed; PDF, HTML and the preview keep the fonts above.',
             wordFontsGetHint: '',       // shown when K.config.wordFontPacks.en has a zip
@@ -1224,6 +1228,8 @@
             notInstalled: 'غير مثبَّت على هذا الحاسوب: تعرض المعاينة خطًا آخر، ويحتاجه Word أو PowerPoint لدى القارئ أيضًا.',
             notInstalledWord: 'غير مثبَّت على هذا النظام؛ ويحتاجه Word أو PowerPoint لدى المستلم أيضًا.',
             fontsHint: 'تحمل PDF وHTML خطوطهما؛ أما Word وPowerPoint فتذكران أسماءها فقط. يُكتب النص اللاتيني بالخط اللاتيني؛ وإن لم تكن في «الخط العربي نفسه» حروف لاتينية، فبـ Times New Roman. لا تأتي الخطوط اللاتينية مع كِلك: يضع PDF مكانها الحروف اللاتينية للخط العربي أو DejaVu Sans.',
+            fontsEmbed: 'تضمين الخطوط في DOCX وPPTX (لتظهر على حاسوب لا توجد عليه)',
+            fontsEmbedded: 'ضُمّنت الخطوط: +{0} KB',
             fontsWordOwn: 'خطوط أخرى لـ DOCX وPPTX',
             fontsWordHint: 'يمكن كتابة أي خط مثبَّت؛ وتبقى لـ PDF وHTML والمعاينة الخطوطُ أعلاه.',
             wordFontsGetHint: '',       // shown when K.config.wordFontPacks.ar has a zip

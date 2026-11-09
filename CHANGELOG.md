@@ -4,6 +4,15 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+### Added
+
+- **Fonts embedded in DOCX and PPTX** (Settings → Fonts → «Embed fonts in DOCX and PPTX», on by default): the
+  text, Latin and code fonts a file uses that Kelk ships (Vazirmatn, Sahel, Vazir Code Hack …), regular and bold,
+  go into the file, so it shows them on a computer without them; Word's and PowerPoint's «Embed fonts in the
+  file» is on. The DOCX holds them obfuscated (ECMA-376 §17.8.1), the PPTX in the Embedded OpenType format
+  PowerPoint uses. The export's message says how much they added. A font typed under «Other fonts for DOCX and
+  PPTX» that Kelk does not ship is named only, as before.
+
 ### Changed
 
 - **One Fonts pane** (Settings → «فونت (قلم)» / Fonts / الخطوط): every font setting in one place — the text font,
@@ -23,6 +32,9 @@ All notable changes to Kelk. Dates are those of the release tags.
   view; a PPTX export checks the text again and, when it no longer fits, shows the report with «Export PPTX
   anyway».
 - Settings → Fonts: one button, «وب‌سایت Vazirmatn و Sahel», for both fonts' page (rastikerdar.github.io).
+- The B fonts: their NOTICE lists the three files they were obtained from (BNAZANIN.rar, BMITRA.rar,
+  BTITRBD.rar); Settings → Fonts has a button to Borna Rayaneh's website; a DOCX or PPTX names them with their
+  Arabic character set (178), embedded or not.
 
 ### Fixed
 

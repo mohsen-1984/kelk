@@ -29,6 +29,34 @@
             return load(K.config.pdfFonts, need);
         },
 
+        /**
+         * Settings → Fonts → Embed fonts: the fonts a .docx or .pptx uses, those Kelk ships (config.pdfFonts: their
+         * TrueType files, as they are), embedded in it (lib/FontEmbed.js, on demand): the text, Latin and code
+         * fonts (the code font only for a text with code), regular and bold — never the generated italics. A font
+         * that declares a character set of its own (config.fontCharset) is described with it even when not
+         * embedded. → { blob, added } (added: the bytes the fonts added; 0 when nothing was embedded).
+         */
+        embed: async function (kind, blob, text) {
+            const f = K.settings.fontsFor(kind), on = K.store.settings().fonts.embed, cs = K.config.fontCharset;
+            const fams = Array.from(new Set([f.bidi, f.latin].concat(HAS_CODE.test(text || '') ? [f.code] : [])));
+            const shipped = on ? fams.filter(function (x) { return K.config.pdfFonts[x]; }) : [];
+            const described = fams.filter(function (x) { return cs[x] != null && shipped.indexOf(x) < 0; });
+            if (!shipped.length && !(kind === 'docx' && described.length)) return { blob: blob, added: 0 };
+            await Promise.all([K.libs.need('jszip'), K.libs.need('fontembed'), load(K.config.pdfFonts, shipped)]);
+            const all = window.PdfFonts || {}, bin = function (b64) {
+                const s = atob(b64), u = new Uint8Array(s.length);
+                for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i);
+                return u;
+            };
+            const fonts = shipped.map(function (name) {
+                const e = Object.keys(all).map(function (k) { return all[k]; }).find(function (x) { return x && x.family === name; });
+                const st = (e && e.styles) || {}, code = name === f.code && name !== f.bidi && name !== f.latin;
+                return { name: name, charset: cs[name], regular: st.normal && bin(st.normal.data), bold: !code && st.bold ? bin(st.bold.data) : null };
+            }).filter(function (x) { return x.regular; }).concat(described.map(function (name) { return { name: name, charset: cs[name] }; }));
+            const out = await window.FontEmbed[kind === 'pptx' ? 'pptx' : 'docx'](blob, fonts);
+            return { blob: out, added: shipped.length ? Math.max(0, out.size - blob.size) : 0 };
+        },
+
         forHtml: function (text) {
             const f = K.settings.fontsFor('html');
             const need = [f.bidi, f.latin];                  // a system Latin font (Calibri …) has no web font: not embedded

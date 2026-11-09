@@ -5,6 +5,8 @@ Copyright (c) 2000 Borna Rayaneh (https://www.bornaray.com/). Version 2.01 (Buil
 
 Obtained unmodified from the publisher's website:
     https://www.bornaray.com/Content/downloads/fonts/BNAZANIN.rar
+    https://www.bornaray.com/Content/downloads/fonts/BMITRA.rar
+    https://www.bornaray.com/Content/downloads/fonts/BTITRBD.rar
 
 The fonts are downloadable from Borna Rayaneh's website. No license file is
 published with them and none is stated on the website. They are included only
@@ -19,7 +21,7 @@ Technical note: the font files set no embedding restriction (OS/2 fsType = 0).
 فونت‌های بی‌نازنین، بی‌میترا و بی‌تیتر — شرکت برنا رایانه
 
 حق نشر این فونت‌ها متعلق به شرکت برنا رایانه (https://www.bornaray.com/) است.
-فایل‌ها بدون هیچ تغییری از نشانی بالا دریافت شده‌اند؛ فونت‌ها از وب‌سایت شرکت
+فایل‌ها بدون هیچ تغییری از نشانی‌های بالا دریافت شده‌اند؛ فونت‌ها از وب‌سایت شرکت
 برنا رایانه قابل دریافت‌اند. همراه فونت‌ها و در وب‌سایت شرکت مجوزی منتشر نشده است.
 این فایل‌ها فقط برای راحتی کاربران در این بسته آمده‌اند و همهٔ حقوق، از جمله تعیین
 مجوز استفاده، جاسازی و توزیع، متعلق به شرکت برنا رایانه است.
