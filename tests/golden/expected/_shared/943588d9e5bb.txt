@@ -3,11 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="generator" content="Kelk HtmlBuilder 2.4">
-<title>Document</title>
+<meta name="generator" content="Kelk HtmlBuilder 2.5">
+<title>کد با فونت هم‌عرض</title>
 <style>
 @font-face{font-family:"Vazirmatn";src:url(data:font/woff2;base64,[111152 bytes sha256 4e3fa217d38f]) format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
-@font-face{font-family:"Vazir Code Hack";src:url(data:font/woff2;base64,[113056 bytes sha256 7cac2a79c75f]) format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"DejaVu Sans Mono";src:url(data:font/woff;base64,[127328 bytes sha256 d1eaa1971b70]) format("woff");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"DejaVu Sans Mono";src:url(data:font/woff;base64,[127568 bytes sha256 61b66a46fbb9]) format("woff");font-weight:700;font-style:normal;font-display:swap}
 *{box-sizing:border-box}
 html{background:#f4f4f2}
 body{margin:0;padding:24px 12px;color:#1c1b1a}
@@ -33,10 +34,10 @@ body{margin:0;padding:24px 12px;color:#1c1b1a}
 .doc th:not([align]),.doc.bd-root th:not([align]):is(.bd-ltr,.bd-rtl){text-align:center}
 .doc blockquote{margin:.5em 0;margin-inline-start:14.15pt;padding:.2em 0;padding-inline-start:12pt;border-inline-start:3.5pt solid #1F6F5C;color:#4A4A4A;background:#F6F9F8;padding-block:.35em;padding-inline-end:.7em;border-radius:3px 8px 8px 3px;border-start-start-radius:3px;border-end-start-radius:3px;border-start-end-radius:8px;border-end-end-radius:8px}
 .doc blockquote p{margin:.2em 0}
-.doc code{font-family:"Vazir Code Hack",ui-monospace,Consolas,monospace;font-size:10.0pt;background:#f4f2ee;padding:.05em .3em;border-radius:3px}
-.doc code :is(.bd-iso-rtl){font-family:"Vazir Code Hack",ui-monospace,Consolas,monospace}
+.doc code{font-family:"DejaVu Sans Mono",ui-monospace,Consolas,monospace;font-size:10.0pt;background:#f4f2ee;padding:.05em .3em;border-radius:3px}
+.doc code :is(.bd-iso-rtl){font-family:"DejaVu Sans Mono",ui-monospace,Consolas,monospace}
 .doc .code{margin:.6em 0;border:0.75pt solid #d4d0c8;background:#FCFCFC;color:#1c1b1a;direction:ltr;border-radius:6px;overflow:hidden}
-.doc .code-lang{background:#E7F1EE;border-bottom:0.75pt solid #d4d0c8;color:#595959;font:8.0pt "Vazir Code Hack",ui-monospace,Consolas,monospace;padding:2pt 6pt;text-align:left}
+.doc .code-lang{background:#E7F1EE;border-bottom:0.75pt solid #d4d0c8;color:#595959;font:8.0pt "DejaVu Sans Mono",ui-monospace,Consolas,monospace;padding:2pt 6pt;text-align:left}
 .doc pre{margin:0;padding:6pt 8pt;overflow-x:auto;direction:ltr;text-align:left;line-height:1.45}
 .doc pre code{background:none;padding:0;font-size:10.0pt}
 .doc img{max-width:100%;height:auto}.doc hr{border:0;border-top:1px solid #a0a0a0}

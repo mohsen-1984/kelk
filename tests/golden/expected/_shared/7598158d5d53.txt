@@ -1,18 +1,19 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="generator" content="Kelk HtmlBuilder 2.4">
-<title>Document</title>
+<meta name="generator" content="Kelk HtmlBuilder 2.5">
+<title>Images</title>
 <style>
+@font-face{font-family:"Vazirmatn";src:url(data:font/woff2;base64,[111152 bytes sha256 4e3fa217d38f]) format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
 *{box-sizing:border-box}
 html{background:#f4f4f2}
 body{margin:0;padding:24px 12px;color:#1c1b1a}
 .page{max-width:776px;margin:0 auto;background:#fff;padding:40px 48px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
-.doc{font-family:"Sahel","Sahel",sans-serif;font-size:12.0pt;line-height:1.60;--bd-base:24pt;--bd-step:18pt}
-.doc .bd-ltr,.doc .bd-iso-ltr:not(code){font-family:"Sahel",sans-serif}
-.doc .bd-rtl,.doc .bd-iso-rtl:not(code){font-family:"Sahel","Sahel",sans-serif}
+.doc{font-family:"Vazirmatn","Vazirmatn",sans-serif;font-size:12.0pt;line-height:1.60;--bd-base:24pt;--bd-step:18pt}
+.doc .bd-ltr,.doc .bd-iso-ltr:not(code){font-family:"Vazirmatn",sans-serif}
+.doc .bd-rtl,.doc .bd-iso-rtl:not(code){font-family:"Vazirmatn","Vazirmatn",sans-serif}
 .doc p{margin:4pt 0 6pt}
 .doc p,.doc.bd-root p:is(.bd-ltr,.bd-rtl){text-align:justify}
 .doc li,.doc.bd-root li:is(.bd-ltr,.bd-rtl){text-align:justify}
@@ -43,7 +44,7 @@ body{margin:0;padding:24px 12px;color:#1c1b1a}
 .doc .kelk-toc-entry,.doc.bd-root .kelk-toc-entry:is(.bd-ltr,.bd-rtl){margin-block:2pt;text-align:start}
 .doc .kelk-toc-entry a{color:inherit;text-decoration:none}.doc .kelk-toc-entry a:hover{text-decoration:underline}
 .doc .toc-1{font-weight:600}.doc.bd-root .kelk-toc-entry.toc-2,.doc .toc-2{margin-inline-start:calc(1 * 18pt)}.doc.bd-root .kelk-toc-entry.toc-3,.doc .toc-3{margin-inline-start:calc(2 * 18pt)}.doc.bd-root .kelk-toc-entry.toc-4,.doc .toc-4{margin-inline-start:calc(3 * 18pt)}.doc.bd-root .kelk-toc-entry.toc-5,.doc .toc-5{margin-inline-start:calc(4 * 18pt)}.doc.bd-root .kelk-toc-entry.toc-6,.doc .toc-6{margin-inline-start:calc(5 * 18pt)}
-.kelk-header,.kelk-footer{font-family:"Sahel","Sahel",sans-serif;font-size:9pt;color:#333}
+.kelk-header,.kelk-footer{font-family:"Vazirmatn","Vazirmatn",sans-serif;font-size:9pt;color:#333}
 .kelk-header{margin-bottom:12pt}.kelk-footer{margin-top:16pt}
 .hf-table{width:100%;border-collapse:collapse}.hf-table td{padding:3pt 5pt;vertical-align:middle;text-align:center}
 .hf-table td.hf-author{text-align:start}.hf-title{font-weight:700}

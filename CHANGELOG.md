@@ -4,6 +4,8 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+## [2.5] — 2026-11-09
+
 ### Added
 
 - **Fonts embedded in DOCX and PPTX** (Settings → Fonts → «Embed fonts in DOCX and PPTX», on by default): the
@@ -21,7 +23,9 @@ All notable changes to Kelk. Dates are those of the release tags.
   those two fonts of their own, and only there may any installed font be typed. The Latin list is Calibri, Arial,
   Tahoma and Times New Roman in every language, or the text font's own Latin letters (the default); the PDF, which
   carries its fonts, writes a system Latin font's text with the text font's letters. The Word group and «Preview
-  with the Word fonts» are gone; a profile with Word fonts typed keeps them as fonts of its own (schema 2).
+  with the Word fonts» are gone; a profile with Word fonts typed keeps them as fonts of its own (schema 2). Since one
+  choice serves every output, a DOCX or PPTX names Vazirmatn by default in English and Arabic too (2.4: Arial and
+  Calibri), and carries it (embedded fonts, above).
 - **B Nazanin and B Mitra** in the text font list, for the preview (their TTFs as they are, loaded on first choice),
   PDF, HTML, DOCX and PPTX; B Titr for PDF. They have no Latin letters: Latin text takes Times New Roman (DejaVu
   Sans in the PDF) unless a Latin font is chosen. The font download adds them in `borna-rayaneh/`, with its
@@ -53,6 +57,9 @@ All notable changes to Kelk. Dates are those of the release tags.
   `CLAUDE.md` and `docs/RELEASING.md` section 6 say so, and that the request to publish is a message of its own.
 - Every pull request targets `main`; one that builds on another unmerged one says so at the top, with the merge
   order and the button to use (`CLAUDE.md`).
+- The startup size budget is 1,613,500 bytes (+12.5 KB over 2.4): the Fonts pane, the slide check's hooks, the
+  «not installed» check, font embedding's option and message (`lib/FontEmbed.js` loads on demand). Loading the
+  slides view on demand (2.6) gives far more back.
 
 ## [2.4] — 2026-11-09
 
