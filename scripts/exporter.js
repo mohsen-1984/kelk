@@ -1,10 +1,10 @@
 /**
  * Kelk.exporter — the preview's HTML through the lib/ builders, configured
- * from the export profile: fonts (Word and PDF apart), sizes, page,
+ * from the export profile: fonts (Settings → Fonts: Kelk.settings.fontsFor), sizes, page,
  * direction, code, header/footer, logo and images.
  *   docx → DocxBuilder     pdf → PdfBuilder (fonts loaded on demand)
  *   doc  → WordHtmlBuilder (MHTML)   html → HtmlBuilder (fonts and images embedded)
- *   pptx → PptxBuilder (Kelk.slides: the Word fonts, Settings → Slides)
+ *   pptx → PptxBuilder (Kelk.slides: the fonts of DOCX, Settings → Slides)
  *   md   → the text
  */
 (function (K) {
@@ -84,18 +84,6 @@
         return /^\d+%$/.test(v || '') ? { lineHeight: v, lineHeightTight: v } : {};
     }
 
-    function fontsFor(kind, s) {
-        if (kind === 'pdf' || kind === 'html') return { bidi: s.fonts.bidi, latin: s.fonts.latin, code: s.code.font };
-        // null → the automatic Word font of the interface language; '' (emptied) → as PDF
-        const W = K.settings.wordFontDefault;
-        const pick = function (v, auto, pdf) { return v == null ? auto : (String(v).trim() || pdf); };
-        return {
-            bidi: pick(s.fonts.wordBidi, W('bidi'), s.fonts.bidi),
-            latin: pick(s.fonts.wordLatin, W('latin'), s.fonts.latin),
-            code: (s.code.wordFont || '').trim() || s.code.font
-        };
-    }
-
     /** Header and footer of the export profile, in BuilderBase terms. */
     function headerFooter(s, logo) {
         const d = s.document, hf = s.headerFooter;
@@ -144,7 +132,7 @@
             math: { mode: (s.math && s.math.html) || 'svg', word: (s.math && s.math.word) || 'native', textFont: s.fonts.bidi },   // HTML: svg | mathml; Word/PDF: images (RTL \text in the web font)
             headerFooterDirection: s.headerFooter.direction,
             meta: { title: K.names.title(), author: s.document.author || '' },   // the file's properties (creator: Kelk)
-            fonts: fontsFor(kind, s),
+            fonts: K.settings.fontsFor(kind),          // Settings → Fonts
             fontSizes: { bidi: +s.fonts.bidiSize || 12, latin: +s.fonts.latinSize || 11.5, code: +s.code.size || 10 },
             header: hf.header,
             footer: hf.footer,
@@ -218,7 +206,6 @@
             K.preview.flush();
             await K.fonts.forHtml(K.editor.value());
             return configure(HtmlBuilder.create(), 'html').addFromHtml(K.preview.html()).toHtml();
-        },
-        _fontsFor: fontsFor
+        }
     };
 })(window.Kelk = window.Kelk || {});

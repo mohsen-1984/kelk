@@ -236,15 +236,51 @@
                     </div>
                 </details>
 
-                <details class="group">
-                    <summary><i data-lucide="type"></i><span data-i18n="gText"></span></summary>
+                <!-- every font in one place: one choice for the preview and every output, or other fonts for DOCX and PPTX -->
+                <details class="group" id="fonts-group">
+                    <summary><i data-lucide="type"></i><span data-i18n="gFonts"></span></summary>
                     <div class="fields">
-                        <label class="field"><span data-i18n="fontBidi"></span><select data-setting="fonts.bidi"></select></label>
-                        <label class="field"><span data-i18n="fontLatin"></span><select data-setting="fonts.latin"></select></label>
-                        <div class="row2">
+                        <label class="field"><span data-i18n="fontBidi"></span><select data-setting="fonts.bidi" data-font-check="#nf-bidi"></select></label>
+                        <div class="field" id="nf-bidi" hidden><span class="hint warn" data-i18n="notInstalled"></span></div>
+                        <label class="field"><span data-i18n="fontLatin"></span><select data-setting="fonts.latin" data-font-check="#nf-latin"></select></label>
+                        <div class="field" id="nf-latin" hidden><span class="hint warn" data-i18n="notInstalled"></span></div>
+                        <label class="field"><span data-i18n="codeFont"></span><select data-setting="code.font"></select></label>
+                        <div class="row3">
                             <label class="field"><span data-i18n="sizeBidi"></span><input type="number" min="6" max="36" step="0.5" dir="ltr" data-setting="fonts.bidiSize"></label>
                             <label class="field"><span data-i18n="sizeLatin"></span><input type="number" min="6" max="36" step="0.5" dir="ltr" data-setting="fonts.latinSize"></label>
+                            <label class="field"><span data-i18n="codeSize"></span><input type="number" min="6" max="24" step="0.5" dir="ltr" data-setting="code.size"></label>
                         </div>
+                        <div class="field"><span class="hint" data-i18n="fontsHint"></span></div>
+                        <label class="check"><input type="checkbox" data-setting="fonts.wordOwn"><span data-i18n="fontsWordOwn"></span></label>
+                        <div class="fields" id="word-fonts" hidden>
+                            <div class="field"><span class="label-row"><label for="f-word-bidi" data-i18n="fontBidi"></label>
+                                <button class="mini" type="button" data-reset="fonts.wordBidi" hidden data-i18n-attr="title:resetDefault;aria-label:resetDefault"><i data-lucide="rotate-ccw"></i></button></span>
+                                <input type="text" id="f-word-bidi" dir="auto" list="dl-word-fonts" data-setting="fonts.wordBidi" data-font-check="#nf-word-bidi"></div>
+                            <div class="field" id="nf-word-bidi" hidden><span class="hint warn" data-i18n="notInstalled"></span></div>
+                            <div class="field"><span class="label-row"><label for="f-word-latin" data-i18n="fontLatin"></label>
+                                <button class="mini" type="button" data-reset="fonts.wordLatin" hidden data-i18n-attr="title:resetDefault;aria-label:resetDefault"><i data-lucide="rotate-ccw"></i></button></span>
+                                <input type="text" id="f-word-latin" dir="auto" list="dl-word-fonts" data-setting="fonts.wordLatin" data-font-check="#nf-word-latin"></div>
+                            <div class="field" id="nf-word-latin" hidden><span class="hint warn" data-i18n="notInstalled"></span></div>
+                            <label class="field"><span data-i18n="codeFont"></span>
+                                <input type="text" dir="auto" list="dl-word-code-fonts" data-setting="code.wordFont" data-font-check="#nf-word-code" data-i18n-attr="placeholder:fontsAsAbove"></label>
+                            <div class="field" id="nf-word-code" hidden><span class="hint warn" data-i18n="notInstalled"></span></div>
+                            <div class="field"><span class="hint" data-i18n="fontsWordHint"></span></div>
+                        </div>
+                        <!-- fonts to install for Word and PowerPoint (Kelk.config.wordFontPacks, by interface language) -->
+                        <div class="field font-pack" id="word-font-pack" hidden>
+                            <span class="hint" data-i18n="wordFontsGetHint"></span>
+                            <div class="btn-row">
+                                <a class="btn soft" id="word-font-zip" download><i data-lucide="download"></i><span data-i18n="wordFontsGet"></span></a>
+                                <a class="btn ghost font-site" target="_blank" rel="noopener noreferrer" hidden><i data-lucide="external-link"></i><span></span></a>
+                                <a class="btn ghost font-site" target="_blank" rel="noopener noreferrer" hidden><i data-lucide="external-link"></i><span></span></a>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="group">
+                    <summary><i data-lucide="pilcrow"></i><span data-i18n="gText"></span></summary>
+                    <div class="fields">
                         <!-- paragraphs (and list items: alignment) in every output; template textAlign / lineHeight -->
                         <div class="row2">
                             <label class="field"><span data-i18n="textAlign"></span>
@@ -263,17 +299,13 @@
                         <label class="check"><input type="checkbox" data-setting="text.breaks"><span data-i18n="lineBreaks"></span></label>
                         <div class="field"><span class="hint" data-i18n="lineBreaksHint"></span></div>
                         <div class="field"><span class="hint"><span data-i18n="textFontsHint"></span>
-                            <button type="button" class="link-btn" data-open-group="gWord" data-i18n="gWord"></button></span></div>
+                            <button type="button" class="link-btn" data-open-group="gFonts" data-i18n="gFonts"></button></span></div>
                     </div>
                 </details>
 
                 <details class="group">
                     <summary><i data-lucide="code"></i><span data-i18n="gCode"></span></summary>
                     <div class="fields">
-                        <label class="field"><span data-i18n="codeFont"></span><select data-setting="code.font"></select></label>
-                        <div class="row2">
-                            <label class="field"><span data-i18n="codeSize"></span><input type="number" min="6" max="24" step="0.5" dir="ltr" data-setting="code.size"></label>
-                        </div>
                         <label class="check"><input type="checkbox" data-setting="code.showLanguage"><span data-i18n="showLanguage"></span></label>
                         <label class="field"><span data-i18n="rtlInCode"></span>
                             <select data-setting="code.rtlFont"><option value="code" data-i18n="rtlInCodeCode"></option><option value="document" data-i18n="rtlInCodeDoc"></option></select></label>
@@ -425,34 +457,6 @@
                     </div>
                 </details>
 
-                <details class="group" id="word-group">
-                    <summary><i data-lucide="file-type"></i><span data-i18n="gWord"></span></summary>
-                    <div class="fields">
-                        <div class="field"><span class="label-row"><label for="f-word-bidi" data-i18n="fontBidi"></label>
-                            <button class="mini" type="button" data-reset="fonts.wordBidi" hidden data-i18n-attr="title:resetDefault;aria-label:resetDefault"><i data-lucide="rotate-ccw"></i></button></span>
-                            <input type="text" id="f-word-bidi" dir="auto" list="dl-word-fonts" data-setting="fonts.wordBidi" data-font-check="#nf-word-bidi" data-i18n-attr="placeholder:sameAsPdf"></div>
-                        <div class="field" id="nf-word-bidi" hidden><span class="hint warn" data-i18n="notInstalled"></span></div>
-                        <div class="field"><span class="label-row"><label for="f-word-latin" data-i18n="fontLatin"></label>
-                            <button class="mini" type="button" data-reset="fonts.wordLatin" hidden data-i18n-attr="title:resetDefault;aria-label:resetDefault"><i data-lucide="rotate-ccw"></i></button></span>
-                            <input type="text" id="f-word-latin" dir="auto" list="dl-word-fonts" data-setting="fonts.wordLatin" data-font-check="#nf-word-latin" data-i18n-attr="placeholder:sameAsPdf"></div>
-                        <div class="field" id="nf-word-latin" hidden><span class="hint warn" data-i18n="notInstalled"></span></div>
-                        <label class="field"><span data-i18n="codeFont"></span>
-                            <input type="text" dir="auto" list="dl-word-code-fonts" data-setting="code.wordFont" data-font-check="#nf-word-code" data-i18n-attr="placeholder:sameAsPdf"></label>
-                        <div class="field" id="nf-word-code" hidden><span class="hint warn" data-i18n="notInstalled"></span></div>
-                        <div class="field"><span class="hint" data-i18n="wordFontsHint"></span></div>
-                        <!-- fonts to install for Word (Kelk.config.wordFontPacks, by interface language) -->
-                        <div class="field font-pack" id="word-font-pack" hidden>
-                            <span class="hint" data-i18n="wordFontsGetHint"></span>
-                            <div class="btn-row">
-                                <a class="btn soft" id="word-font-zip" download><i data-lucide="download"></i><span data-i18n="wordFontsGet"></span></a>
-                                <a class="btn ghost font-site" target="_blank" rel="noopener noreferrer" hidden><i data-lucide="external-link"></i><span></span></a>
-                                <a class="btn ghost font-site" target="_blank" rel="noopener noreferrer" hidden><i data-lucide="external-link"></i><span></span></a>
-                            </div>
-                        </div>
-                        <label class="check"><input type="checkbox" data-ui="previewWordFont"><span data-i18n="previewWordFont"></span></label>
-                    </div>
-                </details>
-
                 <details class="group" id="slides-group">
                     <summary><i data-lucide="presentation"></i><span data-i18n="gSlides"></span></summary>
                     <div class="fields">
@@ -511,7 +515,7 @@
                         <label class="check"><input type="checkbox" data-setting="slides.autoLayout"><span data-i18n="slidesAuto"></span></label>
                         <label class="check"><input type="checkbox" data-setting="slides.split"><span data-i18n="slidesSplit"></span></label>
                         <div class="field"><span class="hint"><span data-i18n="slidesFontsHint"></span>
-                            <button type="button" class="link-btn" data-open-group="gWord" data-i18n="gWord"></button></span></div>
+                            <button type="button" class="link-btn" data-open-group="gFonts" data-i18n="gFonts"></button></span></div>
                         <div class="sub-head" data-i18n="slidesPromptHead"></div>
                         <div class="field"><span class="hint" data-i18n="slidesPromptHint"></span></div>
                         <div class="btn-row">

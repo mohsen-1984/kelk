@@ -65,14 +65,14 @@
     const SCOPES = {
         'direction': 'PHFW', 'document.title': 'HFW', 'document.author': 'HFW', 'document.edition': 'HFW', 'document.link': 'HFW',
         'logoHeight': 'HFW', 'headerFooter.mode': 'HFW', 'headerFooter.header': 'HFW', 'headerFooter.footer': 'HFW', 'headerFooter.direction': 'HFW',
-        'fonts.bidi': 'PHF', 'fonts.latin': 'PHF', 'fonts.bidiSize': 'PHFW', 'fonts.latinSize': 'PHFW', 'fonts.wordBidi': 'W', 'fonts.wordLatin': 'W',
+        'fonts.bidi': 'PHFW', 'fonts.latin': 'PHFW', 'fonts.bidiSize': 'PHFW', 'fonts.latinSize': 'PHFW', 'fonts.wordOwn': 'W', 'fonts.wordBidi': 'W', 'fonts.wordLatin': 'W',
         'toc.enabled': 'PHFW', 'toc.levels': 'PHFW', 'page.size': 'HFW', 'page.orientation': 'HFW', 'page.margin': 'HFW',
         'text.align': 'PHFW', 'text.lineHeight': 'PHFW', 'text.breaks': 'PHFW',
         'page.tableWidth': 'PHFW', 'page.tableMinWidth': 'PHFW', 'page.tableAlign': 'PHFW',
         'tableStyle.lines': 'PHFW', 'tableStyle.fill': 'PHFW', 'tableStyle.total': 'PHFW', 'tableStyle.headerCenter': 'PHFW', 'tableStyle.headerBold': 'PHFW', 'tableStyle.headerColor': 'PHFW', 'tableStyle.stripeColor': 'PHFW', 'tableStyle.borderColor': 'PHFW',
-        'code.showLanguage': 'PHFW', 'code.rtlFont': 'PHFW', 'code.font': 'PHF', 'code.wordFont': 'W', 'code.size': 'PHFW',
+        'code.showLanguage': 'PHFW', 'code.rtlFont': 'PHFW', 'code.font': 'PHFW', 'code.wordFont': 'W', 'code.size': 'PHFW',
         'code.bg': 'PHFW', 'code.headerBg': 'PHFW', 'code.border': 'PHFW', 'quote.border': 'PHFW', 'quote.width': 'PHFW', 'quote.bg': 'PHFW', 'quote.text': 'PHFW',
-        'math.html': 'PH', 'math.word': 'W', 'ui.previewWordFont': 'P'
+        'math.html': 'PH', 'math.word': 'W'
     };
     // Settings → Slides reach the slides preview and the .pptx only
     const reachesPreview = function (path) { return (SCOPES[path] || '').indexOf('P') >= 0 || ((path.indexOf('slides.') === 0 || /^(fonts\.word|code\.wordFont)/.test(path)) && K.slides && K.slides.active()); };
@@ -83,6 +83,8 @@
             const self = this;
             fillSelect('[data-setting="fonts.bidi"]', K.config.fontsBidi);
             fillSelect('[data-setting="fonts.latin"]', K.config.fontsLatin);
+            const same = K.$('[data-setting="fonts.latin"]');             // '': the text font's own Latin letters
+            if (same) same.insertAdjacentHTML('afterbegin', '<option value="" data-i18n="fontLatinSame">' + K.i18n.t('fontLatinSame') + '</option>');
             fillSelect('[data-setting="code.font"]', K.config.fontsCode);
             fillDatalist('#dl-word-fonts', K.config.wordFonts);
             fillDatalist('#dl-word-code-fonts', K.config.wordCodeFonts);
@@ -215,7 +217,7 @@
             if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { self.onChange('fonts.'); });
         },
 
-        /** The font pack of the interface language under Settings → Word (hidden when it has none). */
+        /** The font pack of the interface language under Settings → Fonts (hidden when it has none). */
         fontPack: function () {
             const box = K.$('#word-font-pack');
             if (!box) return;
@@ -264,8 +266,8 @@
             const auto = {
                 'document.title': function () { return K.names.autoTitle(true); },
                 'document.edition': function () { return K.names.defaultEdition(); },
-                'fonts.wordBidi': function () { return K.settings.wordFontDefault('bidi'); },
-                'fonts.wordLatin': function () { return K.settings.wordFontDefault('latin'); },
+                'fonts.wordBidi': function () { return K.settings.fontsFor('html').bidi; },
+                'fonts.wordLatin': function () { return K.settings.fontsFor('html').latin; },
                 'headerFooter.header': function () { return (K.config.samples[K.i18n.lang] || K.config.samples.fa).header; },
                 'headerFooter.footer': function () { return (K.config.samples[K.i18n.lang] || K.config.samples.fa).footer; },
                 'slides.footer': function () { const m = K.slides && K.slides.deckMeta ? K.slides.deckMeta() : {}; return m.footer != null ? String(m.footer) : (m.title || K.names.title() || ''); }
@@ -320,13 +322,7 @@
             });
         },
 
-        /** The automatic Word font of a role ('bidi' | 'latin') for the interface language. */
-        wordFontDefault: function (role) {
-            const d = K.config.wordFontDefaults[K.i18n.lang] || K.config.wordFontDefaults.en;
-            return d[role];
-        },
-
-        /** Word font fields: a note when the typed font is not on this system. */
+        /** Font fields: a note when the chosen or typed font is not on this system. */
         checkWordFonts: function () {
             K.$$('[data-font-check]').forEach(function (el) {
                 const note = K.$(el.getAttribute('data-font-check'));
@@ -336,27 +332,29 @@
         },
 
         /**
-         * The document fonts of the editor and the preview: the Text and Code
-         * groups' fonts, or — with "Preview with the Word fonts" — the Word
-         * fonts, each where it is installed on this system.
-         * @returns {{ bidi: string, latin: string, code: string, word: boolean }}
+         * The fonts of an output (Settings → Fonts): one choice for the preview and every builder; DOCX, DOC and
+         * PPTX take their own fonts when fonts.wordOwn is on (a field left empty: the font above). The PDF carries
+         * its fonts, so a Latin font Kelk does not ship becomes the text font's Latin letters (or DejaVu Sans).
+         * @param {string} kind - 'html' (and the page) | 'pdf' | 'docx' | 'doc' | 'pptx'
+         * @returns {{ bidi: string, latin: string, code: string }}
          */
-        previewFonts: function () {
-            const s = K.store.settings();
-            const word = !!K.store.getUi('previewWordFont');
-            const pick = function (wordName, pdfName) {
-                const w = (wordName || '').trim();
-                return word && w && K.fonts.installed(w) ? w : pdfName;
-            };
-            const wb = s.fonts.wordBidi == null ? this.wordFontDefault('bidi') : s.fonts.wordBidi;
-            const wl = s.fonts.wordLatin == null ? this.wordFontDefault('latin') : s.fonts.wordLatin;
-            return { bidi: pick(wb, s.fonts.bidi), latin: pick(wl, s.fonts.latin), code: pick(s.code.wordFont, s.code.font), word: word };
+        fontsFor: function (kind) {
+            const s = K.store.settings(), C = K.config, f = s.fonts;
+            const noLatin = C.fontsNoLatin.indexOf(f.bidi) >= 0;
+            const out = { bidi: f.bidi, latin: f.latin || (noLatin ? C.noLatinWord : f.bidi), code: s.code.font };
+            if (kind === 'pdf' && !C.pdfFonts[out.latin]) out.latin = noLatin ? 'DejaVu Sans' : f.bidi;
+            if (/^(docx|doc|pptx)$/.test(kind) && f.wordOwn) {
+                const own = function (v, base) { return String(v || '').trim() || base; };
+                return { bidi: own(f.wordBidi, out.bidi), latin: own(f.wordLatin, out.latin), code: own(s.code.wordFont, out.code) };
+            }
+            return out;
         },
 
-        /** Fonts of the page (editor + preview): see previewFonts. */
+        /** Fonts of the page (editor + preview): the HTML export's; a font shown from its PDF file loads on first use. */
         applyFonts: function () {
             const s = K.store.settings(), root = document.documentElement.style;
-            const f = this.previewFonts(), bidi = f.bidi, latin = f.latin, code = f.code;
+            const f = this.fontsFor('html'), bidi = f.bidi, latin = f.latin, code = f.code;
+            [bidi, latin].forEach(function (x) { if (K.config.fontsFromPdf.indexOf(x) >= 0) K.fonts.fromPdf(x); });
             root.setProperty('--font-content', '"' + bidi + '", "' + latin + '", system-ui, sans-serif');
             root.setProperty('--font-latin', '"' + latin + '", system-ui, sans-serif');
             root.setProperty('--font-mono', '"' + code + '", ui-monospace, Consolas, monospace');
@@ -370,9 +368,12 @@
         onChange: function (path, typing) {
             const s = K.store.settings();
             const all = path === '*';
-            if (all || path.indexOf('fonts.') === 0 || path.indexOf('code.') === 0 || path === 'ui.previewWordFont') {
+            if (all || path.indexOf('fonts.') === 0 || path.indexOf('code.') === 0) {
                 this.applyFonts();
                 this.checkWordFonts();
+                const own = K.$('#word-fonts');
+                if (own) own.hidden = !s.fonts.wordOwn;
+                if (path === 'fonts.wordOwn' || path === 'fonts.bidi' || path === 'fonts.latin') this.fillDefaults();
             }
             if (all || path.indexOf('tableStyle.') === 0) this.tableColorsInUse(s.tableStyle || {});
             if (all || path === 'page.tableWidth') {           // the minimum width counts with "auto" only
@@ -391,8 +392,7 @@
             if (all || path === 'headerFooter.mode') {
                 K.$('#hf-custom').hidden = s.headerFooter.mode !== 'custom';
             }
-            const wordFont = path === 'fonts.wordBidi' || path === 'fonts.wordLatin' || path === 'code.wordFont';
-            if (all || reachesPreview(path) || (wordFont && K.store.getUi('previewWordFont'))) {
+            if (all || reachesPreview(path)) {
                 if (typing) K.preview.renderSoon(200);      // the preview's own timer: an export flushes it
                 else K.preview.render();
             } else K.names.refresh();

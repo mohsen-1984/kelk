@@ -6,6 +6,13 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Changed
 
+- **One Fonts pane** (Settings → «فونت (قلم)» / Fonts / الخطوط): every font setting in one place — the text font,
+  the Latin font, the code font and their sizes, the installed-font check and the font download. By default one
+  choice serves the preview and every output (HTML, PDF, DOC, DOCX, PPTX); «Other fonts for DOCX and PPTX» gives
+  those two fonts of their own, and only there may any installed font be typed. The Latin list is Calibri, Arial,
+  Tahoma and Times New Roman in every language, or the text font's own Latin letters (the default); the PDF, which
+  carries its fonts, writes a system Latin font's text with the text font's letters. The Word group and «Preview
+  with the Word fonts» are gone; a profile with Word fonts typed keeps them as fonts of its own (schema 2).
 - **The slide check also runs when text comes in while the Slides view is on**: a paste (Ctrl+V or the Paste
   buttons) or an import that is plainly not in slide format switches to the document view, with the same report
   (its button makes slides anyway). Editing — typing, deleting, cut, undo and redo, replace — never switches the

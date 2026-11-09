@@ -157,12 +157,12 @@ Everything in the .pptx stays editable: text, diagrams as PowerPoint shapes, cha
 - **Each new line is a new line:** on in the Text group — consecutive lines of a paragraph keep their breaks, as a model's answer shows in a chat. Turn it off for the GFM standard (lines join; only a blank line starts a paragraph).
 - **Header and footer:** structured (logo, title, edition; author and page numbers), simple, or custom HTML that starts from a sample.
 - **Table of contents:** after the document title, with the heading levels you choose (H1, H1–H2, H1–H3).
-- **Text and Word fonts:** the *Text* group sets the fonts of the preview, PDF and HTML; the *Word* group sets the fonts a Word file names. PDF and HTML carry their fonts and need nothing installed; a Word file only names its fonts, so they must be installed on the reader's computer.
+- **Fonts:** one choice for the preview and every output; with one option, other fonts for DOCX and PPTX. PDF and HTML carry their fonts and need nothing installed; a Word or PowerPoint file only names its fonts, so they must be installed on the reader's computer.
 - **Tables:** width (automatic, as the content needs, up to 100% and at least a chosen minimum — 50% by default — or a fixed share; column widths always follow the content), alignment, and a **table style**: lines (none, under the header, horizontal, vertical, outer frame, grid) × fill (none, colored header, zebra stripes, or both), three colors, a centered and bold header row (each can be turned off) and an optional total row — the same in the preview and every output.
 - **Code and quotes:** the code font is Vazir Code, made for code with Persian and Arabic in it, which keeps the columns aligned. The *Code* group also changes the colors of code blocks (background, language bar, frame), and the *Quotes* group the quote box (bar color and width, fill, text color).
 - **Formulas:** SVG or MathML in the preview and HTML; editable Word equations or pictures in Word.
 - **Arabic:** Vazirmatn, the default font, covers Arabic too; Arabic fonts such as Cairo, Amiri or Noto Naskh Arabic can be prepared for the PDF (see *For developers*), and in Word any installed Arabic font works.
-- **Slides:** theme, two colors, light or dark title slides, 16:9 or 4:3, text size, timeline direction, footer, slide numbers and speaker notes. Like Word, PowerPoint names its fonts — the *Word* group's fonts.
+- **Slides:** theme, two colors, light or dark title slides, 16:9 or 4:3, text size, timeline direction, footer, slide numbers and speaker notes. Like Word, PowerPoint names its fonts — those of the *Fonts* group.
 
 > 💡 **How to:** this document has numbered headings — turn on "Table of contents" in the Document section of Settings and export a PDF.
 
