@@ -221,17 +221,11 @@
             if (!box) return;
             const p = (K.config.wordFontPacks || {})[K.i18n.lang] || {};
             box.hidden = !p.zip;
-            const zip = K.$('#word-font-zip'), site = K.$('#word-font-site');
-            if (p.zip) zip.setAttribute('href', p.zip);
-            // one link per font: the first is the markup's own, the others its copies (made again on a language change)
-            box.querySelectorAll('.font-site-copy').forEach(function (a) { a.remove(); });
-            const sites = Object.keys(p.sites || {});
-            site.hidden = !sites.length;
-            sites.forEach(function (name, i) {
-                const a = i ? site.cloneNode(true) : site;
-                if (i) { a.removeAttribute('id'); a.classList.add('font-site-copy'); site.parentNode.appendChild(a); }
-                a.setAttribute('href', p.sites[name]);
-                a.querySelector('span').textContent = K.i18n.t('wordFontsSite').replace('{font}', name);
+            if (p.zip) K.$('#word-font-zip').setAttribute('href', p.zip);
+            const names = Object.keys(p.sites || {});
+            box.querySelectorAll('.font-site').forEach(function (a, i) {     // a link per font's web page
+                a.hidden = !names[i];
+                if (names[i]) { a.href = p.sites[names[i]]; a.lastChild.textContent = K.i18n.t('wordFontsSite').replace('{font}', names[i]); }
             });
         },
 

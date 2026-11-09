@@ -99,11 +99,7 @@
             ar: { bidi: 'Arial', latin: 'Calibri' }
         },
 
-        /**
-         * Fonts to install for Word, by interface language: one zip of every .ttf (with an install guide) and the
-         * fonts' web pages ({ name: url }, one link each). Shown under Settings → Word when the language has a zip;
-         * en and ar: none yet (fill zip, sites and the i18n keys wordFontsGet* to show them).
-         */
+        /** Fonts to install for Word, by language: a zip of .ttf files and { font: web page }; shown when zip is set. */
         wordFontPacks: {
             fa: {
                 zip: 'assets/fonts/download/persian-fonts-ttf.zip',
