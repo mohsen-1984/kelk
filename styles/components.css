@@ -511,6 +511,7 @@ details.group.app-group > summary { color: var(--accent-ink); background: var(--
 .present .kelk-slide-meta, .present .kelk-slide-notes { display: none; }
 .present .kelk-slide { border-radius: 0; box-shadow: none; }
 .present-count { position: fixed; bottom: 10px; inset-inline-end: 16px; color: rgba(255,255,255,.45); font: 12px var(--font-ui); }
-/* Settings → Slides: in the Slides view its heading stands out like the App group's; the doc-only scope note */
-.view-slides details.group#slides-group > summary { color: var(--accent-ink); background: var(--accent-soft); border-radius: var(--radius-sm); margin-inline: -6px; padding-inline: 8px; }
+/* Settings → Slides in the Slides view, Settings → Word in the document view: the heading stands out like the App
+   group's; the doc-only scope note */
+.view-slides details.group#slides-group > summary, body:not(.view-slides) details.group#word-group > summary { color: var(--accent-ink); background: var(--accent-soft); border-radius: var(--radius-sm); margin-inline: -6px; padding-inline: 8px; }
 .scope-hint { display: block; border-inline-start: 2px solid var(--accent); padding-inline-start: 8px; }
