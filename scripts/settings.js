@@ -223,8 +223,16 @@
             box.hidden = !p.zip;
             const zip = K.$('#word-font-zip'), site = K.$('#word-font-site');
             if (p.zip) zip.setAttribute('href', p.zip);
-            site.hidden = !p.site;
-            if (p.site) site.setAttribute('href', p.site);
+            // one link per font: the first is the markup's own, the others its copies (made again on a language change)
+            box.querySelectorAll('.font-site-copy').forEach(function (a) { a.remove(); });
+            const sites = Object.keys(p.sites || {});
+            site.hidden = !sites.length;
+            sites.forEach(function (name, i) {
+                const a = i ? site.cloneNode(true) : site;
+                if (i) { a.removeAttribute('id'); a.classList.add('font-site-copy'); site.parentNode.appendChild(a); }
+                a.setAttribute('href', p.sites[name]);
+                a.querySelector('span').textContent = K.i18n.t('wordFontsSite').replace('{font}', name);
+            });
         },
 
         /** Stored values → controls and page state. */

@@ -61,7 +61,7 @@ const FONTS = {
 };
 const MONO = { 'dejavu-mono': '"DejaVu Sans Mono",monospace', 'liberation-mono': '"Liberation Mono",monospace', courier: '"Courier 10 Pitch",Courier,monospace' };
 const HEAD_SCALE = { large: [2.0, 1.55, 1.25, 1.1], medium: [1.6, 1.3, 1.15, 1.0], small: [1.3, 1.15, 1.05, 1.0] };
-// right-to-left body fonts: Vazirmatn and Sahel from the repository (assets/fonts/download/vazirmatn-sahel-ttf.zip,
+// right-to-left body fonts: Vazirmatn and Sahel from the repository (assets/fonts/download/persian-fonts-ttf.zip,
 // static TTFs: wkhtmltopdf takes no woff2), loaded by @font-face from a temporary folder; Noto Naskh Arabic from the
 // system (fonts-noto-core on the CI runner), by @font-face local(). Each is declared under a family of its own
 // (`face`) with a unicode-range of the Arabic blocks, ZWNJ / ZWJ and the direction marks, so it serves the Arabic
@@ -76,7 +76,7 @@ const RTL_FONTS = {
 };
 const NASKH_FACE = Object.entries(RTL_FONTS['noto-naskh'].local).map(([w, names]) =>
   `@font-face{font-family:"Fuzz Naskh";src:${names.map((n) => `local("${n}")`).join(',')};font-weight:${w};unicode-range:${RTL_RANGE}}`).join('\n');
-const FONT_ZIP = path.join(__dirname, '..', '..', '..', 'assets', 'fonts', 'download', 'vazirmatn-sahel-ttf.zip');
+const FONT_ZIP = path.join(__dirname, '..', '..', '..', 'assets', 'fonts', 'download', 'persian-fonts-ttf.zip');
 // tracking: letter-spacing over the whole text, as a producer sets it (the metamorphic net's trackTight / trackLoose
 // shift each run's glyphs by Tc after the fact; here the producer lays the lines out with it)
 const TRACKING = { none: '0', tight: '-0.04em', loose: '0.08em' };
@@ -204,23 +204,25 @@ function css(s, faces) {
   return sheet;
 }
 
-// the right-to-left fonts' TTFs out of the repository's zip into tmp: { key: '@font-face …' }, and a short hash of the
-// zip for the env (another font file draws other PDFs)
+// the right-to-left fonts' TTFs out of the repository's zip into tmp: { key: '@font-face …' }, and per font a short
+// hash of the TTFs it draws with, for the env (another font file draws other PDFs; other files in the zip do not)
 async function rtlFaces(tmp) {
   const JSZip = require(path.join(__dirname, '..', '..', '..', 'vendor', 'jszip.min_3.10.2.js'));
-  const buf = fs.readFileSync(FONT_ZIP), zip = await JSZip.loadAsync(buf), faces = {};
+  const buf = fs.readFileSync(FONT_ZIP), zip = await JSZip.loadAsync(buf), faces = {}, hashes = {};
   for (const [k, f] of Object.entries(RTL_FONTS)) {
     if (!f.files) continue;
-    const rules = [];
+    const rules = [], sha = require('crypto').createHash('sha1');
     for (const [w, entry] of Object.entries(f.files)) {
-      const out = path.join(tmp, path.basename(entry));
-      fs.writeFileSync(out, await zip.file(entry).async('nodebuffer'));
+      const out = path.join(tmp, path.basename(entry)), data = await zip.file(entry).async('nodebuffer');
+      fs.writeFileSync(out, data);
+      sha.update(data);
       rules.push(`@font-face{font-family:"${f.face}";src:url("${fileUrl(out)}") format("truetype");font-weight:${w};unicode-range:${RTL_RANGE}}`);
     }
     faces[k] = rules.join('\n');
+    hashes[k] = sha.digest('hex').slice(0, 12);
   }
   faces['noto-naskh'] = NASKH_FACE;
-  return { faces, hash: require('crypto').createHash('sha1').update(buf).digest('hex').slice(0, 12) };
+  return { faces, hashes };
 }
 
 const MARGIN = { narrow: '1cm', normal: '2cm', wide: '3cm' };
@@ -267,7 +269,7 @@ const HF = `<div style="font-size:7px;width:100%;display:flex;justify-content:sp
   let naskhFile = null;
   try { naskhFile = cp.execFileSync('fc-match', ['-f', '%{file}', RTL_FONTS['noto-naskh'].family]).toString(); } catch (e) { /* no fontconfig */ }
   Object.entries(RTL_FONTS).forEach(([k, f]) => {
-    env.fonts[k] = f.files ? path.basename(FONT_ZIP) + '#' + rf.hash
+    env.fonts[k] = f.files ? f.family + ' TTF#' + rf.hashes[k]
       : !naskhHere ? null : naskhFile && fs.existsSync(naskhFile) ? path.basename(naskhFile) + '#' + sha(naskhFile) : f.family;
   });
   // a rotated held-out block is another set of PDFs: recorded in the env (from the first rotation on, so the env of
