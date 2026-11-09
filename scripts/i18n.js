@@ -354,7 +354,7 @@
             sizeLatin: 'اندازهٔ لاتین (pt)',
             fontsAsAbove: 'خالی: همان فونت بالا',
             notInstalled: 'روی این رایانه نصب نیست: پیش‌نمایش فونت دیگری نشان می‌دهد و Word یا PowerPoint خواننده هم باید آن را داشته باشد.',
-            fontsHint: 'این فونت‌ها برای پیش‌نمایش و همهٔ خروجی‌هاست. PDF و HTML فونت را درون فایل دارند؛ Word و PowerPoint فقط نامش را می‌نویسند. Calibri، Arial، Tahoma و Times New Roman همراه کِلک نیستند: PDF متن لاتین را با حروف لاتین فونت فارسی می‌نویسد.',
+            fontsHint: 'PDF و HTML فونت را درون فایل دارند؛ Word و PowerPoint فقط نامش را. متن لاتین با فونت لاتین نوشته می‌شود؛ اگر «همان فونت فارسی» حروف لاتین نداشته باشد، با Times New Roman. فونت‌های لاتین همراه کِلک نیستند: PDF به‌جایشان حروف لاتین فونت فارسی یا DejaVu Sans را می‌گذارد.',
             fontsWordOwn: 'فونت دیگری برای DOCX و PPTX',
             fontsWordHint: 'هر فونت نصب‌شده‌ای را می‌توانید بنویسید؛ PDF، HTML و پیش‌نمایش همان فونت‌های بالا را می‌گیرند.',
             wordFontsGetHint: 'فونت‌های فارسی را برای Word و PowerPoint نصب کنید (نسخهٔ ttf، با راهنمای نصب):',
@@ -792,7 +792,7 @@
             sizeLatin: 'Latin size (pt)',
             fontsAsAbove: 'Empty: the font above',
             notInstalled: 'Not installed on this computer: the preview shows another font, and the reader’s Word or PowerPoint needs it too.',
-            fontsHint: 'These fonts are for the preview and every output. PDF and HTML carry their fonts; Word and PowerPoint only name them. Calibri, Arial, Tahoma and Times New Roman are not shipped with Kelk: the PDF writes Latin text in the Latin letters of the Persian/Arabic font.',
+            fontsHint: 'PDF and HTML carry their fonts; Word and PowerPoint only name them. Latin text is written in the Latin font; when «the same» font has no Latin letters, in Times New Roman. The Latin fonts are not shipped with Kelk: the PDF uses the Persian/Arabic font\'s Latin letters or DejaVu Sans.',
             fontsWordOwn: 'Other fonts for DOCX and PPTX',
             fontsWordHint: 'Any installed font may be typed; PDF, HTML and the preview keep the fonts above.',
             wordFontsGetHint: '',       // shown when K.config.wordFontPacks.en has a zip
@@ -1220,7 +1220,7 @@
             sizeLatin: 'حجم اللاتيني (pt)',
             fontsAsAbove: 'فارغ: الخط أعلاه',
             notInstalled: 'غير مثبَّت على هذا الحاسوب: تعرض المعاينة خطًا آخر، ويحتاجه Word أو PowerPoint لدى القارئ أيضًا.',
-            fontsHint: 'هذه الخطوط للمعاينة ولكل المخرجات. تحمل PDF وHTML خطوطهما؛ أما Word وPowerPoint فتذكران أسماءها فقط. لا تأتي Calibri وArial وTahoma وTimes New Roman مع كِلك: يكتب PDF النص اللاتيني بالحروف اللاتينية للخط العربي.',
+            fontsHint: 'تحمل PDF وHTML خطوطهما؛ أما Word وPowerPoint فتذكران أسماءها فقط. يُكتب النص اللاتيني بالخط اللاتيني؛ وإن لم تكن في «الخط العربي نفسه» حروف لاتينية، فبـ Times New Roman. لا تأتي الخطوط اللاتينية مع كِلك: يضع PDF مكانها الحروف اللاتينية للخط العربي أو DejaVu Sans.',
             fontsWordOwn: 'خطوط أخرى لـ DOCX وPPTX',
             fontsWordHint: 'يمكن كتابة أي خط مثبَّت؛ وتبقى لـ PDF وHTML والمعاينة الخطوطُ أعلاه.',
             wordFontsGetHint: '',       // shown when K.config.wordFontPacks.ar has a zip
