@@ -4,6 +4,12 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+### Added
+
+- Switching to the Slides view checks the text, leniently: a text plainly not in slide format (no ## headings, or
+  slides far too long for a slide) stays in the document view, with a report that says why, a button to make slides
+  anyway and one to copy the slide prompt.
+
 ### Fixed
 
 - On a phone (one column), the preview did not scroll with a finger, and a finger on it did not scroll the page
