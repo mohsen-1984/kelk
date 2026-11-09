@@ -19,10 +19,45 @@ behaviour is a setting, Settings → Import → *Cells merged over rows*: `repea
 as 2.2 did); column spans are written once either way; the same for Word, HTML and PDF import
 (`importer.mergedRows`). A form's pairs are list items, row by row, everywhere (`_formRows`, `_tablePreamble`).
 
-**2.4 — fonts in Word and PowerPoint files, and the page's settings** (the owner's list, 2026-11-06; small pull
-requests, the safest first).
+**2.4 — a simpler page** (the owner's list of 2026-11-06, revised 2026-11-09; small pull requests, in this order).
 
-1. **Font embedding** in the .docx and the .pptx, as a step after the builder: open the file with JSZip, embed only
+1. **Font download**: one button (all fonts are in one zip, `persian-fonts-ttf.zip`), its label fixed; the font
+   website as two links, Vazirmatn and Sahel.
+2. **Tagline and title**: the two-way conversion in the tagline drawn with Lucide's `arrow-left-right` icon (it looks
+   the same in every font, unlike U+21C6); as text where only text is possible (page title, meta). The page title
+   with an en dash instead of the em dash (less room in a tab), `og:title` and the like in step.
+3. **Word settings header**: the soft accent the PowerPoint settings header has when a slide is selected, when the
+   Word preview is selected.
+4. **Export buttons follow the mode**: document mode hides PPTX; slide mode hides DOCX, PDF, HTML and DOC.
+5. **Mobile preview scroll**: in the narrow one-column layout, with *About Kelk* and the samples open, the editor
+   scrolls with a finger but the preview does not, even empty. Find why, fix.
+6. **Slide mode check**: switching to slides, if the editor's text does not broadly follow the PowerPoint prompt's
+   format, stay in document mode and show a report like the PDF import report: the text is not in slide format,
+   and preparing it with the prompt gives acceptable slides; a button makes slides anyway. Lenient.
+
+**2.5 — fonts in every format** (the owner's items of 2026-11-06 and 2026-11-09, designed together; small pull
+requests).
+
+1. **One Fonts pane** (replaces «Word settings: fonts»; designed with item 2):
+   - everything about fonts in one pane of Settings; in Persian «فونت (قلم)», not «قلم» alone;
+   - by default one font choice for the preview and every builder (HTML, PDF, DOC, DOCX, PPTX); a checkbox lets
+     the user choose another font for DOCX and PPTX, and only then type a font outside the list — a difference
+     between preview / PDF / HTML and DOCX / PPTX is the user's choice, never the default;
+   - the list: Vazirmatn (default), Sahel, B Nazanin, B Mitra for the text; Latin text Calibri, Arial, Tahoma,
+     Times New Roman, in every language;
+   - the check that shows whether a font is installed stays;
+   - the preview's B Nazanin and B Mitra: the original TTFs as web fonts, as they are (byte-identical), loaded on
+     first choice only;
+   - the B fonts come into the repository in one commit of their own: the zip's `borna-rayaneh/` folder, the
+     `pdf-font-b-*.js` files and their notice, the build script, every reference (the owner's rules of 2026-11-06:
+     their own folder with `NOTICE.txt` beside every copy; regular and bold byte-identical to the originals; the
+     README line «(c) Borna Rayaneh, no published license, see borna-rayaneh/NOTICE.txt» — never «free», «open»
+     or «OFL»; removable in one commit). The owner's files for it (the font zip with `borna-rayaneh/`, the
+     `pdf-font-b-*.js` files, their notice and `build_pdf_fonts.py`) say where the fonts come from as
+     «downloadable from Borna Rayaneh's website» («از وب‌سایت شرکت برنا رایانه قابل دریافت‌اند») — never «free
+     download» or «دریافت رایگان»: in `NOTICE.txt`, `BORNA-RAYANEH-NOTICE.txt`, the zip's `README.txt`, the
+     `pdf-font-b-*.js` headers and the build script's `license_text` (the owner's decision, 2026-11-09).
+2. **Font embedding** in the .docx and the .pptx, as a step after the builder: open the file with JSZip, embed only
    the fonts the document uses (regular and bold — never the generated oblique italics), save. An option, on by
    default; the size it adds is reported. Font data: the base64 TTFs of `lib/pdf-base64-ttf-fonts/pdf-font-*.js`
    (global `PdfFonts`), loaded on first use by a script tag (no `fetch()` under file://).
@@ -33,28 +68,17 @@ requests, the safest first).
      from a file PowerPoint saved with embedded fonts, never guessed.
    - The B fonts declare only the Arabic code page: charset 178 (`w:charset` `B2` in DOCX, `charset="-78"` in
      PPTX), or Windows substitutes another font.
-   - The B fonts (B Nazanin, B Mitra, B Titr; © Borna Rayaneh, no published licence) come in with this item, under
-     the owner's rules of 2026-11-06: their own folder `borna-rayaneh/` with `NOTICE.txt` beside every copy;
-     regular and bold byte-identical to the originals; the README line «(c) Borna Rayaneh, no published license,
-     see borna-rayaneh/NOTICE.txt» — never «free», «open» or «OFL»; removable in one commit.
-   - Sahel's PDF font is dehinted: whether that matters for Word and PowerPoint on Windows — to answer.
+   - The B fonts are embedded as any other: only those the document uses.
+   - Sahel: the dehinted font of `pdf-font-sahel.js` (the owner's choice, 2026-11-06; judged in the Windows test).
    - Test: both files opened on a computer without these fonts.
-2. **Mobile preview scroll**: in the narrow one-column layout, with *About Kelk* and the samples open, the editor
-   scrolls with a finger but the preview does not, even empty. Find why, fix.
-3. **Word settings: fonts** — both font fields a select the user can also type into: complex scripts Vazirmatn
-   (default), Sahel, B Nazanin, B Mitra; Latin text, in every language, Calibri, Arial, Tahoma, Times New Roman.
-4. **Word settings header**: the soft accent the PowerPoint settings header has when a slide is selected, when the
-   Word preview is selected.
-5. **Font download**: one button (all fonts are in one zip), its label fixed (it still names Vazirmatn and Sahel);
-   the font website link as two links, Vazirmatn and Sahel.
 
-**2.5 — PDF import, from real files.** Each case is reproduced by a lab PDF of our own (failing on purpose until
+**2.6 — PDF import, from real files.** Each case is reproduced by a lab PDF of our own (failing on purpose until
 fixed: its score is the case's measure), in this order.
 
 1. **Numbers in Persian report fonts** — B Nazanin, B Mitra and B Titr: a report's amounts read «3.004» (the file's
    text has a period between the thousands; the page shows a comma-like mark): **to examine** whether these fonts
    draw «.» as a thousands separator — a reader takes «3.004» for three and a bit. The three fonts come into the
-   repository with 2.4 (item 1); the owner attaches a sample PDF when the item starts, and a lab file of our own
+   repository with 2.5 (item 1); the owner attaches a sample PDF when the item starts, and a lab file of our own
    follows from it
 2. **A designed booklet** (designed documents from browsers: heading, box and figure rules shared by every Chromium
    file in the lab) — **lab:** `chrome-booklet--booklet-cards-fa` (45.4). Cards, badges and coloured boxes:

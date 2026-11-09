@@ -4,6 +4,12 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+### Changed
+
+- Settings → Word: the font download is one zip of every Persian font, `persian-fonts-ttf.zip` (was
+  `vazirmatn-sahel-ttf.zip`), its button no longer naming two fonts; the fonts' web pages are two links, Vazirmatn
+  and Sahel.
+
 ### Development
 
 - The working instructions moved from `docs/WORKING.md` to `CLAUDE.md` at the root; the owner's release steps,

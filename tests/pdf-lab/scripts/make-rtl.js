@@ -8,7 +8,7 @@
 //   kelk, kelkdocx-lo      Kelk's PdfBuilder; Kelk's DocxBuilder → LibreOffice Writer → PDF
 //   node scripts/make-rtl.js [doc-prefix]
 // Needs the Vazirmatn and Sahel TTFs installed for LibreOffice and wkhtmltopdf (assets/fonts/download/
-// vazirmatn-sahel-ttf.zip into ~/.fonts); Chromium takes the web fonts from assets/fonts/.
+// persian-fonts-ttf.zip into ~/.fonts); Chromium takes the web fonts from assets/fonts/.
 const { pdfPath, fileUrl } = require('./env.js');
 const fs = require('fs'), path = require('path'), cp = require('child_process'), os = require('os');
 const { KELK, req } = require('./env.js');

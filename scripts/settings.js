@@ -221,10 +221,12 @@
             if (!box) return;
             const p = (K.config.wordFontPacks || {})[K.i18n.lang] || {};
             box.hidden = !p.zip;
-            const zip = K.$('#word-font-zip'), site = K.$('#word-font-site');
-            if (p.zip) zip.setAttribute('href', p.zip);
-            site.hidden = !p.site;
-            if (p.site) site.setAttribute('href', p.site);
+            if (p.zip) K.$('#word-font-zip').setAttribute('href', p.zip);
+            const names = Object.keys(p.sites || {});
+            box.querySelectorAll('.font-site').forEach(function (a, i) {     // a link per font's web page
+                a.hidden = !names[i];
+                if (names[i]) { a.href = p.sites[names[i]]; a.lastChild.textContent = K.i18n.t('wordFontsSite').replace('{font}', names[i]); }
+            });
         },
 
         /** Stored values → controls and page state. */

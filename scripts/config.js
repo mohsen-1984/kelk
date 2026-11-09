@@ -99,15 +99,14 @@
             ar: { bidi: 'Arial', latin: 'Calibri' }
         },
 
-        /**
-         * Fonts to install for Word, by interface language: a zip of .ttf files and the
-         * fonts' home page. Shown under Settings → Word when the language has a zip;
-         * en and ar: none yet (fill zip, site and the i18n keys wordFontsGet* to show them).
-         */
+        /** Fonts to install for Word, by language: a zip of .ttf files and { font: web page }; shown when zip is set. */
         wordFontPacks: {
-            fa: { zip: 'assets/fonts/download/vazirmatn-sahel-ttf.zip', site: 'https://rastikerdar.github.io/' },
-            en: { zip: '', site: '' },
-            ar: { zip: '', site: '' }
+            fa: {
+                zip: 'assets/fonts/download/persian-fonts-ttf.zip',
+                sites: { Vazirmatn: 'https://github.com/rastikerdar/vazirmatn', Sahel: 'https://github.com/rastikerdar/sahel-font' }
+            },
+            en: { zip: '', sites: {} },
+            ar: { zip: '', sites: {} }
         },
 
         /** Suggestions for the Word font fields (any installed font may be typed). */
