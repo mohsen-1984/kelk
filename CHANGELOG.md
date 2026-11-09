@@ -23,6 +23,11 @@ All notable changes to Kelk. Dates are those of the release tags.
   view; a PPTX export checks the text again and, when it no longer fits, shows the report with «Export PPTX
   anyway».
 
+### Fixed
+
+- The document view no longer builds slides: a slides build still under way when the view changes (or overtaken
+  by a newer one) stops at its next step, and its progress window closes; nothing builds slides outside Slides.
+
 ### Development
 
 - Publishing a release comes only after the release PR (the one that changes the version) is merged:

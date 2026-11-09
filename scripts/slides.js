@@ -11,6 +11,7 @@
 (function (K) {
     'use strict';
 
+    const STALE = {};                                   // thrown by a build's step once a newer build or the document view took over
     let gen = 0, model = null, icons = null, iconsLoading = null, observer = null, store = null, deckMeta = {}, progress = null;
     const EAGER = 2;                 // slides drawn at once; the rest as they near the view (IntersectionObserver)
 
@@ -237,6 +238,7 @@
                 }
             }
             if (K.ui.report.isCustom()) K.ui.report.close(false);
+            if (!slides) { gen++; if (progress) progress.end(); }   // a slides build under way stops: the document builds none
             K.store.setUi('view', slides ? 'slides' : 'document');
             this.applyView();
             if (s && s.set === (slides ? 'about' : 'slides')) {
@@ -276,7 +278,7 @@
          */
         render: async function () {
             const box = K.$('#slides');
-            if (!box || typeof PptxBuilder === 'undefined') return;
+            if (!box || typeof PptxBuilder === 'undefined' || !this.active()) return;     // the document view builds no slides
             const md = K.editor.value();
             const my = ++gen;
             const count = K.$('#slides-count');
@@ -294,7 +296,8 @@
             const W = Object.assign({}, K.config.slidesProgress);
             if (!iconsWanted(md)) delete W.libs;
             const step = stepper(bar, W, KEY, 'layout');
-            const live = function (name, done, total) { if (my === gen) step(name, done, total); return K.ui.paint(); };
+            // a build overtaken by a newer one, or by the switch to the document view, stops at its next step
+            const live = function (name, done, total) { if (my !== gen) throw STALE; step(name, done, total); return K.ui.paint(); };
             bar.start(K.i18n.t('sp_busy'));
             try {
                 if (W.libs) step('libs', 0, 1);
@@ -333,7 +336,7 @@
                 deckNote();
                 K.names.refresh();
             } catch (e) {
-                if (my !== gen) return;
+                if (my !== gen || e === STALE) return;
                 bar.end();
                 console.error(e);
                 box.innerHTML = '<p class="slides-error">' + String(e && e.message || e).replace(/[<&]/g, '') + '</p>';
