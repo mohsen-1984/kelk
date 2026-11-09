@@ -11,6 +11,16 @@ All notable changes to Kelk. Dates are those of the release tags.
   it cannot: fonts by content (Persian, Latin), alignment, the header's fill and borders, stripes, column widths, a
   right-to-left view, a frozen header row and a filter, paper, margins and print titles. SheetJS 0.20.3 is vendored
   and loads only for an XLSX export.
+- **The Excel view** (Preview → Document | Slides | Excel): every table of the text is a sheet. Its preview shows a block
+  per sheet — its name, rows and columns, its first 20 rows (Settings → Excel → «Rows in the preview»); a wide sheet
+  scrolls inside its block, with the header row fixed, on a phone too. The export buttons follow the view: XLSX and
+  CSV (one file per sheet, in «CSV-name.zip»); Ctrl+Enter exports XLSX, Ctrl+Shift+Enter the CSV files. Switching to
+  Excel with a text that has no table keeps the view, with a report. **Settings → Excel**: one sheet per table or all
+  in one, sheet direction, text wrapping, leading zeros, thousands separators, links, line breaks, the header's fill,
+  stripes, borders, header height, filter, frozen header, column widths, paper, orientation, margins, printing, the
+  CSV separator and BOM; its header is tinted in the Excel view. **Settings → Fonts → «Other fonts for XLSX»** (on
+  by default: B Nazanin for Persian, Calibri for Latin): Excel cannot embed fonts, so the view says which fonts the
+  reader needs. The view loads on its first use.
 
 ## [2.5] — 2026-11-09
 

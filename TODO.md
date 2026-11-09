@@ -58,7 +58,9 @@ three pull requests, one release:
    dialog showing each sheet's rows, columns, encoding and separator; a zip with CSV and MD files: the user picks
    one kind, the other files are listed as ignored. Every import becomes Markdown in the editor: one `##` heading and
    one table per sheet (`<br>` for a line break in a cell, `\|` for a bar). The import report's summary table for
-   the three flows. Largest import: a cell count where typing in the editor stays responsive (measured in PR 1).
+   the three flows. Largest import: **100,000 cells** (measured in PR 1, Chrome, a 10-column table, the Excel view:
+   at 100,000 cells (1 MB) a key takes about 50 ms and putting the text in the editor about 1 s; at 200,000 (2 MB)
+   about 90 ms and 4.5 s, the browser's textarea itself taking most of it); a larger file is refused with a message.
 3. **Docs**: About Kelk and samples — an Excel section, the three flows as its subsections (from the page's «what this
    page is for»); og-image.html and a new og-image.png; lib/README; the README in three languages; screenshots.
 

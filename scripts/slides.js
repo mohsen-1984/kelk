@@ -216,15 +216,19 @@
         },
 
         active: function () { return K.store.getUi('view') === 'slides'; },
+        /** The preview's view: 'document' | 'slides' | 'excel' (the Excel view: scripts/sheets.js, loaded on its first use). */
+        view: function () { const v = K.store.getUi('view'); return v === 'slides' || v === 'excel' ? v : 'document'; },
 
         /**
          * Change the view. The two samples are written for their own view: with the about document on
          * screen (unchanged) the Slides view opens the slides sample, and the other way round — a toast
-         * says so, and Undo brings the text back. force: into slides without the slide-format check.
+         * says so, and Undo brings the text back. force: into slides without the slide-format check, into Excel
+         * without the tables check. v: 'document' | 'slides' | 'excel'.
          */
         setView: async function (v, force) {
-            const slides = v === 'slides';
-            if (slides === this.active()) return;
+            v = v === 'slides' || v === 'excel' ? v : 'document';
+            const slides = v === 'slides', was = this.view();
+            if (v === was) return;
             const s = K.samples ? await K.samples.of(K.editor.value()) : null;
             // into slides: a text that is plainly not in slide format (the prompt's) stays a document, with a report
             // that says why and offers to make slides anyway (scripts/slidecheck.js, loaded on the first switch)
@@ -237,11 +241,21 @@
                     return;
                 }
             }
+            // into Excel: a text without a table stays where it is, with a report (scripts/sheets.js)
+            if (v === 'excel' && !force && !s && K.editor.value().trim()) {
+                const self = this;
+                let sh = null;
+                try { sh = await K.libs.need('sheets'); } catch (e) { sh = null; }
+                if (sh && !sh.hasTables(K.editor.value())) {
+                    sh.showNoTables(function () { self.setView('excel', true); });
+                    return;
+                }
+            }
             if (K.ui.report.isCustom()) K.ui.report.close(false);
-            if (!slides) { gen++; if (progress) progress.end(); }   // a slides build under way stops: the document builds none
-            K.store.setUi('view', slides ? 'slides' : 'document');
+            if (!slides) { gen++; if (progress) progress.end(); }   // a slides build under way stops: the other views build none
+            K.store.setUi('view', v);
             this.applyView();
-            if (s && s.set === (slides ? 'about' : 'slides')) {
+            if (s && (v === 'slides' ? s.set === 'about' : s.set === 'slides')) {
                 await K.samples.load(slides ? 'slides' : 'about');
                 K.ui.toast(K.i18n.t(slides ? 'toSlidesSample' : 'toAboutSample'));
             } else K.preview.render();
@@ -259,17 +273,21 @@
 
         /** The toggle, the panes, the primary export button and the name box follow the view. */
         applyView: function () {
-            const on = this.active();
-            document.body.classList.toggle('view-slides', on);
-            K.$$('[data-view]').forEach(function (b) { b.setAttribute('aria-pressed', String((b.getAttribute('data-view') === 'slides') === on)); });
-            const doc = K.$('#preview'), sl = K.$('#slides');
-            if (doc) doc.hidden = on;
-            if (sl) sl.hidden = !on;
-            // the export buttons of the view only: PPTX for slides; DOCX, PDF, HTML and DOC for the document
-            K.$$('.export-bar [data-export]').forEach(function (b) { b.hidden = (b.getAttribute('data-export') === 'pptx') !== on; });
+            const v = this.view();
+            document.body.classList.toggle('view-slides', v === 'slides');
+            document.body.classList.toggle('view-excel', v === 'excel');
+            K.$$('[data-view]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-view') === v)); });
+            const doc = K.$('#preview'), sl = K.$('#slides'), sh = K.$('#sheets');
+            if (doc) doc.hidden = v !== 'document';
+            if (sl) sl.hidden = v !== 'slides';
+            if (sh) sh.hidden = v !== 'excel';
+            // the export buttons of the view only: PPTX for slides; XLSX and the CSV zip for Excel; DOCX, PDF, HTML and
+            // DOC for the document
+            const OF = { pptx: 'slides', xlsx: 'excel', csv: 'excel' };
+            K.$$('.export-bar [data-export]').forEach(function (b) { b.hidden = (OF[b.getAttribute('data-export')] || 'document') !== v; });
             const sep = K.$('.export-bar .sep');
-            if (sep) sep.hidden = on;
-            if (K.names && K.names.setExt) K.names.setExt(on ? 'pptx' : 'docx');
+            if (sep) sep.hidden = v !== 'document';
+            if (K.names && K.names.setExt) K.names.setExt({ slides: 'pptx', excel: 'xlsx' }[v] || 'docx');
         },
 
         /**

@@ -279,13 +279,20 @@
         flush: function () { if (soon) this.render(); },
 
         /**
-         * Draw the preview of the active view. In the Slides view only the slides are drawn (Kelk.slides);
-         * the document is drawn when its HTML is asked for (an export) or the view changes back.
+         * Draw the preview of the active view. In the Slides view only the slides are drawn (Kelk.slides), in the
+         * Excel view only the sheets (scripts/sheets.js, loaded on first use); the document is drawn when its HTML is
+         * asked for (an export) or the view changes back.
          */
         render: function () {
             clearTimeout(soon); soon = 0;
             if (!box) return;
-            if (K.slides && K.slides.active()) { docStale = true; K.names.refresh(); K.slides.render(); return; }
+            const view = K.slides ? K.slides.view() : 'document';
+            if (view === 'slides') { docStale = true; K.names.refresh(); K.slides.render(); return; }
+            if (view === 'excel') {
+                docStale = true; K.names.refresh();
+                K.libs.need('sheets').then(function (sh) { sh.render(); }, function (e) { K.ui.toast(K.i18n.t('failed', e.message), 'error'); });
+                return;
+            }
             this.renderDoc();
         },
 
