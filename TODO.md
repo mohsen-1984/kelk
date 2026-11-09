@@ -19,23 +19,10 @@ behaviour is a setting, Settings → Import → *Cells merged over rows*: `repea
 as 2.2 did); column spans are written once either way; the same for Word, HTML and PDF import
 (`importer.mergedRows`). A form's pairs are list items, row by row, everywhere (`_formRows`, `_tablePreamble`).
 
-**2.4 — a simpler page** (the owner's list of 2026-11-06, revised 2026-11-09; small pull requests, in this order).
-
-1. **Font download**: one button (all fonts are in one zip, `persian-fonts-ttf.zip`), its label fixed; the font
-   website as two links, Vazirmatn and Sahel.
-2. **Tagline and title**: the two-way conversion in the tagline drawn with Lucide's `arrow-left-right` icon (it looks
-   the same in every font, unlike U+21C6); as text where only text is possible (page title, meta). The page title
-   with an en dash instead of the em dash (less room in a tab), `og:title` and the like in step.
-3. **Word settings header**: the soft accent the PowerPoint settings header has when a slide is selected, when the
-   Word preview is selected.
-4. **Export buttons follow the mode**: document mode hides PPTX; slide mode hides DOCX, PDF, HTML and DOC.
-5. **Mobile preview scroll**: in the narrow one-column layout, with *About Kelk* and the samples open, the editor
-   scrolls with a finger but the preview does not, even empty. Find why, fix.
-6. **Slide mode check**: switching to slides, if the editor's text does not broadly follow the PowerPoint prompt's
-   format, stay in document mode and show a report like the PDF import report: the text is not in slide format,
-   and preparing it with the prompt gives acceptable slides; a button makes slides anyway. Lenient.
-7. **PowerPoint export progress**: a large deck takes seconds with no sign of work; show its steps and a bar, as the
-   PDF import does (the export's task dialog).
+**Standing rules from 2.4** (the owner's decisions; done — `CHANGELOG.md` 2.4): the export buttons follow the view
+(DOCX, PDF, HTML, DOC in the document view; PPTX alone in Slides); switching to Slides checks the text leniently and
+stays a document, with a report, when it is plainly not in slide format; slides work shows its progress in one progress
+window across the app (the preview's after 300 ms, not modal, taking no focus from the editor).
 
 **2.5 — fonts in every format** (the owner's items of 2026-11-06 and 2026-11-09, designed together; small pull
 requests).

@@ -278,15 +278,15 @@
                 deckMeta = {}; deckNote();
                 K.names.refresh(); return;
             }
-            // the work's steps in a bar over the slides, shown only when it takes longer than a moment (Kelk.ui.bar):
-            // the icon set on its first use, formulas, pictures and icons, then each slide's layout
-            const bar = progress || (progress = K.ui.bar(K.$('#slides-busy')));
+            // the work's steps in the progress window, not modal, shown only when it takes longer than a moment
+            // (Kelk.ui.bar): the icon set on its first use, formulas, pictures and icons, then each slide's layout
+            const bar = progress || (progress = K.ui.bar());
             const KEY = { libs: 'sp_libs', math: 'sp_math', images: 'sp_images', layout: 'sp_layout' };
             const W = Object.assign({}, K.config.slidesProgress);
             if (!iconsWanted(md)) delete W.libs;
             const step = stepper(bar, W, KEY, 'layout');
             const live = function (name, done, total) { if (my === gen) step(name, done, total); return K.ui.paint(); };
-            bar.start();
+            bar.start(K.i18n.t('sp_busy'));
             try {
                 if (W.libs) step('libs', 0, 1);
                 await needIcons(md);

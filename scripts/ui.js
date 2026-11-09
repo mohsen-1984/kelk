@@ -123,18 +123,44 @@
         },
 
         /**
-         * A progress bar in a pane, not modal (the slides preview: typing goes on): el holds a .task-detail and a
-         * <progress>, as the task dialog does. start() shows it only when the work lasts longer than
-         * config.progressDelayMs (a quick render never flashes it); progress(done, total, detail) as a task's; end().
+         * Progress for work that runs while the page stays usable (the slides preview: typing goes on), in the
+         * same window as a task's (#task), shown without making it modal: no Cancel (styles: dialog.task.quiet), no focus taken from the editor
+         * (the open attribute is set, which moves no focus), clicks pass through it. start(label) shows it only when
+         * the work lasts longer than config.progressDelayMs (a quick render never flashes it); progress(done, total,
+         * detail) as a task's; end(). A task (an export) takes the window over: this one steps aside meanwhile.
          */
-        bar: function (el) {
-            let timer = 0;
-            const bar = el && el.querySelector('progress'), det = el && el.querySelector('.task-detail');
-            return {
-                start: function () { if (!el || !el.hidden || timer) return; timer = setTimeout(function () { timer = 0; el.hidden = false; }, K.config.progressDelayMs); },
-                progress: function (done, total, detail) { if (!el) return; bar.max = total; bar.value = done; det.textContent = detail || ''; },
-                end: function () { clearTimeout(timer); timer = 0; if (el) el.hidden = true; }
+        bar: function () {
+            const self = this;
+            let timer = 0, shown = false;
+            const q = {
+                start: function (label) {
+                    if (shown || timer) return;
+                    timer = setTimeout(function () {
+                        timer = 0;
+                        const dlg = $('#task');
+                        if (!dlg || dlg.open || self._taskOn) return;
+                        $('#task-label').textContent = label || ''; $('#task-detail').textContent = '';
+                        $('#task-bar').removeAttribute('value');
+                        dlg.classList.add('quiet');
+                        dlg.setAttribute('open', '');
+                        shown = true; self._quiet = q;
+                    }, K.config.progressDelayMs);
+                },
+                progress: function (done, total, detail) {
+                    if (!shown) return;
+                    const bar = $('#task-bar');
+                    bar.max = total; bar.value = Math.min(done, total);
+                    $('#task-detail').textContent = detail || '';
+                },
+                end: function () {
+                    clearTimeout(timer); timer = 0;
+                    if (!shown) return;
+                    shown = false; if (self._quiet === q) self._quiet = null;
+                    const dlg = $('#task');
+                    dlg.removeAttribute('open'); dlg.classList.remove('quiet');
+                }
             };
+            return q;
         },
 
         /** Set a button's icon (lucide name). */
@@ -319,6 +345,8 @@
                         if (det) det.textContent = detail || '';
                     }
                 };
+                self._taskOn = true;
+                if (self._quiet) self._quiet.end();          // the slides preview's quiet progress steps aside
                 if (dlg) {
                     lab.textContent = label || ''; det.textContent = ''; bar.removeAttribute('value');
                     btn.onclick = cancel;
@@ -327,7 +355,7 @@
                 const timer = dlg ? setTimeout(function () { if (!dlg.open) dlg.showModal(); }, o.delay == null ? 200 : o.delay) : 0;
                 // done: the dialog's handlers go too (they would keep this task's scope, and what it read, alive)
                 const done = function () {
-                    clearTimeout(timer);
+                    clearTimeout(timer); self._taskOn = false;
                     if (dlg) { if (dlg.open) dlg.close(); btn.onclick = null; dlg.oncancel = null; }
                 };
                 return Promise.race([Promise.resolve().then(function () { return fn(api); }), aborted])
