@@ -4,6 +4,14 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+### Added
+
+- **`lib/XlsxBuilder.js`**: Markdown tables to an Excel workbook (.xlsx) and CSV files — each table a sheet named by the
+  heading or bold line above it, or every table in one sheet. SheetJS writes the workbook, then a polish step adds what
+  it cannot: fonts by content (Persian, Latin), alignment, the header's fill and borders, stripes, column widths, a
+  right-to-left view, a frozen header row and a filter, paper, margins and print titles. SheetJS 0.20.3 is vendored
+  and loads only for an XLSX export.
+
 ## [2.5] — 2026-11-09
 
 ### Added
