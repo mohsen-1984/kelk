@@ -224,11 +224,11 @@ test('a returned profile is a copy: changing it never changes the defaults', fun
 });
 
 test('a tab of an older version writes one value into a newer profile, keeping the rest', function () {
-  const newer = { schemaVersion: 2, page: { size: 'A4' }, code: { font: 'DejaVu Sans Mono' } };
+  const newer = { schemaVersion: 3, page: { size: 'A4' }, code: { font: 'DejaVu Sans Mono' } };
   const w = storageWindow({ 'kelk.settings': JSON.stringify(newer) });
   w.Kelk.store.set('code.size', 9);
   assert.deepEqual(stored(w, 'settings'), {
-    schemaVersion: 2,
+    schemaVersion: 3,
     page: { size: 'A4' },
     code: { font: 'DejaVu Sans Mono', size: 9 }
   });

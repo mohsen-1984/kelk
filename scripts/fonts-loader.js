@@ -46,7 +46,8 @@
         fromPdf: function (family) {
             if (fromPdf[family]) return fromPdf[family];
             fromPdf[family] = K.ui.loadScript(K.config.pdfFonts[family]).then(function () {
-                const e = Object.keys(window.PdfFonts || {}).map(function (k) { return PdfFonts[k]; })
+                const all = window.PdfFonts || {};
+                const e = Object.keys(all).map(function (k) { return all[k]; })
                     .find(function (x) { return x && x.family === family; });
                 if (!e) return;
                 const faces = [['normal', '400'], ['bold', '700']].filter(function (w) { return e.styles[w[0]]; }).map(function (w) {
