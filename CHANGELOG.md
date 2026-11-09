@@ -32,6 +32,9 @@ All notable changes to Kelk. Dates are those of the release tags.
   view; a PPTX export checks the text again and, when it no longer fits, shows the report with «Export PPTX
   anyway».
 - Settings → Fonts: one button, «وب‌سایت Vazirmatn و Sahel», for both fonts' page (rastikerdar.github.io).
+- The B fonts: their NOTICE lists the three files they were obtained from (BNAZANIN.rar, BMITRA.rar,
+  BTITRBD.rar); Settings → Fonts has a button to Borna Rayaneh's website; a DOCX or PPTX names them with their
+  Arabic character set (178), embedded or not.
 
 ### Fixed
 

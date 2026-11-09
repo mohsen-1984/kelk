@@ -108,13 +108,13 @@
         /** Text fonts the page shows from their PDF font file (regular and bold, as web fonts): loaded on first choice. */
         fontsFromPdf: ['B Nazanin', 'B Mitra'],
         /** The Windows character set a font declares, when not ANSI (the DOCX font table, the PPTX embedded font). */
-        fontCharset: {},
+        fontCharset: { 'B Nazanin': 178, 'B Mitra': 178, 'B Titr': 178 },      // the B fonts: Arabic only
 
         /** Fonts to install for Word, by language: a zip of .ttf files and { font: web page }; shown when zip is set. */
         wordFontPacks: {
             fa: {
                 zip: 'assets/fonts/download/persian-fonts-ttf.zip',
-                sites: { 'Vazirmatn و Sahel': 'https://rastikerdar.github.io/' }      // { the name in «وب‌سایت {font}»: its page }
+                sites: { 'Vazirmatn و Sahel': 'https://rastikerdar.github.io/', 'برنا رایانه': 'https://www.bornaray.com/' }   // { the name in «وب‌سایت {font}»: its page }
             },
             en: { zip: '', sites: {} },
             ar: { zip: '', sites: {} }

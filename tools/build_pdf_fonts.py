@@ -164,7 +164,7 @@ FAMILIES = [
              'belong to Borna Rayaneh. The font files set no embedding restriction (OS/2\n'
              'fsType 0). NOTICE.txt, in this folder, must travel with this file.')),
     dict(key='bmitra', family='B Mitra', version='2.01', file='b-mitra',
-         source='https://www.bornaray.com/ (https://www.bornaray.com/Content/downloads/fonts/BNAZANIN.rar)',
+         source='https://www.bornaray.com/ (https://www.bornaray.com/Content/downloads/fonts/BMITRA.rar)',
          license_file='borna-rayaneh/NOTICE.txt', dir='borna-rayaneh',
          copyright='(c) 2000 Borna Rayaneh (https://www.bornaray.com/)',
          regular='borna-rayaneh/BMITRA.TTF', bold='borna-rayaneh/BMITRABD.TTF',
@@ -183,12 +183,12 @@ FAMILIES = [
          license_text=(
              'No license file is published with these fonts. They are downloadable from\n'
              'Borna Rayaneh\'s website, https://www.bornaray.com/; the files were obtained unmodified\n'
-             'from https://www.bornaray.com/Content/downloads/fonts/BNAZANIN.rar. All rights,\n'
+             'from https://www.bornaray.com/Content/downloads/fonts/BMITRA.rar. All rights,\n'
              'including the right to grant a license for use, embedding or redistribution,\n'
              'belong to Borna Rayaneh. The font files set no embedding restriction (OS/2\n'
              'fsType 0). NOTICE.txt, in this folder, must travel with this file.')),
     dict(key='btitr', family='B Titr', version='2.01', file='b-titr',
-         source='https://www.bornaray.com/ (https://www.bornaray.com/Content/downloads/fonts/BNAZANIN.rar)',
+         source='https://www.bornaray.com/ (https://www.bornaray.com/Content/downloads/fonts/BTITRBD.rar)',
          license_file='borna-rayaneh/NOTICE.txt', dir='borna-rayaneh',
          copyright='(c) 2000 Borna Rayaneh (https://www.bornaray.com/)',
          regular='borna-rayaneh/BTITRBD.TTF', bold='borna-rayaneh/BTITRBD.TTF',
@@ -207,7 +207,7 @@ FAMILIES = [
          license_text=(
              'No license file is published with these fonts. They are downloadable from\n'
              'Borna Rayaneh\'s website, https://www.bornaray.com/; the files were obtained unmodified\n'
-             'from https://www.bornaray.com/Content/downloads/fonts/BNAZANIN.rar. All rights,\n'
+             'from https://www.bornaray.com/Content/downloads/fonts/BTITRBD.rar. All rights,\n'
              'including the right to grant a license for use, embedding or redistribution,\n'
              'belong to Borna Rayaneh. The font files set no embedding restriction (OS/2\n'
              'fsType 0). NOTICE.txt, in this folder, must travel with this file.')),
