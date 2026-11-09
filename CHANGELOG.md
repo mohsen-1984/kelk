@@ -4,42 +4,51 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+## [2.4] — 2026-11-09
+
+A simpler page: the export buttons follow the view, a check before making slides, progress for slides work, and a
+preview that scrolls on a phone.
+
 ### Added
 
-- Switching to the Slides view checks the text, leniently: a text plainly not in slide format (no ## headings, or
-  slides far too long for a slide) stays in the document view, with a report that says why, a button to make slides
-  anyway and one to copy the slide prompt.
-
-### Fixed
-
-- The Slides view no longer requests a file named `placeholder` for each picture written `![…](placeholder)` (the
-  slides sample's).
-- On a phone (one column), the preview did not scroll with a finger, and a finger on it did not scroll the page
-  either, even with the preview empty.
+- **A slide-format check**: switching to the Slides view checks the text, leniently. A text plainly not in slide
+  format (no `##` headings, or slides far too long for a slide) stays in the document view, with a report that says
+  why, a button to make slides anyway and one to copy the slide prompt.
+- **Progress for slides work**: PowerPoint export shows its steps and a bar (preparing, writing the file, slide N of
+  M, compressing); the slides preview shows its steps in a bar over the slides (the icon set on first use, formulas,
+  pictures, laying out slide N of M) when the work lasts longer than 300 ms — never while typing a short deck, and
+  the page stays usable.
 
 ### Changed
 
-- The slides preview shows its steps and a bar over the slides (the icon set on first use, formulas, pictures,
-  laying out slide N of M) when its work lasts longer than a moment (300 ms); it never flashes while typing a short
-  deck, and the page stays usable.
-- PowerPoint export shows its steps and a progress bar (preparing, writing the file, slide N of M, compressing):
-  a large deck takes seconds.
-- The export buttons follow the view: DOCX, PDF, HTML and DOC in the document view, PPTX alone in the Slides view;
-  Ctrl+Enter exports the view's own format (DOCX or PPTX).
+- **The export buttons follow the view**: DOCX, PDF, HTML and DOC in the document view, PPTX alone in the Slides
+  view; Ctrl+Enter exports the view's own format.
 - Settings → Word: its heading stands out in the document view, as Settings → Slides' does in the Slides view.
 - The tagline draws the two-way conversion with an icon (Markdown ⇆ Word, PowerPoint, PDF and HTML), the same in
   every font; the page title and its meta tags keep it as text, with en dashes (less room in a browser tab).
-- Settings → Word: the font download is one zip of every Persian font, `persian-fonts-ttf.zip` (was
+- Settings → Word: the font download is one zip of the Persian fonts, `persian-fonts-ttf.zip` (was
   `vazirmatn-sahel-ttf.zip`), its button no longer naming two fonts; the fonts' web pages are two links, Vazirmatn
   and Sahel.
 
+### Fixed
+
+- **On a phone** (one column), the preview did not scroll with a finger, and a finger on it did not scroll the page
+  either, even with the preview empty.
+- The Slides view no longer requests a file named `placeholder` for each picture written `![…](placeholder)` (the
+  slides sample's).
+
 ### Development
 
-- The slide-format check's words and its report content load with it, on the first switch to the Slides view
+- The slide-format check, its words and its report content load on the first switch to the Slides view
   (`scripts/slidecheck.js`): the report panel shows another module's content (`Kelk.ui.report.custom`), and
   `tools/check-i18n.js` reads the words of modules loaded on demand.
+- `PptxBuilder`: `model({ onProgress })` (formulas, pictures, the layout slide by slide, pausing every 20 slides)
+  and `toBlob(model, { onProgress })` (build, write, slides, zip).
+- The startup size budget is 1,600,000 bytes (+15 KB over 2.3, for 2.4's page items), its reasons noted in
+  `tools/size-budget.json`; loading the whole slides view on demand is planned for 2.5.
 - The working instructions moved from `docs/WORKING.md` to `CLAUDE.md` at the root; the owner's release steps,
-  click by click, and the release notes format are now in `docs/RELEASING.md` (section 6).
+  click by click, and the release notes format are now in `docs/RELEASING.md` (section 6). Related low-risk items
+  share a pull request, one commit each.
 
 ## [2.3] — 2026-11-05
 
