@@ -12,7 +12,7 @@
     'use strict';
 
     const STALE = {};                                   // thrown by a build's step once a newer build or the document view took over
-    let gen = 0, model = null, icons = null, iconsLoading = null, observer = null, store = null, deckMeta = {}, progress = null;
+    let gen = 0, built = false, model = null, icons = null, iconsLoading = null, observer = null, store = null, deckMeta = {}, progress = null;
     const EAGER = 2;                 // slides drawn at once; the rest as they near the view (IntersectionObserver)
 
     const pascal = function (n) { return n.split('-').map(function (p) { return p.charAt(0).toUpperCase() + p.slice(1); }).join(''); };
@@ -298,15 +298,17 @@
             const step = stepper(bar, W, KEY, 'layout');
             // a build overtaken by a newer one, or by the switch to the document view, stops at its next step
             const live = function (name, done, total) { if (my !== gen) throw STALE; step(name, done, total); return K.ui.paint(); };
-            bar.start(K.i18n.t('sp_busy'));
+            // the first build is long (the libraries, the formulas, every slide's layout): its window opens at once
+            bar.start(K.i18n.t('sp_busy'), !built);
             try {
+                if (!built) await K.ui.paint();
                 if (W.libs) step('libs', 0, 1);
                 await needIcons(md);
                 const b = builder();
                 const m = await b.model({ onProgress: live });
                 if (my !== gen) return;
                 bar.end();
-                model = m;
+                model = m; built = true;
                 const opts = { notesLabel: K.i18n.t('speakerNotes'), warnText: warnText, uiDir: K.i18n.lang === 'en' ? 'ltr' : 'rtl' };
                 box.innerHTML = PptxBuilder.previewHtml(m, Object.assign({ eager: EAGER }, opts));
                 box.setAttribute('dir', m.dir);

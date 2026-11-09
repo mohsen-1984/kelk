@@ -27,6 +27,8 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 - The document view no longer builds slides: a slides build still under way when the view changes (or overtaken
   by a newer one) stops at its next step, and its progress window closes; nothing builds slides outside Slides.
+- The first slides build opens its progress window at once (it waited 300 ms, which a long first build — the
+  libraries, the formulas, every slide's layout — stretched to a second or two); later builds still wait 300 ms.
 
 ### Development
 
