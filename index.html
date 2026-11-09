@@ -115,7 +115,7 @@
                     <i data-lucide="lightbulb"></i><span data-i18n="sampleNote"></span>
                     <button class="btn soft danger" id="sample-note-clear" type="button"><i data-lucide="eraser"></i><span data-i18n="clear"></span></button>
                 </div>
-                <!-- what a PDF import could not read in full (Kelk.ui.report, scripts/report.js) -->
+                <!-- what a PDF import could not read in full, or why the Slides view did not open (Kelk.ui.report, scripts/report.js) -->
                 <section class="import-report" id="import-report" role="region" aria-labelledby="import-report-title" tabindex="-1" hidden>
                     <div class="report-head">
                         <h3 id="import-report-title"><i data-lucide="file-text"></i><span data-i18n="rep_title"></span></h3>
@@ -128,6 +128,9 @@
                     <div class="report-actions">
                         <button class="btn soft" id="report-safe" type="button" aria-describedby="report-safe-hint" hidden><i data-lucide="rotate-ccw"></i><span data-i18n="rep_safe"></span></button>
                         <button class="btn" id="report-copy" type="button"><i data-lucide="copy"></i><span data-i18n="rep_copy"></span></button>
+                        <!-- the slide-format check's (Kelk.ui.report.slides) -->
+                        <button class="btn soft" id="report-anyway" type="button" hidden><i data-lucide="presentation"></i><span data-i18n="sc_anyway"></span></button>
+                        <button class="btn" id="report-prompt" type="button" hidden><i data-lucide="copy"></i><span data-i18n="slidesPrompt"></span></button>
                         <p class="report-safe-hint" id="report-safe-hint" data-i18n="rep_safeHint" hidden></p>
                     </div>
                 </section>

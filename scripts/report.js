@@ -25,7 +25,11 @@
  *     report that already ran in safe mode). Kelk.ui.report.release(): a new import starts — onSafe (and the
  *     file bytes it holds) goes. No live region of its
  *     own: the focus move announces the panel once (its name), the import's own toast says it loaded.
- * Every code has its key here, written in full (tools/check-i18n.js: DYNAMIC prefixes pdf_ and rep_).
+ *   Kelk.ui.report.slides(res, { onAnyway })
+ *     the same panel for the slide-format check (scripts/slidecheck.js result; the Slides view was not opened):
+ *     the text is not in slide format, its findings, and the buttons "Make slides anyway" (onAnyway) and "Copy
+ *     the slide prompt". It follows the document and closes like an import's report.
+ * Every code has its key here, written in full (tools/check-i18n.js: DYNAMIC prefixes pdf_, rep_ and sc_).
  */
 (function (K) {
     'use strict';
@@ -200,7 +204,9 @@
     K.importReport = { fromResult: fromResult, worth: worth, text: text, FLAGS: FLAGS, NOTES: NOTES, MODES: MODES, MODE_KEYS: MODE_KEYS, WHY: WHY_KEYS };
 
     // ---- the panel ---------------------------------------------------------------------------------------------
-    const state = { entries: [], o: {}, back: null, doc: null, timer: 0 };
+    const state = { entries: [], o: {}, back: null, doc: null, timer: 0, slides: null };
+    /** the slide check's findings: their keys (sc_) */
+    const SC = { noSlides: 'sc_noSlides', oneSlide: 'sc_oneSlide', longSlides: 'sc_longSlides', longIntro: 'sc_longIntro' };
     const docNow = function () { return K.editor && K.editor.doc ? K.editor.doc() : null; };
     const el = function (tag, cls, txt) {
         const e = document.createElement(tag);
@@ -209,9 +215,36 @@
         return e;
     };
 
+    /** the panel's title, icon and buttons: an import's report or the slide check's */
+    function kind() {
+        const sl = !!state.slides, h = K.$('#import-report-title');
+        if (h) { h.querySelector('span').textContent = t(sl ? 'sc_title' : 'rep_title'); K.ui.setIcon(h, sl ? 'presentation' : 'file-text'); }
+        ['#report-anyway', '#report-prompt'].forEach(function (s) { const b = K.$(s); if (b) b.hidden = !sl; });
+        const copyB = K.$('#report-copy'); if (copyB) copyB.hidden = sl;
+    }
+
+    function renderSlides() {
+        const box = K.$('#import-report'), body = K.$('#import-report-body'), res = state.slides;
+        body.textContent = '';
+        body.appendChild(el('p', 'report-summary', t('sc_summary')));
+        const ul = body.appendChild(el('ul', 'report-findings'));
+        res.findings.forEach(function (f) {
+            const li = ul.appendChild(el('li', f.fail ? 'warn' : 'info', t(SC[f.code], f.n, f.of)));
+            li.setAttribute('data-code', f.code);
+        });
+        body.appendChild(el('p', 'report-summary', t('sc_prompt')));
+        ['#report-safe', '#report-safe-hint'].forEach(function (s) { const x = K.$(s); if (x) x.hidden = true; });
+        const name = K.$('#import-report-name'); if (name) name.textContent = '';
+        const brief = K.$('#import-report-brief'); if (brief) brief.textContent = t('sc_brief');
+        box.classList.remove('clean');
+        toggleButton();
+    }
+
     function render() {
         const box = K.$('#import-report'), body = K.$('#import-report-body');
         if (!box || !body) return;
+        kind();
+        if (state.slides) { renderSlides(); return; }
         body.textContent = '';
         state.entries.forEach(function (e) {
             const rep = e.report, sec = body.appendChild(el('div', 'report-entry'));
@@ -302,11 +335,11 @@
     function close(restore) {
         const box = K.$('#import-report');
         if (!box) return;
-        if (box.hidden) { clearTimeout(state.timer); state.entries = []; state.o = {}; state.doc = null; return; }
+        if (box.hidden) { clearTimeout(state.timer); state.entries = []; state.o = {}; state.doc = null; state.slides = null; return; }
         const inside = box.contains(document.activeElement);
         box.hidden = true;
         clearTimeout(state.timer); state.timer = 0;
-        state.entries = []; state.o = {}; state.doc = null;  // the kept file bytes go with it (onSafe holds them)
+        state.entries = []; state.o = {}; state.doc = null; state.slides = null;  // the kept file bytes go with it (onSafe holds them)
         const back = state.back; state.back = null;
         if (restore !== false && inside) {
             const to = back && back.isConnected && !back.disabled && !back.closest('[hidden]') ? back : K.$('#editor');
@@ -321,7 +354,7 @@
         // nothing to tell: an open panel closes (the focus, when it was inside, back where it was before it opened)
         if (!entries.length) { close(); return false; }
         const was = !box.hidden;
-        state.entries = entries; state.o = o || {}; state.doc = docNow();
+        state.entries = entries; state.o = o || {}; state.doc = docNow(); state.slides = null;
         if (!was || !box.contains(document.activeElement)) {
             const a = document.activeElement;
             state.back = a && a !== document.body && !box.contains(a) ? a : state.back;
@@ -334,6 +367,19 @@
         return true;
     }
     report.close = close;
+    report.slides = function (res, o) {
+        const box = K.$('#import-report');
+        if (!box) return false;
+        if (!box.contains(document.activeElement)) { const a = document.activeElement; state.back = a && a !== document.body ? a : state.back; }
+        state.entries = [{ name: '', report: null }]; state.o = o || {}; state.doc = docNow(); state.slides = res;
+        render();
+        collapse(false);
+        box.hidden = false;
+        box.focus();
+        return true;
+    };
+    /** the slide check's panel is open (switching to the Slides view closes it) */
+    report.isSlides = function () { const box = K.$('#import-report'); return !!state.slides && !!box && !box.hidden; };
     /**
      * A new import starts: the file kept for "Re-import in safe mode" goes now (not only when its report is
      * replaced), and the button with it; the report on screen stays until the new one comes.
@@ -349,7 +395,7 @@
     report.refresh = function () { if (state.entries.length) render(); };
     report.collapse = collapse;
     report.follow = follow;
-    report.text = function () { return text(state.entries); };
+    report.text = function () { return state.slides ? '' : text(state.entries); };
 
     function copy() {
         const s = text(state.entries);
@@ -371,6 +417,8 @@
         const ed = K.$('#editor');
         if (ed) ed.addEventListener('kelk:replaced', follow);
         K.$('#report-copy').addEventListener('click', copy);
+        K.$('#report-anyway').addEventListener('click', function () { const run = state.o.onAnyway; close(false); if (run) run(); });
+        K.$('#report-prompt').addEventListener('click', function () { const b = K.$('#btn-slides-prompt'); if (b) b.click(); });
         K.$('#report-safe').addEventListener('click', function () {
             const run = state.o.onSafe;
             close();

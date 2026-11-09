@@ -33,6 +33,7 @@ const DYNAMIC = [
     // the import report: its tables hold each note / flag (pdf_) and mode / why / label (rep_) key in full
     { file: 'scripts/report.js', prefix: 'pdf_' },
     { file: 'scripts/report.js', prefix: 'rep_' },
+    { file: 'scripts/report.js', prefix: 'sc_' },
     // Kelk.i18n.apply(): the markup's own keys, checked above from index.html
     { file: 'scripts/i18n.js', arg: "el.getAttribute('data-i18n')" },
     { file: 'scripts/i18n.js', arg: 'kv[1].trim()' }

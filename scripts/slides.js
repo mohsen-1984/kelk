@@ -196,14 +196,26 @@
         /**
          * Change the view. The two samples are written for their own view: with the about document on
          * screen (unchanged) the Slides view opens the slides sample, and the other way round — a toast
-         * says so, and Undo brings the text back.
+         * says so, and Undo brings the text back. force: into slides without the slide-format check.
          */
-        setView: async function (v) {
+        setView: async function (v, force) {
             const slides = v === 'slides';
             if (slides === this.active()) return;
+            const s = K.samples ? await K.samples.of(K.editor.value()) : null;
+            // into slides: a text that is plainly not in slide format (the prompt's) stays a document, with a report
+            // that says why and offers to make slides anyway (scripts/slidecheck.js, loaded on the first switch)
+            if (slides && !force && !s && K.editor.value().trim()) {
+                const self = this;
+                let res = null;
+                try { res = (await K.libs.need('slidecheck')).check(K.editor.value()); } catch (e) { res = null; }
+                if (res && !res.ok) {
+                    K.ui.report.slides(res, { onAnyway: function () { self.setView('slides', true); } });
+                    return;
+                }
+            }
+            if (K.ui.report.isSlides()) K.ui.report.close(false);
             K.store.setUi('view', slides ? 'slides' : 'document');
             this.applyView();
-            const s = K.samples ? await K.samples.of(K.editor.value()) : null;
             if (s && s.set === (slides ? 'about' : 'slides')) {
                 await K.samples.load(slides ? 'slides' : 'about');
                 K.ui.toast(K.i18n.t(slides ? 'toSlidesSample' : 'toAboutSample'));

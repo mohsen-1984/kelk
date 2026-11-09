@@ -156,6 +156,7 @@
                 global: 'PdfImporter'
             },
             jszip: { src: 'vendor/jszip.min_3.10.2.js', global: 'JSZip' },
+            slidecheck: { src: 'scripts/slidecheck.js', global: 'KelkSlideCheck' },      // on the first switch to slides
             pptx: { src: ['vendor/jszip.min_3.10.2.js', 'vendor/pptxgen.min_4.0.1.js'], global: 'PptxGenJS' }
         },
 
