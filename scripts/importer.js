@@ -396,9 +396,10 @@
             try {
                 if (html && K.store.getUi('importer.richPaste') && MarkdownImporter.isRich(html)) {
                     const md = importer().fromHtml(html).markdown;
-                    pasted = md;
+                    // the Excel view: a table without a heading (cells copied from Excel) gets one (scripts/sheets.js)
+                    pasted = sh ? sh.headTables(md) : md;
                     clear();
-                    K.editor.insert(md);
+                    K.editor.insert(pasted);
                     K.editor.markConverted(true);
                     K.ui.toast(K.i18n.t('imported'));
                 } else if (text) {

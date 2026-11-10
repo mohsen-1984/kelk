@@ -4,53 +4,42 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+## [2.6] — 2026-11-10
+
+Excel and CSV: the standalone CSV / Markdown ⇆ XLSX page joins Kelk.
+
 ### Added
 
-- **`lib/XlsxBuilder.js`**: Markdown tables to an Excel workbook (.xlsx) and CSV files — each table a sheet named by the
-  heading or bold line above it, or every table in one sheet. SheetJS writes the workbook, then a polish step adds what
-  it cannot: fonts by content (Persian, Latin), alignment, the header's fill and borders, stripes, column widths, a
-  right-to-left view, a frozen header row and a filter, paper, margins and print titles. SheetJS 0.20.3 is vendored
-  and loads only for an XLSX export.
-- **The Excel view** (Preview → Document | Slides | Excel): every table of the text is a sheet. Its preview shows a block
-  per sheet — its name, rows and columns, its first 20 rows (Settings → Excel → «Rows in the preview»); a wide sheet
-  scrolls inside its block, with the header row fixed, on a phone too. The export buttons follow the view: XLSX and
-  CSV (one file per sheet, in «CSV-name.zip»); Ctrl+Enter exports XLSX, Ctrl+Shift+Enter the CSV files. Switching to
-  Excel with a text that has no table keeps the view, with a report. **Settings → Excel**: one sheet per table or all
-  in one, sheet direction, text wrapping, leading zeros, thousands separators, links, line breaks, the header's fill,
-  stripes, borders, header height, filter, frozen header, column widths, paper, orientation, margins, printing, the
-  CSV separator and BOM; its header is tinted in the Excel view. **Settings → Fonts → «Other fonts for XLSX»** (on
-  by default: B Nazanin for Persian, Calibri for Latin): Excel cannot embed fonts, so the view says which fonts the
-  reader needs. The view loads on its first use, and Settings → Excel's words when its group first opens.
-- **CSV and XLSX import** (`lib/SheetImporter.js`, PapaParse 5.7.0; both load on the first one): each sheet becomes a
-  `##` heading and a table in the editor, and the page switches to the Excel view. A CSV's encoding (UTF-8, UTF-16,
-  Windows-1256 — Persian Excel's «CSV (Comma delimited)») and separator (, ; Tab |) are found by themselves;
-  in a Persian CSV, Arabic ي and ك become ی and ک (Settings → Import, as in PDF import). Several CSVs, or a zip of them, open the order
-  dialog, each with its rows, columns, encoding and separator. An XLSX comes in on its own (not from a zip, not with
-  other files), every sheet with its values as Excel shows them; cells merged over rows follow Settings → Import
-  (repeated in each row by default, as in Word, HTML and PDF import), cells merged across columns are written once. A zip with CSVs and documents: the dialog asks which
-  kind to import and lists the other files as not imported. The import report shows a summary table of the sheets
-  (and so does a Markdown import in the Excel view). More than 100,000 cells is refused: the editor would slow down.
-- **An Excel sample**, the Excel view's own (as the slides sample is the Slides view's): a few sheets in three
-  languages — Persian and English text, codes with leading zeros, numbers longer than 15 digits, dates, links, a cell
-  with a line break, and a wide monthly table. Each view now opens its own sample when a sample is on screen.
-- **The tagline and the editor's placeholder** name Excel and CSV too, in all three languages.
-- **Paste in the Excel view**: pasted CSV or tab-separated text becomes a heading and a table, like a CSV import
-  (Shift pastes it as it is), and a paste that brings tables (Markdown, or cells from a web page or Word) shows the
-  sheets' summary. Typing and other edits stay quiet.
+- **The Excel view** (Preview → Document | Slides | Excel): each Markdown table is a sheet, named by the heading or
+  bold line above it. The preview shows a block per sheet — name, rows, columns, its first 20 rows — scrolling
+  sideways inside the block with the header row fixed, on a phone too, in the light and dark theme. A text without
+  a table keeps its view, with a report. The view loads on first use.
+- **XLSX and CSV export**: a formatted workbook — a right-to-left sheet when the text is, fonts and alignment by
+  content, a colored, frozen header row with a filter, stripes, borders, column widths, print setup; leading zeros
+  and numbers of more than 15 digits stay text, links stay links, `<br>` is a line break in the cell — and a zip with
+  one CSV per sheet. The workbook's properties name Kelk 2.6 and the document's title, as the other files do.
+  **Settings → Excel** holds the options (one sheet per table or all in one, wrapping, borders,
+  colors, paper, margins, the CSV separator …). **Settings → Fonts → «Other fonts for XLSX»**, on by default
+  (B Nazanin, Calibri): Excel cannot embed fonts, and the view says so.
+- **CSV and XLSX import**: each sheet becomes a `##` heading and a table in the editor. A CSV's encoding — UTF-8,
+  UTF-16 or Windows-1256 (Persian Excel's «CSV (Comma delimited)») — and separator are found by themselves; in a
+  Persian CSV, ي and ك become ی and ک. Several CSVs or a zip of them open the order dialog, with each file's rows,
+  columns, encoding and separator; a zip with CSVs and documents asks which kind to import. An XLSX comes in on its
+  own, with the values Excel shows; merged cells follow Settings → Import. The import report shows a summary table of
+  the sheets. More than 100,000 cells is refused (the editor would slow down).
+- **Paste in the Excel view**: CSV or tab-separated text becomes a heading and a table (Shift pastes it as it is);
+  cells copied from Excel or a web page get a «Table N» heading; a paste with tables shows the summary.
+- **An Excel sample** in three languages (Persian and English text, leading zeros, long numbers, dates, links, a
+  wide table); each view now opens its own sample.
+- **Library**: `lib/XlsxBuilder.js` (Markdown tables → .xlsx and CSV; SheetJS 0.20.3, loaded on demand) and
+  `lib/SheetImporter.js` (CSV and .xlsx → Markdown; PapaParse 5.7.0), documented in lib/README.
 
 ### Changed
 
-- **Wide tables in the preview** are handled like fenced code: when a table's columns cannot fit the pane without
-  breaking words, its cells keep their lines (breaking only at a real line break) and the table scrolls sideways in
-  its own block, a finger too. Narrower tables still fit the pane. The Excel view's sheets do the same.
-- **The link preview** (og-image.png, from tools/og-image.html) shows a sheet beside the page and the slide, and XLSX
-  among the outputs; the page's title and description name Excel and CSV.
-- **The README** (fa, en, ar) and lib/README describe Excel and CSV, with a screenshot of the Excel view in each language.
-- **About Kelk and samples**: a new section, 3.2 «Excel and CSV», with the three flows as its parts (Markdown to
-  Excel, CSV to Excel, Excel to CSV), and XLSX, CSV, csv and xlsx in the outputs and import tables, in all three
-  languages.
-- **The Excel view follows the dark theme**: its sheets take the app's colors, and the header, stripe and border
-  colors are translated as the document preview's are (the files keep the chosen colors).
+- **Wide tables in the preview** behave like fenced code: when a table's columns cannot fit the pane without breaking
+  words, its cells keep their lines and the table scrolls sideways in its own block. Narrower tables still fit.
+- **Words and pictures**: the tagline, the editor's placeholder, the README (fa, en, ar), About Kelk and samples
+  (new section 3.2, «Excel and CSV», with its three flows), the link preview and the screenshots name Excel and CSV.
 
 ## [2.5] — 2026-11-09
 

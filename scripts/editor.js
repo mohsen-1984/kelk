@@ -180,8 +180,9 @@
                 const md = K.importer.fromPaste(dt);
                 if (md == null) return;                      // plain text: the browser pastes it
                 e.preventDefault();
-                pasted = md;
-                K.editor.insert(md);
+                // the Excel view: a table without a heading (cells copied from Excel) gets one: its sheet's name
+                pasted = K.slides.view() === 'excel' && window.KelkSheets ? window.KelkSheets.headTables(md) : md;
+                K.editor.insert(pasted);
                 K.editor.markConverted(true);
                 K.ui.toast(K.i18n.t('imported'));
             });
