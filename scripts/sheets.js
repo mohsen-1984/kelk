@@ -332,7 +332,8 @@
             fontSizes: { bidi: +s.fonts.bidiSize || 12, latin: +s.fonts.latinSize || 11 },
             excel: ex, charsets: k.config.fontCharset || {},
             words: { table: t('xs_table'), data: t('xs_data') },
-            title: k.names.title() || ''
+            title: k.names.title() || '',
+            meta: { title: k.names.title() || '', author: (s.document && s.document.author) || '', creator: 'Kelk ' + k.config.version }   // as the other files
         });
         b.addFromMarkdown(md);
         return { b: b, rows: rows, excel: ex, fonts: f };

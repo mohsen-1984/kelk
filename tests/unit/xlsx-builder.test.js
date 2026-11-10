@@ -87,11 +87,12 @@ test('the workbook: values, a right-to-left Persian sheet, header style, frozen 
   assert.match(styles, /<fgColor rgb="FFE4E9EF"\/>/);       // Kelk's header fill
   const book = await xml('xl/workbook.xml');
   assert.match(book, /_xlnm\.Print_Titles/);
+  assert.match(await xml('docProps/app.xml'), /<Application>Kelk<\/Application>/);
 });
 
 test('settings reach the file: fonts, no stripes, landscape, one sheet for every table', async function () {
   const b = build({ stripes: false, orientation: 'landscape', sheets: 'one', headerBorder: 'none' },
-    { fonts: { bidi: 'Vazirmatn', latin: 'Arial' }, title: 'All' });
+    { fonts: { bidi: 'Vazirmatn', latin: 'Arial' }, title: 'All', meta: { title: 'Report', author: 'Ann', creator: 'Kelk 9.9' } });
   const p = b.plans();
   assert.equal(p.length, 1);
   assert.deepEqual(p[0].roles.slice(0, 5), ['title', 'head', 'body', 'body', 'gap']);
@@ -104,6 +105,11 @@ test('settings reach the file: fonts, no stripes, landscape, one sheet for every
   const styles = await xml('xl/styles.xml');
   assert.match(styles, /Vazirmatn/);
   assert.doesNotMatch(styles, /B Nazanin|charset val="178"/);
+  const core = await xml('docProps/core.xml');
+  assert.match(core, /<dc:title>Report<\/dc:title>/);
+  assert.match(core, /<dc:creator>Kelk 9\.9<\/dc:creator>/);
+  assert.match(core, /<cp:lastModifiedBy>Kelk 9\.9<\/cp:lastModifiedBy>/);
+  assert.match(await xml('docProps/app.xml'), /<Application>Kelk 9\.9<\/Application>[\s\S]*<Company>Ann<\/Company>/);
 });
 
 test('CSV: one file per sheet, quoted where needed, BOM, ASCII digits in the names', function () {

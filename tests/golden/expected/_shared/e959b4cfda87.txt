@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="fa" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="generator" content="Kelk HtmlBuilder 2.5">
-<title>Page breaks</title>
+<meta name="generator" content="Kelk HtmlBuilder 2.6">
+<title>ىبى</title>
 <style>
 @font-face{font-family:"Vazirmatn";src:url(data:font/woff2;base64,[111152 bytes sha256 4e3fa217d38f]) format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
 *{box-sizing:border-box}

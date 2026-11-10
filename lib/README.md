@@ -110,7 +110,7 @@ language (justify; a paragraph holding a long URL or path starts instead), and t
 contents layout (after the opening H1: `<hr>`, contents, `<hr>`, an empty line).
 
 File properties: `configure({ meta: { title, author, subject, keywords, creator } })` (or `setMeta`) — PDF Info,
-the .docx core properties, HTML `<meta name="author">`; the creator is "Kelk " + `BuilderBase.version` (2.5 now) unless set, the title the
+the .docx core properties, HTML `<meta name="author">`; the creator is "Kelk " + `BuilderBase.version` (2.6 now) unless set, the title the
 header's or the first H1 when left out.
 
 ## The builders
@@ -248,7 +248,8 @@ numbers lines up with its table in every case.
 ```js
 const b = XlsxBuilder.create()
     .configure({ fonts: { bidi: 'B Nazanin', latin: 'Calibri' }, fontSizes: { bidi: 12, latin: 11 },
-                 excel: { sheets: 'each', zeros: true, stripes: true } })   // XlsxBuilder.DEFAULTS: every option
+                 excel: { sheets: 'each', zeros: true, stripes: true },     // XlsxBuilder.DEFAULTS: every option
+                 meta: { title: 'Sales', author: 'Ann', creator: 'Kelk 2.6' } })   // the file's properties
     .addFromMarkdown(markdown);                  // marked (global, or { marked }) reads the tables: no DOM needed
 b.sheets();                                      // [{ name, header, rows, cols }]
 const xlsx = await b.toBlob();                   // SheetJS (global XLSX) + JSZip
