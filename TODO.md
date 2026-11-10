@@ -43,35 +43,23 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
   `pdf-font-b-*.js`) and `borna-rayaneh/` in `assets/fonts/download/persian-fonts-ttf.zip`.
 - Every pull request targets `main`; the request to publish comes only after the release PR is merged.
 
-**2.6 — Excel** (the owner's decision of 2026-11-09): the standalone CSV / Markdown ⇄ XLSX page merged into Kelk, in
-three pull requests, one release:
+**Standing rules from 2.6** (the owner's decisions; done — `CHANGELOG.md` 2.6):
 
-1. **Markdown → XLSX**: `lib/XlsxBuilder.js` (each table a sheet, named by the heading or bold line above it; the page's
-   Persian formatting step, `polish`), a third view, **Excel**, with its own preview (one block per sheet with its
-   name, rows and columns; the first 20 rows by default, Settings → Excel; wide sheets scroll inside the table, header
-   row fixed; touch scrolling both ways), the export buttons of the view (XLSX, CSV zip), Settings → Excel (its header
-   tinted in the Excel view, like Slides), the switch check (a text without tables stays where it is, with a report).
-   Fonts stay in Settings → Fonts: XLSX has fonts of its own, on by default — B Nazanin for Persian, Calibri for
-   Latin — since Excel cannot embed fonts (the view says so); DOCX and PPTX keep the shared font.
-   SheetJS writes the workbook (as the page did: tested), loaded on demand only; Tabulator is not taken.
-2. **Import**: CSV; a single XLSX (XLSX files inside a zip are ignored); a zip of CSVs, ordered like MD files, the
-   dialog showing each sheet's rows, columns, encoding and separator; a zip with CSV and MD files: the user picks
-   one kind, the other files are listed as ignored. Every import becomes Markdown in the editor: one `##` heading and
-   one table per sheet (`<br>` for a line break in a cell, `\|` for a bar). The import report's summary table for
-   the three flows. Largest import: **100,000 cells** (measured in PR 1, Chrome, a 10-column table, the Excel view:
-   at 100,000 cells (1 MB) a key takes about 50 ms and putting the text in the editor about 1 s; at 200,000 (2 MB)
-   about 90 ms and 4.5 s, the browser's textarea itself taking most of it); a larger file is refused with a message.
-   Also in this pull request (the owner's decisions of 2026-11-10): **wide tables** in the document preview and the
-   Excel view are handled like fenced code — cells do not wrap until a real line break, and the table scrolls
-   horizontally inside its own block (finger scrolling on a phone); in the document preview a table is wide when its
-   columns' longest words do not fit the pane (narrower tables still fit it). Settings → Excel's words load with the
-   Excel module, like the slide check's (the room it frees takes the import's hooks).
-   Everything Excel-related stays in 2.6; only the low-priority items below wait.
-3. **Docs**: About Kelk and samples — an Excel section, the three flows as its subsections (from the page's «what this
-   page is for»); og-image.html and a new og-image.png; lib/README; the README in three languages; screenshots.
+- Excel is a third view. Each Markdown table is a sheet, named by the heading or bold line above it; every CSV or XLSX
+  import, and a CSV paste in the Excel view, becomes Markdown in the editor — one `##` heading and one table per sheet
+  (`<br>` a line break in a cell, `\|` a bar) — so the three flows share one pipeline. Cells pasted as an HTML table
+  in the Excel view get a «Table N» heading too.
+- XLSX has fonts of its own, on by default (B Nazanin, Calibri): Excel cannot embed fonts, and the view says so. SheetJS
+  writes the workbook, loaded on demand; `lib/XlsxBuilder.js` styles it (the standalone page's polish step).
+- An XLSX comes in on its own only (never from a zip); a zip with CSVs and documents: the user picks one kind. Merged
+  cells follow Settings → Import. More than 100,000 cells is refused (measured: 50 ms a key at 100,000 cells, 90 ms
+  and 4.5 s to load at 200,000; the textarea's own cost).
+- Wide tables in the preview (the document and the Excel view) behave like fenced code: no wrapping before a real line
+  break, scrolling sideways in their own block (`kelk-wide`: the columns' longest words do not fit the pane).
+- Each view has its own sample (about, slides, excel). Settings → Excel's words load with the Excel module.
 
-**2.7 — the slides view on demand, then PDF import from real files** (moved from 2.6, the owner's decision of
-2026-11-09).
+**2.7 — the slides view on demand, then PDF import from real files** (the next release; moved from 2.6, the owner's
+decision of 2026-11-09).
 
 **The slides view on demand** (moved from 2.5, the owner's decision of 2026-11-09): PptxBuilder (170 KB) and
 `scripts/slides.js` (30 KB) load with the page, though a user who writes documents never needs them; load them on
