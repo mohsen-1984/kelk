@@ -156,10 +156,12 @@ async function check(browser, url, lang, theme, allow) {
     await page.evaluate(AXE_SOURCE);
     // the page with every settings group expanded, then each dialog open on its own (a node of a dialog is printed
     // as "[#id] selector")
-    await page.evaluate(function () {
+    await page.evaluate(async function () {
         document.querySelectorAll('details').forEach(function (d) {
             d.open = true;
         });
+        // Settings → Excel's words come with the Excel module, loaded when its group opens: waited for
+        if (window.Kelk && Kelk.libs) await Kelk.libs.need('sheets');
     });
     const dialogs = await page.$$eval('dialog[id]', function (ds) {
         return ds.map(function (d) {

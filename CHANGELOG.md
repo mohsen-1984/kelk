@@ -20,7 +20,7 @@ All notable changes to Kelk. Dates are those of the release tags.
   stripes, borders, header height, filter, frozen header, column widths, paper, orientation, margins, printing, the
   CSV separator and BOM; its header is tinted in the Excel view. **Settings → Fonts → «Other fonts for XLSX»** (on
   by default: B Nazanin for Persian, Calibri for Latin): Excel cannot embed fonts, so the view says which fonts the
-  reader needs. The view loads on its first use.
+  reader needs. The view loads on its first use, and Settings → Excel's words when its group first opens.
 
 ### Changed
 
