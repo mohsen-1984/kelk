@@ -11,7 +11,8 @@ nothing here depends on it.
 ## Files and load order
 
 ```text
-vendor      docx (for .docx) · jsPDF (for .pdf) · JSZip + PptxGenJS (for .pptx) · mammoth + turndown (+ gfm) (for import) · pdf.js (for .pdf import)
+vendor      docx (for .docx) · jsPDF (for .pdf) · JSZip + PptxGenJS (for .pptx) · JSZip + SheetJS (for .xlsx) · PapaParse (for .csv import)
+            · mammoth + turndown (+ gfm) (for import) · pdf.js (for .pdf import)
 fonts       pdf-base64-ttf-fonts/pdf-font-*.js        PDF fonts (window.PdfFonts)
 lib         ImageCore.js        images: registered names, data URIs, URLs, SVG → PNG
             MathCore.js         LaTeX formulas: marked extension, MathJax 4 (local) → SVG / MathML, OMML ↔ TeX (see LATEX.md)
@@ -25,6 +26,8 @@ lib         ImageCore.js        images: registered names, data URIs, URLs, SVG �
             HtmlBuilder.js      .html (standalone page, fonts and images embedded)
             PreviewBuilder.js   a live preview on HtmlBuilder's logic and stylesheet (after HtmlBuilder)
             PptxBuilder.js      .pptx slides (PptxGenJS): a slide convention on GFM, its own layout model and preview (see SLIDES.md)
+            XlsxBuilder.js      .xlsx and CSV: each GFM table a sheet (SheetJS + its own styling step), and a preview
+            SheetImporter.js    .csv / .xlsx → Markdown: a heading and a table per sheet (PapaParse, SheetJS)
             MarkdownImporter.js .docx / HTML / pasted rich text → Markdown
             PdfImporter.js      .pdf → Markdown (needs vendor/pdfjs/, after MarkdownImporter; see PDFIMPORT.md)
             pdfimport/*.js      its parts, after it: thresholds, calibration, extract, lines, regions, ladder, order, blocks (PdfImporter.PARTS); pdfimport/README.md maps their functions
@@ -127,6 +130,7 @@ header's or the first H1 when left out.
   columns), native diagrams (process, cycle, pyramid, funnel, hierarchy, matrix, venn) and native charts
   from tables; speaker notes from comments; icons; callouts. `configure({ slides: {…} })` adds the slide
   options to the shared ones. The convention and the API: **[`SLIDES.md`](SLIDES.md)**.
+- **`XlsxBuilder`** (1.0) — tables, not documents: it stands apart from `BuilderBase` (see [Excel](#excel-xlsxbuilder-and-sheetimporter)).
 
 ## Fonts
 
@@ -239,6 +243,43 @@ decides by its own letters, and a cell with no letter at all — digits of any s
 `٠-٩`, `۰-۹`), signs, symbols, an empty cell — takes its table's direction, so a column of
 numbers lines up with its table in every case.
 
+## Excel: `XlsxBuilder` and `SheetImporter`
+
+```js
+const b = XlsxBuilder.create()
+    .configure({ fonts: { bidi: 'B Nazanin', latin: 'Calibri' }, fontSizes: { bidi: 12, latin: 11 },
+                 excel: { sheets: 'each', zeros: true, stripes: true } })   // XlsxBuilder.DEFAULTS: every option
+    .addFromMarkdown(markdown);                  // marked (global, or { marked }) reads the tables: no DOM needed
+b.sheets();                                      // [{ name, header, rows, cols }]
+const xlsx = await b.toBlob();                   // SheetJS (global XLSX) + JSZip
+const csvZip = await b.toCsvZip();               // one CSV per sheet; toCsvFiles() → [{ name, text }]
+box.innerHTML = XlsxBuilder.previewHtml(b.plans(), { rows: 20 });   // + XlsxBuilder.previewCss(), once
+
+const csv = SheetImporter.readCsv(bytes);        // { rows, encoding, separator } — PapaParse
+const book = SheetImporter.readXlsx(bytes, { mergedRows: 'repeat' });   // [{ name, rows, hidden }] — SheetJS
+const md = SheetImporter.toMarkdown([{ name: 'Sales', rows: csv.rows }]);  // «## Sales» and a GFM table
+```
+
+Each table of the text is a sheet, named by the heading or the bold line above it (unique, at most 31 characters, as
+Excel wants), or every table in one sheet (`excel.sheets: 'one'`, with title rows and gaps). SheetJS writes the
+cells; then the polish step rewrites the workbook's XML, since SheetJS Community Edition writes no styles: fonts by
+content (the `bidi` font for Persian, Arabic and Hebrew text, the `latin` font for the rest), alignment by content
+(right, left, numbers centered), the header row's fill, borders and height, stripes as conditional formatting (sorting
+keeps them), column widths from the content, a right-to-left view when most of the text is, a frozen header row, an
+AutoFilter, a spacer column after the last one (its text cannot overflow), paper, margins, orientation, fit to width,
+print titles. Values: digits become numbers, except leading zeros (`0012`, text), more than 15 digits (Excel keeps
+15) and a leading `+`; `<br>` is a line break in the cell; a cell that is one link keeps its target.
+
+**Fonts are named, never embedded: Excel cannot embed fonts.** Kelk's page gives XLSX its own pair for that reason
+(B Nazanin, Calibri: on most Persian-language computers).
+
+The way back reads CSV in UTF-8, UTF-16 or Windows-1256 (Persian Excel's «CSV (Comma delimited)»: no byte order
+mark; a short file that is valid UTF-8 by chance is caught), the separator guessed among `,` `;` Tab `|`. A workbook
+comes in with the values Excel shows (dates and formats as text), its merged cells by the rule below (`mergedRows`),
+and Kelk's own spacer column dropped; formulas (their values come), styles and link targets do not. `toMarkdown`
+escapes what would change a cell's meaning (`|` `*` `` ` `` `$` `~` `<` `&`, `_` at a word's edge), so the cells read
+back the same.
+
 ## Import: `MarkdownImporter`
 
 ```js
@@ -350,6 +391,8 @@ to show its columns (it is cut at the other part's gutters).
 - **PDF import:** a scan needs an OCR layer; turned text, borderless two-column tables and formulas from other
   programs are not read well yet; Persian PDFs whose fonts carry broken ToUnicode maps (wkhtmltopdf) lose letters
   (`PDFIMPORT.md` §9, `TODO.md`).
+- **Excel:** fonts are named, not embedded (Excel cannot embed fonts); formulas, merged cells and styles are not
+  written; an XLSX import brings values, not formulas, styles or link targets.
 - **Slides:** no animations or transitions; equations are drawn by PowerPoint (their width may differ a little from the preview); fonts are named, not
   embedded (`SLIDES.md` §7).
 - A DOM is required to build documents (browser, or a DOM implementation in Node).
