@@ -36,6 +36,8 @@ All notable changes to Kelk. Dates are those of the release tags.
 - **Wide tables in the preview** are handled like fenced code: when a table's columns cannot fit the pane without
   breaking words, its cells keep their lines (breaking only at a real line break) and the table scrolls sideways in
   its own block, a finger too. Narrower tables still fit the pane. The Excel view's sheets do the same.
+- **The Excel view follows the dark theme**: its sheets take the app's colors, and the header, stripe and border
+  colors are translated as the document preview's are (the files keep the chosen colors).
 
 ## [2.5] — 2026-11-09
 

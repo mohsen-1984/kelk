@@ -296,7 +296,16 @@
         '.xs-sum th{font-weight:600;color:var(--muted);background:var(--panel-2)}',
         '.xs-sum td.n{text-align:center;font-variant-numeric:tabular-nums}',
         '.xs-sum td.src{color:var(--muted)}',
-        '.xs-sum tfoot td{font-weight:600;border-bottom:0;border-top:2px solid var(--line-strong)}'
+        '.xs-sum tfoot td{font-weight:600;border-bottom:0;border-top:2px solid var(--line-strong)}',
+        // the dark theme: the sheets take the app's colors (their own colors: translated in render)
+        '[data-theme="dark"] .kx-sheet{background:var(--panel);color:var(--ink);border-color:var(--line);box-shadow:none}',
+        '[data-theme="dark"] .kx-head,[data-theme="dark"] .kx-more{background:var(--panel-2);border-color:var(--line)}',
+        '[data-theme="dark"] .kx-size,[data-theme="dark"] .kx-more{color:var(--muted)}',
+        '[data-theme="dark"] .kx-grid .kx-rn{background:var(--code-bg);color:var(--muted);border-color:var(--line)}',
+        '[data-theme="dark"] .kx-grid thead .kx-rn{background:var(--panel-2)}',
+        '[data-theme="dark"] .kx-grid tr.title td,[data-theme="dark"] .kx-grid tr.gap td{background:var(--panel)}',
+        '[data-theme="dark"] .kx-grid .lnk{color:var(--accent-ink)}',
+        '[data-theme="dark"] .kx-note.warn{background:#3b2c14;color:#f1cf94}'
     ].join('\n');
     const SAMPLE = '| Name | Age |\n|------|-----|\n| Ann  | 31  |';
 
@@ -345,8 +354,15 @@
         [c.fonts.bidi, c.fonts.latin].forEach(function (x) { if (k.config.fontsFromPdf.indexOf(x) >= 0) k.fonts.fromPdf(x); });
         const keep = box.querySelectorAll('.kx-scroll');
         const scroll = Array.prototype.map.call(keep, function (el) { return [el.scrollLeft, el.scrollTop]; });
+        // the dark theme: the sheet's colors translated as the document preview's are (the files keep the chosen ones)
+        let ex = c.excel;
+        const dk = document.documentElement.getAttribute('data-theme') === 'dark' && k.preview.dark;
+        if (dk) {
+            ex = Object.assign({}, ex, { headerColor: dk.fill(ex.headerColor), stripeColor: dk.fill(ex.stripeColor),
+                headerBorderColor: dk.line(ex.headerBorderColor), bodyBorderColor: dk.line(ex.bodyBorderColor) });
+        }
         box.innerHTML = XlsxBuilder.previewHtml(plans, {
-            rows: c.rows, excel: c.excel, fonts: c.fonts,
+            rows: c.rows, excel: ex, fonts: c.fonts,
             size: function (r, n) { return t('xs_size', r, n); },
             more: function (n) { return t('xs_more', n); },
             label: t('xs_region'),

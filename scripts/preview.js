@@ -210,6 +210,9 @@
     }
 
     K.preview = {
+        /** The dark theme's color translation (the Excel view's sheets use it too: scripts/sheets.js). */
+        dark: { fill: darkFill, line: darkLine, text: darkText },
+
         init: function () {
             box = K.$('#preview');
             if (typeof marked !== 'undefined') marked.setOptions({ gfm: true, breaks: false });
