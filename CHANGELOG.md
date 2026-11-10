@@ -23,7 +23,8 @@ All notable changes to Kelk. Dates are those of the release tags.
   reader needs. The view loads on its first use, and Settings → Excel's words when its group first opens.
 - **CSV and XLSX import** (`lib/SheetImporter.js`, PapaParse 5.7.0; both load on the first one): each sheet becomes a
   `##` heading and a table in the editor, and the page switches to the Excel view. A CSV's encoding (UTF-8, UTF-16,
-  Windows-1256) and separator (, ; Tab |) are found by themselves. Several CSVs, or a zip of them, open the order
+  Windows-1256 — Persian Excel's «CSV (Comma delimited)») and separator (, ; Tab |) are found by themselves;
+  in a Persian CSV, Arabic ي and ك become ی and ک (Settings → Import, as in PDF import). Several CSVs, or a zip of them, open the order
   dialog, each with its rows, columns, encoding and separator. An XLSX comes in on its own (not from a zip, not with
   other files), every sheet with its values as Excel shows them; cells merged over rows follow Settings → Import
   (repeated in each row by default, as in Word, HTML and PDF import), cells merged across columns are written once. A zip with CSVs and documents: the dialog asks which

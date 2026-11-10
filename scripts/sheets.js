@@ -408,7 +408,7 @@
                 if (isXlsx(d)) {
                     d.book = SheetImporter.readXlsx(bytes, { mergedRows: k.store.getUi('importer.mergedRows') });   // Settings → Import
                 } else {
-                    d.csv = SheetImporter.readCsv(bytes);
+                    d.csv = SheetImporter.readCsv(bytes, { persianLetters: k.store.getUi('importer.persianLetters') !== false });
                     const z = SheetImporter.size(d.csv.rows);
                     d.info = d.csv.error ? t('xs_emptyFile') : t('xs_info', z.rows, z.cols, ENC[d.csv.encoding] || d.csv.encoding, sepName(d.csv.separator));
                 }

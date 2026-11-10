@@ -27,6 +27,22 @@ test('CSV: UTF-8 with a BOM, the separator guessed, quoted line breaks, empty ro
   assert.equal(r.error, null);
 });
 
+test('CSV: Persian Excel\'s «CSV (Comma delimited)» — Windows-1256, no BOM, CRLF; its Arabic ي becomes ی', function () {
+  // نام,شهر,کد / پژمان گلچين,يزد,0012 / سپيده,کرمان,0045 — as Persian Windows writes them (ی saved as ي)
+  const hex = 'e4c7e32cd4e5d12c98cf0d0a818ee3c7e42090e18dede42cedd2cf2c303031320d0ad381edcfe52c98d1e3c7e42c303034350d0a';
+  const r = SheetImporter.readCsv(Buffer.from(hex, 'hex'), { Papa });
+  assert.equal(r.encoding, 'windows-1256');
+  assert.equal(r.separator, ',');
+  assert.deepEqual(r.rows, [['نام', 'شهر', 'کد'], ['پژمان گلچین', 'یزد', '0012'], ['سپیده', 'کرمان', '0045']]);
+  assert.deepEqual(SheetImporter.readCsv(Buffer.from(hex, 'hex'), { Papa, persianLetters: false }).rows[1][1], 'يزد');
+});
+
+test('CSV: a short Windows-1256 text that happens to be valid UTF-8 (سپ = D3 81) is still Windows-1256', function () {
+  assert.equal(SheetImporter.sniffEncoding(new Uint8Array([0xD3, 0x81, 0x2C, 0x31])), 'windows-1256');
+  assert.equal(SheetImporter.sniffEncoding(bytes('naïve,café')), 'utf-8');
+  assert.equal(SheetImporter.sniffEncoding(bytes('Москва,1')), 'utf-8');
+});
+
 test('CSV: Windows-1256 when the bytes are not UTF-8; an empty file says so', function () {
   const r = SheetImporter.readCsv(new Uint8Array([0xE3, 0xD4, 0xE5, 0xCF, 0x2C, 0x31]), { Papa });
   assert.equal(r.encoding, 'windows-1256');
