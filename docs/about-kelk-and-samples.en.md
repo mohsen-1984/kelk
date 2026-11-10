@@ -162,7 +162,7 @@ The **Excel** button above the preview shows each table of the text as a sheet: 
 
 #### 3.2.1 Markdown to Excel
 
-Each table becomes a sheet, named by the heading or bold line above it — or, in Settings → Excel, all tables one after another in one sheet. Paste a model's answer straight in. The workbook comes formatted: a right-to-left sheet when most of its text is Persian or Arabic, separate fonts for Persian and English cells, alignment by content, a colored and frozen header row with a filter, striped rows, borders, columns as wide as their content, and print settings. A code with leading zeros (`0012`) and a number of more than 15 digits stay text; links stay links, and `<br>` is a line break inside the cell.
+Each table becomes a sheet, named by the heading or bold line above it — or, in Settings → Excel, all tables one after another in one sheet. Paste a model's answer straight in. The workbook comes formatted: a right-to-left sheet when any of its cells is Persian, Arabic or Hebrew, separate fonts for Persian and English cells, alignment by content, a colored and frozen header row with a filter, striped rows, borders, columns as wide as their content, and print settings. A code with leading zeros (`0012`) and a number of more than 15 digits stay text; links stay links, and `<br>` is a line break inside the cell.
 
 > ⚠️ **Excel cannot embed fonts:** the file only names them. So XLSX has fonts of its own (Settings → Fonts): B Nazanin for Persian and Calibri for Latin, found on most Persian-language computers.
 
