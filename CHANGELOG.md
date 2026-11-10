@@ -35,8 +35,8 @@ All notable changes to Kelk. Dates are those of the release tags.
   with a line break, and a wide monthly table. Each view now opens its own sample when a sample is on screen.
 - **The tagline and the editor's placeholder** name Excel and CSV too, in all three languages.
 - **Paste in the Excel view**: pasted CSV or tab-separated text becomes a heading and a table, like a CSV import
-  (Shift pastes it as it is), and a paste that brings tables (Markdown, or cells from a web page or Word) shows the
-  sheets' summary. Typing and other edits stay quiet.
+  (Shift pastes it as it is); cells copied from Excel or a web page get a «Table N» heading too, so each sheet has a
+  name; and a paste that brings tables shows the sheets' summary. Typing and other edits stay quiet.
 
 ### Changed
 

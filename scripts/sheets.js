@@ -19,6 +19,8 @@
  *       on each, not a Markdown table) — synchronous: the paste event decides on it
  *   KelkSheets.pasteCsv(text)          such a paste → a heading and a table at the cursor, then the summary
  *   KelkSheets.afterPaste(text)        any other paste in the Excel view: the summary when it holds a table
+ *   KelkSheets.headTables(md)          a rich paste's Markdown (cells copied from Excel or a web page come as an HTML
+ *       table) with a «## Table N» heading above each table that has no heading or bold line: a sheet name
  *   KelkSheets.STRINGS                 its words (xs_*, and Settings → Excel's ex*), fa / en / ar: added to
  *       Kelk.i18n's tables when it loads, then Settings → Excel is labelled (it loads when that group opens: settings.js)
  *       (tools/check-i18n.js reads them from here)
@@ -589,10 +591,7 @@
             let count = 0;
             try { count = XlsxBuilder.findTables(k.editor.value()).length; } catch (e) { count = 0; }
             const name = t('xs_table') + ' ' + (count + 1);
-            // a blank line before and after: the heading and the table stand apart from the text around them
-            const area = k.$('#editor'), before = area.value.slice(0, area.selectionStart);
-            const lead = !before.trim() ? '' : /\n\n$/.test(before) ? '' : /\n$/.test(before) ? '\n' : '\n\n';
-            k.editor.insert(lead + SheetImporter.toMarkdown([{ name: name, rows: r.rows }]) + '\n');
+            k.editor.insert(lead() + SheetImporter.toMarkdown([{ name: name, rows: r.rows }]) + '\n');
             render();
             summary();
         } catch (e) {
@@ -600,7 +599,40 @@
         }
     }
 
+    /** The line breaks a heading pasted at the cursor needs to stand apart from the text before it. */
+    function lead() {
+        const k = K(), area = k.$ && k.$('#editor');
+        if (!area) return '';
+        const before = area.value.slice(0, area.selectionStart);
+        return !before.trim() ? '' : /\n\n$/.test(before) ? '' : /\n$/.test(before) ? '\n' : '\n\n';
+    }
+
     function afterPaste(text) { if (hasTables(text)) summary(); }
+
+    /** A heading for each table that has none above it, numbered after the text's own tables (as pasteCsv). */
+    function headTables(md) {
+        const k = K(), lines = String(md || '').split('\n');
+        let n = 0;
+        try { n = XlsxBuilder.findTables(k.editor.value()).length; } catch (e) { n = 0; }
+        const sep = /^\s*\|?\s*:?-{1,}:?\s*(\|\s*:?-{1,}:?\s*)*\|?\s*$/;
+        const out = [];
+        for (let i = 0; i < lines.length; i++) {
+            const starts = /\|/.test(lines[i]) && i + 1 < lines.length && sep.test(lines[i + 1]) && /\|/.test(lines[i + 1]) &&
+                !(i > 0 && /\|/.test(lines[i - 1]) && lines[i - 1].trim());          // not a row of the table above
+            if (starts) {
+                let j = out.length - 1;
+                while (j >= 0 && !out[j].trim()) j--;
+                const named = j >= 0 && (/^#{1,6}\s/.test(out[j]) || /^\s*\*\*[^*]+\*\*\s*:?\s*$/.test(out[j]));
+                if (!named) {
+                    if (out.length && out[out.length - 1].trim()) out.push('');
+                    out.push('## ' + t('xs_table') + ' ' + (++n), '');
+                } else n++;
+            }
+            out.push(lines[i]);
+        }
+        const res = out.join('\n');
+        return /^## /.test(res) && res !== md ? lead() + res : res;
+    }
 
     async function blob(kind) {
         const k = K(), c = builder(k.editor.value());
@@ -627,7 +659,7 @@
     }
 
     const api = { render: render, hasTables: hasTables, showNoTables: showNoTables, blob: blob, importSheets: importSheets, summary: summary,
-        looksLikeCsv: looksLikeCsv, pasteCsv: pasteCsv, afterPaste: afterPaste, STRINGS: STRINGS };
+        looksLikeCsv: looksLikeCsv, pasteCsv: pasteCsv, afterPaste: afterPaste, headTables: headTables, STRINGS: STRINGS };
     root.KelkSheets = api;
     if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);
