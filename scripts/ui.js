@@ -373,18 +373,21 @@
 
         /**
          * Several documents (a zip, a multi-file drop) before they are imported: the order they come in, and
-         * which of them. o: { title, docs: [{ name, path, size }], skipped: [{ name, path, size, reason:
-         * 'type' | 'size' }], images: n, maxMB }. Each document has the icon of its kind (md, txt, html, docx,
-         * pdf), a checkbox, a handle to drag (mouse or touch) and up/down buttons (Alt + ↑/↓ on a focused row);
-         * the files that cannot come in are listed apart, with the reason. Resolves with the documents
-         * chosen, in their order, or null on Cancel / Esc.
+         * which of them. o: { title, docs: [{ name, path, size, info }], skipped: [{ name, path, size, reason:
+         * 'type' | 'size' | 'xlsx', note }], images: n, maxMB, choice }. Each document has the icon of its kind (md,
+         * txt, html, docx, pdf, csv), a checkbox, a handle to drag (mouse or touch) and up/down buttons (Alt + ↑/↓ on
+         * a focused row); info: a line under its name (a CSV's rows, columns, encoding, separator). The files that
+         * cannot come in are listed apart, with the reason (note: the reason's own words).
+         * choice: two kinds that cannot come in together (CSV sheets, documents) — { label, value, options: [{ value,
+         * label }], pick(value) → { docs, skipped } }: a switch above the list; the kind not chosen is listed apart.
+         * Resolves with the documents chosen, in their order, or null on Cancel / Esc.
          */
         order: function (o) {
             const dlg = $('#order');
             if (!dlg) return Promise.resolve(o.docs);
             const list = $('#order-list'), ok = $('#order-ok'), count = $('#order-count');
-            const KIND = { '.md': 'md', '.markdown': 'md', '.txt': 'txt', '.html': 'html', '.htm': 'html', '.docx': 'docx', '.pdf': 'pdf' };
-            const ICON = { md: 'file-pen-line', txt: 'file-text', html: 'file-code', docx: 'file-type', pdf: 'file-badge', image: 'file-image', none: 'file-x' };
+            const KIND = { '.md': 'md', '.markdown': 'md', '.txt': 'txt', '.html': 'html', '.htm': 'html', '.docx': 'docx', '.pdf': 'pdf', '.csv': 'csv', '.xlsx': 'csv' };
+            const ICON = { md: 'file-pen-line', txt: 'file-text', html: 'file-code', docx: 'file-type', pdf: 'file-badge', csv: 'sheet', image: 'file-image', none: 'file-x' };
             const ext = function (n) { const m = /\.[^.\/]+$/.exec(n || ''); return m ? m[0].toLowerCase() : ''; };
             const size = function (b) {
                 if (!(b >= 0)) return '';
@@ -398,6 +401,7 @@
                 const dir = d.path && d.path.indexOf('/') >= 0 ? d.path.slice(0, d.path.lastIndexOf('/') + 1) : '';
                 box.appendChild(el('bdi', 'n', d.name));
                 if (dir) box.appendChild(el('bdi', 'dir', dir));
+                if (d.info) box.appendChild(el('bdi', 'info', d.info));
                 const meta = el('span', 'order-meta');
                 meta.appendChild(el('span', 'order-tag k-' + kind, (ext(d.name).slice(1) || '?').toUpperCase()));
                 if (note) meta.appendChild(el('span', 'order-note', note));
@@ -405,45 +409,65 @@
                 return [box, meta];
             };
 
-            list.textContent = '';
-            o.docs.forEach(function (d, i) {
-                const kind = KIND[ext(d.name)] || 'none';
-                const li = el('li', 'order-row');
-                li._doc = d; li.tabIndex = -1;
-                const grip = el('span', 'order-grip');
-                grip.title = K.i18n.t('orderDrag'); grip.setAttribute('aria-hidden', 'true');
-                const gi = el('i'); gi.setAttribute('data-lucide', 'grip-vertical'); grip.appendChild(gi);
-                const cb = el('input'); cb.type = 'checkbox'; cb.checked = true; cb.setAttribute('aria-label', d.name);
-                const up = el('button', 'btn ghost icon order-up'), down = el('button', 'btn ghost icon order-down');
-                [[up, 'arrow-up', K.i18n.t('orderUp')], [down, 'arrow-down', K.i18n.t('orderDown')]].forEach(function (b) {
-                    b[0].type = 'button'; b[0].title = b[2]; b[0].setAttribute('aria-label', b[2]);
-                    const ic = el('i'); ic.setAttribute('data-lucide', b[1]); b[0].appendChild(ic);
+            const fill = function (docs, skipped) {
+                list.textContent = '';
+                docs.forEach(function (d) {
+                    const kind = KIND[ext(d.name)] || 'none';
+                    const li = el('li', 'order-row');
+                    li._doc = d; li.tabIndex = -1;
+                    const grip = el('span', 'order-grip');
+                    grip.title = K.i18n.t('orderDrag'); grip.setAttribute('aria-hidden', 'true');
+                    const gi = el('i'); gi.setAttribute('data-lucide', 'grip-vertical'); grip.appendChild(gi);
+                    const cb = el('input'); cb.type = 'checkbox'; cb.checked = true; cb.setAttribute('aria-label', d.name);
+                    const up = el('button', 'btn ghost icon order-up'), down = el('button', 'btn ghost icon order-down');
+                    [[up, 'arrow-up', K.i18n.t('orderUp')], [down, 'arrow-down', K.i18n.t('orderDown')]].forEach(function (b) {
+                        b[0].type = 'button'; b[0].title = b[2]; b[0].setAttribute('aria-label', b[2]);
+                        const ic = el('i'); ic.setAttribute('data-lucide', b[1]); b[0].appendChild(ic);
+                    });
+                    li.append(grip, cb, iconOf(kind));
+                    label(d, kind).forEach(function (x) { li.appendChild(x); });
+                    li.append(up, down);
+                    list.appendChild(li);
                 });
-                li.append(grip, cb, iconOf(kind));
-                label(d, kind).forEach(function (x) { li.appendChild(x); });
-                li.append(up, down);
-                list.appendChild(li);
-            });
 
-            const skip = $('#order-skip'), skipList = $('#order-skip-list');
-            skipList.textContent = '';
-            (o.skipped || []).forEach(function (d) {
-                const li = el('li', 'order-row off');
-                li.appendChild(iconOf('none'));
-                label(d, 'none', d.reason === 'size' ? K.i18n.t('orderTooBig', o.maxMB) : K.i18n.t('orderNoType')).forEach(function (x) { li.appendChild(x); });
-                skipList.appendChild(li);
-            });
-            if (o.images) {
-                const li = el('li', 'order-row off img');
-                li.appendChild(iconOf('image'));
-                li.appendChild(el('span', 'order-name', K.i18n.t('orderImages', o.images)));
-                skipList.appendChild(li);
-            }
-            $('#order-skip-head').textContent = K.i18n.t('orderSkipped', (o.skipped || []).length);
-            $('#order-skip-head').hidden = !(o.skipped || []).length;
-            skip.hidden = !skipList.children.length;
+                const skip = $('#order-skip'), skipList = $('#order-skip-list');
+                skipList.textContent = '';
+                (skipped || []).forEach(function (d) {
+                    const li = el('li', 'order-row off');
+                    li.appendChild(iconOf('none'));
+                    const note = d.reason === 'size' ? K.i18n.t('orderTooBig', o.maxMB) : d.note || (d.reason === 'xlsx' ? K.i18n.t('orderXlsx') : K.i18n.t('orderNoType'));
+                    label(d, 'none', note).forEach(function (x) { li.appendChild(x); });
+                    skipList.appendChild(li);
+                });
+                if (o.images) {
+                    const li = el('li', 'order-row off img');
+                    li.appendChild(iconOf('image'));
+                    li.appendChild(el('span', 'order-name', K.i18n.t('orderImages', o.images)));
+                    skipList.appendChild(li);
+                }
+                $('#order-skip-head').textContent = K.i18n.t('orderSkipped', (skipped || []).length);
+                $('#order-skip-head').hidden = !(skipped || []).length;
+                skip.hidden = !skipList.children.length;
+                K.ui.icons(dlg);
+            };
+            fill(o.docs, o.skipped);
             $('#order-label').textContent = o.title || '';
-            this.icons(dlg);
+            // two kinds that do not mix (CSV sheets or documents): a switch; the other kind waits in the list apart
+            const kind = $('#order-kind');
+            if (kind) {
+                kind.textContent = '';
+                kind.hidden = !o.choice;
+                if (o.choice) {
+                    kind.appendChild(el('span', 'order-kind-label', o.choice.label));
+                    o.choice.options.forEach(function (c) {
+                        const lab = el('label', 'order-kind-opt'), r = el('input');
+                        r.type = 'radio'; r.name = 'order-kind'; r.value = c.value; r.checked = c.value === o.choice.value;
+                        r.onchange = function () { const p = o.choice.pick(c.value); fill(p.docs, p.skipped); refresh(); };
+                        lab.append(r, el('span', '', c.label));
+                        kind.appendChild(lab);
+                    });
+                }
+            }
 
             const rows = function () { return Array.from(list.children); };
             const refresh = function () {

@@ -30,6 +30,7 @@ const VENDOR = {
   pdfjsLib: 'readonly', // vendor/pdfjs/
   PptxGenJS: 'readonly', // vendor/pptxgen.min_*.js
   XLSX: 'readonly', // vendor/xlsx.full.min_*.js (SheetJS)
+  Papa: 'readonly', // vendor/papaparse.min_*.js
 };
 
 // Kelk's own libraries (lib/*.js): each is a UMD-style IIFE that sets global.<Name> in the browser
@@ -49,6 +50,7 @@ const KELK_LIB = {
   PreviewBuilder: 'readonly',
   WordHtmlBuilder: 'readonly',
   XlsxBuilder: 'readonly',
+  SheetImporter: 'readonly',
   createMsoTemplate: 'readonly', // top-level `var` in lib/msOfficeWordHtmlTemplate.js
 };
 

@@ -65,7 +65,7 @@ three pull requests, one release:
    Excel view are handled like fenced code — cells do not wrap until a real line break, and the table scrolls
    horizontally inside its own block (finger scrolling on a phone); in the document preview a table is wide when its
    columns' longest words do not fit the pane (narrower tables still fit it). Settings → Excel's words load with the
-   Excel module, like the slide check's (the startup budget comes back down).
+   Excel module, like the slide check's (the room it frees takes the import's hooks).
    Everything Excel-related stays in 2.6; only the low-priority items below wait.
 3. **Docs**: About Kelk and samples — an Excel section, the three flows as its subsections (from the page's «what this
    page is for»); og-image.html and a new og-image.png; lib/README; the README in three languages; screenshots.

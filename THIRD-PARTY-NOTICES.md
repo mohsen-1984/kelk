@@ -19,6 +19,7 @@ unchanged unless noted; each keeps its own license.
 | PptxGenJS (the minified build without its source-map line) | 4.0.1 | MIT | `vendor/pptxgen.min_4.0.1.js` | https://github.com/gitbrent/PptxGenJS |
 | JSZip (with pako) | 3.10.2 | MIT (dual MIT / GPLv3; used under MIT) | `vendor/jszip.min_3.10.2.js` | https://github.com/Stuk/jszip |
 | SheetJS Community Edition (`xlsx.full.min.js`, with its codepage tables) | 0.20.3 | Apache-2.0 | `vendor/xlsx.full.min_0.20.3.js` | https://git.sheetjs.com/sheetjs/sheetjs |
+| PapaParse | 5.7.0 | MIT | `vendor/papaparse.min_5.7.0.js` | https://github.com/mholt/PapaParse |
 | PDF.js (pdfjs-dist; wrapped as classic scripts by `tools/build-pdfjs.js`, code unchanged) | 6.4.299 | Apache-2.0 | `vendor/pdfjs/` (`LICENSE` there) | https://github.com/mozilla/pdf.js |
 | OpenJPEG and PDFium JBIG2 decoders (WebAssembly builds shipped with PDF.js; base64) | PDF.js 6.4.299 | BSD-2-Clause (OpenJPEG), BSD-3-Clause (PDFium); PDF.js glue Apache-2.0 | `vendor/pdfjs/wasm/` (`LICENSE_*` there) | https://github.com/mozilla/pdf.js |
 | MathJax (startup, core, TeX input + extensions, SVG output, ui/safe) | 4.1.3 | Apache-2.0 | `vendor/mathjax_4.1.3/` (`LICENSE` there) | https://github.com/mathjax/MathJax |

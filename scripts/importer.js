@@ -6,6 +6,8 @@
  *   .html / .htm      MarkdownImporter.fromHtml
  *   .docx             MarkdownImporter.fromDocx (mammoth)
  *   .pdf              PdfImporter (it and PDF.js loaded on the first .pdf) → HTML → MarkdownImporter
+ *   .csv, .xlsx       sheets: one heading and one table each (scripts/sheets.js, lib/SheetImporter.js — loaded on
+ *                     the first one); an .xlsx on its own only, never from a zip
  *   rich paste        MarkdownImporter.fromHtml (Word, web pages)
  * Cleaning, sanitizing and nested-table handling happen once, inside
  * MarkdownImporter (lib/), with the options of Settings → Import.
@@ -60,7 +62,7 @@
         t.label(K.i18n.t('taskZip', file.name));
         await K.libs.need('jszip');                  // loaded on the first .zip
         const zip = await JSZip.loadAsync(await readBuffer(file));
-        const X = K.config.extensions, known = [].concat(X.markdown, X.html, X.docx, X.pdf);
+        const X = K.config.extensions, known = [].concat(X.markdown, X.html, X.docx, X.pdf, X.csv);
         const entries = Object.keys(zip.files).map(function (k) { return zip.files[k]; })
             .filter(function (e) { return !e.dir && !/(^|\/)(__MACOSX|\.)/.test(e.name); });
         for (const e of entries) {
@@ -68,7 +70,7 @@
             const x = ext(e.name), base = e.name.split('/').pop();
             const size = e._data && e._data.uncompressedSize;
             const image = /^\.(png|jpe?g|gif|webp|svg|bmp)$/.test(x);
-            if (!image && known.indexOf(x) < 0) { skipped.push({ name: base, path: e.name, size: size, reason: 'type' }); continue; }
+            if (!image && known.indexOf(x) < 0) { skipped.push({ name: base, path: e.name, size: size, reason: X.xlsx.indexOf(x) >= 0 ? 'xlsx' : 'type' }); continue; }
             if (size > maxMB * 1024 * 1024) { skipped.push({ name: base, path: e.name, size: size, reason: 'size' }); continue; }
             if (image) {
                 const type = x === '.svg' ? 'image/svg+xml' : 'image/' + x.slice(1).replace('jpg', 'jpeg');
@@ -259,7 +261,7 @@
             big.forEach(function (f) { K.ui.toast(K.i18n.t('tooLarge', maxMB) + ': ' + f.name, 'error'); });
             files = files.filter(function (f) { return big.indexOf(f) < 0; });
             if (!files.length) return;
-            const X = K.config.extensions, known = [].concat(X.markdown, X.html, X.docx, X.pdf);
+            const X = K.config.extensions, known = [].concat(X.markdown, X.html, X.docx, X.pdf, X.csv);
             const first = files.length === 1 ? files[0].name : files.map(function (f) { return f.name; }).sort(byName)[0];
             const zipped = files.some(function (f) { return ext(f.name) === '.zip'; });
             const fail = function (err) {
@@ -276,6 +278,7 @@
                     for (const f of files) {
                         if (ext(f.name) === '.zip') await unzip(f, docs, pics, skipped, t, maxMB);
                         else if (K.images.isImage(f)) continue;
+                        else if (files.length > 1 && X.xlsx.indexOf(ext(f.name)) >= 0) skipped.push({ name: f.name, path: f.name, size: f.size, reason: 'xlsx' });
                         else if (files.length > 1 && known.indexOf(ext(f.name)) < 0) skipped.push({ name: f.name, path: f.name, size: f.size, reason: 'type' });
                         else docs.push({ name: f.name, path: f.name, size: f.size, file: f });
                     }
@@ -284,10 +287,20 @@
                     return { docs: docs, pics: pics, skipped: skipped };
                 });
             } catch (err) { fail(err); return; }
-            let docs = set.docs;
+            let docs = set.docs, ordered = false;
             if (!docs.length) { K.ui.toast(K.i18n.t('zipEmpty'), 'warn'); return; }
+            // CSV and XLSX: sheets (scripts/sheets.js). With documents beside them, the user picks one kind: the sheets
+            // come in there, or the documents chosen, in their order, go on below
+            if (docs.some(function (d) { return [].concat(X.csv, X.xlsx).indexOf(ext(d.name)) >= 0; })) {
+                let r = null;
+                try {
+                    r = await (await K.libs.need('sheets')).importSheets({ docs: docs, skipped: set.skipped, images: Object.keys(set.pics).length, files: files, first: first, maxMB: maxMB });
+                } catch (err) { fail(err); return; }
+                if (!r) return;
+                docs = r.docs; ordered = true;
+            }
             // 2. several documents, or files left out: their order and which of them (Kelk.ui.order)
-            if (docs.length > 1 || set.skipped.length) {
+            if (!ordered && (docs.length > 1 || set.skipped.length)) {
                 docs = await K.ui.order({
                     title: K.i18n.t('orderTitle', files.length === 1 ? files[0].name : first),
                     docs: docs, skipped: set.skipped, images: Object.keys(set.pics).length, maxMB: maxMB
@@ -329,6 +342,8 @@
                 name: one ? one.name : '',
                 onSafe: onSafe
             });
+            // in the Excel view, the tables that came in (no PDF report to show)
+            if (!reports.length && K.slides.view() === 'excel') K.libs.need('sheets').then(function (sh) { sh.summary(); }, function () {});
         },
 
         /**

@@ -12,6 +12,7 @@
         repoUrl: 'https://github.com/mohsen-1984/kelk',   // the footer link (hidden when empty)
         storagePrefix: 'kelk.',
         maxFileMB: 20,                  // the default of Settings → App → Largest file to import (ui.importer.maxMB)
+        maxSheetCells: 100000,          // CSV / XLSX import: more cells than this and typing in the editor slows (2.6, measured)
         // a PDF import's progress bar: each step's share of the bar (they add up to 1), measured on large files —
         // after the last page is read, the font repairs, the layout and the Markdown still take about two thirds of the time
         importProgress: { read: 0.33, fonts: 0.17, lines: 0.08, layout: 0.37, markdown: 0.05 },
@@ -187,7 +188,8 @@
             slidecheck: { src: 'scripts/slidecheck.js', global: 'KelkSlideCheck' },      // on the first switch to slides
             // the Excel view (its preview, the no-tables report, the exports): on the first switch to Excel
             sheets: { src: ['lib/XlsxBuilder.js', 'scripts/sheets.js'], global: 'KelkSheets' },
-            xlsx: { src: ['vendor/jszip.min_3.10.2.js', 'vendor/xlsx.full.min_0.20.3.js'], global: 'XLSX' },     // an XLSX export
+            xlsx: { src: ['vendor/jszip.min_3.10.2.js', 'vendor/xlsx.full.min_0.20.3.js'], global: 'XLSX' },     // an XLSX export or import
+            sheetimport: { src: ['vendor/papaparse.min_5.7.0.js', 'lib/SheetImporter.js'], global: 'SheetImporter' },   // a CSV / XLSX import
             pptx: { src: ['vendor/jszip.min_3.10.2.js', 'vendor/pptxgen.min_4.0.1.js'], global: 'PptxGenJS' }
         },
 
@@ -218,7 +220,9 @@
             html: ['.html', '.htm'],
             docx: ['.docx'],
             pdf: ['.pdf'],
-            zip: ['.zip']
+            zip: ['.zip'],
+            csv: ['.csv'],
+            xlsx: ['.xlsx']                 // on its own only: a workbook in a zip is not imported
         }
     };
 

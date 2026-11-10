@@ -439,6 +439,7 @@ dialog.order .task-detail { margin-bottom: 10px; line-height: 1.6; }
 .k-html { color: var(--k-html); }  .order-tag.k-html { background: var(--k-html); color: var(--panel); }
 .k-docx { color: var(--k-docx); }  .order-tag.k-docx { background: var(--k-docx); color: var(--panel); }
 .k-pdf { color: var(--k-pdf); }    .order-tag.k-pdf { background: var(--k-pdf); color: var(--panel); }
+.k-csv { color: var(--k-csv, #1d6f42); }  .order-tag.k-csv { background: var(--k-csv, #1d6f42); color: var(--panel); }
 .k-image { color: var(--muted); }
 .k-none { color: var(--muted); }   .order-tag.k-none { background: transparent; color: var(--muted); border: 1px solid var(--line-strong); padding: 2px 4px; }
 /* the files that do not come in: apart, muted, with the reason */
@@ -447,6 +448,13 @@ dialog.order .task-detail { margin-bottom: 10px; line-height: 1.6; }
 .order-list.off { max-height: 22vh; background: var(--panel-2); }
 .order-list.off .order-row { background: transparent; min-height: 34px; color: var(--muted); }
 .order-note { font-style: italic; }
+.order-name .info { color: var(--muted); font-size: 11.5px; overflow-wrap: anywhere; }
+/* CSV sheets or documents (a zip with both): the kind to import */
+.order-kind { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-bottom: 10px; padding: 8px 10px;
+  border-radius: var(--radius-sm); background: var(--accent-soft); font-size: 13px; }
+.order-kind-label { font-weight: 600; }
+.order-kind-opt { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.order-kind-opt input { margin: 0; accent-color: var(--accent); }
 dialog.order .task-actions { gap: 8px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
 dialog.order #order-sort { margin-inline-end: auto; }
 .order-count { color: var(--muted); font-size: 12.5px; }
