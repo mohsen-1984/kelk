@@ -43,6 +43,8 @@ All notable changes to Kelk. Dates are those of the release tags.
 - **Wide tables in the preview** are handled like fenced code: when a table's columns cannot fit the pane without
   breaking words, its cells keep their lines (breaking only at a real line break) and the table scrolls sideways in
   its own block, a finger too. Narrower tables still fit the pane. The Excel view's sheets do the same.
+- **The link preview** (og-image.png, from tools/og-image.html) shows a sheet beside the page and the slide, and XLSX
+  among the outputs; the page's title and description name Excel and CSV.
 - **About Kelk and samples**: a new section, 3.2 «Excel and CSV», with the three flows as its parts (Markdown to
   Excel, CSV to Excel, Excel to CSV), and XLSX, CSV, csv and xlsx in the outputs and import tables, in all three
   languages.
