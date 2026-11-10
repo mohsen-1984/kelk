@@ -406,7 +406,7 @@
                 task.label(t('xs_reading', d.name));
                 const bytes = new Uint8Array(await d.file.arrayBuffer());
                 if (isXlsx(d)) {
-                    d.book = SheetImporter.readXlsx(bytes);
+                    d.book = SheetImporter.readXlsx(bytes, { mergedRows: k.store.getUi('importer.mergedRows') });   // Settings → Import
                 } else {
                     d.csv = SheetImporter.readCsv(bytes);
                     const z = SheetImporter.size(d.csv.rows);

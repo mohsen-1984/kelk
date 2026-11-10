@@ -25,7 +25,8 @@ All notable changes to Kelk. Dates are those of the release tags.
   `##` heading and a table in the editor, and the page switches to the Excel view. A CSV's encoding (UTF-8, UTF-16,
   Windows-1256) and separator (, ; Tab |) are found by themselves. Several CSVs, or a zip of them, open the order
   dialog, each with its rows, columns, encoding and separator. An XLSX comes in on its own (not from a zip, not with
-  other files), every sheet with its values as Excel shows them. A zip with CSVs and documents: the dialog asks which
+  other files), every sheet with its values as Excel shows them; cells merged over rows follow Settings → Import
+  (repeated in each row by default, as in Word, HTML and PDF import), cells merged across columns are written once. A zip with CSVs and documents: the dialog asks which
   kind to import and lists the other files as not imported. The import report shows a summary table of the sheets
   (and so does a Markdown import in the Excel view). More than 100,000 cells is refused: the editor would slow down.
 
