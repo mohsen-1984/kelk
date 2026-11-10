@@ -266,7 +266,7 @@ Excel wants), or every table in one sheet (`excel.sheets: 'one'`, with title row
 cells; then the polish step rewrites the workbook's XML, since SheetJS Community Edition writes no styles: fonts by
 content (the `bidi` font for Persian, Arabic and Hebrew text, the `latin` font for the rest), alignment by content
 (right, left, numbers centered), the header row's fill, borders and height, stripes as conditional formatting (sorting
-keeps them), column widths from the content, a right-to-left view when most of the text is, a frozen header row, an
+keeps them), column widths from the content, a right-to-left view when any cell holds an RTL letter (`BidiCore.hasRtlLetter`, as a table's column order), a frozen header row, an
 AutoFilter, a spacer column after the last one (its text cannot overflow), paper, margins, orientation, fit to width,
 print titles. Values: digits become numbers, except leading zeros (`0012`, text), more than 15 digits (Excel keeps
 15) and a leading `+`; `<br>` is a line break in the cell; a cell that is one link keeps its target.

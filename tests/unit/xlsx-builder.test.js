@@ -131,6 +131,35 @@ test('the preview: a block per sheet, the first rows, a note for the rest', func
   assert.match(html, /<thead><tr><th class="kx-rn">1<\/th>/);
 });
 
+test('direction: a sheet is right to left when any cell holds an RTL letter (BidiCore), in the file and the preview', async function () {
+  const md = [
+    '## RTL only', '', '| شهر | تعداد |', '|-|-|', '| مشهد | 12 |', '| تهران | 7 |', '',
+    // mostly English, one Persian cell — the old count (Persian cells >= Latin cells) made this left to right
+    '## Mixed', '', '| Name | Code | City |', '|-|-|-|', '| Ann | A1 | London |', '| Bob | B2 | تهران |', '| Cy | C3 | Paris |', '',
+    '## LTR only', '', '| Name | Age |', '|-|-|', '| Ann | 31 |', '',
+    '## Digits only', '', '| ۱ | 2 |', '|-|-|', '| ۳ | 4 |', '',                 // Persian digits are not letters
+    '## Hebrew', '', '| Item | Note |', '|-|-|', '| x | שלום |', '',
+    '## Arabic', '', '| ID | الاسم |', '|-|-|', '| 1 | Sam |'
+  ].join('\n');
+  const b = XlsxBuilder.create().addFromMarkdown(md, { marked });
+  const want = { 'RTL only': true, Mixed: true, 'LTR only': false, 'Digits only': false, Hebrew: true, Arabic: true };
+  const plans = b.plans();
+  assert.deepEqual(Object.fromEntries(plans.map((p) => [p.name, p.rtl])), want);
+  // the workbook: each sheet's view, in its own order
+  const { zip } = await read(b);
+  for (let i = 0; i < plans.length; i++) {
+    const x = await zip.file('xl/worksheets/sheet' + (i + 1) + '.xml').async('string');
+    assert.equal(/<sheetView[^>]*rightToLeft="1"/.test(x), want[plans[i].name], plans[i].name);
+  }
+  // the preview: each block's dir follows the same rule
+  const html = XlsxBuilder.previewHtml(plans, {});
+  assert.deepEqual((html.match(/<section class="kx-sheet" dir="(rtl|ltr)"/g) || []).map((m) => m.includes('rtl')), Object.values(want));
+  // forced, and every table in one sheet: any RTL cell makes the one sheet right to left
+  assert.equal(XlsxBuilder.create().configure({ excel: { direction: 'ltr' } }).addFromMarkdown(md, { marked }).plans()[0].rtl, false);
+  assert.equal(XlsxBuilder.create().configure({ excel: { direction: 'rtl' } }).addFromMarkdown('| a |\n|-|\n| b |', { marked }).plans()[0].rtl, true);
+  assert.equal(XlsxBuilder.create().configure({ excel: { sheets: 'one' } }).addFromMarkdown(md, { marked }).plans()[0].rtl, true);
+});
+
 test('configure: an unknown key throws', function () {
   assert.throws(() => XlsxBuilder.create().configure({ nope: 1 }), /unknown option/);
   assert.throws(() => XlsxBuilder.create().configure({ excel: { nope: 1 } }), /unknown excel option/);

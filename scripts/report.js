@@ -26,10 +26,11 @@
  *     file bytes it holds) goes. No live region of its
  *     own: the focus move announces the panel once (its name), the import's own toast says it loaded.
  *   Kelk.ui.report.custom(view)
- *     the same panel with content of another module (the slide-format check, scripts/slidecheck.js, loaded on
- *     demand with its words): view = { icon, title(), brief(), body(el) — fills the panel's body, buttons:
- *     [{ icon, label(), run }] } — the functions run again on a language change. It follows the document and
- *     closes like an import's report; Copy and safe mode are not shown. report.isCustom(): it is open.
+ *     the same panel with content of another module (the slide-format check, scripts/slidecheck.js; the Excel
+ *     view's summary and no-tables reports, scripts/sheets.js — loaded on demand with their words): view = { icon,
+ *     title(), brief(), body(el) — fills the panel's body, buttons: [{ icon, label(), run }] } — the functions run
+ *     again on a language change. It follows the document, collapses after config.reportOpenMs and closes like an
+ *     import's report; Copy and safe mode are not shown. report.isCustom(): it is open.
  * Every code has its key here, written in full (tools/check-i18n.js: DYNAMIC prefixes pdf_ and rep_).
  */
 (function (K) {
@@ -378,6 +379,7 @@
         collapse(false);
         box.hidden = false;
         box.focus();
+        collapseLater();                    // as every report: open for config.reportOpenMs, then its toggle line only
         return true;
     };
     report.isCustom = function () { const box = K.$('#import-report'); return !!state.view && !!box && !box.hidden; };

@@ -22,7 +22,8 @@
         // only for work longer than progressDelayMs
         slidesProgress: { libs: 0.3, math: 0.1, images: 0.1, layout: 0.5 },
         progressDelayMs: 300,
-        // the PDF import report: open this long (ms) after an import, then collapsed to its head; 0: stays open
+        // the import report (PDF, PPTX, Excel …): stays open this long (ms) after an import, then collapses to its
+        // toggle line; 0: stays open
         reportOpenMs: 3000,
         maxImageMB: 5,
         maxLogoPx: 256,                 // uploaded logos are scaled down to this height

@@ -4,7 +4,7 @@ This text is the **Excel** view's sample: each Markdown table becomes a sheet, n
 
 What to look for in the sheets:
 
-- Latin text is left-aligned, Persian text right-aligned in a Persian font, numbers centered; a sheet whose text is mostly Persian opens right to left.
+- Latin text is left-aligned, Persian text right-aligned in a Persian font, numbers centered; a sheet with even one Persian cell opens right to left.
 - The code `0012` keeps its leading zeros (text), and a number of more than 15 digits stays text too, since Excel keeps only 15 digits exactly.
 - Dates stay as they are written (text), Persian or Gregorian.
 - Links stay links in Excel.
