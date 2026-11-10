@@ -161,7 +161,7 @@ async function check(browser, url, lang, theme, allow) {
             d.open = true;
         });
         // Settings → Excel's words come with the Excel module, loaded when its group opens: waited for
-        if (window.Kelk && Kelk.libs) await Kelk.libs.need('sheets');
+        if (window.Kelk && window.Kelk.libs) await window.Kelk.libs.need('sheets');
     });
     const dialogs = await page.$$eval('dialog[id]', function (ds) {
         return ds.map(function (d) {

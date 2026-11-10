@@ -17,6 +17,7 @@
    its cells break only at a real line break, and it scrolls sideways in its own block (a finger too) */
 .doc table.kelk-wide { width: max-content; max-width: 100%; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
 .doc table.kelk-wide :is(th, td) { white-space: nowrap; overflow-wrap: normal; word-break: normal; }
+.doc table.kelk-wide:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* code frame bar: the language on one side, the copy button on the other */
 .doc .code-lang { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 1.6em; }
