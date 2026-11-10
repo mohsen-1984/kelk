@@ -165,7 +165,8 @@
             const el = K.$('#nb-ext');
             // the extension follows the page direction, so the dot sits next to the
             // name: "name.docx" in LTR, "docx.نام" read right to left in RTL
-            if (el) el.textContent = '.' + (ext || lastExt);
+            const x = ext || lastExt;
+            if (el) el.textContent = '.' + (x === 'csv' ? 'zip' : x);        // the CSV files come in a zip
         },
 
         init: function () {
@@ -186,9 +187,10 @@
             stem.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
-                    // the last format used, or the view's own when the view hides it (PPTX for slides, DOCX for the document)
+                    // the last format used, or the view's own when the view hides it (PPTX for slides, XLSX for Excel, DOCX
+                    // for the document)
                     let ext = lastExt, b = K.$('[data-export="' + ext + '"]');
-                    if (!b || b.hidden) { ext = K.slides.active() ? 'pptx' : 'docx'; b = K.$('[data-export="' + ext + '"]'); }
+                    if (!b || b.hidden) { ext = { slides: 'pptx', excel: 'xlsx' }[K.slides.view()] || 'docx'; b = K.$('[data-export="' + ext + '"]'); }
                     K.exporter.run(ext, b);
                 }
                 if (e.key === 'Escape') { user = null; self.refresh(); stem.blur(); }

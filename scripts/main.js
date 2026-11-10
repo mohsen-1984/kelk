@@ -258,7 +258,7 @@
             const mod = e.ctrlKey || e.metaKey, k = e.key.toLowerCase();
             if (mod && !e.shiftKey && !e.altKey && k === 's') { e.preventDefault(); exp('md'); }
             else if (mod && e.altKey && e.key === 'Enter') { e.preventDefault(); exp('pptx'); }
-            else if (mod && e.key === 'Enter') { e.preventDefault(); exp(e.shiftKey ? 'pdf' : K.slides.active() ? 'pptx' : 'docx'); }
+            else if (mod && e.key === 'Enter') { e.preventDefault(); const v = K.slides.view(); exp(v === 'excel' ? (e.shiftKey ? 'csv' : 'xlsx') : e.shiftKey ? 'pdf' : v === 'slides' ? 'pptx' : 'docx'); }
             else if (e.key === 'F5' && K.slides.active() && !document.querySelector('.present')) { e.preventDefault(); K.slides.present(); }
             else if (mod && !e.shiftKey && k === 'o') { e.preventDefault(); K.$('#file-import').click(); }
             else if (mod && e.key === ',') { e.preventDefault(); togglePane(); }

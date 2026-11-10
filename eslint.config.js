@@ -29,6 +29,7 @@ const VENDOR = {
   mammoth: 'readonly', // vendor/mammoth.browser.min_*.js
   pdfjsLib: 'readonly', // vendor/pdfjs/
   PptxGenJS: 'readonly', // vendor/pptxgen.min_*.js
+  XLSX: 'readonly', // vendor/xlsx.full.min_*.js (SheetJS)
 };
 
 // Kelk's own libraries (lib/*.js): each is a UMD-style IIFE that sets global.<Name> in the browser
@@ -47,6 +48,7 @@ const KELK_LIB = {
   PptxBuilder: 'readonly',
   PreviewBuilder: 'readonly',
   WordHtmlBuilder: 'readonly',
+  XlsxBuilder: 'readonly',
   createMsoTemplate: 'readonly', // top-level `var` in lib/msOfficeWordHtmlTemplate.js
 };
 

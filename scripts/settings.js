@@ -66,6 +66,7 @@
         'direction': 'PHFW', 'document.title': 'HFW', 'document.author': 'HFW', 'document.edition': 'HFW', 'document.link': 'HFW',
         'logoHeight': 'HFW', 'headerFooter.mode': 'HFW', 'headerFooter.header': 'HFW', 'headerFooter.footer': 'HFW', 'headerFooter.direction': 'HFW',
         'fonts.bidi': 'PHFW', 'fonts.latin': 'PHFW', 'fonts.bidiSize': 'PHFW', 'fonts.latinSize': 'PHFW', 'fonts.wordOwn': 'W', 'fonts.embed': 'W', 'fonts.wordBidi': 'W', 'fonts.wordLatin': 'W',
+        'fonts.xlsxOwn': 'X', 'fonts.xlsxBidi': 'X', 'fonts.xlsxLatin': 'X',
         'toc.enabled': 'PHFW', 'toc.levels': 'PHFW', 'page.size': 'HFW', 'page.orientation': 'HFW', 'page.margin': 'HFW',
         'text.align': 'PHFW', 'text.lineHeight': 'PHFW', 'text.breaks': 'PHFW',
         'page.tableWidth': 'PHFW', 'page.tableMinWidth': 'PHFW', 'page.tableAlign': 'PHFW',
@@ -74,8 +75,14 @@
         'code.bg': 'PHFW', 'code.headerBg': 'PHFW', 'code.border': 'PHFW', 'quote.border': 'PHFW', 'quote.width': 'PHFW', 'quote.bg': 'PHFW', 'quote.text': 'PHFW',
         'math.html': 'PH', 'math.word': 'W'
     };
-    // Settings → Slides reach the slides preview and the .pptx only
-    const reachesPreview = function (path) { return (SCOPES[path] || '').indexOf('P') >= 0 || ((path.indexOf('slides.') === 0 || /^(fonts\.word|code\.wordFont)/.test(path)) && K.slides && K.slides.active()); };
+    // Settings → Slides reach the slides preview and the .pptx only; Settings → Excel and the XLSX fonts (X), the Excel
+    // view's preview and the .xlsx / CSV only
+    const reachesPreview = function (path) {
+        const view = K.slides ? K.slides.view() : 'document';
+        return (SCOPES[path] || '').indexOf('P') >= 0 ||
+            ((path.indexOf('slides.') === 0 || /^(fonts\.word|code\.wordFont)/.test(path)) && view === 'slides') ||
+            ((path.indexOf('excel.') === 0 || (SCOPES[path] || '').indexOf('X') >= 0) && view === 'excel');
+    };
     let renderTimer = 0;
 
     K.settings = {
@@ -338,7 +345,8 @@
          * The fonts of an output (Settings → Fonts): one choice for the preview and every builder; DOCX, DOC and
          * PPTX take their own fonts when fonts.wordOwn is on (a field left empty: the font above). The PDF carries
          * its fonts, so a Latin font Kelk does not ship becomes the text font's Latin letters (or DejaVu Sans).
-         * @param {string} kind - 'html' (and the page) | 'pdf' | 'docx' | 'doc' | 'pptx'
+         * XLSX takes its own fonts when fonts.xlsxOwn is on (the default: Excel cannot embed fonts).
+     * @param {string} kind - 'html' (and the page) | 'pdf' | 'docx' | 'doc' | 'pptx' | 'xlsx'
          * @returns {{ bidi: string, latin: string, code: string }}
          */
         fontsFor: function (kind) {
@@ -346,10 +354,11 @@
             const noLatin = C.fontsNoLatin.indexOf(f.bidi) >= 0;
             const out = { bidi: f.bidi, latin: f.latin || (noLatin ? C.noLatinWord : f.bidi), code: s.code.font };
             if (kind === 'pdf' && !C.pdfFonts[out.latin]) out.latin = noLatin ? 'DejaVu Sans' : f.bidi;
+            const own = function (v, base) { return String(v || '').trim() || base; };
             if (/^(docx|doc|pptx)$/.test(kind) && f.wordOwn) {
-                const own = function (v, base) { return String(v || '').trim() || base; };
                 return { bidi: own(f.wordBidi, out.bidi), latin: own(f.wordLatin, out.latin), code: own(s.code.wordFont, out.code) };
             }
+            if (kind === 'xlsx' && f.xlsxOwn) return { bidi: own(f.xlsxBidi, out.bidi), latin: own(f.xlsxLatin, out.latin), code: out.code };
             return out;
         },
 
@@ -376,9 +385,12 @@
                 this.checkWordFonts();
                 const own = K.$('#word-fonts');
                 if (own) own.hidden = !s.fonts.wordOwn;
+                const xl = K.$('#xlsx-fonts');
+                if (xl) xl.hidden = !s.fonts.xlsxOwn;
                 if (path === 'fonts.wordOwn' || path === 'fonts.bidi' || path === 'fonts.latin') this.fillDefaults();
             }
             if (all || path.indexOf('tableStyle.') === 0) this.tableColorsInUse(s.tableStyle || {});
+            if (all || path === 'excel.sheets') { const one = K.$('#ex-one'); if (one) one.hidden = (s.excel || {}).sheets !== 'one'; }
             if (all || path === 'page.tableWidth') {           // the minimum width counts with "auto" only
                 const auto = (s.page.tableWidth || 'auto') === 'auto', f = K.$('#f-table-min');
                 if (f) { f.classList.toggle('unused', !auto); f.querySelector('select').disabled = !auto; }

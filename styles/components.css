@@ -501,7 +501,15 @@ details.group.app-group > summary { color: var(--accent-ink); background: var(--
 .view-slides .slides-only { display: inline-flex !important; }
 .view-slides .doc-only { display: none !important; }
 .slides-count { font-size: 12px; color: var(--muted); align-items: center; padding-inline-end: 4px; }
+.excel-only { display: none !important; }
+.view-excel .excel-only { display: inline-flex !important; }
+.view-excel .doc-only { display: none !important; }
 @media (max-width: 560px) { .view-toggle button span { display: none; } }
+
+/* the Excel view (scripts/sheets.js; the sheets' own styles: XlsxBuilder.previewCss) */
+.sheets-pane { font-family: var(--font-ui); color: var(--ink); min-width: 0; }
+.sheets-pane:empty::before { content: attr(data-empty); color: var(--placeholder); display: block; padding: 18px 20px; }
+.report-sample { margin: 6px 0 0; padding: 8px 10px; border-radius: var(--radius-sm); background: var(--accent-soft); font: 12px/1.5 var(--font-mono); overflow-x: auto; }
 
 .slides-pane { padding: 18px 20px 28px; font-family: var(--font-ui); color: var(--ink); }
 .slides-pane:empty::before { content: attr(data-empty); color: var(--placeholder); }
@@ -521,5 +529,5 @@ details.group.app-group > summary { color: var(--accent-ink); background: var(--
 .present-count { position: fixed; bottom: 10px; inset-inline-end: 16px; color: rgba(255,255,255,.45); font: 12px var(--font-ui); }
 /* Settings → Slides in the Slides view, Settings → Word in the document view: the heading stands out like the App
    group's; the doc-only scope note */
-.view-slides details.group#slides-group > summary { color: var(--accent-ink); background: var(--accent-soft); border-radius: var(--radius-sm); margin-inline: -6px; padding-inline: 8px; }
+.view-excel details.group#excel-group > summary, .view-slides details.group#slides-group > summary { color: var(--accent-ink); background: var(--accent-soft); border-radius: var(--radius-sm); margin-inline: -6px; padding-inline: 8px; }
 .scope-hint { display: block; border-inline-start: 2px solid var(--accent); padding-inline-start: 8px; }

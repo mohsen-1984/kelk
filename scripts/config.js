@@ -37,7 +37,7 @@
             scrollSync: true,
             sampleSeen: false,
             sampleLang: null,           // the about/sample document on screen (its language), if any
-            view: 'document',           // the preview: document | slides (Kelk.slides)
+            view: 'document',           // the preview: document | slides | excel (Kelk.slides.view)
             sourceName: null,           // the imported (or sample) file's name: the exports' default name, kept across reloads
             importer: { richPaste: true, nestedTables: 'extract', mergedRows: 'repeat', images: 'markdown', asciiNumbers: true, persianLetters: true,
                         maxMB: '20', separator: 'name' }   // largest file to import (MB); between files: name | rule | none
@@ -63,6 +63,11 @@
                 wordOwn: false,         // DOCX, DOC and PPTX take the fonts below instead (any installed font may be typed)
                 wordBidi: null,         // null → the font above
                 wordLatin: null,
+                // XLSX: fonts of its own, on by default — Excel cannot embed fonts, so the classic pair Persian readers
+                // have (B Nazanin, Calibri); off: the fonts above
+                xlsxOwn: true,
+                xlsxBidi: 'B Nazanin',
+                xlsxLatin: 'Calibri',
                 bidiSize: 12,           // pt
                 latinSize: 11.5
             },
@@ -83,7 +88,14 @@
             // footer null → the document's title; the rest: slide numbers, speaker notes, automatic layouts, long slides split
             slides: { theme: 'modern-emerald', primary: '', accent: '', titleStyle: 'dark', aspect: '16:9', size: 'medium', timeline: 'auto',
                       footer: null, numbers: true, notes: true, autoLayout: true, split: true, sectionNumbers: true, sections: true,
-                      decoration: 'auto', bullet: '•', logo: 'all' }
+                      decoration: 'auto', bullet: '•', logo: 'all' },
+            // Excel (lib/XlsxBuilder: its DEFAULTS, the same values) and the Excel view's preview (previewRows)
+            excel: { sheets: 'each', gap: 2, titleRow: true, direction: 'auto', zeros: true, links: true, breaks: true,
+                     wrap: 'none', thousands: false, headerColor: '#E4E9EF', stripes: true, stripeColor: '#F5F7FA',
+                     headerBorder: 'all', headerBorderWidth: 'thin', headerBorderColor: '#A9B5C4',
+                     bodyBorder: 'all', bodyBorderWidth: 'thin', bodyBorderColor: '#A9B5C4', headerHeight: 21,
+                     filter: true, freeze: true, columns: 'content', paper: 'A4', orientation: 'auto', margins: 'kelk',
+                     center: true, fit: true, headerFooter: true, csvSeparator: ',', csvBom: true, previewRows: 20 }
         },
 
         /** Default edition: LTR header → Draft; RTL header → by interface language (Persian unless Arabic). */
@@ -173,6 +185,9 @@
             jszip: { src: 'vendor/jszip.min_3.10.2.js', global: 'JSZip' },
             fontembed: { src: 'lib/FontEmbed.js', global: 'FontEmbed' },           // Settings → Fonts → Embed fonts
             slidecheck: { src: 'scripts/slidecheck.js', global: 'KelkSlideCheck' },      // on the first switch to slides
+            // the Excel view (its preview, the no-tables report, the exports): on the first switch to Excel
+            sheets: { src: ['lib/XlsxBuilder.js', 'scripts/sheets.js'], global: 'KelkSheets' },
+            xlsx: { src: ['vendor/jszip.min_3.10.2.js', 'vendor/xlsx.full.min_0.20.3.js'], global: 'XLSX' },     // an XLSX export
             pptx: { src: ['vendor/jszip.min_3.10.2.js', 'vendor/pptxgen.min_4.0.1.js'], global: 'PptxGenJS' }
         },
 

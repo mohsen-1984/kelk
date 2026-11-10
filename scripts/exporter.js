@@ -5,6 +5,7 @@
  *   docx → DocxBuilder     pdf → PdfBuilder (fonts loaded on demand)
  *   doc  → WordHtmlBuilder (MHTML)   html → HtmlBuilder (fonts and images embedded)
  *   pptx → PptxBuilder (Kelk.slides: the fonts of DOCX, Settings → Slides)
+ *   xlsx, csv → XlsxBuilder (scripts/sheets.js: the XLSX fonts, Settings → Excel; the CSV files in a zip, «CSV-name.zip»)
  *   md   → the text
  */
 (function (K) {
@@ -157,6 +158,13 @@
             if (!md.trim()) { K.ui.toast(K.i18n.t('emptyDoc'), 'warn'); return; }
             // PPTX: the text edited out of slide format → the slide check's report, which can export anyway (o.force)
             if (kind === 'pptx' && !(o && o.force) && !(await K.slides.exportOk(function () { K.exporter.run('pptx', btn, { force: true }); }))) return;
+            // XLSX, CSV: a text without a table → the no-tables report (scripts/sheets.js)
+            const sheet = kind === 'xlsx' || kind === 'csv';
+            if (sheet) {
+                let sh = null;
+                try { sh = await K.libs.need('sheets'); } catch (e) { K.ui.toast(K.i18n.t('failed', e.message), 'error'); return; }
+                if (!sh.hasTables(md)) { sh.showNoTables(null, 'export'); return; }
+            }
             if (kind === 'md') {
                 const blob = new Blob([K.images.embed(md)], { type: 'text/markdown;charset=utf-8' });
                 K.ui.download(blob, blob.type, K.ui.fileName(kind));
@@ -171,6 +179,7 @@
                     // DOCX, PPTX: the fonts they use, embedded (Settings → Fonts)
                     const embed = async function (b) { const r = await K.fonts.embed(kind, await b, md); added = r.added; return r.blob; };
                     await K.ui.paint();                        // the dialog is up before the builder holds the page
+                    if (sheet) return (await K.libs.need('sheets')).blob(kind);          // from the Markdown, not the preview
                     K.preview.flush();                         // typed while the dialog came up (nothing waiting: no-op)
                     const html = K.preview.html();
                     // Word / PDF: a formula with right-to-left \text embeds the web font in its image
@@ -192,7 +201,7 @@
                     }
                     throw new Error('unknown output ' + kind);
                 }, { delay: 120 });
-                K.ui.download(blob, blob.type, K.ui.fileName(kind));
+                K.ui.download(blob, blob.type, kind === 'csv' ? 'CSV-' + K.ui.fileName('zip') : K.ui.fileName(kind));
                 K.ui.toast(K.i18n.t('exported', kind.toUpperCase()) + (added ? ' · ' + K.i18n.t('fontsEmbedded', Math.round(added / 1024)) : ''));
             } catch (e) {
                 if (e && e.code === 'aborted') { K.ui.toast(K.i18n.t('cancelled')); return; }

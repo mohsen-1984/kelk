@@ -154,13 +154,15 @@
         <section class="panel preview-panel" aria-labelledby="h-preview">
             <div class="panel-head">
                 <h2 id="h-preview"><i data-lucide="eye"></i><span data-i18n="preview"></span></h2>
-                <!-- the same Markdown as a document or as slides (Kelk.slides; lib/SLIDES.md) -->
+                <!-- the same Markdown as a document, as slides (Kelk.slides; lib/SLIDES.md) or as Excel sheets (scripts/sheets.js) -->
                 <div class="segmented view-toggle" role="group" data-i18n-attr="aria-label:viewToggle;title:viewToggle">
                     <button type="button" data-view="document" aria-pressed="true"><i data-lucide="file-text"></i><span data-i18n="viewDocument"></span></button>
                     <button type="button" data-view="slides" aria-pressed="false"><i data-lucide="presentation"></i><span data-i18n="viewSlides"></span></button>
+                    <button type="button" data-view="excel" aria-pressed="false"><i data-lucide="sheet"></i><span data-i18n="viewExcel"></span></button>
                 </div>
                 <div class="actions">
                     <span class="slides-count slides-only" id="slides-count"></span>
+                    <span class="slides-count excel-only" id="sheets-count"></span>
                     <button class="btn ghost icon slides-only" id="btn-present" type="button" data-i18n-attr="title:present;aria-label:present"><i data-lucide="monitor-play"></i></button>
                     <button class="btn ghost icon doc-only" id="btn-copy-preview" type="button" data-i18n-attr="title:copy;aria-label:copy"><i data-lucide="copy"></i></button>
                     <button class="btn ghost icon btn-max" id="max-preview" type="button" data-max="preview" data-i18n-attr="title:maximize;aria-label:maximize"><i data-lucide="maximize-2"></i></button>
@@ -169,6 +171,7 @@
             <div class="preview-scroll">
                 <article id="preview" class="doc" data-i18n-attr="data-empty:previewEmpty"></article>
                 <div id="slides" class="slides-pane" hidden data-i18n-attr="data-empty:previewEmpty"></div>
+                <div id="sheets" class="sheets-pane" hidden data-i18n-attr="data-empty:previewEmpty"></div>
             </div>
             <div class="panel-foot export-foot">
                 <div class="namebox" data-i18n-attr="title:fileName">
@@ -178,8 +181,11 @@
                 <div class="export-bar" role="group" data-i18n-attr="aria-label:exportAs">
                     <button class="btn primary" type="button" data-export="docx" data-i18n-attr="title:docxHint"><i data-lucide="file-text"></i>DOCX</button>
                     <button class="btn soft" type="button" data-export="pdf" data-i18n-attr="title:pdfHint"><i data-lucide="file-type"></i>PDF</button>
-                    <!-- PPTX in the Slides view only (DOCX, PDF, HTML, DOC in the document view: slides.js applyView) -->
+                    <!-- PPTX in the Slides view only, XLSX and CSV in the Excel view (DOCX, PDF, HTML, DOC in the document view:
+                         slides.js applyView) -->
                     <button class="btn primary" type="button" data-export="pptx" data-i18n-attr="title:pptxHint" hidden><i data-lucide="presentation"></i>PPTX</button>
+                    <button class="btn primary" type="button" data-export="xlsx" data-i18n-attr="title:xlsxHint" hidden><i data-lucide="sheet"></i>XLSX</button>
+                    <button class="btn soft" type="button" data-export="csv" data-i18n-attr="title:csvHint" hidden><i data-lucide="file-archive"></i>CSV</button>
                     <span class="sep" aria-hidden="true"></span>
                     <button class="btn" type="button" data-export="html" data-i18n-attr="title:htmlHint"><i data-lucide="code-xml"></i>HTML</button>
                     <button class="btn ghost" type="button" data-export="doc" data-i18n-attr="title:docHint"><i data-lucide="file"></i>DOC</button>
@@ -265,6 +271,17 @@
                                 <input type="text" dir="auto" list="dl-word-code-fonts" data-setting="code.wordFont" data-font-check="#nf-word-code" data-i18n-attr="placeholder:fontsAsAbove"></label>
                             <div class="field" id="nf-word-code" hidden><span class="hint danger" data-i18n="notInstalledWord"></span></div>
                             <div class="field"><span class="hint" data-i18n="fontsWordHint"></span></div>
+                        </div>
+                        <!-- XLSX: fonts of its own, on by default (Excel cannot embed fonts) -->
+                        <label class="check"><input type="checkbox" data-setting="fonts.xlsxOwn"><span data-i18n="fontsXlsxOwn"></span></label>
+                        <div class="fields" id="xlsx-fonts" hidden>
+                            <div class="field"><label for="f-xlsx-bidi" data-i18n="fontBidi"></label>
+                                <input type="text" id="f-xlsx-bidi" dir="auto" list="dl-word-fonts" data-setting="fonts.xlsxBidi" data-font-check="#nf-xlsx-bidi"></div>
+                            <div class="field" id="nf-xlsx-bidi" hidden><span class="hint danger" data-i18n="notInstalledXlsx"></span></div>
+                            <div class="field"><label for="f-xlsx-latin" data-i18n="fontLatin"></label>
+                                <input type="text" id="f-xlsx-latin" dir="auto" list="dl-word-fonts" data-setting="fonts.xlsxLatin" data-font-check="#nf-xlsx-latin"></div>
+                            <div class="field" id="nf-xlsx-latin" hidden><span class="hint danger" data-i18n="notInstalledXlsx"></span></div>
+                            <div class="field"><span class="hint" data-i18n="fontsXlsxHint"></span></div>
                         </div>
                         <!-- fonts to install for Word and PowerPoint (Kelk.config.wordFontPacks, by interface language) -->
                         <div class="field font-pack" id="word-font-pack" hidden>
@@ -454,6 +471,99 @@
                         <div class="field"><span class="hint" data-i18n="logoHint"></span></div>
                         <label class="field"><span data-i18n="logoHeight"></span>
                             <select data-setting="logoHeight"><option>0.8cm</option><option>1cm</option><option>1.2cm</option><option>1.5cm</option><option>2cm</option></select></label>
+                    </div>
+                </details>
+
+                <!-- Settings → Excel: the .xlsx and the CSV files (lib/XlsxBuilder; the fonts are in Settings → Fonts) -->
+                <details class="group" id="excel-group">
+                    <summary><i data-lucide="sheet"></i><span data-i18n="gExcel"></span></summary>
+                    <div class="fields">
+                        <div class="field"><span class="hint scope-hint" data-i18n="excelScope"></span></div>
+                        <label class="field"><span data-i18n="exSheets"></span>
+                            <select data-setting="excel.sheets">
+                                <option value="each" data-i18n="exSheetsEach"></option>
+                                <option value="one" data-i18n="exSheetsOne"></option>
+                            </select></label>
+                        <div class="row2" id="ex-one" hidden>
+                            <label class="field"><span data-i18n="exGap"></span><input type="number" min="0" max="5" step="1" dir="ltr" data-setting="excel.gap"></label>
+                            <label class="check"><input type="checkbox" data-setting="excel.titleRow"><span data-i18n="exTitleRow"></span></label>
+                        </div>
+                        <div class="row2">
+                            <label class="field"><span data-i18n="exDirection"></span>
+                                <select data-setting="excel.direction">
+                                    <option value="auto" data-i18n="dirAuto"></option>
+                                    <option value="rtl" data-i18n="dirRtl"></option>
+                                    <option value="ltr" data-i18n="dirLtr"></option>
+                                </select></label>
+                            <label class="field"><span data-i18n="exWrap"></span>
+                                <select data-setting="excel.wrap">
+                                    <option value="none" data-i18n="exWrapNone"></option>
+                                    <option value="multi" data-i18n="exWrapMulti"></option>
+                                    <option value="all" data-i18n="exWrapAll"></option>
+                                </select></label>
+                        </div>
+                        <label class="check"><input type="checkbox" data-setting="excel.zeros"><span data-i18n="exZeros"></span></label>
+                        <label class="check"><input type="checkbox" data-setting="excel.thousands"><span data-i18n="exThousands"></span></label>
+                        <label class="check"><input type="checkbox" data-setting="excel.links"><span data-i18n="exLinks"></span></label>
+                        <label class="check"><input type="checkbox" data-setting="excel.breaks"><span data-i18n="exBreaks"></span></label>
+                        <label class="check"><input type="checkbox" data-setting="excel.filter"><span data-i18n="exFilter"></span></label>
+                        <label class="check"><input type="checkbox" data-setting="excel.freeze"><span data-i18n="exFreeze"></span></label>
+                        <div class="row2">
+                            <label class="field color"><span data-i18n="exHeaderColor"></span><input type="color" data-setting="excel.headerColor"></label>
+                            <label class="field color"><span data-i18n="exStripeColor"></span><input type="color" data-setting="excel.stripeColor"></label>
+                        </div>
+                        <label class="check"><input type="checkbox" data-setting="excel.stripes"><span data-i18n="exStripes"></span></label>
+                        <div class="row3">
+                            <label class="field"><span data-i18n="exHeaderBorder"></span>
+                                <select data-setting="excel.headerBorder"><option value="all" data-i18n="exBorderAll"></option><option value="none" data-i18n="exBorderNone"></option></select></label>
+                            <label class="field"><span data-i18n="exBorderWidth"></span>
+                                <select data-setting="excel.headerBorderWidth"><option value="thin" data-i18n="exThin"></option><option value="medium" data-i18n="exMedium"></option></select></label>
+                            <label class="field color"><span data-i18n="exBorderColor"></span><input type="color" data-setting="excel.headerBorderColor"></label>
+                        </div>
+                        <div class="row3">
+                            <label class="field"><span data-i18n="exBodyBorder"></span>
+                                <select data-setting="excel.bodyBorder"><option value="all" data-i18n="exBorderAll"></option><option value="none" data-i18n="exBorderNone"></option></select></label>
+                            <label class="field"><span data-i18n="exBorderWidth"></span>
+                                <select data-setting="excel.bodyBorderWidth"><option value="thin" data-i18n="exThin"></option><option value="medium" data-i18n="exMedium"></option></select></label>
+                            <label class="field color"><span data-i18n="exBorderColor"></span><input type="color" data-setting="excel.bodyBorderColor"></label>
+                        </div>
+                        <label class="field"><span data-i18n="exHeaderHeight"></span><input type="number" min="0" max="60" step="1" dir="ltr" data-setting="excel.headerHeight"></label>
+                        <label class="field"><span data-i18n="exPreviewRows"></span><input type="number" min="5" max="500" step="5" dir="ltr" data-setting="excel.previewRows"></label>
+
+                        <div class="sub-head" data-i18n="exPrint"></div>
+                        <div class="row2">
+                            <label class="field"><span data-i18n="exColumns"></span>
+                                <select data-setting="excel.columns"><option value="content" data-i18n="exColContent"></option><option value="page" data-i18n="exColPage"></option></select></label>
+                            <label class="field"><span data-i18n="pageSize"></span>
+                                <select data-setting="excel.paper"><option>A4</option><option>A3</option><option>Letter</option></select></label>
+                        </div>
+                        <div class="row2">
+                            <label class="field"><span data-i18n="orientation"></span>
+                                <select data-setting="excel.orientation">
+                                    <option value="auto" data-i18n="exOrientAuto"></option>
+                                    <option value="portrait" data-i18n="portrait"></option>
+                                    <option value="landscape" data-i18n="landscape"></option>
+                                </select></label>
+                            <label class="field"><span data-i18n="margins"></span>
+                                <select data-setting="excel.margins">
+                                    <option value="kelk" data-i18n="exMarginsKelk"></option>
+                                    <option value="normal" data-i18n="exMarginsNormal"></option>
+                                    <option value="wide" data-i18n="exMarginsWide"></option>
+                                    <option value="narrow" data-i18n="exMarginsNarrow"></option>
+                                </select></label>
+                        </div>
+                        <label class="check"><input type="checkbox" data-setting="excel.fit"><span data-i18n="exFit"></span></label>
+                        <label class="check"><input type="checkbox" data-setting="excel.center"><span data-i18n="exCenter"></span></label>
+                        <label class="check"><input type="checkbox" data-setting="excel.headerFooter"><span data-i18n="exHeaderFooter"></span></label>
+
+                        <div class="sub-head" data-i18n="exCsv"></div>
+                        <label class="field"><span data-i18n="exCsvSep"></span>
+                            <select data-setting="excel.csvSeparator">
+                                <option value="," data-i18n="exComma"></option>
+                                <option value=";" data-i18n="exSemicolon"></option>
+                                <option value="tab" data-i18n="exTab"></option>
+                            </select></label>
+                        <label class="check"><input type="checkbox" data-setting="excel.csvBom"><span data-i18n="exCsvBom"></span></label>
                     </div>
                 </details>
 
@@ -653,6 +763,7 @@
             <tr><td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Enter</kbd></td><td data-i18n="kPdf"></td></tr>
             <tr><td><kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Enter</kbd></td><td data-i18n="kPptx"></td></tr>
             <tr><td><kbd>F5</kbd></td><td data-i18n="kPresent"></td></tr>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>Enter</kbd></td><td data-i18n="kXlsx"></td></tr>
             <tr><td><kbd>Ctrl</kbd> + <kbd>O</kbd></td><td data-i18n="kOpen"></td></tr>
             <tr><td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>V</kbd></td><td data-i18n="kPastePlain"></td></tr>
             <tr><td><kbd>Ctrl</kbd> + <kbd>Z</kbd></td><td data-i18n="kUndo"></td></tr>
