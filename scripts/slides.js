@@ -255,9 +255,11 @@
             if (!slides) { gen++; if (progress) progress.end(); }   // a slides build under way stops: the other views build none
             K.store.setUi('view', v);
             this.applyView();
-            if (s && (v === 'slides' ? s.set === 'about' : s.set === 'slides')) {
-                await K.samples.load(slides ? 'slides' : 'about');
-                K.ui.toast(K.i18n.t(slides ? 'toSlidesSample' : 'toAboutSample'));
+            // a sample on screen: each view has its own (the about document, the slides sample, the Excel sample)
+            const want = K.samples.setOfView(v);
+            if (s && s.set !== want) {
+                await K.samples.load(want);
+                K.ui.toast(want === 'slides' ? K.i18n.t('toSlidesSample') : want === 'excel' ? K.i18n.t('toExcelSample') : K.i18n.t('toAboutSample'));
             } else K.preview.render();
             K.$('.preview-scroll').scrollTop = 0;
         },

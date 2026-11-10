@@ -20,44 +20,58 @@
         if (text !== K.editor.value()) return;              // edited meanwhile: the next call decides
         note.hidden = !which;
         if (which) {                                        // a sample on screen: its file name names the exports
-            const all = which.set === 'slides' ? window.KelkSlideSamples : window.KelkSamples;
+            const all = window[SAMPLES[which.set][1]];
             if (all && all[which.lang]) K.names.adopt(all[which.lang].name);
         }
         const label = note.querySelector('[data-i18n]');
-        if (label) { const slides = !!which && which.set === 'slides'; label.setAttribute('data-i18n', slides ? 'sampleNoteSlides' : 'sampleNote'); label.textContent = K.i18n.t(slides ? 'sampleNoteSlides' : 'sampleNote'); }
+        if (label) {
+            const set = which ? which.set : 'about';
+            label.setAttribute('data-i18n', set === 'slides' ? 'sampleNoteSlides' : set === 'excel' ? 'sampleNoteExcel' : 'sampleNote');
+            label.textContent = set === 'slides' ? K.i18n.t('sampleNoteSlides') : set === 'excel' ? K.i18n.t('sampleNoteExcel') : K.i18n.t('sampleNote');
+        }
     }
 
+    /** The sample sets: a view's own sample — [its script, its global] (tools/build-samples.js). */
+    const SAMPLES = {
+        about: [K.config.sample, 'KelkSamples'],             // the document view: about + guide + samples
+        slides: [K.config.slidesSample, 'KelkSlideSamples'],
+        excel: [K.config.excelSample, 'KelkExcelSamples']
+    };
+    /** The view's sample set: 'about' | 'slides' | 'excel'. */
+    const setOfView = function (v) { return v === 'slides' || v === 'excel' ? v : 'about'; };
+
     /**
-     * Which sample is this text — { set: 'about' | 'slides', lang } or null. The samples scripts load
+     * Which sample is this text — { set: 'about' | 'slides' | 'excel', lang } or null. The samples scripts load
      * when the text could be one (a remembered sample language, or the scripts already in).
      */
     async function sampleOf(text) {
         if (!text || !text.trim()) return null;
-        const sets = [['about', K.config.sample, 'KelkSamples'], ['slides', K.config.slidesSample, 'KelkSlideSamples']];
+        const sets = Object.keys(SAMPLES);
         for (let i = 0; i < sets.length; i++) {
-            let all = window[sets[i][2]];
+            const src = SAMPLES[sets[i]];
+            let all = window[src[1]];
             if (!all && K.store.getUi('sampleLang')) {
-                try { await K.ui.loadScript(sets[i][1]); all = window[sets[i][2]]; } catch (e) { all = null; }
+                try { await K.ui.loadScript(src[0]); all = window[src[1]]; } catch (e) { all = null; }
             }
             if (!all) continue;
             const sl = K.store.getUi('sampleLang');
-            if (sl && all[sl] && all[sl].markdown === text) return { set: sets[i][0], lang: sl };
+            if (sl && all[sl] && all[sl].markdown === text) return { set: sets[i], lang: sl };
             const k = Object.keys(all).find(function (x) { return all[x] && all[x].markdown === text; });
-            if (k) return { set: sets[i][0], lang: k };
+            if (k) return { set: sets[i], lang: k };
         }
         return null;
     }
 
     /**
-     * Load the sample of the interface language (a script, so file:// works): in the Slides view the
-     * slides sample (AI literacy), otherwise the about/guide/sample document.
+     * Load the sample of the interface language (a script, so file:// works): the view's own — the slides
+     * sample (AI literacy) in Slides, the Excel sample in Excel, otherwise the about/guide/sample document.
      */
     async function loadSample(_, set) {                 // no confirm: the text before it is one Undo away
         try {
-            const slides = set ? set === 'slides' : K.slides.active();
-            await K.ui.loadScript(slides ? K.config.slidesSample : K.config.sample);
-            // the document of the interface language (about Kelk + guide + samples, or the slides)
-            const all = (slides ? window.KelkSlideSamples : window.KelkSamples) || {};
+            const src = SAMPLES[set || setOfView(K.slides.view())] || SAMPLES.about;
+            await K.ui.loadScript(src[0]);
+            // the text of the interface language (about Kelk + guide + samples, the slides, or the sheets)
+            const all = window[src[1]] || {};
             const lang = all[K.i18n.lang] ? K.i18n.lang : (all.en ? 'en' : 'fa');
             const doc = all[lang];
             K.names.newDocument(doc.name, lang);    // remembered: this text IS the sample of `lang`; its file name names the exports
@@ -71,7 +85,7 @@
     }
 
     /** For Kelk.slides: which sample is on screen, and loading the other one when the view changes. */
-    K.samples = { of: sampleOf, load: function (set) { return loadSample(false, set); } };
+    K.samples = { of: sampleOf, load: function (set) { return loadSample(false, set); }, setOfView: setOfView };
 
     function start() {
         const u = K.store.ui();
@@ -133,7 +147,7 @@
             const text = K.editor.value();
             if (text.trim()) {
                 try {
-                    await Promise.all([K.ui.loadScript(K.config.sample), K.ui.loadScript(K.config.slidesSample)]);   // cached after the first time
+                    await Promise.all(Object.keys(SAMPLES).map(function (k) { return K.ui.loadScript(SAMPLES[k][0]); }));   // cached after the first time
                     showingSample = await sampleOf(text);
                 } catch (e) { /* no samples: keep the text */ }
             }

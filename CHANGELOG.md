@@ -30,6 +30,9 @@ All notable changes to Kelk. Dates are those of the release tags.
   (repeated in each row by default, as in Word, HTML and PDF import), cells merged across columns are written once. A zip with CSVs and documents: the dialog asks which
   kind to import and lists the other files as not imported. The import report shows a summary table of the sheets
   (and so does a Markdown import in the Excel view). More than 100,000 cells is refused: the editor would slow down.
+- **An Excel sample**, the Excel view's own (as the slides sample is the Slides view's): a few sheets in three
+  languages — Persian and English text, codes with leading zeros, numbers longer than 15 digits, dates, links, a cell
+  with a line break, and a wide monthly table. Each view now opens its own sample when a sample is on screen.
 - **Paste in the Excel view**: pasted CSV or tab-separated text becomes a heading and a table, like a CSV import
   (Shift pastes it as it is), and a paste that brings tables (Markdown, or cells from a web page or Word) shows the
   sheets' summary. Typing and other edits stay quiet.
