@@ -165,11 +165,22 @@
                     insertImages(imgs);
                     return;
                 }
-                setTimeout(function () { if (K.slides) K.slides.checkIncoming(); }, 0);    // after the paste: in Slides, the slide check
+                let pasted = dt ? dt.getData('text/plain') || '' : '';
+                // the Excel view: CSV or tab-separated text (not Excel's own cells, which come as an HTML table)
+                // becomes a heading and a table, like a CSV import (scripts/sheets.js); Shift pastes it as it is
+                const sh = !shift && K.slides && K.slides.view() === 'excel' && window.KelkSheets;
+                if (sh && !/<table/i.test(dt.getData('text/html') || '') && sh.looksLikeCsv(pasted)) {
+                    e.preventDefault();
+                    sh.pasteCsv(pasted);
+                    return;
+                }
+                // after the paste: in Slides, the slide check; in Excel, the sheets' summary when tables came in
+                setTimeout(function () { if (K.slides) K.slides.checkIncoming(pasted); }, 0);
                 if (shift || !K.store.getUi('importer.richPaste')) return;
                 const md = K.importer.fromPaste(dt);
                 if (md == null) return;                      // plain text: the browser pastes it
                 e.preventDefault();
+                pasted = md;
                 K.editor.insert(md);
                 K.editor.markConverted(true);
                 K.ui.toast(K.i18n.t('imported'));

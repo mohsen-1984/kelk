@@ -115,6 +115,7 @@ module.exports = [
       'assets/icons.js',
       'docs/about-kelk-and-samples.js',
       'docs/slides-samples.js',
+      'docs/excel-samples.js',
       'tests/pdf-lab/corpus.js',
       // PDF-lab outputs (LAB_OUT defaults to tests/pdf-lab/out) and private material (.gitignore).
       'tests/pdf-lab/out/**',

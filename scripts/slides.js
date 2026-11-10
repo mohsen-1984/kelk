@@ -255,16 +255,22 @@
             if (!slides) { gen++; if (progress) progress.end(); }   // a slides build under way stops: the other views build none
             K.store.setUi('view', v);
             this.applyView();
-            if (s && (v === 'slides' ? s.set === 'about' : s.set === 'slides')) {
-                await K.samples.load(slides ? 'slides' : 'about');
-                K.ui.toast(K.i18n.t(slides ? 'toSlidesSample' : 'toAboutSample'));
+            // a sample on screen: each view has its own (the about document, the slides sample, the Excel sample)
+            const want = K.samples.setOfView(v);
+            if (s && s.set !== want) {
+                await K.samples.load(want);
+                K.ui.toast(want === 'slides' ? K.i18n.t('toSlidesSample') : want === 'excel' ? K.i18n.t('toExcelSample') : K.i18n.t('toAboutSample'));
             } else K.preview.render();
             K.$('.preview-scroll').scrollTop = 0;
         },
 
         /** After a paste or an import: in Slides, the slide check may switch to the document (scripts/slidecheck.js). */
-        checkIncoming: function () {
+        checkIncoming: function (pasted) {
             if (this.active()) K.libs.need('slidecheck').then(function (sc) { return sc.incoming(); }).catch(function () {});
+            // the Excel view: a paste that holds a table → the sheets' summary (typing and other edits: nothing)
+            else if (this.view() === 'excel' && pasted && pasted.indexOf('|') >= 0) {
+                K.libs.need('sheets').then(function (sh) { sh.afterPaste(pasted); }).catch(function () {});
+            }
         },
         /** Before a PPTX export: false when the text no longer fits and the report offers to export anyway. */
         exportOk: function (anyway) {

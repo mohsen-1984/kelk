@@ -163,6 +163,7 @@
 
         sample: 'docs/about-kelk-and-samples.js',   // KelkSamples[lang] (tools/build-samples.js)
         slidesSample: 'docs/slides-samples.js',     // KelkSlideSamples[lang]: the slides sample (AI literacy)
+        excelSample: 'docs/excel-samples.js',       // KelkExcelSamples[lang]: the Excel sample (sheets, numbers, links, a wide table)
 
         /** Slides: the full Lucide icon set for :name: icons (loaded on the first icon). */
         slides: { icons: 'vendor/lucide.min_1.48.0.js' },
