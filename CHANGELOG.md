@@ -22,6 +22,12 @@ All notable changes to Kelk. Dates are those of the release tags.
   by default: B Nazanin for Persian, Calibri for Latin): Excel cannot embed fonts, so the view says which fonts the
   reader needs. The view loads on its first use.
 
+### Changed
+
+- **Wide tables in the preview** are handled like fenced code: when a table's columns cannot fit the pane without
+  breaking words, its cells keep their lines (breaking only at a real line break) and the table scrolls sideways in
+  its own block, a finger too. Narrower tables still fit the pane. The Excel view's sheets do the same.
+
 ## [2.5] — 2026-11-09
 
 ### Added
