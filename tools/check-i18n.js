@@ -40,8 +40,8 @@ const DYNAMIC = [
     { file: 'scripts/slidecheck.js', prefix: 'sc_' },
     // the Excel view (loaded on demand, its words with it)
     { file: 'scripts/sheets.js', prefix: 'xs_' },
-    // Kelk.i18n.apply(): the markup's own keys, checked above from index.html
-    { file: 'scripts/i18n.js', arg: "el.getAttribute('data-i18n')" },
+    // Kelk.i18n.relabel(): the markup's own keys, checked above from index.html
+    { file: 'scripts/i18n.js', arg: 'k' },
     { file: 'scripts/i18n.js', arg: 'kv[1].trim()' }
 ];
 

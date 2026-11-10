@@ -147,7 +147,7 @@
                     <button class="btn soft" id="btn-md" type="button" data-export="md" data-i18n-attr="title:mdHint"><i data-lucide="file-down"></i>MD</button>
                 </div>
             </div>
-            <input type="file" id="file-import" hidden multiple accept=".md,.markdown,.txt,.html,.htm,.docx,.pdf,.zip,text/markdown,text/plain,text/html,application/pdf,application/zip">
+            <input type="file" id="file-import" hidden multiple accept=".md,.markdown,.txt,.html,.htm,.docx,.pdf,.csv,.xlsx,.zip,text/markdown,text/plain,text/html,text/csv,application/pdf,application/zip,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
         </section>
 
         <!-- preview -->
@@ -737,6 +737,7 @@
     <div class="dlg-body">
         <div class="task-label" id="order-label" dir="auto"></div>
         <div class="task-detail" id="order-detail" data-i18n="orderHint"></div>
+        <div class="order-kind" id="order-kind" role="radiogroup" hidden></div>
         <ol class="order-list" id="order-list"></ol>
         <div class="order-skip" id="order-skip" hidden>
             <div class="order-skip-head" id="order-skip-head"></div>

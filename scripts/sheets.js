@@ -10,7 +10,13 @@
  *       mode '' (the switch to Excel did not happen: its button opens the view anyway) | 'export' (an XLSX or CSV
  *       export: nothing to write)
  *   KelkSheets.blob(kind)              'xlsx' (SheetJS loads first: Kelk.config.libs.xlsx) | 'csv' (a zip of CSV files)
- *   KelkSheets.STRINGS                 its words (xs_*), fa / en / ar: added to Kelk.i18n's tables when it loads
+ *   KelkSheets.importSheets(o)         CSV and XLSX files from Kelk.importer (lib/SheetImporter.js): each sheet one
+ *       «##» heading and one table in the editor, then the Excel view and the summary. Several CSVs: the order
+ *       dialog, each with its rows, columns, encoding and separator; CSVs beside documents: the user picks one kind
+ *       (the documents chosen go back to the importer: { docs }). Over Kelk.config.maxSheetCells: refused.
+ *   KelkSheets.summary(rows)           the report panel: a table of the sheets — the text's tables, or rows given
+ *   KelkSheets.STRINGS                 its words (xs_*, and Settings → Excel's ex*), fa / en / ar: added to
+ *       Kelk.i18n's tables when it loads, then Settings → Excel is labelled (it loads when that group opens: settings.js)
  *       (tools/check-i18n.js reads them from here)
  */
 (function (root) {
@@ -32,7 +38,78 @@
             xs_count: '{0} شیت',
             xs_table: 'جدول',
             xs_data: 'داده‌ها',
-            xs_region: 'شیت '
+            xs_region: 'شیت ',
+            xs_reading: 'خواندن {0}…',
+            xs_kind: 'وارد شود:',
+            xs_kindCsv: 'شیت‌های CSV ({0})',
+            xs_kindDoc: 'سندها ({0})',
+            xs_notDoc: 'سند است؛ شیت‌های CSV انتخاب شده‌اند',
+            xs_notCsv: 'CSV است؛ سندها انتخاب شده‌اند',
+            xs_info: '{0} سطر · {1} ستون · {2} · جداکننده: {3}',
+            xs_emptyFile: 'خالی است',
+            xs_sepBar: 'خط عمودی (|)',
+            xs_tooMany: 'برای ویرایشگر خیلی بزرگ است: {0} سلول (بیشینه {1}). فایل را کوچک‌تر کنید یا چند بخش کنید.',
+            xs_loaded: '{0} شیت وارد شد',
+            xs_sumTitle: 'خلاصهٔ شیت‌ها',
+            xs_sumBrief: '{0} شیت · {1} سطر',
+            xs_colSheet: 'شیت',
+            xs_colSource: 'فایل',
+            xs_colRows: 'سطر',
+            xs_colCols: 'ستون',
+            xs_colEnc: 'کدگذاری',
+            xs_colSep: 'جداکننده',
+            xs_total: 'جمع',
+            xs_most: '{0} (بیشترین)',
+            xs_emptySheets: 'شیت‌های خالی که وارد نشدند: {0}',
+            xs_sumNote: 'سطرها یعنی سطرهای زیر سرستون. در ویرایشگر هر شیت یک عنوان ## و یک جدول است؛ XLSX و CSV از همین جدول‌ها ساخته می‌شوند.',
+            // Settings → Excel (index.html, #excel-group): labelled when this module loads
+            exSheets: 'جدول‌ها',
+            exSheetsEach: 'هر جدول یک شیت',
+            exSheetsOne: 'همهٔ جدول‌ها در یک شیت',
+            exGap: 'سطرهای خالی بین جدول‌ها',
+            exTitleRow: 'نام هر جدول بالای آن',
+            exDirection: 'جهت شیت',
+            exWrap: 'شکستن متن سلول',
+            exWrapNone: 'بدون شکستن',
+            exWrapMulti: 'سلول‌های چندخطی',
+            exWrapAll: 'همهٔ سلول‌ها',
+            exZeros: 'صفرهای ابتدایی بماند (0012 متن می‌ماند)',
+            exThousands: 'جداکنندهٔ هزارگان برای عددها',
+            exLinks: 'پیوندها بماند',
+            exBreaks: '<br> در سلول، شکست خط شود',
+            exHeaderColor: 'رنگ سرستون',
+            exStripes: 'سطرهای راه‌راه',
+            exStripeColor: 'رنگ راه‌راه',
+            exHeaderBorder: 'کادر سرستون',
+            exBodyBorder: 'کادر سلول‌ها',
+            exBorderAll: 'دورتادور',
+            exBorderNone: 'بدون کادر',
+            exThin: 'نازک',
+            exMedium: 'متوسط',
+            exBorderColor: 'رنگ کادر',
+            exBorderWidth: 'ضخامت',
+            exHeaderHeight: 'ارتفاع سطر سرستون (pt؛ 0: پیش‌فرض اکسل)',
+            exFilter: 'فیلتر روی سرستون',
+            exFreeze: 'ثابت‌ماندن سطر سرستون',
+            exColumns: 'پهنای ستون‌ها',
+            exColContent: 'به اندازهٔ محتوا',
+            exColPage: 'به پهنای صفحه',
+            exOrientAuto: 'خودکار',
+            exMarginsKelk: 'کلک (بالا و پایین 1 cm، کناره‌ها 0.5 cm)',
+            exMarginsNormal: 'معمولی',
+            exMarginsWide: 'پهن',
+            exMarginsNarrow: 'باریک',
+            exCenter: 'وسط صفحه (افقی)',
+            exFit: 'جا شدن در پهنای صفحه',
+            exHeaderFooter: 'نام شیت و شمارهٔ صفحه در چاپ',
+            exCsv: 'CSV',
+            exCsvSep: 'جداکننده',
+            exComma: 'ویرگول (,)',
+            exSemicolon: 'نقطه‌ویرگول (;)',
+            exTab: 'Tab',
+            exCsvBom: 'UTF-8 با BOM (اکسل متن فارسی را درست می‌خواند)',
+            exPreviewRows: 'سطرهای پیش‌نمایش',
+            exPrint: 'چاپ'
         },
         en: {
             xs_title: 'No table for Excel',
@@ -49,7 +126,78 @@
             xs_count: '{0} sheets',
             xs_table: 'Table',
             xs_data: 'Data',
-            xs_region: 'Sheet '
+            xs_region: 'Sheet ',
+            xs_reading: 'Reading {0}…',
+            xs_kind: 'Import:',
+            xs_kindCsv: 'CSV sheets ({0})',
+            xs_kindDoc: 'Documents ({0})',
+            xs_notDoc: 'a document: CSV sheets were chosen',
+            xs_notCsv: 'a CSV: documents were chosen',
+            xs_info: '{0} rows · {1} columns · {2} · separator: {3}',
+            xs_emptyFile: 'empty',
+            xs_sepBar: 'bar (|)',
+            xs_tooMany: 'Too large for the editor: {0} cells (at most {1}). Make the file smaller or split it.',
+            xs_loaded: '{0} sheets imported',
+            xs_sumTitle: 'Sheets summary',
+            xs_sumBrief: '{0} sheets · {1} rows',
+            xs_colSheet: 'Sheet',
+            xs_colSource: 'File',
+            xs_colRows: 'Rows',
+            xs_colCols: 'Columns',
+            xs_colEnc: 'Encoding',
+            xs_colSep: 'Separator',
+            xs_total: 'Total',
+            xs_most: '{0} (most)',
+            xs_emptySheets: 'Empty sheets not imported: {0}',
+            xs_sumNote: 'Rows are those under the header row. In the editor each sheet is a ## heading and a table; XLSX and CSV are made from these tables.',
+            // Settings → Excel (index.html, #excel-group): labelled when this module loads
+            exSheets: 'Tables',
+            exSheetsEach: 'A sheet for each table',
+            exSheetsOne: 'All tables in one sheet',
+            exGap: 'Empty rows between tables',
+            exTitleRow: 'Each table’s name above it',
+            exDirection: 'Sheet direction',
+            exWrap: 'Wrap text in cells',
+            exWrapNone: 'No wrapping',
+            exWrapMulti: 'Cells with several lines',
+            exWrapAll: 'All cells',
+            exZeros: 'Keep leading zeros (0012 stays text)',
+            exThousands: 'Thousands separator for numbers',
+            exLinks: 'Keep links',
+            exBreaks: '<br> in a cell is a line break',
+            exHeaderColor: 'Header fill',
+            exStripes: 'Striped rows',
+            exStripeColor: 'Stripe color',
+            exHeaderBorder: 'Header borders',
+            exBodyBorder: 'Cell borders',
+            exBorderAll: 'All around',
+            exBorderNone: 'None',
+            exThin: 'Thin',
+            exMedium: 'Medium',
+            exBorderColor: 'Border color',
+            exBorderWidth: 'Thickness',
+            exHeaderHeight: 'Header row height (pt; 0: Excel’s own)',
+            exFilter: 'Filter on the header row',
+            exFreeze: 'Freeze the header row',
+            exColumns: 'Column widths',
+            exColContent: 'Fit the content',
+            exColPage: 'Fit the page width',
+            exOrientAuto: 'Automatic',
+            exMarginsKelk: 'Kelk (1 cm top and bottom, 0.5 cm sides)',
+            exMarginsNormal: 'Normal',
+            exMarginsWide: 'Wide',
+            exMarginsNarrow: 'Narrow',
+            exCenter: 'Center on the page (horizontally)',
+            exFit: 'Fit to the page width',
+            exHeaderFooter: 'Sheet name and page numbers when printed',
+            exCsv: 'CSV',
+            exCsvSep: 'Separator',
+            exComma: 'Comma (,)',
+            exSemicolon: 'Semicolon (;)',
+            exTab: 'Tab',
+            exCsvBom: 'UTF-8 with BOM (Excel reads Persian text right)',
+            exPreviewRows: 'Rows in the preview',
+            exPrint: 'Print'
         },
         ar: {
             xs_title: 'لا جدول لـ Excel',
@@ -66,9 +214,90 @@
             xs_count: '{0} ورقة',
             xs_table: 'جدول',
             xs_data: 'البيانات',
-            xs_region: 'ورقة '
+            xs_region: 'ورقة ',
+            xs_reading: 'قراءة {0}…',
+            xs_kind: 'استيراد:',
+            xs_kindCsv: 'أوراق CSV ({0})',
+            xs_kindDoc: 'المستندات ({0})',
+            xs_notDoc: 'مستند؛ اختيرت أوراق CSV',
+            xs_notCsv: 'ملف CSV؛ اختيرت المستندات',
+            xs_info: '{0} صف · {1} عمود · {2} · الفاصل: {3}',
+            xs_emptyFile: 'فارغ',
+            xs_sepBar: 'خط عمودي (|)',
+            xs_tooMany: 'كبير جدًّا على المحرر: {0} خلية (الحد {1}). صغّر الملف أو قسّمه.',
+            xs_loaded: 'استُوردت {0} ورقة',
+            xs_sumTitle: 'ملخص الأوراق',
+            xs_sumBrief: '{0} ورقة · {1} صف',
+            xs_colSheet: 'الورقة',
+            xs_colSource: 'الملف',
+            xs_colRows: 'الصفوف',
+            xs_colCols: 'الأعمدة',
+            xs_colEnc: 'الترميز',
+            xs_colSep: 'الفاصل',
+            xs_total: 'المجموع',
+            xs_most: '{0} (الأكثر)',
+            xs_emptySheets: 'أوراق فارغة لم تُستورد: {0}',
+            xs_sumNote: 'الصفوف هي ما تحت صف العناوين. في المحرر كل ورقة عنوان ## وجدول؛ ومن هذه الجداول يُصنع XLSX وCSV.',
+            // Settings → Excel (index.html, #excel-group): labelled when this module loads
+            exSheets: 'الجداول',
+            exSheetsEach: 'ورقة لكل جدول',
+            exSheetsOne: 'كل الجداول في ورقة واحدة',
+            exGap: 'صفوف فارغة بين الجداول',
+            exTitleRow: 'اسم كل جدول فوقه',
+            exDirection: 'اتجاه الورقة',
+            exWrap: 'التفاف النص في الخلايا',
+            exWrapNone: 'بلا التفاف',
+            exWrapMulti: 'الخلايا متعددة الأسطر',
+            exWrapAll: 'كل الخلايا',
+            exZeros: 'إبقاء الأصفار في البداية (يبقى 0012 نصًّا)',
+            exThousands: 'فاصل الآلاف للأعداد',
+            exLinks: 'إبقاء الروابط',
+            exBreaks: '<br> في الخلية فاصل سطر',
+            exHeaderColor: 'لون صف العناوين',
+            exStripes: 'صفوف مخططة',
+            exStripeColor: 'لون التخطيط',
+            exHeaderBorder: 'حدود صف العناوين',
+            exBodyBorder: 'حدود الخلايا',
+            exBorderAll: 'من كل الجهات',
+            exBorderNone: 'بلا حدود',
+            exThin: 'رفيع',
+            exMedium: 'متوسط',
+            exBorderColor: 'لون الحدود',
+            exBorderWidth: 'السُّمك',
+            exHeaderHeight: 'ارتفاع صف العناوين (pt؛ 0: ارتفاع Excel)',
+            exFilter: 'عامل تصفية على صف العناوين',
+            exFreeze: 'تثبيت صف العناوين',
+            exColumns: 'عرض الأعمدة',
+            exColContent: 'بقدر المحتوى',
+            exColPage: 'بعرض الصفحة',
+            exOrientAuto: 'تلقائي',
+            exMarginsKelk: 'كِلك (1 cm أعلى وأسفل، 0.5 cm الجانبان)',
+            exMarginsNormal: 'عادية',
+            exMarginsWide: 'عريضة',
+            exMarginsNarrow: 'ضيقة',
+            exCenter: 'في وسط الصفحة (أفقيًّا)',
+            exFit: 'ملاءمة عرض الصفحة',
+            exHeaderFooter: 'اسم الورقة وأرقام الصفحات عند الطباعة',
+            exCsv: 'CSV',
+            exCsvSep: 'الفاصل',
+            exComma: 'فاصلة (,)',
+            exSemicolon: 'فاصلة منقوطة (;)',
+            exTab: 'Tab',
+            exCsvBom: 'UTF-8 مع BOM (يقرأ Excel النص العربي صحيحًا)',
+            exPreviewRows: 'صفوف المعاينة',
+            exPrint: 'الطباعة'
         }
     };
+    /** the summary's table in the report panel */
+    const REPORT_CSS = [
+        '.xs-sum-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:4px 0 8px}',
+        '.xs-sum{border-collapse:collapse;font-size:12.5px;width:100%}',
+        '.xs-sum th,.xs-sum td{padding:4px 8px;border-bottom:1px solid var(--line);text-align:start;white-space:nowrap}',
+        '.xs-sum th{font-weight:600;color:var(--muted);background:var(--panel-2)}',
+        '.xs-sum td.n{text-align:center;font-variant-numeric:tabular-nums}',
+        '.xs-sum td.src{color:var(--muted)}',
+        '.xs-sum tfoot td{font-weight:600;border-bottom:0;border-top:2px solid var(--line-strong)}'
+    ].join('\n');
     const SAMPLE = '| Name | Age |\n|------|-----|\n| Ann  | 31  |';
 
     const K = function () { return root.Kelk; };
@@ -151,6 +380,147 @@
         });
     }
 
+    // ---- import: CSV, XLSX → the editor's Markdown -------------------------------------------------------------
+
+    const SEP = { ',': 'exComma', ';': 'exSemicolon', '\t': 'exTab', '|': 'xs_sepBar' };
+    const ENC = { 'utf-8': 'UTF-8', 'utf-16le': 'UTF-16', 'utf-16be': 'UTF-16', 'windows-1256': 'Windows-1256' };
+    const sepName = function (c) { return SEP[c] ? t(SEP[c]) : JSON.stringify(c); };
+    const stem = function (n) { return String(n || '').replace(/\.[^.]*$/, ''); };
+    const isCsv = function (d) { return /\.csv$/i.test(d.name); };
+    const isXlsx = function (d) { return /\.xlsx$/i.test(d.name); };
+
+    /**
+     * o: { docs (the importer's: { name, path, size, file }), skipped, images, files, first, maxMB }.
+     * Resolves null when done here (imported, cancelled or refused), or { docs } when the user chose the documents.
+     */
+    async function importSheets(o) {
+        const k = K();
+        const sheets = o.docs.filter(function (d) { return isCsv(d) || isXlsx(d); });
+        const others = o.docs.filter(function (d) { return !isCsv(d) && !isXlsx(d); });
+        await k.libs.need('sheetimport');
+        if (sheets.some(isXlsx)) await k.libs.need('xlsx');
+        // read every sheet first: the order dialog shows what each CSV holds
+        await k.ui.task(t('xs_reading', o.first), async function (task) {
+            for (const d of sheets) {
+                if (task.signal.aborted) return;
+                task.label(t('xs_reading', d.name));
+                const bytes = new Uint8Array(await d.file.arrayBuffer());
+                if (isXlsx(d)) {
+                    d.book = SheetImporter.readXlsx(bytes);
+                } else {
+                    d.csv = SheetImporter.readCsv(bytes);
+                    const z = SheetImporter.size(d.csv.rows);
+                    d.info = d.csv.error ? t('xs_emptyFile') : t('xs_info', z.rows, z.cols, ENC[d.csv.encoding] || d.csv.encoding, sepName(d.csv.separator));
+                }
+            }
+        });
+        let value = 'csv', choice = null;
+        const pick = function (v) {
+            const on = v === 'csv' ? sheets : others, off = v === 'csv' ? others : sheets;
+            return { docs: on, skipped: o.skipped.concat(off.map(function (d) {
+                return { name: d.name, path: d.path, size: d.size, reason: 'kind', note: t(v === 'csv' ? 'xs_notDoc' : 'xs_notCsv') };
+            })) };
+        };
+        if (others.length) {
+            value = k.slides.view() === 'excel' || sheets.length >= others.length ? 'csv' : 'doc';
+            choice = { label: t('xs_kind'), value: value, pick: pick,
+                options: [{ value: 'csv', label: t('xs_kindCsv', sheets.length) }, { value: 'doc', label: t('xs_kindDoc', others.length) }] };
+        }
+        let chosen = sheets;
+        if (choice || sheets.length > 1 || o.skipped.length) {
+            const p = pick(value);
+            chosen = await k.ui.order({ title: k.i18n.t('orderTitle', o.files.length === 1 ? o.files[0].name : o.first),
+                docs: p.docs, skipped: p.skipped, images: value === 'doc' ? o.images : 0, maxMB: o.maxMB, choice: choice });
+            if (!chosen || !chosen.length) return null;                  // Cancel: the text stays as it was
+        }
+        if (!isCsv(chosen[0]) && !isXlsx(chosen[0])) return { docs: chosen };   // the documents: the importer goes on
+        // the sheets, in the order chosen; an empty one is left out and named in the summary
+        const list = [], empty = [];
+        chosen.forEach(function (d) {
+            if (d.book) {
+                d.book.forEach(function (b) {
+                    if (b.rows.length) list.push({ name: b.name, rows: b.rows, source: d.name });
+                    else empty.push(b.name);
+                });
+            } else if (d.csv && d.csv.rows.length) {
+                list.push({ name: stem(d.name), rows: d.csv.rows, source: d.name, encoding: d.csv.encoding, separator: d.csv.separator });
+            } else empty.push(d.name);
+        });
+        if (!list.length) { k.ui.toast(k.i18n.t('zipEmpty'), 'warn'); return null; }
+        const cells = list.reduce(function (n, x) { return n + SheetImporter.size(x.rows).cells; }, 0);
+        const max = +k.config.maxSheetCells || 100000;
+        if (cells > max) { k.ui.toast(t('xs_tooMany', cells.toLocaleString('en-US'), max.toLocaleString('en-US')), 'error', 9000); return null; }
+        const md = SheetImporter.toMarkdown(list);
+        const name = o.files.length === 1 ? o.files[0].name : chosen[0].name;
+        k.ui.report.release();
+        k.names.setSource(name);
+        k.editor.set(md, name);
+        k.editor.markConverted(true);
+        await k.slides.setView('excel', true);
+        if (k.slides.view() === 'excel') render();
+        k.ui.toast(t('xs_loaded', list.length));
+        summary(list.map(function (x) {
+            const z = SheetImporter.size(x.rows);
+            return { name: x.name, source: x.source, rows: z.rows, cols: z.cols, encoding: x.encoding ? ENC[x.encoding] || x.encoding : '', separator: x.separator ? sepName(x.separator) : '' };
+        }), empty);
+        return null;
+    }
+
+    /**
+     * The report panel: a table of the sheets (a row each: name, source, rows, columns — and for a CSV its encoding
+     * and separator), their totals, the empty sheets left out. rows: given by an import, else the text's tables.
+     */
+    function summary(rows, empty) {
+        const k = K();
+        if (!rows) {
+            let plans = [];
+            try { plans = builder(k.editor.value()).b.sheets(); } catch (e) { plans = []; }
+            if (!plans.length) { showNoTables(null); return; }
+            rows = plans.map(function (p) { return { name: p.name, rows: p.rows.length, cols: p.cols }; });
+        }
+        const src = rows.some(function (r) { return r.source; }), csv = rows.some(function (r) { return r.encoding; });
+        const total = rows.reduce(function (n, r) { return n + r.rows; }, 0);
+        const most = rows.reduce(function (n, r) { return Math.max(n, r.cols); }, 0);
+        const el = function (box, tag, cls, txt) {
+            const e = box.appendChild(document.createElement(tag));
+            if (cls) e.className = cls;
+            if (txt != null) e.textContent = txt;
+            return e;
+        };
+        return k.ui.report.custom({
+            icon: 'sheet',
+            title: function () { return t('xs_sumTitle'); },
+            brief: function () { return t('xs_sumBrief', rows.length, total); },
+            body: function (box) {
+                const wrap = el(box, 'div', 'xs-sum-wrap');
+                const table = el(wrap, 'table', 'xs-sum');
+                const head = ['#', t('xs_colSheet')].concat(src ? [t('xs_colSource')] : [], [t('xs_colRows'), t('xs_colCols')], csv ? [t('xs_colEnc'), t('xs_colSep')] : []);
+                const tr = el(el(table, 'thead'), 'tr');
+                head.forEach(function (h) { el(tr, 'th', '', h).scope = 'col'; });
+                const body = el(table, 'tbody');
+                rows.forEach(function (r, i) {
+                    const row = el(body, 'tr');
+                    el(row, 'td', 'n', String(i + 1));
+                    el(row, 'td', '', r.name).dir = 'auto';
+                    if (src) el(row, 'td', 'src', r.source || '').dir = 'auto';
+                    el(row, 'td', 'n', String(r.rows));
+                    el(row, 'td', 'n', String(r.cols));
+                    if (csv) { el(row, 'td', '', r.encoding || '').dir = 'ltr'; el(row, 'td', '', r.separator || ''); }
+                });
+                const foot = el(el(table, 'tfoot'), 'tr');
+                el(foot, 'td', '', '');
+                el(foot, 'td', '', t('xs_total') + ': ' + t('xs_count', rows.length));
+                if (src) el(foot, 'td', '', '');
+                el(foot, 'td', 'n', String(total));
+                el(foot, 'td', 'n', t('xs_most', most));
+                if (csv) { el(foot, 'td', '', ''); el(foot, 'td', '', ''); }
+                if (empty && empty.length) el(box, 'p', 'report-summary', t('xs_emptySheets', empty.join('، ')));
+                el(box, 'p', 'report-summary', t('xs_sumNote'));
+            },
+            buttons: []
+        });
+    }
+
     async function blob(kind) {
         const k = K(), c = builder(k.editor.value());
         if (kind === 'xlsx') {
@@ -165,15 +535,17 @@
     if (root.Kelk && root.Kelk.i18n && root.Kelk.i18n._strings) {
         const all = root.Kelk.i18n._strings;
         Object.keys(STRINGS).forEach(function (l) { if (all[l]) Object.assign(all[l], STRINGS[l]); });
+        const group = typeof document !== 'undefined' && document.getElementById('excel-group');
+        if (group && root.Kelk.i18n.relabel) root.Kelk.i18n.relabel(group);          // Settings → Excel's words
     }
     if (typeof document !== 'undefined' && typeof XlsxBuilder !== 'undefined' && !document.getElementById('kelk-sheets-css')) {
         const st = document.createElement('style');
         st.id = 'kelk-sheets-css';
-        st.textContent = XlsxBuilder.previewCss();
+        st.textContent = XlsxBuilder.previewCss() + '\n' + REPORT_CSS;
         document.head.appendChild(st);
     }
 
-    const api = { render: render, hasTables: hasTables, showNoTables: showNoTables, blob: blob, STRINGS: STRINGS };
+    const api = { render: render, hasTables: hasTables, showNoTables: showNoTables, blob: blob, importSheets: importSheets, summary: summary, STRINGS: STRINGS };
     root.KelkSheets = api;
     if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

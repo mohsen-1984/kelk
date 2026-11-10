@@ -61,6 +61,12 @@ three pull requests, one release:
    the three flows. Largest import: **100,000 cells** (measured in PR 1, Chrome, a 10-column table, the Excel view:
    at 100,000 cells (1 MB) a key takes about 50 ms and putting the text in the editor about 1 s; at 200,000 (2 MB)
    about 90 ms and 4.5 s, the browser's textarea itself taking most of it); a larger file is refused with a message.
+   Also in this pull request (the owner's decisions of 2026-11-10): **wide tables** in the document preview and the
+   Excel view are handled like fenced code — cells do not wrap until a real line break, and the table scrolls
+   horizontally inside its own block (finger scrolling on a phone); in the document preview a table is wide when its
+   columns' longest words do not fit the pane (narrower tables still fit it). Settings → Excel's words load with the
+   Excel module, like the slide check's (the room it frees takes the import's hooks).
+   Everything Excel-related stays in 2.6; only the low-priority items below wait.
 3. **Docs**: About Kelk and samples — an Excel section, the three flows as its subsections (from the page's «what this
    page is for»); og-image.html and a new og-image.png; lib/README; the README in three languages; screenshots.
 
@@ -421,6 +427,9 @@ mixed-direction lists and tables)
 - Low: write XLSX without SheetJS (its ~950 KB load on the first XLSX export): the polish step already rewrites the
   sheets' views, columns and styles; the cells, shared strings and links are a small writer of our own on JSZip.
   SheetJS would then load only to read an XLSX.
+- Low: wide tables in DOCX, PDF and the HTML export are still squeezed to the page width (a column narrower than
+  its longest word breaks it letter by letter). A fix: a landscape page, or a smaller font, for a table whose
+  columns do not fit (the preview scrolls them instead, 2.6).
 
 ### Other
 

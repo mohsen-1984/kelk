@@ -20,7 +20,20 @@ All notable changes to Kelk. Dates are those of the release tags.
   stripes, borders, header height, filter, frozen header, column widths, paper, orientation, margins, printing, the
   CSV separator and BOM; its header is tinted in the Excel view. **Settings → Fonts → «Other fonts for XLSX»** (on
   by default: B Nazanin for Persian, Calibri for Latin): Excel cannot embed fonts, so the view says which fonts the
-  reader needs. The view loads on its first use.
+  reader needs. The view loads on its first use, and Settings → Excel's words when its group first opens.
+- **CSV and XLSX import** (`lib/SheetImporter.js`, PapaParse 5.7.0; both load on the first one): each sheet becomes a
+  `##` heading and a table in the editor, and the page switches to the Excel view. A CSV's encoding (UTF-8, UTF-16,
+  Windows-1256) and separator (, ; Tab |) are found by themselves. Several CSVs, or a zip of them, open the order
+  dialog, each with its rows, columns, encoding and separator. An XLSX comes in on its own (not from a zip, not with
+  other files), every sheet with its values as Excel shows them. A zip with CSVs and documents: the dialog asks which
+  kind to import and lists the other files as not imported. The import report shows a summary table of the sheets
+  (and so does a Markdown import in the Excel view). More than 100,000 cells is refused: the editor would slow down.
+
+### Changed
+
+- **Wide tables in the preview** are handled like fenced code: when a table's columns cannot fit the pane without
+  breaking words, its cells keep their lines (breaking only at a real line break) and the table scrolls sideways in
+  its own block, a finger too. Narrower tables still fit the pane. The Excel view's sheets do the same.
 
 ## [2.5] — 2026-11-09
 

@@ -262,6 +262,7 @@
             orderCount: '{0} از {1} فایل',
             orderSkipped: 'وارد نمی‌شوند ({0})',
             orderNoType: 'قابل تبدیل نیست',
+            orderXlsx: 'XLSX فقط تنها وارد می‌شود (نه درون zip، نه همراه فایل‌های دیگر)',
             orderTooBig: 'بزرگ‌تر از {0} مگابایت',
             orderImages: '{0} تصویر — هر جا سندی نامشان را آورده باشد، قرار می‌گیرند',
             loadedN: '{0} فایل بارگذاری شد',
@@ -398,53 +399,6 @@
             kXlsx: 'خروجی XLSX (در نمای اکسل؛ با Shift: فایل‌های CSV)',
             gExcel: 'اکسل (Excel)',
             excelScope: 'این گروه فقط برای اکسل (XLSX و CSV) است. فونت‌ها در گروه «فونت (قلم)» است؛ گروه‌های دیگر روی اکسل اثری ندارند.',
-            exSheets: 'جدول‌ها',
-            exSheetsEach: 'هر جدول یک شیت',
-            exSheetsOne: 'همهٔ جدول‌ها در یک شیت',
-            exGap: 'سطرهای خالی بین جدول‌ها',
-            exTitleRow: 'نام هر جدول بالای آن',
-            exDirection: 'جهت شیت',
-            exWrap: 'شکستن متن سلول',
-            exWrapNone: 'بدون شکستن',
-            exWrapMulti: 'سلول‌های چندخطی',
-            exWrapAll: 'همهٔ سلول‌ها',
-            exZeros: 'صفرهای ابتدایی بماند (0012 متن می‌ماند)',
-            exThousands: 'جداکنندهٔ هزارگان برای عددها',
-            exLinks: 'پیوندها بماند',
-            exBreaks: '<br> در سلول، شکست خط شود',
-            exHeaderColor: 'رنگ سرستون',
-            exStripes: 'سطرهای راه‌راه',
-            exStripeColor: 'رنگ راه‌راه',
-            exHeaderBorder: 'کادر سرستون',
-            exBodyBorder: 'کادر سلول‌ها',
-            exBorderAll: 'دورتادور',
-            exBorderNone: 'بدون کادر',
-            exThin: 'نازک',
-            exMedium: 'متوسط',
-            exBorderColor: 'رنگ کادر',
-            exBorderWidth: 'ضخامت',
-            exHeaderHeight: 'ارتفاع سطر سرستون (pt؛ 0: پیش‌فرض اکسل)',
-            exFilter: 'فیلتر روی سرستون',
-            exFreeze: 'ثابت‌ماندن سطر سرستون',
-            exColumns: 'پهنای ستون‌ها',
-            exColContent: 'به اندازهٔ محتوا',
-            exColPage: 'به پهنای صفحه',
-            exOrientAuto: 'خودکار',
-            exMarginsKelk: 'کلک (بالا و پایین 1 cm، کناره‌ها 0.5 cm)',
-            exMarginsNormal: 'معمولی',
-            exMarginsWide: 'پهن',
-            exMarginsNarrow: 'باریک',
-            exCenter: 'وسط صفحه (افقی)',
-            exFit: 'جا شدن در پهنای صفحه',
-            exHeaderFooter: 'نام شیت و شمارهٔ صفحه در چاپ',
-            exCsv: 'CSV',
-            exCsvSep: 'جداکننده',
-            exComma: 'ویرگول (,)',
-            exSemicolon: 'نقطه‌ویرگول (;)',
-            exTab: 'Tab',
-            exCsvBom: 'UTF-8 با BOM (اکسل متن فارسی را درست می‌خواند)',
-            exPreviewRows: 'سطرهای پیش‌نمایش',
-            exPrint: 'چاپ',
             fontsXlsxOwn: 'فونت دیگری برای XLSX',
             fontsXlsxHint: 'اکسل فونت را درون فایل نمی‌گذارد؛ رایانهٔ خواننده باید آن را داشته باشد. خاموش: XLSX همان فونت‌های بالا را می‌گیرد.',
             notInstalledXlsx: 'روی این سیستم نصب نیست؛ اکسل گیرنده هم باید آن را داشته باشد.',
@@ -759,6 +713,7 @@
             orderCount: '{0} of {1} files',
             orderSkipped: 'Not imported ({0})',
             orderNoType: 'cannot be converted',
+            orderXlsx: 'An XLSX comes in on its own only (not in a zip, not with other files)',
             orderTooBig: 'larger than {0} MB',
             orderImages: 'Pictures: {0} — placed wherever a document names them',
             loadedN: '{0} files loaded',
@@ -895,53 +850,6 @@
             kXlsx: 'XLSX export (in the Excel view; with Shift: the CSV files)',
             gExcel: 'Excel',
             excelScope: 'This group is for Excel (XLSX and CSV) only. Fonts are in Fonts; the other groups do not reach Excel.',
-            exSheets: 'Tables',
-            exSheetsEach: 'A sheet for each table',
-            exSheetsOne: 'All tables in one sheet',
-            exGap: 'Empty rows between tables',
-            exTitleRow: 'Each table’s name above it',
-            exDirection: 'Sheet direction',
-            exWrap: 'Wrap text in cells',
-            exWrapNone: 'No wrapping',
-            exWrapMulti: 'Cells with several lines',
-            exWrapAll: 'All cells',
-            exZeros: 'Keep leading zeros (0012 stays text)',
-            exThousands: 'Thousands separator for numbers',
-            exLinks: 'Keep links',
-            exBreaks: '<br> in a cell is a line break',
-            exHeaderColor: 'Header fill',
-            exStripes: 'Striped rows',
-            exStripeColor: 'Stripe color',
-            exHeaderBorder: 'Header borders',
-            exBodyBorder: 'Cell borders',
-            exBorderAll: 'All around',
-            exBorderNone: 'None',
-            exThin: 'Thin',
-            exMedium: 'Medium',
-            exBorderColor: 'Border color',
-            exBorderWidth: 'Thickness',
-            exHeaderHeight: 'Header row height (pt; 0: Excel’s own)',
-            exFilter: 'Filter on the header row',
-            exFreeze: 'Freeze the header row',
-            exColumns: 'Column widths',
-            exColContent: 'Fit the content',
-            exColPage: 'Fit the page width',
-            exOrientAuto: 'Automatic',
-            exMarginsKelk: 'Kelk (1 cm top and bottom, 0.5 cm sides)',
-            exMarginsNormal: 'Normal',
-            exMarginsWide: 'Wide',
-            exMarginsNarrow: 'Narrow',
-            exCenter: 'Center on the page (horizontally)',
-            exFit: 'Fit to the page width',
-            exHeaderFooter: 'Sheet name and page numbers when printed',
-            exCsv: 'CSV',
-            exCsvSep: 'Separator',
-            exComma: 'Comma (,)',
-            exSemicolon: 'Semicolon (;)',
-            exTab: 'Tab',
-            exCsvBom: 'UTF-8 with BOM (Excel reads Persian text right)',
-            exPreviewRows: 'Rows in the preview',
-            exPrint: 'Print',
             fontsXlsxOwn: 'Other fonts for XLSX',
             fontsXlsxHint: 'Excel cannot embed fonts: the reader’s computer needs them. Off: XLSX takes the fonts above.',
             notInstalledXlsx: 'Not installed on this system; the recipient’s Excel needs it too.',
@@ -1247,6 +1155,7 @@
             orderCount: '{0} من {1} ملفات',
             orderSkipped: 'لن تُستورد ({0})',
             orderNoType: 'لا يمكن تحويله',
+            orderXlsx: 'يُستورد XLSX وحده فقط (لا داخل zip ولا مع ملفات أخرى)',
             orderTooBig: 'أكبر من {0} ميغابايت',
             orderImages: 'الصور: {0} — توضع حيثما يذكر المستندُ اسمها',
             loadedN: 'تم تحميل {0} ملفات',
@@ -1382,53 +1291,6 @@
             kXlsx: 'تصدير XLSX (في عرض Excel؛ مع Shift: ملفات CSV)',
             gExcel: 'Excel',
             excelScope: 'هذه المجموعة لـ Excel (XLSX وCSV) فقط. الخطوط في «الخطوط»؛ ولا تؤثر المجموعات الأخرى في Excel.',
-            exSheets: 'الجداول',
-            exSheetsEach: 'ورقة لكل جدول',
-            exSheetsOne: 'كل الجداول في ورقة واحدة',
-            exGap: 'صفوف فارغة بين الجداول',
-            exTitleRow: 'اسم كل جدول فوقه',
-            exDirection: 'اتجاه الورقة',
-            exWrap: 'التفاف النص في الخلايا',
-            exWrapNone: 'بلا التفاف',
-            exWrapMulti: 'الخلايا متعددة الأسطر',
-            exWrapAll: 'كل الخلايا',
-            exZeros: 'إبقاء الأصفار في البداية (يبقى 0012 نصًّا)',
-            exThousands: 'فاصل الآلاف للأعداد',
-            exLinks: 'إبقاء الروابط',
-            exBreaks: '<br> في الخلية فاصل سطر',
-            exHeaderColor: 'لون صف العناوين',
-            exStripes: 'صفوف مخططة',
-            exStripeColor: 'لون التخطيط',
-            exHeaderBorder: 'حدود صف العناوين',
-            exBodyBorder: 'حدود الخلايا',
-            exBorderAll: 'من كل الجهات',
-            exBorderNone: 'بلا حدود',
-            exThin: 'رفيع',
-            exMedium: 'متوسط',
-            exBorderColor: 'لون الحدود',
-            exBorderWidth: 'السُّمك',
-            exHeaderHeight: 'ارتفاع صف العناوين (pt؛ 0: ارتفاع Excel)',
-            exFilter: 'عامل تصفية على صف العناوين',
-            exFreeze: 'تثبيت صف العناوين',
-            exColumns: 'عرض الأعمدة',
-            exColContent: 'بقدر المحتوى',
-            exColPage: 'بعرض الصفحة',
-            exOrientAuto: 'تلقائي',
-            exMarginsKelk: 'كِلك (1 cm أعلى وأسفل، 0.5 cm الجانبان)',
-            exMarginsNormal: 'عادية',
-            exMarginsWide: 'عريضة',
-            exMarginsNarrow: 'ضيقة',
-            exCenter: 'في وسط الصفحة (أفقيًّا)',
-            exFit: 'ملاءمة عرض الصفحة',
-            exHeaderFooter: 'اسم الورقة وأرقام الصفحات عند الطباعة',
-            exCsv: 'CSV',
-            exCsvSep: 'الفاصل',
-            exComma: 'فاصلة (,)',
-            exSemicolon: 'فاصلة منقوطة (;)',
-            exTab: 'Tab',
-            exCsvBom: 'UTF-8 مع BOM (يقرأ Excel النص العربي صحيحًا)',
-            exPreviewRows: 'صفوف المعاينة',
-            exPrint: 'الطباعة',
             fontsXlsxOwn: 'خطوط أخرى لـ XLSX',
             fontsXlsxHint: 'لا يستطيع Excel تضمين الخطوط؛ يحتاجها حاسوب القارئ. عند الإيقاف: تأخذ XLSX الخطوط أعلاه.',
             notInstalledXlsx: 'غير مثبَّت على هذا النظام؛ ويحتاجه Excel لدى المستلم أيضًا.',
@@ -1504,6 +1366,25 @@
         dir: function () { return this.lang === 'en' ? 'ltr' : 'rtl'; },
 
         /**
+         * Label the elements under root (data-i18n, data-i18n-attr). A key no table has yet is left alone: its words
+         * come with a module loaded on demand (Settings → Excel: scripts/sheets.js), which labels its part then.
+         */
+        relabel: function (root) {
+            const self = this;
+            const has = function (k) { return STRINGS.en[k] != null; };
+            root.querySelectorAll('[data-i18n]').forEach(function (el) {
+                const k = el.getAttribute('data-i18n');
+                if (has(k)) el.textContent = self.t(k);
+            });
+            root.querySelectorAll('[data-i18n-attr]').forEach(function (el) {
+                el.getAttribute('data-i18n-attr').split(';').forEach(function (pair) {
+                    const kv = pair.split(':');
+                    if (kv.length === 2 && has(kv[1].trim())) el.setAttribute(kv[0].trim(), self.t(kv[1].trim()));
+                });
+            });
+        },
+
+        /**
          * The locale of {date} in an export's header/footer: an LTR header gets English, an RTL one the
          * interface's right-to-left language (Arabic in the Arabic interface, else Persian) — the same rule
          * as the page / of / contents words (Kelk.names.rtlWords). Latin digits, as before.
@@ -1525,16 +1406,7 @@
             const root = document.documentElement;
             root.lang = this.lang;
             root.dir = this.dir();
-            const self = this;
-            document.querySelectorAll('[data-i18n]').forEach(function (el) {
-                el.textContent = self.t(el.getAttribute('data-i18n'));
-            });
-            document.querySelectorAll('[data-i18n-attr]').forEach(function (el) {
-                el.getAttribute('data-i18n-attr').split(';').forEach(function (pair) {
-                    const kv = pair.split(':');
-                    if (kv.length === 2) el.setAttribute(kv[0].trim(), self.t(kv[1].trim()));
-                });
-            });
+            this.relabel(document);
             document.title = (this.t('appName') + ' – ' + this.t('tagline')).replace(/ — /g, ' – ');   // en dashes: less room in a tab
         }
     };

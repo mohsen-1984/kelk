@@ -95,6 +95,9 @@
             fillSelect('[data-setting="code.font"]', K.config.fontsCode);
             fillDatalist('#dl-word-fonts', K.config.wordFonts);
             fillDatalist('#dl-word-code-fonts', K.config.wordCodeFonts);
+            // Settings → Excel: its words come with the Excel module (scripts/sheets.js), loaded when the group opens
+            const xg = K.$('#excel-group');
+            if (xg) xg.addEventListener('toggle', function () { if (xg.open) K.libs.need('sheets').catch(function (e) { K.ui.toast(K.i18n.t('failed', e.message), 'error'); }); });
 
             const live = function (el) { return el.type === 'checkbox' || el.tagName === 'SELECT' ? 'change' : 'input'; };
             K.$$('[data-setting]').forEach(function (el) {
