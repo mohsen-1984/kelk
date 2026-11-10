@@ -263,8 +263,12 @@
         },
 
         /** After a paste or an import: in Slides, the slide check may switch to the document (scripts/slidecheck.js). */
-        checkIncoming: function () {
+        checkIncoming: function (pasted) {
             if (this.active()) K.libs.need('slidecheck').then(function (sc) { return sc.incoming(); }).catch(function () {});
+            // the Excel view: a paste that holds a table → the sheets' summary (typing and other edits: nothing)
+            else if (this.view() === 'excel' && pasted && pasted.indexOf('|') >= 0) {
+                K.libs.need('sheets').then(function (sh) { sh.afterPaste(pasted); }).catch(function () {});
+            }
         },
         /** Before a PPTX export: false when the text no longer fits and the report offers to export anyway. */
         exportOk: function (anyway) {

@@ -389,9 +389,14 @@
             if (!html && !text && !image && navigator.clipboard && navigator.clipboard.readText) {
                 try { text = await navigator.clipboard.readText(); } catch (e) { if (!readFailed) readFailed = e; }
             }
+            let pasted = text;
+            // the Excel view: CSV or tab-separated text becomes a heading and a table (scripts/sheets.js)
+            const sh = K.slides && K.slides.view() === 'excel' && window.KelkSheets;
+            if (sh && text && !/<table/i.test(html || '') && sh.looksLikeCsv(text)) { clear(); sh.pasteCsv(text); return; }
             try {
                 if (html && K.store.getUi('importer.richPaste') && MarkdownImporter.isRich(html)) {
                     const md = importer().fromHtml(html).markdown;
+                    pasted = md;
                     clear();
                     K.editor.insert(md);
                     K.editor.markConverted(true);
@@ -410,7 +415,7 @@
             } catch (e) {
                 K.ui.toast(K.i18n.t('failed', e.message), 'error');
             }
-            if ((html || text) && K.slides) K.slides.checkIncoming();                   // in Slides, the slide check
+            if ((html || text) && K.slides) K.slides.checkIncoming(pasted);             // Slides: the slide check; Excel: the summary
         }
     };
 })(window.Kelk = window.Kelk || {});

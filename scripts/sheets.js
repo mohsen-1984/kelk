@@ -15,6 +15,10 @@
  *       dialog, each with its rows, columns, encoding and separator; CSVs beside documents: the user picks one kind
  *       (the documents chosen go back to the importer: { docs }). Over Kelk.config.maxSheetCells: refused.
  *   KelkSheets.summary(rows)           the report panel: a table of the sheets — the text's tables, or rows given
+ *   KelkSheets.looksLikeCsv(text)      pasted text that is CSV or tab-separated (2+ lines, the same separator count
+ *       on each, not a Markdown table) — synchronous: the paste event decides on it
+ *   KelkSheets.pasteCsv(text)          such a paste → a heading and a table at the cursor, then the summary
+ *   KelkSheets.afterPaste(text)        any other paste in the Excel view: the summary when it holds a table
  *   KelkSheets.STRINGS                 its words (xs_*, and Settings → Excel's ex*), fa / en / ar: added to
  *       Kelk.i18n's tables when it loads, then Settings → Excel is labelled (it loads when that group opens: settings.js)
  *       (tools/check-i18n.js reads them from here)
@@ -537,6 +541,67 @@
         });
     }
 
+    // ---- paste in the Excel view ---------------------------------------------------------------------------------
+
+    /** The records of a CSV text (a line break inside quotes stays in its record), the first 50. */
+    function records(text) {
+        const out = [];
+        let cur = '', q = false;
+        for (let i = 0; i < text.length && out.length < 50; i++) {
+            const ch = text[i];
+            if (ch === '"') q = !q;
+            if ((ch === '\n' || ch === '\r') && !q) {
+                if (ch === '\r' && text[i + 1] === '\n') i++;
+                if (cur.trim()) out.push(cur);
+                cur = '';
+            } else cur += ch;
+        }
+        if (cur.trim() && out.length < 50) out.push(cur);
+        return out;
+    }
+    /** The separator count outside quotes. */
+    function countSep(rec, sep) {
+        let n = 0, q = false;
+        for (let i = 0; i < rec.length; i++) {
+            const ch = rec[i];
+            if (ch === '"') q = !q;
+            else if (ch === sep && !q) n++;
+        }
+        return n;
+    }
+    function looksLikeCsv(text) {
+        const recs = records(String(text || ''));
+        if (recs.length < 2) return false;
+        if (recs.some(function (l) { return /^\s*\|/.test(l); })) return false;            // a Markdown table
+        return ['\t', ',', ';'].some(function (sep) {
+            const n = countSep(recs[0], sep);
+            return n >= 1 && recs.every(function (l) { return countSep(l, sep) === n; });
+        });
+    }
+
+    async function pasteCsv(text) {
+        const k = K();
+        try {
+            await k.libs.need('sheetimport');
+            const r = SheetImporter.readCsv(new TextEncoder().encode(text), { persianLetters: k.store.getUi('importer.persianLetters') !== false });
+            const z = SheetImporter.size(r.rows), max = +k.config.maxSheetCells || 100000;
+            if (z.cells > max) { k.ui.toast(t('xs_tooMany', z.cells.toLocaleString('en-US'), max.toLocaleString('en-US')), 'error', 9000); return; }
+            let count = 0;
+            try { count = XlsxBuilder.findTables(k.editor.value()).length; } catch (e) { count = 0; }
+            const name = t('xs_table') + ' ' + (count + 1);
+            // a blank line before and after: the heading and the table stand apart from the text around them
+            const area = k.$('#editor'), before = area.value.slice(0, area.selectionStart);
+            const lead = !before.trim() ? '' : /\n\n$/.test(before) ? '' : /\n$/.test(before) ? '\n' : '\n\n';
+            k.editor.insert(lead + SheetImporter.toMarkdown([{ name: name, rows: r.rows }]) + '\n');
+            render();
+            summary();
+        } catch (e) {
+            k.ui.toast(t('failed', e.message), 'error');
+        }
+    }
+
+    function afterPaste(text) { if (hasTables(text)) summary(); }
+
     async function blob(kind) {
         const k = K(), c = builder(k.editor.value());
         if (kind === 'xlsx') {
@@ -561,7 +626,8 @@
         document.head.appendChild(st);
     }
 
-    const api = { render: render, hasTables: hasTables, showNoTables: showNoTables, blob: blob, importSheets: importSheets, summary: summary, STRINGS: STRINGS };
+    const api = { render: render, hasTables: hasTables, showNoTables: showNoTables, blob: blob, importSheets: importSheets, summary: summary,
+        looksLikeCsv: looksLikeCsv, pasteCsv: pasteCsv, afterPaste: afterPaste, STRINGS: STRINGS };
     root.KelkSheets = api;
     if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);
