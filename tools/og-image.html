@@ -41,15 +41,15 @@
   h1 .fa { color: var(--accent); margin-left: 14px; font-weight: 700; }
   .meaning { margin-top: 12px; font-size: 21px; color: var(--muted); }
   .meaning b { color: var(--accent); font-weight: 700; }
-  .tag { margin-top: 40px; font-size: 28px; font-weight: 700; line-height: 1.4; white-space: nowrap; }
+  .tag { margin-top: 40px; font-size: 25px; font-weight: 700; line-height: 1.4; white-space: nowrap; }
   .tag-fa { margin-top: 10px; font-size: 25px; font-weight: 600; color: var(--muted); direction: rtl; text-align: left; }
-  .chips { margin-top: 36px; display: flex; gap: 10px; align-items: center; }
-  .chip { padding: 8px 16px; border-radius: 10px; font-size: 20px; white-space: nowrap; font-weight: 800; color: var(--accent);
+  .chips { margin-top: 36px; display: flex; gap: 8px; align-items: center; }
+  .chip { padding: 7px 11px; border-radius: 10px; font-size: 18px; white-space: nowrap; font-weight: 800; color: var(--accent);
           background: var(--paper); border: 2px solid var(--line); }
   .chip.on { background: var(--accent); color: #fff; border-color: var(--accent); }
   .chip.back { margin-left: 8px; border-style: dashed; color: var(--ink); }
   /* a slide of a deck (the PowerPoint output), in front of the page */
-  .slide { position: absolute; right: 250px; top: 415px; width: 300px; height: 169px; background: var(--paper); border-radius: 10px;
+  .slide { position: absolute; right: 292px; top: 418px; width: 300px; height: 169px; background: var(--paper); border-radius: 10px;
            box-shadow: 0 20px 40px -20px rgba(20, 40, 34, .5), 0 0 0 1px var(--line); transform: rotate(3deg); overflow: hidden; direction: rtl; }
   .slide .bar { height: 40px; background: var(--accent); color: #fff; font-size: 16px; font-weight: 800; padding: 9px 16px; }
   .slide .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 14px 14px 0; }
@@ -57,6 +57,17 @@
   .slide .card span { display: block; margin-top: 6px; height: 5px; border-radius: 3px; background: #b9d3ca; }
   .slide .card span + span { width: 70%; }
   .slide .tag-pptx { position: absolute; left: 10px; bottom: 8px; font: 800 11px 'Vazirmatn'; color: var(--accent); direction: ltr; }
+  /* a sheet of a workbook (the Excel output), in front of the page: a frozen colored header, stripes, codes with zeros */
+  .sheet { position: absolute; right: 26px; top: 446px; width: 250px; background: var(--paper); border-radius: 10px;
+           box-shadow: 0 20px 40px -20px rgba(20, 40, 34, .5), 0 0 0 1px var(--line); transform: rotate(-3deg); overflow: hidden; direction: rtl; }
+  .sheet .bar { height: 30px; background: #1d6f42; color: #fff; font-size: 13px; font-weight: 800; padding: 6px 12px; display: flex; justify-content: space-between; }
+  .sheet .bar span { direction: ltr; font-size: 11px; opacity: .9; padding-top: 1px; }
+  .sheet table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .sheet th, .sheet td { border: 1px solid #c7d0db; padding: 3px 7px; text-align: right; }
+  .sheet th { background: #e4e9ef; font-weight: 800; text-align: center; }
+  .sheet tr:nth-child(odd) td { background: #f5f7fa; }
+  .sheet td.n { text-align: center; direction: ltr; }
+  .sheet .rn { width: 18px; background: #eef0f2 !important; color: #8a939c; text-align: center; font-size: 10px; }
 
   /* right: a page of a finished document — right to left, a formula, a table */
   .page { position: absolute; right: 72px; top: 112px; width: 420px; background: var(--paper); border-radius: 14px;
@@ -92,9 +103,9 @@
         <div class="meaning"><b>kelk</b> — the reed pen of Persian calligraphy</div>
       </div>
     </div>
-    <div class="tag">Markdown → Word, PowerPoint, PDF, HTML<br>PDF → Markdown — in your browser</div>
+    <div class="tag">Markdown → Word, PowerPoint, Excel, PDF, HTML<br>and back to Markdown — in your browser</div>
     <div class="tag-fa">راست‌به‌چپ، با فرمول‌های LaTeX؛ بدون اینترنت</div>
-    <div class="chips"><span class="chip on">DOCX</span><span class="chip">PPTX</span><span class="chip">PDF</span><span class="chip">HTML</span><span class="chip back">PDF → MD</span></div>
+    <div class="chips"><span class="chip on">DOCX</span><span class="chip">PPTX</span><span class="chip">XLSX</span><span class="chip">PDF</span><span class="chip">HTML</span><span class="chip back">PDF → MD</span></div>
   </div>
 
   <div class="page" aria-hidden="true">
@@ -118,6 +129,15 @@
       <div class="card">ارائه<span></span><span></span></div>
     </div>
     <div class="tag-pptx">PPTX</div>
+  </div>
+  <div class="sheet" aria-hidden="true">
+    <div class="bar">فروش شعبه‌ها<span>XLSX · CSV</span></div>
+    <table>
+      <tr><th class="rn">1</th><th>شعبه</th><th>کد</th><th>فروش</th></tr>
+      <tr><td class="rn">2</td><td>مشهد</td><td class="n">0012</td><td class="n">1,250</td></tr>
+      <tr><td class="rn">3</td><td>تهران</td><td class="n">0045</td><td class="n">980</td></tr>
+      <tr><td class="rn">4</td><td>شیراز</td><td class="n">0107</td><td class="n">715</td></tr>
+    </table>
   </div>
 </body>
 </html>
