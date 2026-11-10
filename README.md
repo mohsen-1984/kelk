@@ -1,8 +1,8 @@
-# Kelk — Markdown to Word (DOCX, DOC), PowerPoint (PPTX), PDF and HTML — and back — in the browser
+# Kelk — Markdown to Word (DOCX, DOC), PowerPoint (PPTX), Excel (XLSX, CSV), PDF and HTML — and back — in the browser
 
 **Kelk** (کِلک) converts **Markdown** — full **GitHub Flavored Markdown (GFM)** — into
-**Word DOCX**, **Word DOC (MHTML)**, **PowerPoint slides (PPTX)**, **PDF** and a **standalone HTML** page, and converts
-**Word .docx, PDF, HTML and rich text back to Markdown**. It runs **100% client-side in your browser**:
+**Word DOCX**, **Word DOC (MHTML)**, **PowerPoint slides (PPTX)**, **Excel workbooks (XLSX) and CSV**, **PDF** and a
+**standalone HTML** page, and converts **Word .docx, PDF, HTML, CSV, Excel .xlsx and rich text back to Markdown**. It runs **100% client-side in your browser**:
 no server, no upload, no account, no installation — it even works **offline** from `file://`.
 
 It gets **right-to-left and bidirectional text** right — **Persian (Farsi), Arabic, Hebrew, Urdu,
@@ -30,6 +30,13 @@ Free and open source (MIT).
   callouts are supported. Right-to-left decks are mirrored. Everything stays editable, and a full-screen
   Present mode is included. In Slides the only export is PPTX; a text plainly not in slide format stays a
   document, with a note on why. The convention, and a prompt that teaches it to AI models: [`lib/SLIDES.md`](lib/SLIDES.md).
+- **Markdown → Excel (XLSX) and CSV**: the preview's third view, **Excel**, shows each table as a sheet (its name
+  from the heading above it, its rows and columns, its first rows), and the exports are **XLSX** and a zip of
+  **CSV** files. The workbook comes formatted for Persian and English alike: a right-to-left sheet when the text is,
+  fonts and alignment by content, a colored, frozen header row with a filter, stripes, column widths, print setup;
+  leading zeros and long numbers stay text. **And back:** a CSV (UTF-8, or Windows-1256 from Persian Excel), a zip of
+  CSVs or an XLSX becomes a heading and a table per sheet, ready to edit or hand to a model. CSV is to Excel what
+  Markdown is to Word: a model that cannot make files can still answer in CSV.
 - **DOCX / PDF / HTML / pasted rich text → Markdown** — clean input for AI models (fewer tokens, clear structure);
   several files or a .zip at once become one document, in the order you set: a window lists them with the icon of
   their kind, and marks those that cannot be converted.
@@ -53,7 +60,7 @@ Free and open source (MIT).
   code blocks and quotes have their own colors.
 - Maximize the editor or the preview; *Clear & paste* turns the clipboard into the document; light and dark theme.
 - Header and footer (structured, simple or custom HTML), automatic title and edition, one font choice for
-  every output (or other fonts for DOCX and PPTX), fonts embedded in DOCX and PPTX, A3–A5/Letter/Legal pages, a monospace code font made for Persian and Arabic.
+  every output (or other fonts for DOCX and PPTX; XLSX has its own, since Excel cannot embed fonts), fonts embedded in DOCX and PPTX, A3–A5/Letter/Legal pages, a monospace code font made for Persian and Arabic.
 
 | Output | Best for | Fonts |
 |---|---|---|
@@ -62,10 +69,14 @@ Free and open source (MIT).
 | **DOC** (MHTML) | a free-form header/footer; Microsoft Word only | must be installed |
 | **HTML** | a standalone page for the web or an archive | embedded |
 | **PPTX** | a talk: editable slides, charts and diagrams, speaker notes | must be installed |
+| **XLSX** | data in Excel: each table a sheet, formatted | must be installed (Excel cannot embed fonts) |
+| **CSV** | data for any tool or model: a zip, one file per sheet | — |
 
 ![A PDF made by Kelk: table of contents, mixed Persian and English, tables](docs/screenshots/kelk-pdf.png)
 
 ![Kelk's Slides view: the AI-literacy sample as slides, with Settings → Slides](docs/screenshots/kelk-slides-en.png)
+
+![Kelk's Excel view: the Excel sample as sheets, with Settings → Excel](docs/screenshots/kelk-excel-en.png)
 
 ![Slides made by Kelk: timelines, a native chart, diagrams and cards from Markdown](docs/screenshots/kelk-slides-gallery-en.png)
 
@@ -88,7 +99,8 @@ The about-and-guide document opens on the first visit, in the interface language
 
 `lib/` is a **standalone JavaScript library** with no build step: four builders with one API —
 `DocxBuilder` (.docx, on docx.js), `PdfBuilder` (.pdf, on jsPDF), `WordHtmlBuilder` (.doc),
-`HtmlBuilder` (.html) and `PptxBuilder` (.pptx slides, on PptxGenJS) — plus `PreviewBuilder` (a live preview in a page element, on
+`HtmlBuilder` (.html) and `PptxBuilder` (.pptx slides, on PptxGenJS) — plus `XlsxBuilder` (.xlsx and CSV, on SheetJS),
+`SheetImporter` (CSV and .xlsx → Markdown, on PapaParse and SheetJS), `PreviewBuilder` (a live preview in a page element, on
 `HtmlBuilder`'s logic and stylesheet), `BidiCore` (every direction decision), `MarkdownImporter`
 (.docx/HTML → Markdown) and `PdfImporter` (.pdf → Markdown, on pdf.js). Any font can be prepared for the PDF with `tools/build_pdf_fonts.py`.
 Documentation: **[`lib/README.md`](lib/README.md)**; the reasons behind formulas and PDF import:
@@ -137,11 +149,11 @@ B Nazanin, B Mitra and B Titr: (c) Borna Rayaneh, no published license, see born
 <a id="fa"></a>
 <div dir="rtl">
 
-## کِلک — تبدیل مارک‌داون به Word، PowerPoint، PDF و HTML و برعکس، در مرورگر
+## کِلک — تبدیل مارک‌داون به Word، PowerPoint، Excel، PDF و HTML و برعکس، در مرورگر
 
 **کِلک** متن **مارک‌داون** — با پشتیبانی کامل از **GitHub Flavored Markdown (GFM)** — را به
-**Word DOCX**، **Word DOC (MHTML)**، **اسلایدهای PowerPoint (PPTX)**، **PDF** و یک صفحهٔ **HTML مستقل** تبدیل می‌کند، و فایل
-**Word (.docx)، PDF، HTML و متن کپی‌شده از Word یا وب را به مارک‌داون** برمی‌گرداند. همه‌چیز
+**Word DOCX**، **Word DOC (MHTML)**، **اسلایدهای PowerPoint (PPTX)**، **کارپوشهٔ اکسل (XLSX) و CSV**، **PDF** و یک صفحهٔ
+**HTML مستقل** تبدیل می‌کند، و فایل **Word (.docx)، PDF، HTML، CSV، اکسل (.xlsx) و متن کپی‌شده از Word یا وب را به مارک‌داون** برمی‌گرداند. همه‌چیز
 **کاملاً در مرورگر شما (client-side)** انجام می‌شود: بدون سرور، بدون بارگذاری فایل، بدون حساب کاربری
 و بدون نصب؛ حتی **بدون اینترنت** و مستقیم از `file://` کار می‌کند.
 
@@ -162,6 +174,7 @@ English و العربية است. رایگان و متن‌باز (MIT).
 - **مارک‌داون به DOC (MHTML)** برای Microsoft Word، با سربرگ و پانویس کاملاً آزاد.
 - **مارک‌داون به HTML**: یک فایل مستقل با قلم‌ها، سبک‌ها و تصویرهای درون فایل.
 - **مارک‌داون به PowerPoint (PPTX)**: هر `##` یک اسلاید است و پیش‌نمایش میان «سند» و «اسلاید» جابه‌جا می‌شود. چیدمان اسلاید از روی محتوا انتخاب می‌شود: کارت، گام‌ها، آمار، گاه‌شمار افقی یا عمودی، چندستونی و فهرست مطالب. نمودار وِن، چرخه، هرم، فرایند، ماتریس و درخت (سلسله‌مراتب) با شکل‌های خود PowerPoint ساخته می‌شوند، و نمودار داده از روی جدول (با Edit Data). یادداشت سخنران از کامنت‌ها می‌آید و نماد Lucide و کادر نکته هم پشتیبانی می‌شود. ارائهٔ راست‌به‌چپ قرینه چیده می‌شود. همه‌چیز قابل ویرایش است و نمایش تمام‌صفحه هم دارد. در نمای اسلاید تنها خروجی PPTX است؛ متنی که پیداست قالب اسلاید ندارد در نمای سند می‌ماند و یادداشتی دلیلش را می‌گوید. قاعدهٔ اسلاید و پرامپت آموزش آن به مدل‌ها: [`lib/SLIDES.md`](lib/SLIDES.md).
+- **مارک‌داون به اکسل (XLSX) و CSV**: نمای سوم پیش‌نمایش، **اکسل**، هر جدول را یک شیت نشان می‌دهد (نامش از عنوان بالای آن، تعداد سطر و ستون، و سطرهای اول) و خروجی‌ها **XLSX** و یک zip از فایل‌های **CSV** است. کارپوشه برای فارسی و انگلیسی قالب‌بندی‌شده می‌آید: شیت راست‌به‌چپ وقتی متن فارسی است، فونت و چینش بر اساس محتوا، سرستون رنگی و ثابت با فیلتر، سطرهای راه‌راه، پهنای ستون و تنظیمات چاپ؛ صفرهای ابتدایی و عددهای طولانی متن می‌مانند. **و برعکس:** یک CSV (UTF-8 یا Windows-1256 اکسل فارسی)، یک zip از CSVها یا یک XLSX، برای هر شیت یک عنوان و یک جدول می‌شود؛ آمادهٔ ویرایش یا دادن به مدل. CSV برای اکسل همان است که مارک‌داون برای Word: مدلی که نمی‌تواند فایل بسازد هم می‌تواند پاسخ را CSV بدهد.
 - **DOCX، PDF، HTML و متن کپی‌شده به مارک‌داون**: ورودی تمیز برای مدل‌های هوش مصنوعی؛ توکن کمتر و ساختار روشن‌تر؛ چند فایل یا یک zip با هم یک سند می‌شوند، به ترتیبی که خودتان تعیین می‌کنید: پنجره‌ای فایل‌ها را با نماد نوعشان فهرست می‌کند و فایل‌های غیرقابل تبدیل را جدا نشان می‌دهد. فایل PDF ساخته‌شده با مرورگر، Word، LibreOffice، Excel و برنامه‌های دیگر با عنوان‌ها، فهرست‌ها، جدول‌ها (با خط یا بی‌خط، حتی در چند صفحه، با خانه‌های ادغام‌شده)، کد، نقل‌قول و پیوندهایش برمی‌گردد؛ در فارسی و عربی با نیم‌فاصله‌ها، حروف و رقم‌های اصلاح‌شده؛ فرمول‌های PDFهای خود کِلک با همان LaTeX. PDF برای چاپ ساخته شده: نتیجه را بازبینی کنید؛ فایل اسکن‌شده لایهٔ OCR می‌خواهد ([چگونگی کار و محدودیت‌ها](lib/PDFIMPORT.md)).
 - **یکدست‌سازی و پاک‌سازی سند Word:** فایل docx به‌هم‌ریخته را وارد کنید و دوباره DOCX بگیرید: جهت و تراز هر پاراگراف، سلول و آیتم فهرست درست، یک مجموعه سبک واقعی Word، جدول‌های هم‌شکل و بدون قالب‌بندی‌های پراکنده.
 - **پشتیبانی کامل از GFM** ([مشخصات](https://github.github.com/gfm/)): جدول با ترازبندی، فهرست کارها، فهرست تودرتو، خط‌خوردگی، بلوک کد با رنگ‌آمیزی، نقل‌قول، پیوند و تصویر.
@@ -170,7 +183,7 @@ English و العربية است. رایگان و متن‌باز (MIT).
 - **فرمول‌های LaTeX** (`$…$`، `$$…$$`، `\(…\)` و `\[…\]`) در پیش‌نمایش و هر چهار خروجی: **معادلهٔ قابل ویرایش Word** در DOCX و DOC، برداری (vector) در PDF، و SVG یا MathML در HTML؛ معادله‌های Word هنگام ورود به LaTeX برمی‌گردند. MathJax محلی، بدون اینترنت.
 - **سبک جدول (Table style):** خطوط (بدون خط، زیر عنوان، افقی، عمودی، قاب، شبکه‌ای) × پس‌زمینه (بدون رنگ، عنوان رنگی، راه‌راه یا هر دو)، سه رنگ و سطر جمع؛ در همهٔ خروجی‌ها یکسان. بلوک کد و نقل‌قول هم رنگ‌های خودشان را دارند.
 - بزرگ‌کردن ویرایشگر یا پیش‌نمایش؛ «پاک کردن و چسباندن» (Clear & paste) محتوای کلیپ‌بورد را سند می‌کند؛ پوستهٔ روشن و تیره.
-- سربرگ و پانویس (ساختاریافته، ساده یا HTML دلخواه)، عنوان و نسخهٔ خودکار، یک انتخاب فونت برای همهٔ خروجی‌ها (یا فونت دیگری برای DOCX و PPTX)، فونت‌های جاسازی‌شده در DOCX و PPTX، صفحه‌های A3 تا A5، Letter و Legal، و قلم کد هم‌عرض (monospace) که برای فارسی و عربی ساخته شده.
+- سربرگ و پانویس (ساختاریافته، ساده یا HTML دلخواه)، عنوان و نسخهٔ خودکار، یک انتخاب فونت برای همهٔ خروجی‌ها (یا فونت دیگری برای DOCX و PPTX؛ XLSX فونت‌های خودش را دارد، چون اکسل فونت را درون فایل نمی‌گذارد)، فونت‌های جاسازی‌شده در DOCX و PPTX، صفحه‌های A3 تا A5، Letter و Legal، و قلم کد هم‌عرض (monospace) که برای فارسی و عربی ساخته شده.
 
 | خروجی | مناسب برای | قلم‌ها |
 |---|---|---|
@@ -179,8 +192,12 @@ English و العربية است. رایگان و متن‌باز (MIT).
 | **DOC** (MHTML) | سربرگ و پانویس آزاد؛ فقط Microsoft Word | باید نصب باشد |
 | **HTML** | صفحهٔ مستقل برای وب یا بایگانی | درون فایل |
 | **PPTX** | ارائه: اسلاید، نمودار و دیاگرام قابل ویرایش، یادداشت سخنران | باید نصب باشد |
+| **XLSX** | داده در اکسل: هر جدول یک شیت، قالب‌بندی‌شده | باید نصب باشد (اکسل فونت را درون فایل نمی‌گذارد) |
+| **CSV** | داده برای هر ابزار و مدل: یک zip، یک فایل برای هر شیت | — |
 
 ![نمای اسلاید کِلک: نمونهٔ «سواد هوش مصنوعی» به‌صورت اسلاید، با تنظیمات اسلاید](docs/screenshots/kelk-slides-fa.png)
+
+![نمای اکسل کِلک: نمونهٔ اکسل به‌صورت شیت، با تنظیمات اکسل](docs/screenshots/kelk-excel-fa.png)
 
 ![فرمول‌های LaTeX در کِلک: پیش‌نمایش بخش 6.5 نمونه‌ها](docs/screenshots/kelk-math-fa.png)
 
@@ -212,11 +229,11 @@ Vazirmatn، Vazir Code و Sahel کار زنده‌یاد [صابر راستی‌
 <a id="ar"></a>
 <div dir="rtl">
 
-## كِلك — تحويل ماركداون إلى Word وPowerPoint وPDF وHTML وبالعكس، في المتصفح
+## كِلك — تحويل ماركداون إلى Word وPowerPoint وExcel وPDF وHTML وبالعكس، في المتصفح
 
 يحوّل **كِلك** نص **ماركداون** — مع دعم كامل لـ **GitHub Flavored Markdown (GFM)** — إلى
-**Word DOCX** و**Word DOC (MHTML)** و**شرائح PowerPoint (PPTX)** و**PDF** وصفحة **HTML مستقلة**، ويعيد **ملفات Word (.docx)
-وPDF وHTML والنص المنسوخ من Word أو الويب إلى ماركداون**. يعمل كل شيء **بالكامل في متصفحك
+**Word DOCX** و**Word DOC (MHTML)** و**شرائح PowerPoint (PPTX)** و**مصنفات Excel (XLSX) وCSV** و**PDF** وصفحة **HTML مستقلة**،
+ويعيد **ملفات Word (.docx) وPDF وHTML وCSV وExcel (.xlsx) والنص المنسوخ من Word أو الويب إلى ماركداون**. يعمل كل شيء **بالكامل في متصفحك
 (client-side)**: بلا خادم، ولا رفع ملفات، ولا حساب، ولا تثبيت؛ ويعمل حتى **دون إنترنت** من `file://`.
 
 يعالج **النصوص من اليمين إلى اليسار وثنائية الاتجاه (BiDi)** — **العربية والفارسية والعبرية
@@ -236,6 +253,7 @@ Vazirmatn، Vazir Code و Sahel کار زنده‌یاد [صابر راستی‌
 - **ماركداون إلى DOC (MHTML)** لبرنامج Microsoft Word، برأس وتذييل حرّين تمامًا.
 - **ماركداون إلى HTML**: ملف واحد مستقل بخطوطه وأنماطه وصوره.
 - **ماركداون إلى PowerPoint (PPTX)**: كل `##` شريحة، وتنتقل المعاينة بين «مستند» و«شرائح». يُختار تخطيط الشريحة بحسب محتواها: بطاقات، وخطوات، وإحصاءات، وخط زمني أفقي أو عمودي، وأعمدة، وجدول محتويات. تُرسم المخططات بأشكال PowerPoint نفسها: عملية، ودورة، وهرم، وتسلسل هرمي، ومصفوفة، وفِن. وتُصنع مخططات البيانات من الجداول (مع Edit Data)، وتأتي ملاحظات المتحدث من التعليقات، وتُدعم أيقونات Lucide ومربعات الملاحظة. تُعكس شرائح العروض من اليمين إلى اليسار. كل شيء قابل للتحرير، ويتوفر عرض بملء الشاشة. في عرض الشرائح التصدير الوحيد هو PPTX؛ والنص الذي ليس بتنسيق الشرائح بوضوح يبقى مستندًا، مع ملاحظة تبيّن السبب. القاعدة وموجّه يعلّمها لنماذج الذكاء الاصطناعي: [`lib/SLIDES.md`](lib/SLIDES.md).
+- **ماركداون إلى Excel (XLSX) وCSV**: العرض الثالث في المعاينة، **Excel**، يعرض كل جدول ورقةً (اسمها من العنوان فوقه، وعدد صفوفها وأعمدتها، وصفوفها الأولى)، والتصدير **XLSX** وملف zip من ملفات **CSV**. ويأتي المصنف منسَّقًا للعربية والإنجليزية معًا: ورقة من اليمين إلى اليسار حين يكون النص كذلك، وخطوط ومحاذاة بحسب المحتوى، وصف عناوين ملوّن مثبّت مع عامل تصفية، وصفوف مخططة، وعرض أعمدة، وإعدادات طباعة؛ وتبقى الأصفار في البداية والأعداد الطويلة نصًّا. **وبالعكس:** ملف CSV (UTF-8 أو Windows-1256 من Excel العربي والفارسي) أو zip من ملفات CSV أو ملف XLSX يصبح عنوانًا وجدولًا لكل ورقة، جاهزًا للتحرير أو لإعطائه نموذجًا. ملف CSV بالنسبة إلى Excel كالماركداون بالنسبة إلى Word: النموذج الذي لا يصنع ملفات يستطيع أن يجيب بـ CSV.
 - **DOCX وPDF وHTML والنص الملصوق إلى ماركداون**: مدخلات نظيفة لنماذج الذكاء الاصطناعي؛ رموز أقل وبنية أوضح؛ وتصبح عدة ملفات أو ملف zip مستندًا واحدًا بالترتيب الذي تحدده: تعرض نافذة الملفات برمز نوعها، وتميّز الملفات التي لا يمكن تحويلها. يعود ملف PDF المصنوع بالمتصفح أو Word أو LibreOffice أو Excel وغيرها بعناوينه وقوائمه وجداوله (بخطوط أو دونها، وعبر الصفحات، مع الخلايا المدمجة) وشيفرته واقتباساته وروابطه؛ وبالعربية والفارسية مع إصلاح فواصل ZWNJ والحروف والأرقام؛ وتعود صيغ ملفات PDF التي صنعها كِلك بنص LaTeX نفسه. صُنع PDF للطباعة: راجع النتيجة، والملف الممسوح ضوئيًا يحتاج إلى طبقة OCR ([كيف يعمل وحدوده](lib/PDFIMPORT.md)).
 - **توحيد مستند Word وتنظيفه:** استورد ملف docx مبعثرًا وصدّره DOCX من جديد: اتجاه كل فقرة وخلية وعنصر قائمة ومحاذاته صحيحان، ومجموعة واحدة من أنماط Word الحقيقية، وجداول متشابهة، بلا تنسيقات متفرقة.
 - **دعم كامل لـ GFM** ([المواصفات](https://github.github.com/gfm/)): جداول بمحاذاة، وقوائم مهام، وقوائم متداخلة، وشطب، وكتل شيفرة ملوّنة، واقتباسات، وروابط، وصور.
@@ -244,7 +262,7 @@ Vazirmatn، Vazir Code و Sahel کار زنده‌یاد [صابر راستی‌
 - **صيغ LaTeX** (`$…$` و`$$…$$` و`\(…\)` و`\[…\]`) في المعاينة والمخرجات الأربعة: **معادلات Word قابلة للتحرير** في DOCX وDOC، ومتجهات (vector) في PDF، وSVG أو MathML في HTML؛ وتعود معادلات Word إلى LaTeX عند الاستيراد. MathJax محلي، بلا إنترنت.
 - **نمط الجدول (Table style):** الخطوط (بلا خطوط، تحت الرأس، أفقية، عمودية، إطار، شبكي) × التعبئة (بلا تعبئة، رأس ملوَّن، تخطيط أو كلاهما)، وثلاثة ألوان، وصف مجموع؛ واحد في كل المخرجات. ولكتل الشيفرة والاقتباسات ألوانها أيضًا.
 - تكبير المحرّر أو المعاينة؛ و«مسح ولصق» يجعل محتوى الحافظة هو المستند؛ ومظهر فاتح وداكن.
-- رأس وتذييل (منظَّم، أو بسيط، أو HTML حرّ)، وعنوان وإصدار تلقائيان، واختيار خط واحد لكل المخرجات (أو خطوط أخرى لـ DOCX وPPTX)، وخطوط مضمَّنة في DOCX وPPTX، وصفحات من A3 إلى A5 وLetter وLegal، وخط شيفرة ثابت العرض (monospace) مصمَّم للعربية والفارسية.
+- رأس وتذييل (منظَّم، أو بسيط، أو HTML حرّ)، وعنوان وإصدار تلقائيان، واختيار خط واحد لكل المخرجات (أو خطوط أخرى لـ DOCX وPPTX؛ ولـ XLSX خطوطه الخاصة، لأن Excel لا يستطيع تضمين الخطوط)، وخطوط مضمَّنة في DOCX وPPTX، وصفحات من A3 إلى A5 وLetter وLegal، وخط شيفرة ثابت العرض (monospace) مصمَّم للعربية والفارسية.
 - **الخطوط:** Vazirmatn، الخط الافتراضي، يدعم العربية؛ ويمكن تجهيز خطوط عربية مثل Cairo وAmiri وNoto Naskh Arabic لملفات PDF.
 
 | الصيغة | الأنسب لـ | الخطوط |
@@ -254,8 +272,12 @@ Vazirmatn، Vazir Code و Sahel کار زنده‌یاد [صابر راستی‌
 | **DOC** (MHTML) | رأس وتذييل حرّان؛ Microsoft Word فقط | يجب أن تكون مثبّتة |
 | **HTML** | صفحة مستقلة للويب أو الأرشيف | مضمَّنة |
 | **PPTX** | عرض تقديمي: شرائح ومخططات قابلة للتحرير، وملاحظات المتحدث | يجب أن تكون مثبّتة |
+| **XLSX** | بيانات في Excel: كل جدول ورقة، منسَّقة | يجب أن تكون مثبّتة (لا يستطيع Excel تضمين الخطوط) |
+| **CSV** | بيانات لأي أداة أو نموذج: ملف zip، ملف لكل ورقة | — |
 
 ![عرض الشرائح في كِلك: نموذج «محو الأمية في الذكاء الاصطناعي» شرائحَ، مع إعدادات الشرائح](docs/screenshots/kelk-slides-ar.png)
+
+![عرض Excel في كِلك: نموذج Excel أوراقًا، مع إعدادات Excel](docs/screenshots/kelk-excel-ar.png)
 
 ![صيغ LaTeX في كِلك: معاينة القسم 6.5 من النماذج](docs/screenshots/kelk-math-ar.png)
 

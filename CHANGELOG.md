@@ -45,6 +45,7 @@ All notable changes to Kelk. Dates are those of the release tags.
   its own block, a finger too. Narrower tables still fit the pane. The Excel view's sheets do the same.
 - **The link preview** (og-image.png, from tools/og-image.html) shows a sheet beside the page and the slide, and XLSX
   among the outputs; the page's title and description name Excel and CSV.
+- **The README** (fa, en, ar) and lib/README describe Excel and CSV, with a screenshot of the Excel view in each language.
 - **About Kelk and samples**: a new section, 3.2 «Excel and CSV», with the three flows as its parts (Markdown to
   Excel, CSV to Excel, Excel to CSV), and XLSX, CSV, csv and xlsx in the outputs and import tables, in all three
   languages.
