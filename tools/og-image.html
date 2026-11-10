@@ -42,6 +42,8 @@
   .meaning { margin-top: 12px; font-size: 21px; color: var(--muted); }
   .meaning b { color: var(--accent); font-weight: 700; }
   .tag { margin-top: 40px; font-size: 25px; font-weight: 700; line-height: 1.4; white-space: nowrap; }
+  .tag .arrows { width: 1.15em; height: 1.15em; vertical-align: -0.2em; fill: none; stroke: var(--accent); stroke-width: 2.25;
+                 stroke-linecap: round; stroke-linejoin: round; margin: 0 2px; }
   .tag-fa { margin-top: 10px; font-size: 25px; font-weight: 600; color: var(--muted); direction: rtl; text-align: left; }
   .chips { margin-top: 36px; display: flex; gap: 8px; align-items: center; }
   .chip { padding: 7px 11px; border-radius: 10px; font-size: 18px; white-space: nowrap; font-weight: 800; color: var(--accent);
@@ -103,7 +105,8 @@
         <div class="meaning"><b>kelk</b> — the reed pen of Persian calligraphy</div>
       </div>
     </div>
-    <div class="tag">Markdown → Word, PowerPoint, Excel, PDF, HTML<br>and back to Markdown — in your browser</div>
+    <!-- the two-way conversion as the page's tagline draws it: Lucide arrow-left-right (index.html .tag-arrows) -->
+    <div class="tag">Markdown <svg class="arrows" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg> Word, PowerPoint, Excel, PDF, HTML<br>entirely in your browser</div>
     <div class="tag-fa">راست‌به‌چپ، با فرمول‌های LaTeX؛ بدون اینترنت</div>
     <div class="chips"><span class="chip on">DOCX</span><span class="chip">PPTX</span><span class="chip">XLSX</span><span class="chip">PDF</span><span class="chip">HTML</span><span class="chip back">PDF → MD</span></div>
   </div>
