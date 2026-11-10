@@ -108,6 +108,8 @@ Kelk supports **GitHub Flavored Markdown** in full ([GFM spec](https://github.gi
 | **HTML** | a standalone page for the web or an archive | inside the file | opens offline |
 | **MD** | the text itself, to edit later or give a model | — | the MD button in the text panel |
 | **PPTX** | a talk: slides you can edit, with speaker notes | must be installed | the Slides view shows it first |
+| **XLSX** | data for Excel: each table a sheet | must be installed | in the Excel view; Excel cannot embed fonts |
+| **CSV** | data for any tool or model | — | a zip with one file per sheet |
 
 - **PDF** comes from Kelk's own layout engine: Arabic-script shaping, diacritics, a table of contents with page numbers, and fonts embedded in the file. To simply send a document, PDF is the easiest.
 - **DOCX** is a standard Word document. If the document will be edited, DOCX is the better choice.
@@ -124,6 +126,7 @@ Kelk supports **GitHub Flavored Markdown** in full ([GFM spec](https://github.gi
 | **docx** | headings, lists, tables, images, and Word equations as LaTeX |
 | **html**, and text pasted from Word or the web | the page's structure as Markdown; KaTeX, MathJax and Wikipedia formulas as LaTeX |
 | **pdf** | the document's text and structure (section 1.4); formulas of Kelk's own PDFs as LaTeX |
+| **csv**, **xlsx** | each sheet a heading and a table (section 3.2) |
 | **several files**, or a **zip** | one document, with the separator of the app settings between the files; first a window lists them with their kind, in name order: drag them into another order or leave some out — files that cannot be converted are listed apart. A zip's images are found too |
 
 The MD button saves the text with its images (inside the file), and importing it again brings them back.
@@ -150,6 +153,28 @@ Everything in the .pptx stays editable: text, diagrams as PowerPoint shapes, cha
 > 💡 **How to:** in the Slides view the sample button opens a 33-slide deck on AI literacy that uses every layout, chart and diagram. **Present** (F5) shows it full screen.
 
 ---
+
+### 3.2 Excel and CSV
+
+CSV is to Excel what Markdown is to Word: plain text any tool can read and write. For work with language models this matters: the same table as CSV or a Markdown table takes far fewer tokens and is within reach of any model, even one that cannot make files at all — just ask for the answer as a table or as CSV text.
+
+The **Excel** button above the preview shows each table of the text as a sheet: its name, its rows and columns, and its first rows (how many: Settings → Excel; the files hold every row). The **XLSX** button makes an Excel workbook, the **CSV** button a zip with one file per sheet. A text without a table keeps its view, with a report saying why. The Excel view has its own sample.
+
+#### 3.2.1 Markdown to Excel
+
+Each table becomes a sheet, named by the heading or bold line above it — or, in Settings → Excel, all tables one after another in one sheet. Paste a model's answer straight in. The workbook comes formatted: a right-to-left sheet when most of its text is Persian or Arabic, separate fonts for Persian and English cells, alignment by content, a colored and frozen header row with a filter, striped rows, borders, columns as wide as their content, and print settings. A code with leading zeros (`0012`) and a number of more than 15 digits stay text; links stay links, and `<br>` is a line break inside the cell.
+
+> ⚠️ **Excel cannot embed fonts:** the file only names them. So XLSX has fonts of its own (Settings → Fonts): B Nazanin for Persian and Calibri for Latin, found on most Persian-language computers.
+
+#### 3.2.2 CSV to Excel
+
+Import a CSV file, or paste CSV text in the Excel view: each file becomes a heading and a table in the editor, editable right there. Several CSVs, or a zip of them, open the order dialog, which shows each file's rows, columns, encoding and separator. The encoding (UTF-8, UTF-16, or Windows-1256 — Persian Windows Excel's "CSV (Comma delimited)") and the separator (`,` `;` Tab `|`) are found by themselves. A zip with both CSVs and documents asks which to import. After the import, a report shows a summary table of the sheets. More than 100,000 cells is refused: the editor would slow down.
+
+> 💡 **Tip:** if a value holds a comma itself, ask the model to put the values in straight double quotes (`"`), or the columns shift.
+
+#### 3.2.3 Excel to CSV
+
+For when you want to give a table to a model: import an XLSX file (on its own; an XLSX inside a zip is not imported). Each sheet becomes a table with the values Excel shows, and merged cells behave as in Word and PDF import. Then take the sheets as a zip with the **CSV** button, or paste the tables straight into the chat. Formulas (their values come), formatting and link targets do not come in.
 
 ## 4. Settings worth knowing
 
