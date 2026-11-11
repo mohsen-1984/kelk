@@ -12,6 +12,8 @@ All notable changes to Kelk. Dates are those of the release tags.
   (the application, the drawing engine, the production path) is a group of its own, labelled a guess, with its
   evidence; the operating system only when the file itself names it, never from the fonts. DOCX and HTML imports
   get the same report panel when they have something to show.
+- **Copy the file information as a table**: a button under it copies it as Markdown (GFM) tables — the file's own
+  words, then Kelk's guesses with their evidence.
 
 ### Changed
 
