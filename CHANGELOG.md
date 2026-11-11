@@ -21,6 +21,10 @@ All notable changes to Kelk. Dates are those of the release tags.
 - **The Excel samples show an LTR sheet next to RTL ones**: the Persian and Arabic samples' *Products* sheet is all
   English, so it opens left to right; the English sample has no Persian sheet, only a small *Other scripts* sheet with
   a few Persian and Arabic cells (it opens right to left, by the rule of any RTL cell).
+- **Excel: wrapping split in two** (Settings → Excel): *Wrap text in header rows* (default: all cells) and *Wrap text in
+  other rows* (default: none, as before), in the page and in `XlsxBuilder` (`excel.wrapHead`, `excel.wrap`). Columns
+  keep their widths; a header wraps when its column is narrower than its text or it holds a `<br>`, and only then
+  loses its fixed height.
 - **Every progress state names its step** (the rule since 2.7: no generic progress anywhere in Kelk): one step helper for
   every task, in fa / en / ar; a state without its step is refused. The slides preview's window shows the step named
   before it opened (it opened with an empty line).

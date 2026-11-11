@@ -99,7 +99,7 @@
                       decoration: 'auto', bullet: '•', logo: 'all' },
             // Excel (lib/XlsxBuilder: its DEFAULTS, the same values) and the Excel view's preview (previewRows)
             excel: { sheets: 'each', gap: 2, titleRow: true, direction: 'auto', zeros: true, links: true, breaks: true,
-                     wrap: 'none', thousands: false, headerColor: '#E4E9EF', stripes: true, stripeColor: '#F5F7FA',
+                     wrapHead: 'all', wrap: 'none', thousands: false, headerColor: '#E4E9EF', stripes: true, stripeColor: '#F5F7FA',
                      headerBorder: 'all', headerBorderWidth: 'thin', headerBorderColor: '#A9B5C4',
                      bodyBorder: 'all', bodyBorderWidth: 'thin', bodyBorderColor: '#A9B5C4', headerHeight: 21,
                      filter: true, freeze: true, columns: 'content', paper: 'A4', orientation: 'auto', margins: 'kelk',

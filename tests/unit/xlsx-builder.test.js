@@ -164,3 +164,17 @@ test('configure: an unknown key throws', function () {
   assert.throws(() => XlsxBuilder.create().configure({ nope: 1 }), /unknown option/);
   assert.throws(() => XlsxBuilder.create().configure({ excel: { nope: 1 } }), /unknown excel option/);
 });
+
+test('wrapping: header rows and the other rows each have their own setting (by default the header wraps, the rest not)', async function () {
+  const wraps = async (excel, md) => {
+    const b = XlsxBuilder.create().configure({ excel: excel || {} }).addFromMarkdown(md, { marked });
+    const r = await read(b), styles = await r.xml('xl/styles.xml'), sheet = await r.xml('xl/worksheets/sheet1.xml');
+    const xfs = styles.split('<cellXfs')[1].split('</cellXfs>')[0].match(/<xf\b[^]*?(?:\/>|<\/xf>)/g);
+    const at = (ref) => /wrapText="1"/.test(xfs[+new RegExp('<c r="' + ref + '" s="(\\d+)"').exec(sheet)[1]]);
+    return { head: at('A1'), body: at('A2'), height: /<row r="1"[^>]*\bht="21"/.test(sheet) };
+  };
+  const md = '| Name<br>first | Age |\n|-|-|\n| Ann<br>Lee | 31 |';
+  assert.deepEqual(await wraps(null, md), { head: true, body: false, height: false });                  // the header's <br> wraps
+  assert.deepEqual(await wraps(null, '| Name | Age |\n|-|-|\n| Ann | 31 |'), { head: true, body: false, height: true });   // fits: 21 pt
+  assert.deepEqual(await wraps({ wrapHead: 'none', wrap: 'all' }, md), { head: false, body: true, height: true });
+});
