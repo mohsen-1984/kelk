@@ -17,7 +17,8 @@
         // after the last page is read, the font repairs, the layout and the Markdown still take about two thirds of the time
         importProgress: { read: 0.33, fonts: 0.17, lines: 0.08, layout: 0.37, markdown: 0.05 },
         // a PowerPoint export's progress bar (slides.js blob): each step's share, measured on decks of 200–430 slides
-        pptxProgress: { model: 0.05, build: 0.03, write: 0.5, slides: 0.22, zip: 0.2 },
+        // (libs: PptxGenJS on the first export, not measured)
+        pptxProgress: { libs: 0.02, model: 0.05, build: 0.03, write: 0.5, slides: 0.22, zip: 0.2 },
         // the slides preview's bar (slides.js render): the icon set on first use, formulas, pictures, the layout; shown
         // only for work longer than progressDelayMs
         slidesProgress: { libs: 0.3, math: 0.1, images: 0.1, layout: 0.5 },

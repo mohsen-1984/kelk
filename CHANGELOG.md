@@ -4,6 +4,12 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+### Changed
+
+- **Every progress state names its step** (the rule since 2.7: no generic progress anywhere in Kelk): one step helper for
+  every task, in fa / en / ar; a state without its step is refused. The slides preview's window shows the step named
+  before it opened (it opened with an empty line).
+
 ## [2.6] — 2026-11-10
 
 Excel and CSV: the standalone CSV / Markdown ⇆ XLSX page joins Kelk.

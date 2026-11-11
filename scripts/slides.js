@@ -21,24 +21,6 @@
      * Icons (:name: before a lead): the full Lucide set (vendor), loaded on the first icon. The page's own
      * icons (assets/icons.js) keep window.lucide: the full library is read and the page's object put back.
      */
-    /**
-     * Steps → a progress bar and its detail line (t: Kelk.ui.task's api, or Kelk.ui.bar's): W { step: share }, in order
-     * — the shares of the steps given are scaled to fill the bar; KEY { step: string key }; the step `count` reads
-     * «N of M» ({0} of {1}).
-     */
-    function stepper(t, W, KEY, count) {
-        const order = Object.keys(W), sum = order.reduce(function (n, k) { return n + W[k]; }, 0);
-        let shown = -1;
-        return function (name, done, total) {
-            if (!t || !(name in W)) return;
-            const before = order.slice(0, order.indexOf(name)).reduce(function (n, k) { return n + W[k]; }, 0);
-            const per = Math.round((before + W[name] * (total ? Math.min(1, done / total) : 0)) / sum * 1000);
-            if (per === shown) return;
-            shown = per;
-            t.progress(per, 1000, name === count ? K.i18n.t(KEY[name], Math.min(done + 1, total), total) : K.i18n.t(KEY[name]));
-        };
-    }
-
     /** the text names a Lucide icon and the icon set is not loaded yet (its first use) */
     function iconsWanted(md) { return !icons && /(^|\n)\s*(?:[-*+]|\d+[.)])\s+:[a-z0-9-]+:/.test(md); }
 
@@ -319,14 +301,14 @@
             const KEY = { libs: 'sp_libs', math: 'sp_math', images: 'sp_images', layout: 'sp_layout' };
             const W = Object.assign({}, K.config.slidesProgress);
             if (!iconsWanted(md)) delete W.libs;
-            const step = stepper(bar, W, KEY, 'layout');
+            const step = K.ui.steps(bar, W, KEY, 'layout');
             // a build overtaken by a newer one, or by the switch to the document view, stops at its next step
             const live = function (name, done, total) { if (my !== gen) throw STALE; step(name, done, total); return K.ui.paint(); };
             // the first build is long (the libraries, the formulas, every slide's layout): its window opens at once
+            step(W.libs ? 'libs' : 'math', 0, 1);                  // named before the window opens (at once on the first build)
             bar.start(K.i18n.t('sp_busy'), !built);
             try {
                 if (!built) await K.ui.paint();
-                if (W.libs) step('libs', 0, 1);
                 await needIcons(md);
                 const b = builder();
                 const m = await b.model({ onProgress: live });
@@ -375,10 +357,12 @@
          */
         blob: async function (t) {
             const md = K.editor.value();
-            const KEY = { model: 'pptx_model', build: 'pptx_build', write: 'pptx_write', slides: 'pptx_slides', zip: 'pptx_zip' };
-            const step = stepper(t, K.config.pptxProgress, KEY, 'slides');
+            const KEY = { libs: 'pptx_libs', model: 'pptx_model', build: 'pptx_build', write: 'pptx_write', slides: 'pptx_slides', zip: 'pptx_zip' };
+            const step = K.ui.steps(t, K.config.pptxProgress, KEY, 'slides');
+            // PptxGenJS on the first export, the icon set on the first icon: named only when they load
+            if (!K.libs.loaded('pptx')) { step('libs', 0, 1); await K.libs.need('pptx'); }
             step('model', 0, 1);
-            await Promise.all([K.libs.need('pptx'), needIcons(md)]);
+            await needIcons(md);
             const b = builder();
             const m = await b.model();
             await K.ui.paint();
