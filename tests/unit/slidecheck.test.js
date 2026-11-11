@@ -86,6 +86,8 @@ test('before a PPTX export: a text that fits exports; one that no longer does sh
     assert.equal(shown.length, 1);
     assert.equal(shown[0].brief(), 'sc_exportBrief');
     assert.equal(shown[0].buttons[0].label(), 'sc_exportAnyway');
+    // Copy report (2.8): the report as Markdown — a heading, the summary, the findings as a list, the prompt's advice
+    assert.equal(shown[0].copy(), '## sc_title\n\nsc_export\n\n**rep_findingsHead**\n\n- sc_noSlides\n\nsc_prompt\n');
     shown[0].buttons[0].run();
     assert.equal(anyway, 1);
   } finally { delete globalThis.Kelk; }

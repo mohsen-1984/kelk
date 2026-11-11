@@ -12,6 +12,7 @@ All notable changes to Kelk. Dates are those of the release tags.
 - **The import report reads more easily**: the same *Copy report* in every import's panel (PDF, DOCX, HTML, XLSX);
   more room between findings, the file information's rows ruled like the pages table, and the panel's body a little
   taller on small screens (never under 160 px), the editor's foot still on screen at 800 px high.
+- **The slide-format check's panel** has *Copy report* too: its summary, findings and advice as Markdown.
 
 ### Fixed
 
