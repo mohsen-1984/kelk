@@ -134,8 +134,17 @@
      * The steps of a document's import (Kelk.ui.steps: every one named), each kind its own: the library on first use
      * (named only when it loads), the file read, the conversion; a PDF's are in fromPdf. Rough shares, not measured.
      */
-    const DOC_STEPS = { libs: 0.1, file: 0.1, images: 0.2, convert: 0.6 };
-    const DOC_KEYS = { libs: 'imp_docxLibs', file: 'imp_file', images: 'imp_mdImages', convert: 'imp_html' };
+    const DOC_STEPS = { libs: 0.1, file: 0.1, info: 0.05, images: 0.2, convert: 0.55 };
+    const DOC_KEYS = { libs: 'imp_docxLibs', file: 'imp_file', info: 'imp_info', images: 'imp_mdImages', convert: 'imp_html' };
+
+    /**
+     * The file's information for the import report (scripts/fileinfo.js, loaded on the first import that has some):
+     * read(fi) → info, or null when the module cannot load (the import goes on without it).
+     */
+    async function fileInfo(step, read) {
+        step('info', 0, 1);
+        try { return await read(await K.libs.need('fileinfo')); } catch (e) { return null; }
+    }
 
     /** One document → { md, converted } (a PDF: and report, bytes); null when its kind is not known. */
     async function convert(file, name, t, o) {
@@ -151,19 +160,21 @@
         if (X.html.indexOf(e) >= 0) {
             step('file', 0, 1);
             const text = await readText(file);
+            const info = await fileInfo(step, function (fi) { return fi.fromHtml(text); });
             step('convert', 0, 1);
             await K.ui.paint();                      // the conversion holds the page: its name first
-            return { md: importer().fromHtml(text).markdown, converted: true };
+            return { md: importer().fromHtml(text).markdown, converted: true, info: info, kind: 'html' };
         }
         if (docx) {
             if (!K.libs.loaded('mammoth')) { step('libs', 0, 1); await K.libs.need('mammoth'); }   // loaded on the first .docx import
             step('file', 0, 1);
             const buf = await readBuffer(file);
+            const info = await fileInfo(step, function (fi) { return fi.fromOffice(new Uint8Array(buf)); });   // docProps
             step('convert', 0, 1);
             await K.ui.paint();
             const r = await importer().fromDocx(buf);
             if (r.messages && r.messages.length) console.info('mammoth:', r.messages);
-            return { md: r.markdown, converted: true };
+            return { md: r.markdown, converted: true, info: info, kind: 'docx' };
         }
         if (X.pdf.indexOf(e) >= 0) return Object.assign({ converted: true }, await fromPdf(file, name, t, o));
         K.ui.toast(K.i18n.t('unsupported', e || name), 'error');
@@ -195,6 +206,10 @@
             await K.libs.need('pdfjs');              // loaded on the first .pdf import
             await K.libs.need('pdfimport');          // PdfImporter and its parts, after pdf.js (as its header says)
         }
+        // the file's information for the report (scripts/fileinfo.js): with the libraries, on the first import
+        let fi = null;
+        if (!K.libs.loaded('fileinfo')) step('libs', 0, 1);
+        try { fi = await K.libs.need('fileinfo'); } catch (e) { fi = null; }
         const set = K.store.getUi('importer'), base = name.replace(/\.[^.]+$/, '');
         step('file', 0, 1);
         const buf = await readBuffer(file), bytes = o && o.keepBytes ? new Uint8Array(buf.slice(0)) : null;
@@ -229,7 +244,7 @@
                 if (mode) opts.mode = hooks.mode = mode;
                 const r = await PdfImporter.create(opts).fromArrayBuffer(buf, hooks);
                 if (r.messages && r.messages.length) console.info('PdfImporter:', r.messages);
-                return { md: r.markdown, report: K.importReport.fromResult(r), bytes: bytes };
+                return { md: r.markdown, report: K.importReport.fromResult(r), bytes: bytes, info: fi ? fi.fromPdf(r) : null, kind: 'pdf' };
             } finally { K.images.flush(); }
         });
     }
@@ -343,7 +358,8 @@
                         const r = await convert(d.file, d.name, t, co);
                         if (r == null) continue;
                         if (Object.keys(set.pics).length) t.progress(1000, 1000, K.i18n.t('imp_pics'));   // the zip's pictures the text names
-                        out.push({ name: d.name, md: await placeImages(r.md, d.path, set.pics), converted: r.converted, report: r.report, bytes: r.bytes });
+                        out.push({ name: d.name, md: await placeImages(r.md, d.path, set.pics), converted: r.converted, report: r.report, bytes: r.bytes,
+                            info: r.info, kind: r.kind });
                     }
                     return out;
                 });
@@ -357,13 +373,14 @@
             K.editor.markConverted(parts.some(function (p) { return p.converted; }));
             setTimeout(function () { if (K.slides) K.slides.checkIncoming(); }, 0);          // after the import's report: in Slides, the slide check
             K.ui.toast(parts.length > 1 ? K.i18n.t('loadedN', parts.length) : K.i18n.t('loaded', name));
-            const reports = parts.filter(function (p) { return p.report; });
+            // a PDF's report, and any file's information (an empty report beside it): nothing to show, no panel
+            const reports = parts.filter(function (p) { return p.report || (p.info && K.fileInfo && K.fileInfo.any(p.info)); });
             const one = parts.length === 1 && reports.length === 1 ? parts[0] : null;
             // the bytes: held by the safe-mode action only (the panel's), not by parts, the task's promise or this
             // function's scope (safeAction: a closure of its own — one here would share the scope with the task's)
             const onSafe = one && one.bytes ? safeAction(one.bytes, one.name) : null;
             parts.forEach(function (p) { p.bytes = null; });
-            K.ui.report(one ? one.report : reports.map(function (p) { return { name: p.name, report: p.report }; }), {
+            K.ui.report(reports.map(function (p) { return { name: p.name, report: p.report || K.importReport.none(), info: p.info, kind: p.kind }; }), {
                 name: one ? one.name : '',
                 onSafe: onSafe
             });

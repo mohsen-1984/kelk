@@ -45,6 +45,8 @@ const DYNAMIC = [
     { file: 'scripts/slidecheck.js', prefix: 'sc_' },
     // the Excel view (loaded on demand, its words with it)
     { file: 'scripts/sheets.js', prefix: 'xs_' },
+    // the imported file's information in the import report (loaded on demand, its words with it)
+    { file: 'scripts/fileinfo.js', prefix: 'fi_' },
     // Kelk.i18n.relabel(): the markup's own keys, checked above from index.html
     { file: 'scripts/i18n.js', arg: 'k' },
     { file: 'scripts/i18n.js', arg: 'kv[1].trim()' }
@@ -60,7 +62,7 @@ const read = function (f) {
  * STRINGS of scripts/i18n.js, run in a sandbox with an empty window — and the words of the modules loaded on
  * demand (LAZY: each adds its own table to Kelk.i18n's when it loads), run in the same window after it.
  */
-const LAZY = ['scripts/slidecheck.js', 'scripts/sheets.js'];
+const LAZY = ['scripts/slidecheck.js', 'scripts/sheets.js', 'scripts/fileinfo.js'];
 function tables() {
     const sandbox = { window: {} };
     vm.runInNewContext(read('scripts/i18n.js'), sandbox, { filename: 'scripts/i18n.js' });

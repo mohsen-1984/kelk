@@ -331,7 +331,10 @@ r.failedPages;                  // pages that could not be read or laid out (the
 // options.signal: an AbortSignal — the import stops at the next page with err.code 'aborted'
 // options.asciiNumbers (true): ۰–۹ / ٠–٩ → 0–9, and inside a number ٬ ، → ',' · ٫ → '.' · ٪ → '%' (code untouched)
 // options.persianLetters (true): in a Persian document, ي ك ى → ی ک ی (an Arabic document keeps its letters)
-r.profile;                      // who made it: { engine, app, version, os: { value, confidence, evidence }, path,
+r.info;                         // the file's own words, as written: { title, author, subject, keywords, creator, producer,
+                                //   creatorTool, xmpProducer, history, created, modified, pdfVersion, pages, pageSize,
+                                //   lang, tagged, outline, pageLabels, encrypted, fonts } (PDFIMPORT.md §2a)
+r.profile;                      // who made it: { engine, app, version, os: { value, confidence, evidence, stated }, path,
                                 //   postprocessors, tagged, outline, pageLabels, text: { invisible, type3 } } (PDFIMPORT.md §2a)
 PdfImporter.provenance({ producer, creator, xmp, fonts });   // the same, as a pure function
 r.profile.tagged;               // { marked, structTree, cover, sem, trust, roles, headings } — the structure tree, measured
