@@ -107,6 +107,7 @@ runs and the tools need none of those — only Node and Playwright.
 | `chrome-tagged` | `chrome-github-nobg-hf` with a structure tree and an outline (`tagged`, `outline`: what desktop Chrome writes) | its Markdown must equal its untagged twin's — tagging alone must not move the importer |
 | `chrome-layout`, `chrome-mono` | Chromium: the layout pages; the monospace document | |
 | `chrome-float-tagged` | `infobox.md` as an encyclopedia prints from Chrome / Edge (`make-infobox.js`, tagged): a framed table floated beside a squeezed paragraph | the table and the paragraph from the structure tree |
+| `chrome-quote-italic` | `fa-quote-italic.md` from Chrome (`make-quote-italic.js`): paragraphs with a first-line indent and no space between them, quotes set in and in italic by the stylesheet — Vazirmatn slanted by Chrome (no italic face) — one right after a numbered list | the quote read as the last item's text, a plain paragraph taken into the quote |
 | `chrome-form` | `make-form.js`: the invoices in Chromium, landscape, every word bold; pairs in one run or apart, an empty value, a value raised 6 pt, rules between rows; a wrapped remark; a table note in a colspan cell | pairs one per item, bands as headings, the note after the table (r9: 45 and 48) |
 | `chrome-layers--banner` | `make-overlay.js`: a news card that is one link as a whole, a cookie banner over its lower part with its own heading, text, link and button | the banner keeps its own link only (the previous importer gave it the card's: `lnk` 33) |
 | `chrome-layers` | `overlay.md` as a web app prints it (`make-overlay.js`): in a framed card, its text drawn twice, a paragraph under an opaque panel | the visible text only, each word once |
@@ -606,6 +607,7 @@ python3 scripts/make-xlsx.py && python3 scripts/make-more.py && python3 scripts/
 node scripts/make-docx.js && python3 scripts/add-diagram.py
 node scripts/make-chrome.js           # chrome-*
 node scripts/make-overlay.js && node scripts/make-infobox.js   # chrome-layers, chrome-float-tagged
+node scripts/make-quote-italic.js     # chrome-quote-italic
 python3 scripts/make-word-rtl.py      # word-print (and corpus/word-rtl.md)
 python3 scripts/make-slides-rtl.py    # pptx-rtl (and corpus/slides-rtl.md)
 python3 scripts/make-deck-arial.py    # pptx-arial (and corpus/deck-arial.md)
