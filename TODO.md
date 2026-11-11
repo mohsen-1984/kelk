@@ -127,6 +127,13 @@ fixed: its score is the case's measure).
    repository with 2.5 (item 1); the owner attaches a sample PDF when the item starts, and a lab file of our own
    follows from it
 
+**The stress check's margin** (CI's *lab*, `run-stress.js`: the whole lab joined in one PDF must never hold the page
+a second at once): 836 ms on CI after 2.7's `fa-brackets` files, against the 1,000 ms limit (main had stood at 684–776).
+2.7 put a pause between the whole-document steps; what is left is one page's own layout (one call of `_layoutPage`
+or `_toHtml`, up to about 0.8 s on a slow machine) and the lines' and furniture steps. Each real-sample lab file of 2.8
+adds to the joined PDF: if the check comes near the limit again, look for the step that holds the page
+(`_layoutPage`'s steps) rather than leave files out of the lab.
+
 **Export progress inside the builders** (from 2.7's progress item): DocxBuilder, PdfBuilder, HtmlBuilder and
 WordHtmlBuilder build in one synchronous run, so during «building the document» the step name shows but the bar
 stands still. A moving bar needs the builders to yield between parts (sections, pages; PdfBuilder's two layout
