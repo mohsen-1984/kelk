@@ -11,7 +11,7 @@ Kurdish** mixed with English — and works just as well for **every left-to-righ
 Free and open source (MIT).
 
 **▶ [Open Kelk online](https://mohsen-1984.github.io/kelk/)** ·
-**⬇ [Download kelk_2.6.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.6.zip)** ·
+**⬇ [Download kelk_2.7.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.7.zip)** ·
 [فارسی ↓](#fa) · [العربية ↓](#ar) · Contact: [mhn.com@gmail.com](mailto:mhn.com@gmail.com)
 
 ![Kelk — Markdown to DOCX and PDF converter, English interface](docs/screenshots/kelk-en.png)
@@ -43,7 +43,9 @@ Free and open source (MIT).
   PDFs from browsers, Word, LibreOffice, Excel and others come back with their headings, lists, tables
   (ruled or not, across pages, with merged cells), code, quotes and links; in Persian and Arabic with their ZWNJs,
   letters and digits repaired; formulas in Kelk's own PDFs come back as their LaTeX. A PDF is made for print: review what
-  comes back, and a scan needs an OCR layer ([how it works, and its limits](lib/PDFIMPORT.md)).
+  comes back, and a scan needs an OCR layer ([how it works, and its limits](lib/PDFIMPORT.md)). After an import, the
+  report lists the file's information: what the file says about itself (title, author, application, fonts …) and,
+  marked as a guess, what Kelk reads from it; a button copies it as a table.
 - **Clean up a Word document:** import a messy .docx and export DOCX again — direction and alignment set right
   per paragraph, cell and list item, one set of real Word styles, uniform tables, stray formatting gone.
 - **Full GFM** ([spec](https://github.github.com/gfm/)): tables with alignment, task lists,
@@ -87,7 +89,7 @@ Free and open source (MIT).
 ## Use it
 
 - **Online:** [mohsen-1984.github.io/kelk](https://mohsen-1984.github.io/kelk/).
-- **On your computer:** [download kelk_2.6.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.6.zip),
+- **On your computer:** [download kelk_2.7.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.7.zip),
   unpack it and open `index.html` — offline, for personal use or inside a company network.
 - **On your own host:** upload the folder to any static web host.
 
@@ -122,7 +124,7 @@ docs/          about + guide + samples (en / fa / ar), screenshots, RELEASING.md
 tests/         builder-suite.html — every test case through the four document builders, in the browser ·
                slides-suite.html — the slides: layouts, notes, warnings, the .pptx read back ·
                pdf-import-suite.html — PDFs you pick, scored offline ·
-               pdf-lab/ — 196 PDFs (our generators and real Windows producers), scored, fuzzed and gated (Node + Playwright)
+               pdf-lab/ — 204 PDFs (our generators and real Windows producers), scored, fuzzed and gated (Node + Playwright)
 tools/         bidi-lab.html (every direction rule) · build_pdf_fonts.py · build-icons.js · build-samples.js · og-image.html (source of assets/og-image.png)
                · check-*.js (version, interface strings, accessibility, startup size) · build-release.sh (the two zips)
 .github/       CI on every push: the PDF lab and its gate, the builders against golden snapshots, .docx checked
@@ -130,8 +132,8 @@ tools/         bidi-lab.html (every direction rule) · build_pdf_fonts.py · bui
 package.json   the dev tools CI installs (npm ci) — the app itself has no build step and no dependencies to install
 ```
 
-Release downloads: `kelk_2.6.zip` is the app (what most people want); `kelk-with-pdf-lab_2.6.zip` adds
-`tests/pdf-lab/` (196 PDFs, about 25 MB) for working on the PDF importer.
+Release downloads: `kelk_2.7.zip` is the app (what most people want); `kelk-with-pdf-lab_2.7.zip` adds
+`tests/pdf-lab/` (204 PDFs, about 26 MB) for working on the PDF importer.
 
 ## Contact, credits, license
 
@@ -162,7 +164,7 @@ B Nazanin, B Mitra and B Titr: (c) Borna Rayaneh, no published license, see born
 English و العربية است. رایگان و متن‌باز (MIT).
 
 **▶ [کِلک برخط](https://mohsen-1984.github.io/kelk/)** ·
-**⬇ [دریافت kelk_2.6.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.6.zip)** ·
+**⬇ [دریافت kelk_2.7.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.7.zip)** ·
 تماس: [mhn.com@gmail.com](mailto:mhn.com@gmail.com)
 
 ![کِلک — رابط فارسی](docs/screenshots/kelk-fa.png)
@@ -175,7 +177,7 @@ English و العربية است. رایگان و متن‌باز (MIT).
 - **مارک‌داون به HTML**: یک فایل مستقل با قلم‌ها، سبک‌ها و تصویرهای درون فایل.
 - **مارک‌داون به PowerPoint (PPTX)**: هر `##` یک اسلاید است و پیش‌نمایش میان «سند» و «اسلاید» جابه‌جا می‌شود. چیدمان اسلاید از روی محتوا انتخاب می‌شود: کارت، گام‌ها، آمار، گاه‌شمار افقی یا عمودی، چندستونی و فهرست مطالب. نمودار وِن، چرخه، هرم، فرایند، ماتریس و درخت (سلسله‌مراتب) با شکل‌های خود PowerPoint ساخته می‌شوند، و نمودار داده از روی جدول (با Edit Data). یادداشت سخنران از کامنت‌ها می‌آید و نماد Lucide و کادر نکته هم پشتیبانی می‌شود. ارائهٔ راست‌به‌چپ قرینه چیده می‌شود. همه‌چیز قابل ویرایش است و نمایش تمام‌صفحه هم دارد. در نمای اسلاید تنها خروجی PPTX است؛ متنی که پیداست قالب اسلاید ندارد در نمای سند می‌ماند و یادداشتی دلیلش را می‌گوید. قاعدهٔ اسلاید و پرامپت آموزش آن به مدل‌ها: [`lib/SLIDES.md`](lib/SLIDES.md).
 - **مارک‌داون ⇆ اکسل (XLSX) و CSV**: نمای سوم پیش‌نمایش، **اکسل**، هر جدول را یک شیت نشان می‌دهد (نامش از عنوان بالای آن، تعداد سطر و ستون، و سطرهای اول) و خروجی‌ها **XLSX** و یک zip از فایل‌های **CSV** است. کارپوشه برای فارسی و انگلیسی قالب‌بندی‌شده می‌آید: شیت راست‌به‌چپ وقتی سلولی فارسی، عربی یا عبری دارد، فونت و چینش بر اساس محتوا، سرستون رنگی و ثابت با فیلتر، سطرهای راه‌راه، پهنای ستون و تنظیمات چاپ؛ صفرهای ابتدایی و عددهای طولانی متن می‌مانند. **اکسل و CSV به مارک‌داون:** یک CSV (UTF-8 یا Windows-1256 اکسل فارسی)، یک zip از CSVها یا یک XLSX، برای هر شیت یک عنوان و یک جدول می‌شود؛ آمادهٔ ویرایش یا دادن به مدل. CSV برای اکسل همان است که مارک‌داون برای Word: مدلی که نمی‌تواند فایل بسازد هم می‌تواند پاسخ را CSV بدهد.
-- **DOCX، PDF، HTML و متن کپی‌شده به مارک‌داون**: ورودی تمیز برای مدل‌های هوش مصنوعی؛ توکن کمتر و ساختار روشن‌تر؛ چند فایل یا یک zip با هم یک سند می‌شوند، به ترتیبی که خودتان تعیین می‌کنید: پنجره‌ای فایل‌ها را با نماد نوعشان فهرست می‌کند و فایل‌های غیرقابل تبدیل را جدا نشان می‌دهد. فایل PDF ساخته‌شده با مرورگر، Word، LibreOffice، Excel و برنامه‌های دیگر با عنوان‌ها، فهرست‌ها، جدول‌ها (با خط یا بی‌خط، حتی در چند صفحه، با خانه‌های ادغام‌شده)، کد، نقل‌قول و پیوندهایش برمی‌گردد؛ در فارسی و عربی با نیم‌فاصله‌ها، حروف و رقم‌های اصلاح‌شده؛ فرمول‌های PDFهای خود کِلک با همان LaTeX. PDF برای چاپ ساخته شده: نتیجه را بازبینی کنید؛ فایل اسکن‌شده لایهٔ OCR می‌خواهد ([چگونگی کار و محدودیت‌ها](lib/PDFIMPORT.md)).
+- **DOCX، PDF، HTML و متن کپی‌شده به مارک‌داون**: ورودی تمیز برای مدل‌های هوش مصنوعی؛ توکن کمتر و ساختار روشن‌تر؛ چند فایل یا یک zip با هم یک سند می‌شوند، به ترتیبی که خودتان تعیین می‌کنید: پنجره‌ای فایل‌ها را با نماد نوعشان فهرست می‌کند و فایل‌های غیرقابل تبدیل را جدا نشان می‌دهد. فایل PDF ساخته‌شده با مرورگر، Word، LibreOffice، Excel و برنامه‌های دیگر با عنوان‌ها، فهرست‌ها، جدول‌ها (با خط یا بی‌خط، حتی در چند صفحه، با خانه‌های ادغام‌شده)، کد، نقل‌قول و پیوندهایش برمی‌گردد؛ در فارسی و عربی با نیم‌فاصله‌ها، حروف و رقم‌های اصلاح‌شده؛ فرمول‌های PDFهای خود کِلک با همان LaTeX. PDF برای چاپ ساخته شده: نتیجه را بازبینی کنید؛ فایل اسکن‌شده لایهٔ OCR می‌خواهد ([چگونگی کار و محدودیت‌ها](lib/PDFIMPORT.md)). پس از ورود، گزارش ورود اطلاعات فایل را هم نشان می‌دهد: آنچه خود فایل دربارهٔ خودش می‌گوید (عنوان، نویسنده، برنامهٔ سازنده، فونت‌ها …) و جدا از آن، با برچسب «حدس»، برداشت کِلک؛ یک دکمه آن را به‌صورت جدول رونوشت می‌کند.
 - **یکدست‌سازی و پاک‌سازی سند Word:** فایل docx به‌هم‌ریخته را وارد کنید و دوباره DOCX بگیرید: جهت و تراز هر پاراگراف، سلول و آیتم فهرست درست، یک مجموعه سبک واقعی Word، جدول‌های هم‌شکل و بدون قالب‌بندی‌های پراکنده.
 - **پشتیبانی کامل از GFM** ([مشخصات](https://github.github.com/gfm/)): جدول با ترازبندی، فهرست کارها، فهرست تودرتو، خط‌خوردگی، بلوک کد با رنگ‌آمیزی، نقل‌قول، پیوند و تصویر.
 - **تصویر:** کشیدن یا چسباندن تصویر در متن (در همهٔ خروجی‌ها جاسازی می‌شود)، نشانی عمومی وب، یا لوگو در سربرگ.
@@ -206,7 +208,7 @@ English و العربية است. رایگان و متن‌باز (MIT).
 ### استفاده
 
 - **برخط:** [mohsen-1984.github.io/kelk](https://mohsen-1984.github.io/kelk/)
-- **روی رایانه:** [kelk_2.6.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.6.zip) را دریافت کنید، باز کنید و `index.html` را باز کنید؛ بدون اینترنت، برای استفادهٔ شخصی یا در شبکهٔ داخلی شرکت.
+- **روی رایانه:** [kelk_2.7.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.7.zip) را دریافت کنید، باز کنید و `index.html` را باز کنید؛ بدون اینترنت، برای استفادهٔ شخصی یا در شبکهٔ داخلی شرکت.
 - **روی میزبان خودتان:** پوشه را روی هر میزبان وب ایستا بارگذاری کنید.
 
 سند معرفی و راهنما در نخستین بازدید به زبان رابط کاربری باز می‌شود:
@@ -241,7 +243,7 @@ Vazirmatn، Vazir Code و Sahel کار زنده‌یاد [صابر راستی‌
 الواجهة بالعربية والفارسية والإنجليزية. مجاني ومفتوح المصدر (MIT).
 
 **▶ [كِلك على الإنترنت](https://mohsen-1984.github.io/kelk/)** ·
-**⬇ [تنزيل kelk_2.6.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.6.zip)** ·
+**⬇ [تنزيل kelk_2.7.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.7.zip)** ·
 للتواصل: [mhn.com@gmail.com](mailto:mhn.com@gmail.com)
 
 ![كِلك — الواجهة العربية](docs/screenshots/kelk-ar.png)
@@ -254,7 +256,7 @@ Vazirmatn، Vazir Code و Sahel کار زنده‌یاد [صابر راستی‌
 - **ماركداون إلى HTML**: ملف واحد مستقل بخطوطه وأنماطه وصوره.
 - **ماركداون إلى PowerPoint (PPTX)**: كل `##` شريحة، وتنتقل المعاينة بين «مستند» و«شرائح». يُختار تخطيط الشريحة بحسب محتواها: بطاقات، وخطوات، وإحصاءات، وخط زمني أفقي أو عمودي، وأعمدة، وجدول محتويات. تُرسم المخططات بأشكال PowerPoint نفسها: عملية، ودورة، وهرم، وتسلسل هرمي، ومصفوفة، وفِن. وتُصنع مخططات البيانات من الجداول (مع Edit Data)، وتأتي ملاحظات المتحدث من التعليقات، وتُدعم أيقونات Lucide ومربعات الملاحظة. تُعكس شرائح العروض من اليمين إلى اليسار. كل شيء قابل للتحرير، ويتوفر عرض بملء الشاشة. في عرض الشرائح التصدير الوحيد هو PPTX؛ والنص الذي ليس بتنسيق الشرائح بوضوح يبقى مستندًا، مع ملاحظة تبيّن السبب. القاعدة وموجّه يعلّمها لنماذج الذكاء الاصطناعي: [`lib/SLIDES.md`](lib/SLIDES.md).
 - **ماركداون ⇆ Excel (XLSX) وCSV**: العرض الثالث في المعاينة، **Excel**، يعرض كل جدول ورقةً (اسمها من العنوان فوقه، وعدد صفوفها وأعمدتها، وصفوفها الأولى)، والتصدير **XLSX** وملف zip من ملفات **CSV**. ويأتي المصنف منسَّقًا للعربية والإنجليزية معًا: ورقة من اليمين إلى اليسار حين تحوي خليةً عربية أو فارسية أو عبرية، وخطوط ومحاذاة بحسب المحتوى، وصف عناوين ملوّن مثبّت مع عامل تصفية، وصفوف مخططة، وعرض أعمدة، وإعدادات طباعة؛ وتبقى الأصفار في البداية والأعداد الطويلة نصًّا. **من Excel وCSV إلى ماركداون:** ملف CSV (UTF-8 أو Windows-1256 من Excel العربي والفارسي) أو zip من ملفات CSV أو ملف XLSX يصبح عنوانًا وجدولًا لكل ورقة، جاهزًا للتحرير أو لإعطائه نموذجًا. ملف CSV بالنسبة إلى Excel كالماركداون بالنسبة إلى Word: النموذج الذي لا يصنع ملفات يستطيع أن يجيب بـ CSV.
-- **DOCX وPDF وHTML والنص الملصوق إلى ماركداون**: مدخلات نظيفة لنماذج الذكاء الاصطناعي؛ رموز أقل وبنية أوضح؛ وتصبح عدة ملفات أو ملف zip مستندًا واحدًا بالترتيب الذي تحدده: تعرض نافذة الملفات برمز نوعها، وتميّز الملفات التي لا يمكن تحويلها. يعود ملف PDF المصنوع بالمتصفح أو Word أو LibreOffice أو Excel وغيرها بعناوينه وقوائمه وجداوله (بخطوط أو دونها، وعبر الصفحات، مع الخلايا المدمجة) وشيفرته واقتباساته وروابطه؛ وبالعربية والفارسية مع إصلاح فواصل ZWNJ والحروف والأرقام؛ وتعود صيغ ملفات PDF التي صنعها كِلك بنص LaTeX نفسه. صُنع PDF للطباعة: راجع النتيجة، والملف الممسوح ضوئيًا يحتاج إلى طبقة OCR ([كيف يعمل وحدوده](lib/PDFIMPORT.md)).
+- **DOCX وPDF وHTML والنص الملصوق إلى ماركداون**: مدخلات نظيفة لنماذج الذكاء الاصطناعي؛ رموز أقل وبنية أوضح؛ وتصبح عدة ملفات أو ملف zip مستندًا واحدًا بالترتيب الذي تحدده: تعرض نافذة الملفات برمز نوعها، وتميّز الملفات التي لا يمكن تحويلها. يعود ملف PDF المصنوع بالمتصفح أو Word أو LibreOffice أو Excel وغيرها بعناوينه وقوائمه وجداوله (بخطوط أو دونها، وعبر الصفحات، مع الخلايا المدمجة) وشيفرته واقتباساته وروابطه؛ وبالعربية والفارسية مع إصلاح فواصل ZWNJ والحروف والأرقام؛ وتعود صيغ ملفات PDF التي صنعها كِلك بنص LaTeX نفسه. صُنع PDF للطباعة: راجع النتيجة، والملف الممسوح ضوئيًا يحتاج إلى طبقة OCR ([كيف يعمل وحدوده](lib/PDFIMPORT.md)). وبعد الاستيراد يعرض التقرير معلومات الملف: ما يقوله الملف عن نفسه (العنوان، والمؤلف، والبرنامج المنتج، والخطوط …)، وعلى حدة، بوسم «تخمين»، ما يستنتجه كِلك؛ ويمكن نسخها كجدول بزر.
 - **توحيد مستند Word وتنظيفه:** استورد ملف docx مبعثرًا وصدّره DOCX من جديد: اتجاه كل فقرة وخلية وعنصر قائمة ومحاذاته صحيحان، ومجموعة واحدة من أنماط Word الحقيقية، وجداول متشابهة، بلا تنسيقات متفرقة.
 - **دعم كامل لـ GFM** ([المواصفات](https://github.github.com/gfm/)): جداول بمحاذاة، وقوائم مهام، وقوائم متداخلة، وشطب، وكتل شيفرة ملوّنة، واقتباسات، وروابط، وصور.
 - **الصور:** سحب الصورة أو لصقها في النص (تُضمَّن في كل الصيغ)، أو عنوان ويب عام، أو شعار في الرأس.
@@ -286,7 +288,7 @@ Vazirmatn، Vazir Code و Sahel کار زنده‌یاد [صابر راستی‌
 ### الاستخدام
 
 - **على الإنترنت:** [mohsen-1984.github.io/kelk](https://mohsen-1984.github.io/kelk/)
-- **على حاسوبك:** نزّل [kelk_2.6.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.6.zip) وافتحه ثم افتح `index.html`؛ يعمل دون إنترنت، للاستخدام الشخصي أو داخل شبكة المؤسسة.
+- **على حاسوبك:** نزّل [kelk_2.7.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_2.7.zip) وافتحه ثم افتح `index.html`؛ يعمل دون إنترنت، للاستخدام الشخصي أو داخل شبكة المؤسسة.
 - **على استضافتك:** ارفع المجلد إلى أي استضافة ويب ثابتة.
 
 يُفتح مستند التعريف والدليل في الزيارة الأولى بلغة الواجهة:

@@ -58,47 +58,20 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
   break, scrolling sideways in their own block (`kelk-wide`: the columns' longest words do not fit the pane).
 - Each view has its own sample (about, slides, excel). Settings → Excel's words load with the Excel module.
 
-**2.7 — PDF import from the synthetic lab** (the next release; the owner's decisions of 2026-11-11). No real
-samples in this release: only what the lab can cover, with new lab files of our own where needed (no personal
-metadata in them: author, company, user names). The lab's gate, the golden files and the held-out checks stay green.
-In this order, one pull request each (3 and 4 may split in two):
+**Standing rules from 2.7** (the owner's decisions; done — `CHANGELOG.md` 2.7):
 
-1. **Every progress state names its step** (`ui/2.7-progress`). The rule: no generic progress anywhere in Kelk —
-   every task, import or export, says the step under way, in fa / en / ar (`Kelk.ui.steps`; `Kelk.ui.task` refuses
-   an empty step). Imports: the libraries loading on first use, reading the file, opening the PDF, then the
-   importer's own steps. Exports: the library, the fonts, the formulas, the build, the fonts embedded, the package.
-   The page repaints before each long step that holds it (a builder), so its name shows. Step names only: the bar
-   does not move inside a builder (see «Export progress inside the builders» below)
-2. **The imported file's information in the import report** (`pdf/2.7-file-info`): a table in the report panel,
-   collapsed, with what the file says — for a PDF its Info and XMP fields (title, author, subject, keywords,
-   creator, producer, dates as written, PDF version, pages, page size, language, tagged, outline, page labels,
-   fonts), for a DOCX / XLSX `docProps` (core, app), for an HTML `<title>` and its generator. What Kelk infers
-   (the maker, the engine, the production path) is its own group, labelled a guess, with its evidence; the
-   operating system only when the file names it (a browser's User-Agent, Quartz's «macOS Version», «(Windows)»,
-   Microsoft Print to PDF) — never from the fonts. DOCX, XLSX and HTML imports get the same report panel as a PDF
-   (the same component, `reportOpenMs`), shown only when there is something to show
-3. **Right to left**, in two pull requests:
-   - **3a, the LibreOffice path** (`pdf/2.7-rtl`): brackets named by the logical character (0 → 100 on every
-     `lohtml-rtl--*` and `kelkdocx-lo--*` file), a list's bullet or number set against its word, right-to-left items
-     set flush left (lab: `*--fa-brackets`). Still lost there: tables of `lohtml-rtl--fa-article`, `--fa-report`,
-     `--ar-article` (two columns run together; a header cell over two lines split off), quotes; on `ar-article` an
-     Arabic font's marks named wrongly («ٍ» at word ends, «:» for shadda) — 2.8
-   - **3b, Chromium's quotes** (`pdf/2.7-rtl-quotes`): a font with no italic face slanted by the producer is italic
-     (Chrome's synthetic italic of Vazirmatn, Sahel, Noto Naskh), and a quote set in and in italic is told from the
-     list or paragraph beside it (lab: `chrome-quote-italic--fa-quote-italic` 77.8 → 100; fuzz quotes dev +6.9,
-     held-out +3.6)
-   - **3c, right-to-left tables** (`pdf/2.7-rtl-tables`): a right-to-left document is now measured as drawing its
-     word spaces (`_spacedDoc` counted lowercase letters only), so a gap with no space in it is a cell boundary there
-     too (`lohtml-rtl--fa-report` 79.6 → 87.3). The rest moves to 2.8 (the owner's decision of 2026-11-11: bigger than
-     two pull requests) — see «Right-to-left borderless tables» there
-   - **The lab's own limit, fixed first** (`lab/2.7-wk-fonts`, generator 5): wkhtmltopdf drew the fuzz set's
-     `@font-face` fonts as outlines, no text layer (its 9 right-to-left `dev` files: total ≈ 26). It now takes them as
-     installed fonts: those files 26 → 56, the RTL `dev` mean 75.7 → 82.0, with no change to the importer — the mean
-     3b is measured on
-4. ~~A designed booklet~~ and 5. ~~digits and form boxes~~ — moved to 2.8 (the owner's decision of 2026-11-11)
-6. Release 2.7
+- No generic progress anywhere in Kelk: every task, import or export, names the step under way, in fa / en / ar
+  (`Kelk.ui.steps`; `Kelk.ui.task` refuses an empty step); the page repaints before a long step that holds it.
+- The imported file's information (PDF, DOCX, XLSX, HTML) sits in the import report, collapsed, shown only when there
+  is something to show; what the file says, as written, apart from what Kelk infers (labelled a guess, with its
+  evidence); the operating system only when the file names it, never from the fonts. A button copies it as GFM
+  tables. The report stays open `reportOpenMs` (5 s) after an import.
+- Kelk writes what the PDF says: a numbered badge that draws only «1» comes back «## 1 title», no period added.
+- New lab files are ours, made by a script, with no personal metadata (author, company, user names).
+- Excel: header rows and the other rows wrap separately (`excel.wrapHead` all, `excel.wrap` none by default); any RTL
+  cell still makes the whole sheet RTL (2.6), so each sample keeps an all-English sheet to show one left to right.
 
-**2.8 — PDF import from real files, the slides view on demand** (moved from 2.7, the owner's decision of 2026-11-11).
+**2.8 — PDF import from real files, the slides view on demand** (the next release; moved from 2.7, the owner's decision of 2026-11-11).
 
 **The slides view on demand** (moved from 2.5, then 2.7; the owner's decisions of 2026-11-09 and 2026-11-11): PptxBuilder (170 KB) and
 `scripts/slides.js` (30 KB) load with the page, though a user who writes documents never needs them; load them on
@@ -167,7 +140,7 @@ passes with a table of contents) and report them, as the slides build does.
 **High**
 
 - PDF import, right to left: RTL fuzz files score well below English ones (RTL ≈ 77–81 against LTR ≈ 92–93; tables
-  and quotes weakest, then `zwnj` — see 2.7 item 3 for what is done and what the wkhtmltopdf files are); Chrome's
+  and quotes weakest, then `zwnj` — see `CHANGELOG.md` 2.7 for what is done); Chrome's
   browser-default style loses quotes and code in fa / ar while the text is right
 - PDF import: wkhtmltopdf Persian (`zwnj` 0, `yehKaf` 53–68 — a broken ToUnicode in the file); the narrow-space → ZWNJ
   rule hurts those files
