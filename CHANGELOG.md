@@ -12,6 +12,9 @@ All notable changes to Kelk. Dates are those of the release tags.
 - **Imports name every step**: the PDF reader and importer loading on first use, reading the file, opening the PDF,
   then each page; a Word file's reader and its conversion; a zip's files one by one; CSV and XLSX reading, the
   Markdown, the editor and the Excel view.
+- **Exports name every step**: the library on first use, the fonts, the formulas' font, the build, the fonts
+  embedded (by name); the page repaints before a builder holds it, so its step shows. The bar stands still while a
+  builder works (a moving bar: TODO.md).
 
 ## [2.6] — 2026-11-10
 

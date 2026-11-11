@@ -146,6 +146,10 @@
         });
     }
 
+    // an export's step names (Kelk.ui.steps, in exporter.run): the library each output loads on first use, its build
+    const EXPORT_LIBS = { docx: 'exp_libsDocx', pdf: 'exp_libsPdf', xlsx: 'exp_libsXlsx', csv: 'exp_libsZip' };
+    const EXPORT_BUILD = { docx: 'exp_docx', doc: 'exp_doc', pdf: 'exp_pdf', html: 'exp_html', xlsx: 'exp_xlsx', csv: 'exp_csv' };
+
     K.exporter = {
         /**
          * One export. The page waits in Kelk.ui.task's dialog while the file is made (fonts and the libraries
@@ -176,27 +180,45 @@
             let added = 0;
             try {
                 const blob = await K.ui.task(K.i18n.t('taskExport', kind.toUpperCase()), async function (t) {
+                    // every step named (config.exportProgress; Kelk.ui.steps): a library on its first use (named only
+                    // then), fonts, the formulas' font, the build — the page repaints before each builder, which holds
+                    // it until the file is made (the bar stands still meanwhile: TODO.md) —, the fonts embedded
+                    const step = K.ui.steps(t, K.config.exportProgress, {
+                        libs: EXPORT_LIBS[kind] || 'exp_libsDocx', fonts: kind === 'html' ? 'exp_fontsHtml' : 'exp_fontsPdf', math: 'exp_math',
+                        build: EXPORT_BUILD[kind] || 'exp_docx', embed: 'exp_embed'
+                    });
+                    const paintStep = async function (name, args) { step(name, 0, 1, args); await K.ui.paint(); };
                     // DOCX, PPTX: the fonts they use, embedded (Settings → Fonts)
-                    const embed = async function (b) { const r = await K.fonts.embed(kind, await b, md); added = r.added; return r.blob; };
-                    await K.ui.paint();                        // the dialog is up before the builder holds the page
-                    if (sheet) return (await K.libs.need('sheets')).blob(kind);          // from the Markdown, not the preview
+                    const onEmbed = kind === 'pptx'
+                        ? function (names) { t.progress(1000, 1000, K.i18n.t('exp_embed', names.join(K.i18n.t('listSep')))); return K.ui.paint(); }
+                        : function (names) { return paintStep('embed', [names.join(K.i18n.t('listSep'))]); };
+                    const embed = async function (b) { const r = await K.fonts.embed(kind, await b, md, onEmbed); added = r.added; return r.blob; };
+                    if (sheet) return (await K.libs.need('sheets')).blob(kind, function (name) { return paintStep(name); });   // from the Markdown, not the preview
                     K.preview.flush();                         // typed while the dialog came up (nothing waiting: no-op)
+                    if (kind === 'pptx') return embed(K.slides.blob(t));
                     const html = K.preview.html();
                     // Word / PDF: a formula with right-to-left \text embeds the web font in its image
-                    if (kind !== 'html' && /data-tex="[^"]*[֐-ࣿ]/.test(html)) await K.fonts.forHtml(md);
+                    if (kind !== 'html' && /data-tex="[^"]*[֐-ࣿ]/.test(html)) { step('math', 0, 1); await K.fonts.forHtml(md); }
                     if (kind === 'docx') {
-                        await K.libs.need('docx');
+                        if (!K.libs.loaded('docx')) { step('libs', 0, 1); await K.libs.need('docx'); }
+                        await paintStep('build');
                         return embed(configure(DocxBuilder.create(), 'docx').addFromHtml(html).toBlob());
                     }
-                    if (kind === 'doc') return configure(WordHtmlBuilder.create(), 'doc').addFromHtml(html).toBlob();
+                    if (kind === 'doc') {
+                        await paintStep('build');
+                        return configure(WordHtmlBuilder.create(), 'doc').addFromHtml(html).toBlob();
+                    }
                     if (kind === 'pdf') {
-                        await Promise.all([K.libs.need('jspdf'), K.fonts.forPdf(md)]);
-                        await K.ui.paint();
+                        if (!K.libs.loaded('jspdf')) { step('libs', 0, 1); await K.libs.need('jspdf'); }
+                        step('fonts', 0, 1);
+                        await K.fonts.forPdf(md);
+                        await paintStep('build');
                         return configure(PdfBuilder.create(), 'pdf').addFromHtml(html).toBlob();
                     }
-                    if (kind === 'pptx') return embed(K.slides.blob(t));
                     if (kind === 'html') {
+                        step('fonts', 0, 1);
                         await K.fonts.forHtml(md);
+                        await paintStep('build');
                         return configure(HtmlBuilder.create(), 'html').addFromHtml(html).toBlob();
                     }
                     throw new Error('unknown output ' + kind);

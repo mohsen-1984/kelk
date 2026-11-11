@@ -37,6 +37,7 @@ const DYNAMIC = [
     { file: 'scripts/ui.js', arg: 'KEY[name]' },
     { file: 'scripts/importer.js', prefix: 'imp_' },
     { file: 'scripts/importer.js', prefix: 'task' },
+    { file: 'scripts/exporter.js', prefix: 'exp_' },
     // the import report: its tables hold each note / flag (pdf_) and mode / why / label (rep_) key in full
     { file: 'scripts/report.js', prefix: 'pdf_' },
     { file: 'scripts/report.js', prefix: 'rep_' },

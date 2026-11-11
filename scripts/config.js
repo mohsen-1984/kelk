@@ -21,6 +21,9 @@
         // a PowerPoint export's progress bar (slides.js blob): each step's share, measured on decks of 200–430 slides
         // (libs: PptxGenJS on the first export, not measured)
         pptxProgress: { libs: 0.02, model: 0.05, build: 0.03, write: 0.5, slides: 0.22, zip: 0.2 },
+        // the other exports' bars (exporter.js): rough shares, not measured — what each step shows is its name; the
+        // builders run in one synchronous step, so the bar stands still while they work (TODO: a moving bar)
+        exportProgress: { math: 0.05, libs: 0.1, fonts: 0.15, build: 0.6, embed: 0.1 },
         // the slides preview's bar (slides.js render): the icon set on first use, formulas, pictures, the layout; shown
         // only for work longer than progressDelayMs
         slidesProgress: { libs: 0.3, math: 0.1, images: 0.1, layout: 0.5 },
