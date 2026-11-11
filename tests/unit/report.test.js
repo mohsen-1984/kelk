@@ -282,7 +282,7 @@ test('the panel: focus in on open, back on close (×, Escape); Copy report; Re-i
   assert.equal(box.hidden, true);
   assert.equal(d.activeElement, from, '× : the focus goes back');
 
-  // Copy report: the plain text on the clipboard, a toast
+  // Copy report: the report as Markdown on the clipboard (2.8), a toast
   let copied = null;
   Object.defineProperty(w.navigator, 'clipboard', {
     configurable: true,
@@ -296,11 +296,14 @@ test('the panel: focus in on open, back on close (×, Escape); Copy report; Re-i
   K.ui.report(clone(SAMPLE), { name: 'a.pdf' });
   d.getElementById('report-copy').click();
   await new Promise((r) => setTimeout(r, 0));
-  assert.ok(copied && copied.startsWith(K.i18n.t('rep_title') + '\n'), 'the title first');
-  assert.match(copied, /a\.pdf/);
-  assert.match(copied, /- Page 3: simplified, 41% — low confidence, missing word spaces/);
+  assert.ok(copied && copied.startsWith('## ' + K.i18n.t('rep_title') + '\n'), 'the title first, a heading');
+  assert.match(copied, /^### a\.pdf$/m, 'the file, a heading');
+  assert.match(copied, /^\*\*Findings\*\*\n\n- /m, 'the findings, a list');
+  assert.match(copied, /^\| Page \| Mode \| Confidence \| Why \|\n\| --- \| --- \| --- \| --- \|$/m, 'the pages, a GFM table');
+  assert.match(copied, /^\| 3 \| simplified \| 41% \| low confidence, missing word spaces \|$/m);
+  assert.doesNotMatch(copied, /\n{3}/, 'one blank line between blocks');
   assert.ok(copied.includes(K.i18n.t('pdf_printNoLinks')));
-  assert.doesNotMatch(copied, /<|\b(rep|pdf)_\w+/, 'plain text, no keys');
+  assert.doesNotMatch(copied, /<|\b(rep|pdf)_\w+/, 'Markdown, no HTML, no keys');
   assert.ok(toasts(w).some((t) => t.includes(K.i18n.t('copied'))));
 
   // Re-import in safe mode: its action runs, the panel closes; a report that ran in safe mode has no button

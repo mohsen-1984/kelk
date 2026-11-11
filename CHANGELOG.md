@@ -4,6 +4,12 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+### Changed
+
+- **One copy button per report panel**: *Copy report* copies the whole report as Markdown — the findings as a list,
+  the pages not read in full and the file's information as GFM tables. File information's own *Copy as a table*
+  button is gone (it sat at the panel's far end).
+
 ## [2.7] — 2026-11-11
 
 PDF import, right to left, and the imported file's information; every progress step named.

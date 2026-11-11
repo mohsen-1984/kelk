@@ -14,7 +14,9 @@
  *                                     (kelkSource, kelkMath, monoBody alone are not news: the import went as it
  *                                     should).
  *   Kelk.importReport.none()          an empty report: a file with nothing to report but its information (2.7).
- *   Kelk.importReport.text(entries)   the report as plain text (Copy report).
+ *   Kelk.importReport.text(entries)   the report as Markdown (Copy report): its findings a list; the pages not read
+ *                                     in full and the file's information GFM tables (2.8: the one copy button).
+ *   Kelk.importReport.gfmTable(head, rows)   cells → a GFM table's lines (bars escaped), for a custom view's copy.
  *   An entry ({ name, report }) may carry info and kind: the file's information (scripts/fileinfo.js, loaded by the
  *     import), shown under the report in a closed <details> and copied with it; kind 'docx', 'xlsx', 'html' … names
  *     the panel «Import report» instead of «PDF import report».
@@ -32,9 +34,10 @@
  *   Kelk.ui.report.custom(view)
  *     the same panel with content of another module (the slide-format check, scripts/slidecheck.js; the Excel
  *     view's summary and no-tables reports, scripts/sheets.js — loaded on demand with their words): view = { icon,
- *     title(), brief(), body(el) — fills the panel's body, buttons: [{ icon, label(), run }] } — the functions run
- *     again on a language change. It follows the document, collapses after config.reportOpenMs and closes like an
- *     import's report; Copy and safe mode are not shown. report.isCustom(): it is open.
+ *     title(), brief(), body(el) — fills the panel's body, buttons: [{ icon, label(), run }], copy() — the Markdown
+ *     Copy report puts on the clipboard (no copy: no Copy report) } — the functions run again on a language change.
+ *     It follows the document, collapses after config.reportOpenMs and closes like an import's report; safe mode is
+ *     not shown. report.isCustom(): it is open.
  * Every code has its key here, written in full (tools/check-i18n.js: DYNAMIC prefixes pdf_ and rep_).
  */
 (function (K) {
@@ -188,33 +191,44 @@
         return rep ? [{ name: (o && o.name) || '', report: rep }] : [];
     }
 
+    /** a GFM table cell: one line, its bars escaped */
+    const cell = function (v) { return String(v == null ? '' : v).replace(/\r?\n/g, ' ').replace(/\|/g, '\\|').trim(); };
+    const row = function (cells) { return '| ' + cells.map(cell).join(' | ') + ' |'; };
+    /** cells → a GFM table's lines (the head, its rule, the rows) */
+    function gfmTable(head, rows) {
+        return [row(head), '| ' + head.map(function () { return '---'; }).join(' | ') + ' |'].concat(rows.map(row));
+    }
+
+    /**
+     * The report as Markdown (Copy report, 2.8): a heading, then for each file its name, summary and findings (a
+     * list), the pages not read in full and the file's information as GFM tables. No bidi isolates (a paste target
+     * has its own direction).
+     */
     function text(entries) {
-        const lines = [t(titleKey(entries))];
+        const lines = ['## ' + t(titleKey(entries))];
         entries.forEach(function (e) {
             const rep = e.report;
             lines.push('');
-            if (e.name) lines.push(e.name);
+            if (e.name) lines.push('### ' + e.name, '');
             const s = summaryText(rep);
             if (s) lines.push(s);
-            if (rep.mode === 'safe') lines.push(t('rep_safeMode'));
+            if (rep.mode === 'safe') lines.push('', t('rep_safeMode'));
             const fs = findings(rep);
             if (fs.length) {
-                lines.push('', t('rep_findingsHead'));
+                lines.push('', '**' + t('rep_findingsHead') + '**', '');
                 fs.forEach(function (f) { lines.push('- ' + f.text); });
             }
             if (rep.pages.length) {
-                lines.push('', t('rep_pagesHead'));
-                rep.pages.forEach(function (p) {
-                    lines.push('- ' + t('rep_colPage') + ' ' + p.page + ': ' + modeName(pageMode(p)) + sep() + pct(p.conf) +
-                        (p.why.length ? ' — ' + p.why.map(whyName).join(sep()) : ''));
-                });
+                lines.push('', '**' + t('rep_pagesHead') + '**', '');
+                Array.prototype.push.apply(lines, gfmTable(['rep_colPage', 'rep_colMode', 'rep_colConf', 'rep_colWhy'].map(function (k) { return t(k); }),
+                    rep.pages.map(function (p) { return [p.page, modeName(pageMode(p)), pct(p.conf), p.why.map(whyName).join(sep())]; })));
             }
-            if (infoOf(e)) { lines.push(''); Array.prototype.push.apply(lines, K.fileInfo.lines(e.info)); }
+            if (infoOf(e)) lines.push('', '**' + t('fi_head') + '**', '', K.fileInfo.gfm(e.info).replace(/\n$/, ''));
         });
-        return lines.join('\n').replace(/[⁦-⁩]/g, '') + '\n';        // plain text: no bidi isolates
+        return lines.join('\n').replace(/[⁦-⁩]/g, '').replace(/^ +$/gm, '').replace(/\n{3,}/g, '\n\n').trim() + '\n';
     }
 
-    K.importReport = { fromResult: fromResult, worth: worth, text: text, none: none, FLAGS: FLAGS, NOTES: NOTES, MODES: MODES, MODE_KEYS: MODE_KEYS, WHY: WHY_KEYS };
+    K.importReport = { fromResult: fromResult, worth: worth, text: text, gfmTable: gfmTable, none: none, FLAGS: FLAGS, NOTES: NOTES, MODES: MODES, MODE_KEYS: MODE_KEYS, WHY: WHY_KEYS };
 
     // ---- the panel ---------------------------------------------------------------------------------------------
     const state = { entries: [], o: {}, back: null, doc: null, timer: 0, view: null };
@@ -230,7 +244,7 @@
     function kind() {
         const v = state.view, h = K.$('#import-report-title'), acts = K.$('#import-report .report-actions');
         if (h) { h.querySelector('span').textContent = v ? v.title() : t(titleKey(state.entries)); K.ui.setIcon(h, v ? v.icon : 'file-text'); }
-        const copyB = K.$('#report-copy'); if (copyB) copyB.hidden = !!v;
+        const copyB = K.$('#report-copy'); if (copyB) copyB.hidden = !!v && !v.copy;
         if (!acts) return;
         acts.querySelectorAll('.report-custom').forEach(function (b) { b.remove(); });
         if (v) (v.buttons || []).forEach(function (bt) {
@@ -411,10 +425,10 @@
     report.refresh = function () { if (state.entries.length) render(); };
     report.collapse = collapse;
     report.follow = follow;
-    report.text = function () { return state.view ? '' : text(state.entries); };
+    report.text = function () { return state.view ? (state.view.copy ? state.view.copy() : '') : text(state.entries); };
 
     function copy() {
-        const s = text(state.entries);
+        const s = report.text();
         const ok = function () { K.ui.toast(K.i18n.t('copied')); };
         const no = function (e) { K.ui.toast(K.i18n.t('failed', e && e.message || ''), 'error'); };
         try {
