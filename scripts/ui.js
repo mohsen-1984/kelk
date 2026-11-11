@@ -12,6 +12,8 @@
 
     const scripts = new Map();      // src → Promise
     const batches = [];             // K.ui.batch: toasts held back, one queue per batch
+    // a progress state without its step (Kelk.ui.steps names every one): refused, and said in the console (tests read it)
+    const NO_STEP = 'Kelk.ui: a progress state must name its step (no generic progress)';
 
     /**
      * Kelk.libs — the large libraries (docx 0.4 MB, jsPDF 0.4 MB, mammoth
@@ -36,6 +38,13 @@
                 if (!window[lib.global]) throw new Error(K.i18n.t('libFailed', name));
                 return window[lib.global];
             });
+        },
+        /** the library is on the page (need() would load nothing): a step «Loading … (first time only)» is named only when not */
+        loaded: function (name) {
+            const lib = K.config.libs[name];
+            if (!lib) return false;
+            const srcs = [].concat(lib.src);
+            return !!window[lib.global] && srcs.every(function (src) { return !scripts.has(src) || scripts.get(src).done; });
         }
     };
 
@@ -123,6 +132,30 @@
         },
 
         /**
+         * A task's steps → its bar and detail line (t: Kelk.ui.task's api, or Kelk.ui.bar's). Every progress state
+         * names the step under way, in the interface language (the rule since 2.7: no generic progress in Kelk).
+         * W { step: share }, in order — the shares of the steps given are scaled to fill the bar; KEY { step: string
+         * key }; COUNT: the steps (a name or a list) that read «N of M» — the item under way, {0} = done + 1, {1} =
+         * total. step(name, done, total, args): args (an array) fill the key's {0}, {1} … instead. A step before a
+         * long synchronous one (a builder) is followed by `await Kelk.ui.paint()`, so its name is on screen first.
+         */
+        steps: function (t, W, KEY, COUNT) {
+            const order = Object.keys(W), sum = order.reduce(function (n, k) { return n + W[k]; }, 0) || 1;
+            const counted = [].concat(COUNT || []);
+            let shown = '';
+            return function (name, done, total, args) {
+                if (!t || order.indexOf(name) < 0) return;
+                const before = order.slice(0, order.indexOf(name)).reduce(function (n, k) { return n + W[k]; }, 0);
+                const per = Math.round((before + W[name] * (total ? Math.min(1, (done || 0) / total) : 0)) / sum * 1000);
+                const text = args ? K.i18n.t.apply(K.i18n, [KEY[name]].concat(args))
+                    : counted.indexOf(name) >= 0 && total ? K.i18n.t(KEY[name], Math.min((done || 0) + 1, total), total) : K.i18n.t(KEY[name]);
+                if (per + '|' + text === shown) return;
+                shown = per + '|' + text;
+                t.progress(per, 1000, text);
+            };
+        },
+
+        /**
          * Progress for work that runs while the page stays usable (the slides preview: typing goes on), in the
          * same window as a task's (#task), shown without making it modal: no Cancel (styles: dialog.task.quiet), no focus taken from the editor
          * (the open attribute is set, which moves no focus), clicks pass through it. start(label) shows it only when
@@ -132,7 +165,12 @@
          */
         bar: function () {
             const self = this;
-            let timer = 0, shown = false;
+            let timer = 0, shown = false, last = null;
+            const show = function () {
+                const bar = $('#task-bar');
+                if (last && last[1] > 0) { bar.max = last[1]; bar.value = Math.min(last[0], last[1]); } else bar.removeAttribute('value');
+                $('#task-detail').textContent = last ? last[2] : '';
+            };
             const q = {
                 start: function (label, now) {
                     if (shown || timer) return;
@@ -140,8 +178,9 @@
                         timer = 0;
                         const dlg = $('#task');
                         if (!dlg || dlg.open || self._taskOn) return;
-                        $('#task-label').textContent = label || ''; $('#task-detail').textContent = '';
-                        $('#task-bar').removeAttribute('value');
+                        $('#task-label').textContent = label || '';
+                        show();                                      // the step named before the window opened
+                        if (!last) console.error(NO_STEP);
                         dlg.classList.add('quiet');
                         dlg.setAttribute('open', '');
                         shown = true; self._quiet = q;
@@ -149,13 +188,12 @@
                     if (now) open(); else timer = setTimeout(open, K.config.progressDelayMs);
                 },
                 progress: function (done, total, detail) {
-                    if (!shown) return;
-                    const bar = $('#task-bar');
-                    bar.max = total; bar.value = Math.min(done, total);
-                    $('#task-detail').textContent = detail || '';
+                    if (!detail) { console.error(NO_STEP); return; }
+                    last = [done, total, detail];
+                    if (shown) show();
                 },
                 end: function () {
-                    clearTimeout(timer); timer = 0;
+                    clearTimeout(timer); timer = 0; last = null;
                     if (!shown) return;
                     shown = false; if (self._quiet === q) self._quiet = null;
                     const dlg = $('#task');
@@ -184,7 +222,7 @@
                 scripts.set(src, new Promise(function (resolve, reject) {
                     const s = document.createElement('script');
                     s.src = src;
-                    s.onload = resolve;
+                    s.onload = function () { scripts.get(src).done = true; resolve(); };
                     s.onerror = function () { scripts.delete(src); reject(new Error(K.i18n.t('libFailed', src))); };
                     document.head.appendChild(s);
                 }));
@@ -342,9 +380,10 @@
                     signal: ctl.signal,
                     label: function (t) { if (lab) lab.textContent = t; },
                     progress: function (done, total, detail) {
+                        if (!detail) { console.error(NO_STEP); return; }   // no generic progress: the step keeps its last name
                         if (!bar) return;
                         if (total > 0) { bar.max = total; bar.value = Math.min(done, total); } else bar.removeAttribute('value');
-                        if (det) det.textContent = detail || '';
+                        if (det) det.textContent = detail;
                     }
                 };
                 self._taskOn = true;
@@ -354,7 +393,11 @@
                     btn.onclick = cancel;
                     dlg.oncancel = function (e) { e.preventDefault(); cancel(); };       // Esc
                 }
-                const timer = dlg ? setTimeout(function () { if (!dlg.open) dlg.showModal(); }, o.delay == null ? 200 : o.delay) : 0;
+                const timer = dlg ? setTimeout(function () {
+                    if (dlg.open) return;
+                    if (!det.textContent) console.error(NO_STEP);
+                    dlg.showModal();
+                }, o.delay == null ? 200 : o.delay) : 0;
                 // done: the dialog's handlers go too (they would keep this task's scope, and what it read, alive)
                 const done = function () {
                     clearTimeout(timer); self._taskOn = false;

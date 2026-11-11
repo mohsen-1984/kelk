@@ -34,14 +34,16 @@
          * TrueType files, as they are), embedded in it (lib/FontEmbed.js, on demand): the text, Latin and code
          * fonts (the code font only for a text with code), regular and bold — never the generated italics. A font
          * that declares a character set of its own (config.fontCharset) is described with it even when not
-         * embedded. → { blob, added } (added: the bytes the fonts added; 0 when nothing was embedded).
+         * embedded. → { blob, added } (added: the bytes the fonts added; 0 when nothing was embedded). onStep(names):
+         * called once the fonts to embed are known, before they load (the export's step «Embedding the fonts: …»).
          */
-        embed: async function (kind, blob, text) {
+        embed: async function (kind, blob, text, onStep) {
             const f = K.settings.fontsFor(kind), on = K.store.settings().fonts.embed, cs = K.config.fontCharset;
             const fams = Array.from(new Set([f.bidi, f.latin].concat(HAS_CODE.test(text || '') ? [f.code] : [])));
             const shipped = on ? fams.filter(function (x) { return K.config.pdfFonts[x]; }) : [];
             const described = fams.filter(function (x) { return cs[x] != null && shipped.indexOf(x) < 0; });
             if (!shipped.length && !(kind === 'docx' && described.length)) return { blob: blob, added: 0 };
+            if (onStep) await onStep(shipped.length ? shipped : described);
             await Promise.all([K.libs.need('jszip'), K.libs.need('fontembed'), load(K.config.pdfFonts, shipped)]);
             const all = window.PdfFonts || {}, bin = function (b64) {
                 const s = atob(b64), u = new Uint8Array(s.length);

@@ -46,6 +46,11 @@
             xs_data: 'داده‌ها',
             xs_region: 'شیت ',
             xs_reading: 'خواندن {0}…',
+            xs_libs: 'بارگذاری خوانندهٔ صفحه‌گسترده (فقط بار اول)…',
+            xs_readN: 'خواندن فایل {0} از {1}',
+            xs_stepMarkdown: 'نوشتن جدول‌ها به مارک‌داون…',
+            xs_stepEditor: 'گذاشتن متن در ویرایشگر…',
+            xs_stepView: 'ساختن نمای Excel…',
             xs_kind: 'وارد شود:',
             xs_kindCsv: 'شیت‌های CSV ({0})',
             xs_kindDoc: 'سندها ({0})',
@@ -134,6 +139,11 @@
             xs_data: 'Data',
             xs_region: 'Sheet ',
             xs_reading: 'Reading {0}…',
+            xs_libs: 'Loading the spreadsheet reader (first time only)…',
+            xs_readN: 'Reading file {0} of {1}',
+            xs_stepMarkdown: 'Writing the tables as Markdown…',
+            xs_stepEditor: 'Putting the text in the editor…',
+            xs_stepView: 'Building the Excel view…',
             xs_kind: 'Import:',
             xs_kindCsv: 'CSV sheets ({0})',
             xs_kindDoc: 'Documents ({0})',
@@ -222,6 +232,11 @@
             xs_data: 'البيانات',
             xs_region: 'ورقة ',
             xs_reading: 'قراءة {0}…',
+            xs_libs: 'تحميل قارئ جداول البيانات (في المرة الأولى فقط)…',
+            xs_readN: 'قراءة الملف {0} من {1}',
+            xs_stepMarkdown: 'كتابة الجداول بصيغة ماركداون…',
+            xs_stepEditor: 'وضع النص في المحرّر…',
+            xs_stepView: 'إنشاء عرض Excel…',
             xs_kind: 'استيراد:',
             xs_kindCsv: 'أوراق CSV ({0})',
             xs_kindDoc: 'المستندات ({0})',
@@ -420,13 +435,22 @@
         const k = K();
         const sheets = o.docs.filter(function (d) { return isCsv(d) || isXlsx(d); });
         const others = o.docs.filter(function (d) { return !isCsv(d) && !isXlsx(d); });
-        await k.libs.need('sheetimport');
-        if (sheets.some(isXlsx)) await k.libs.need('xlsx');
-        // read every sheet first: the order dialog shows what each CSV holds
+        // read every sheet first: the order dialog shows what each CSV holds. The readers load on first use (named
+        // only then), then each file is read (its name in the label, «N of M» in the step)
         await k.ui.task(t('xs_reading', o.first), async function (task) {
-            for (const d of sheets) {
+            const step = k.ui.steps(task, { libs: 0.2, read: 0.8 }, { libs: 'xs_libs', read: 'xs_readN' }, 'read');
+            const xl = sheets.some(isXlsx);
+            if (!k.libs.loaded('sheetimport') || (xl && !k.libs.loaded('xlsx'))) {
+                step('libs', 0, 1);
+                await k.libs.need('sheetimport');
+                if (xl) await k.libs.need('xlsx');
+            }
+            for (let i = 0; i < sheets.length; i++) {
+                const d = sheets[i];
                 if (task.signal.aborted) return;
                 task.label(t('xs_reading', d.name));
+                step('read', i, sheets.length);
+                await k.ui.paint();                  // reading a workbook holds the page: its step first
                 const bytes = new Uint8Array(await d.file.arrayBuffer());
                 if (isXlsx(d)) {
                     d.book = SheetImporter.readXlsx(bytes, { mergedRows: k.store.getUi('importer.mergedRows') });   // Settings → Import
@@ -473,14 +497,26 @@
         const cells = list.reduce(function (n, x) { return n + SheetImporter.size(x.rows).cells; }, 0);
         const max = +k.config.maxSheetCells || 100000;
         if (cells > max) { k.ui.toast(t('xs_tooMany', cells.toLocaleString('en-US'), max.toLocaleString('en-US')), 'error', 9000); return null; }
-        const md = SheetImporter.toMarkdown(list);
         const name = o.files.length === 1 ? o.files[0].name : chosen[0].name;
-        k.ui.report.release();
-        k.names.setSource(name);
-        k.editor.set(md, name);
-        k.editor.markConverted(true);
-        await k.slides.setView('excel', true);
-        if (k.slides.view() === 'excel') render();
+        // up to 100,000 cells: the Markdown, the editor and the Excel view take seconds — named steps, as the reading
+        await k.ui.task(k.i18n.t('taskImport', name), async function (task) {
+            const step = k.ui.steps(task, { markdown: 0.3, editor: 0.4, view: 0.3 },
+                { markdown: 'xs_stepMarkdown', editor: 'xs_stepEditor', view: 'xs_stepView' });
+            step('markdown', 0, 1);
+            await k.ui.paint();
+            const md = SheetImporter.toMarkdown(list);
+            if (task.signal.aborted) return;         // Cancel before the text is replaced: it stays as it was
+            step('editor', 0, 1);
+            await k.ui.paint();
+            k.ui.report.release();
+            k.names.setSource(name);
+            k.editor.set(md, name);
+            k.editor.markConverted(true);
+            step('view', 0, 1);
+            await k.ui.paint();
+            await k.slides.setView('excel', true);
+            if (k.slides.view() === 'excel') render();
+        });
         k.ui.toast(t('xs_loaded', list.length));
         summary(list.map(function (x) {
             const z = SheetImporter.size(x.rows);
@@ -635,14 +671,14 @@
         return /^## /.test(res) && res !== md ? lead() + res : res;
     }
 
-    async function blob(kind) {
-        const k = K(), c = builder(k.editor.value());
-        if (kind === 'xlsx') {
-            await k.libs.need('xlsx');
-            return c.b.toBlob();
-        }
-        await k.libs.need('jszip');
-        return c.b.toCsvZip();
+    /** The XLSX, or the CSVs in a zip. step(name): the export's steps (exporter.js) — 'libs' (named only when the library loads), 'build'. */
+    async function blob(kind, step) {
+        const k = K(), c = builder(k.editor.value()), lib = kind === 'xlsx' ? 'xlsx' : 'jszip';
+        step = step || function () {};
+        if (!k.libs.loaded(lib)) { step('libs'); await k.libs.need(lib); }
+        step('build');
+        await k.ui.paint();                          // the workbook is written in one run: its step first
+        return kind === 'xlsx' ? c.b.toBlob() : c.b.toCsvZip();
     }
 
     // in the page: its words join Kelk.i18n's tables, the preview's stylesheet joins the page
