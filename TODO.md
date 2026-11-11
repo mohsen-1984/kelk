@@ -85,11 +85,10 @@ In this order, one pull request each (3 and 4 may split in two):
      Arabic font's marks named wrongly («ٍ» at word ends, «:» for shadda) — 2.8
    - **3b, Chromium** (`pdf/2.7-rtl-tables`): the RTL fuzz files' tables (Chromium 74) and quotes (80), against
      ≈ 88 and ≈ 87 left to right
-   - **The lab's own limit**: wkhtmltopdf embeds none of the fuzz set's `@font-face` fonts, so its right-to-left fuzz
-     files (9 of 44 in `dev`) carry their Persian and Arabic text as outlines, with no text layer (total ≈ 26, words
-     ≈ 29 %): no rule can read them, and they hold the RTL fuzz mean down (Chromium's RTL files ≈ 88.5). The fix is the
-     generator's (installed fonts for wkhtmltopdf, as `make-rtl.js` does), with a new `GENERATOR` and the fuzz
-     baseline rebuilt by a CI run with `baseline` ticked — 2.8
+   - **The lab's own limit, fixed first** (`lab/2.7-wk-fonts`, generator 5): wkhtmltopdf drew the fuzz set's
+     `@font-face` fonts as outlines, no text layer (its 9 right-to-left `dev` files: total ≈ 26). It now takes them as
+     installed fonts: those files 26 → 56, the RTL `dev` mean 75.7 → 82.0, with no change to the importer — the mean
+     3b is measured on
 4. **A designed booklet** (designed documents from browsers: heading, box and figure rules shared by every Chromium
    file in the lab) — **lab:** `chrome-booklet--booklet-cards-fa` (45.4). Cards, badges and coloured boxes:
    - a table of contents — a number badge, the title, dot leaders drawn as a dashed rule, no page number — comes
@@ -127,6 +126,13 @@ fixed: its score is the case's measure).
    draw «.» as a thousands separator — a reader takes «3.004» for three and a bit. The three fonts come into the
    repository with 2.5 (item 1); the owner attaches a sample PDF when the item starts, and a lab file of our own
    follows from it
+
+**The stress check's margin** (CI's *lab*, `run-stress.js`: the whole lab joined in one PDF must never hold the page
+a second at once): 836 ms on CI after 2.7's `fa-brackets` files, against the 1,000 ms limit (main had stood at 684–776).
+2.7 put a pause between the whole-document steps; what is left is one page's own layout (one call of `_layoutPage`
+or `_toHtml`, up to about 0.8 s on a slow machine) and the lines' and furniture steps. Each real-sample lab file of 2.8
+adds to the joined PDF: if the check comes near the limit again, look for the step that holds the page
+(`_layoutPage`'s steps) rather than leave files out of the lab.
 
 **Export progress inside the builders** (from 2.7's progress item): DocxBuilder, PdfBuilder, HtmlBuilder and
 WordHtmlBuilder build in one synchronous run, so during «building the document» the step name shows but the bar
