@@ -13,6 +13,8 @@ All notable changes to Kelk. Dates are those of the release tags.
   more room between findings, the file information's rows ruled like the pages table, and the panel's body a little
   taller on small screens (never under 160 px), the editor's foot still on screen at 800 px high.
 - **The slide-format check's panel** has *Copy report* too: its summary, findings and advice as Markdown.
+- **The PDF lab's baseline**: its fuzz means are now the current generator's (5; they were generator 4's), written on
+  the CI runner. The corpus, golden and held-out numbers are unchanged.
 
 ### Fixed
 
