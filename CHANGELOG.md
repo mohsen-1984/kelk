@@ -18,6 +18,10 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Fixed
 
+- **PDF import, right to left: borderless tables at the text's own line height** come back as tables. Where a «left»-
+  aligned first column meets right-aligned numbers, the cells stand only their padding apart, under a column's gap, and
+  no gap cut the table from the paragraph under it: its rows came back as paragraphs. Rows already cut into cells now
+  need only a cell's gap (lab: a new Persian file, tables 0 → 100; fuzz: two files, +14 each; no file worse).
 - **The Excel import's summary** has *Copy report* too (the sheets as a GFM table with their totals, then each XLSX's
   information), and its table shows whole: it had shrunk to one row with a scroll bar of its own inside the panel's.
 

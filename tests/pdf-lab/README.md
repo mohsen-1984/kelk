@@ -148,6 +148,7 @@ runs and the tools need none of those — only Node and Playwright.
 | `chrome-headtable` | `make-headtable.js`: the report (English and Persian) under a running head made as a two-cell bordered table in the top margin, its long table over pages with its header row repeated | the head goes, the table stays one (the previous importer 88: the head read as table rows) |
 | `chrome-letterhead` | `make-letter-ltr.js`: an English letter whose head (Chromium's header template) repeats on both pages with bare values, their labels the paper's | the head once, first, its values labelled «Date», «No.», «Attachments» |
 | `chrome-card--receipt`, `lowriter--merged` | `make-tables-rtl.js`: a Persian web receipt (a framed card, rules between rows and between label and value, an amount with ٬ separators); a Word table (docx) through LibreOffice with a merged title row and a paragraph merged over three columns (its last row: since round 11 a closing note, given back after the table), every cell with its own borders | the previous importer 70.8 and 73.4 (no table found; merged cells sliced) |
+| `chrome-rtl-rows--fa-rows` | `make-rows-rtl.js`: a Persian page (Vazirmatn 11 pt, line height 1.15) with a borderless table at the text's own pitch, no wider gap above or below it; its first column «left»-aligned (`:---`), its numbers right-aligned, so the two meet at their shared side only the cells' padding apart (9 pt, under a column's gap) | the previous importer 80.0 (tables 0: the rows as paragraphs, the header bold with «·» between the cells) |
 | `chrome-fa-links` | `make-links.js`: a Persian article's back matter as a Firefox print of a Persian encyclopedia page has it — contents with dot leaders (bold, a line apart), a Persian reference and Latin ones in one numbered list (numbers on both sides), links wrapped mid-address, a link underline drawn long and clipped to the link, Latin items of a right-to-left list with «▪» at their right end, a page number in a circle halfway down the margin and a rule down it |
 | `ocr-tesseract` | `make-ocr.js`: `chrome-plain-hf--article`, `--features`, `--report` printed to images (`pdftoppm -r 200 -gray`), then `tesseract … pdf` | an OCR layer over a scan: one font, no bold, sizes from letter heights, bullets misread. The rules were written on the article (62 → 91); features and report check them (62 → 92, 84 → 92) |
 
@@ -638,6 +639,7 @@ node scripts/make-others.js           # wk-*, kelk, kelkdocx-lo, pandoc-lo, loht
 node scripts/make-pictures.js         # chrome-pictures--*, wk-pictures--brochure
 node scripts/make-positioned.js && node scripts/make-headtable.js   # chrome-positioned, chrome-headtable--*
 node scripts/make-tables-rtl.js       # chrome-card--receipt, lowriter--merged
+node scripts/make-rows-rtl.js         # chrome-rtl-rows--fa-rows
 node scripts/make-links.js            # chrome-fa-links--fa-links
 node scripts/make-rtl.js              # the right-to-left corpus: chrome-rtl-*, wk-rtl, lohtml-rtl, kelk / kelkdocx-lo of fa-*, ar-*
                                       # (first: unzip assets/fonts/download/persian-fonts-ttf.zip into ~/.fonts)

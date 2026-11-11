@@ -98,6 +98,12 @@ requests (see each item's *PR*); the booklet only if time allows.
    (under 20 prose gaps) is never measured as drawing its spaces, and its borderless table's header row breaks off as
    headings (left to right the same page reads whole). What 2.7 found: the spaces are measured only from gaps before
    lowercase letters, which right-to-left scripts do not have (#63 fixed the measure for LibreOffice's files).
+   **Done in 2.8** (`pdf/2.8-rtl-tables`): a table at the text's own pitch whose «left»-aligned first column meets
+   right-aligned numbers — the cells only their padding apart (9 pt), under a column's gap — is cut out by
+   `baselineRun` when its rows are cut cells (`rowCell`): lab `chrome-rtl-rows--fa-rows` (80.0 → 100), fuzz `none`
+   right to left 45.6 → 73.6 (`fz50` and `fz17`, tables 0 → 100 and 96). **Left:** `zebra` right to left (≈ 52):
+   wider tables whose cells wrap onto two or three lines (`fz42-chr--fa-report`), and two-column pages
+   (`fz23`, `fz53`, `fz62`); the short page above.
 3. **A lighter startup: the slides view and the builders on first use** (moved from 2.5, then 2.7; the owner's
    decisions of 2026-11-09 and 2026-11-11). *PR:* `ui/2.8-startup`, its own (it touches every export).
    - The slides view: PptxBuilder (170 KB) and `scripts/slides.js` (30 KB) load with the page, though a user who
