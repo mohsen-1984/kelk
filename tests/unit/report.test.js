@@ -236,7 +236,7 @@ for (const lang of ['fa', 'en', 'ar']) {
     assert.equal(hint.textContent, K.i18n.t('rep_safeHint'));
     assert.equal(d.getElementById('report-safe').getAttribute('aria-describedby'), 'report-safe-hint');
     // the copied text: the language's list separator
-    assert.ok(K.ui.report.text().includes(K.i18n.t('rep_mode_simplified') + K.i18n.t('listSep')), 'listSep in Copy report');
+    assert.ok(K.ui.report.text().includes(K.i18n.t('rep_why_lowConf') + K.i18n.t('listSep')), 'listSep in Copy report');
     SAMPLE.flags.concat(SAMPLE.notes).forEach(function (f) {
       const li = box.querySelector('.report-findings [data-code="' + f.code + '"]');
       assert.ok(li, 'a row for ' + f.code);
@@ -282,7 +282,7 @@ test('the panel: focus in on open, back on close (×, Escape); Copy report; Re-i
   assert.equal(box.hidden, true);
   assert.equal(d.activeElement, from, '× : the focus goes back');
 
-  // Copy report: the plain text on the clipboard, a toast
+  // Copy report: the report as Markdown on the clipboard (2.8), a toast
   let copied = null;
   Object.defineProperty(w.navigator, 'clipboard', {
     configurable: true,
@@ -296,12 +296,27 @@ test('the panel: focus in on open, back on close (×, Escape); Copy report; Re-i
   K.ui.report(clone(SAMPLE), { name: 'a.pdf' });
   d.getElementById('report-copy').click();
   await new Promise((r) => setTimeout(r, 0));
-  assert.ok(copied && copied.startsWith(K.i18n.t('rep_title') + '\n'), 'the title first');
-  assert.match(copied, /a\.pdf/);
-  assert.match(copied, /- Page 3: simplified, 41% — low confidence, missing word spaces/);
+  assert.ok(copied && copied.startsWith('## ' + K.i18n.t('rep_title') + '\n'), 'the title first, a heading');
+  assert.match(copied, /^### a\.pdf$/m, 'the file, a heading');
+  assert.match(copied, /^\*\*Findings\*\*\n\n- /m, 'the findings, a list');
+  const head = ['rep_colPage', 'rep_colMode', 'rep_colConf', 'rep_colWhy'].map((k) => K.i18n.t(k));
+  assert.ok(copied.includes('| ' + head.join(' | ') + ' |\n| --- | --- | --- | --- |\n'), 'the pages, a GFM table');
+  assert.match(copied, /^\| 3 \| simplified \| 41% \| low confidence, missing word spaces \|$/m);
+  assert.doesNotMatch(copied, /\n{3}/, 'one blank line between blocks');
   assert.ok(copied.includes(K.i18n.t('pdf_printNoLinks')));
-  assert.doesNotMatch(copied, /<|\b(rep|pdf)_\w+/, 'plain text, no keys');
+  assert.doesNotMatch(copied, /<|\b(rep|pdf)_\w+/, 'Markdown, no HTML, no keys');
   assert.ok(toasts(w).some((t) => t.includes(K.i18n.t('copied'))));
+  // a custom view (the Excel summary): Copy report copies its copy(); without one, no Copy report (2.8)
+  const view = { icon: 'sheet', title: () => 'Sheets', brief: () => '1 sheet', body: function (el) { el.textContent = 'x'; }, buttons: [] };
+  K.ui.report.custom(Object.assign({ copy: () => '## Sheets\n\n| # | Sheet |\n| --- | --- |\n| 1 | A \\| B |\n' }, view));
+  assert.equal(d.getElementById('report-copy').hidden, false, 'a view with copy(): Copy report');
+  d.getElementById('report-copy').click();
+  await new Promise((r) => setTimeout(r, 0));
+  assert.equal(copied, '## Sheets\n\n| # | Sheet |\n| --- | --- |\n| 1 | A \\| B |\n');
+  K.ui.report.custom(view);
+  assert.equal(d.getElementById('report-copy').hidden, true, 'no copy(): no Copy report');
+  K.ui.report.close();
+  assert.equal(K.importReport.gfmTable(['a', 'b'], [['x|y', 'line\nbreak']]).join('\n'), '| a | b |\n| --- | --- |\n| x\\|y | line break |');
 
   // Re-import in safe mode: its action runs, the panel closes; a report that ran in safe mode has no button
   let safe = 0;

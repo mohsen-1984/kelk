@@ -160,8 +160,12 @@ test('an HTML import shows its information in the report panel, closed; a bare o
   assert.equal(d.open, false, 'closed by default');
   assert.match(d.textContent, /TitleA page/);
   assert.match(d.textContent, /GeneratorKelk 2\.6/);
-  assert.match(K.ui.report.text(), /- Generator: Kelk 2\.6/);
-  assert.equal(d.querySelector('.fi-actions button').textContent, 'Copy as a table', 'the table’s Copy button');
+  // one copy button per panel (2.8): Copy report carries the file information as GFM tables; none of its own
+  const md = K.ui.report.text();
+  assert.match(md, /^\*\*File information\*\*\n\n\| Field \| Value \|\n\| --- \| --- \|$/m);
+  assert.match(md, /^\| Generator \| Kelk 2\.6 \|$/m);
+  assert.equal(d.querySelector('button'), null, 'no copy button of its own');
+  assert.equal(w.document.getElementById('report-copy').hidden, false, 'the panel’s Copy report');
   await K.importer.fromFile(new w.File(['<p>Only a paragraph</p>'], 'bare.html', { type: 'text/html' }));
   assert.equal(box.hidden, true, 'nothing to show: no panel');
   assert.deepEqual(errors, []);
