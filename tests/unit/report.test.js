@@ -316,7 +316,7 @@ test('the panel: focus in on open, back on close (×, Escape); Copy report; Re-i
   K.ui.report.custom(view);
   assert.equal(d.getElementById('report-copy').hidden, true, 'no copy(): no Copy report');
   K.ui.report.close();
-  assert.deepEqual(K.importReport.gfmTable(['a', 'b'], [['x|y', 'line\nbreak']]), ['| a | b |', '| --- | --- |', '| x\\|y | line break |']);
+  assert.equal(K.importReport.gfmTable(['a', 'b'], [['x|y', 'line\nbreak']]).join('\n'), '| a | b |\n| --- | --- |\n| x\\|y | line break |');
 
   // Re-import in safe mode: its action runs, the panel closes; a report that ran in safe mode has no button
   let safe = 0;
