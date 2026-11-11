@@ -875,6 +875,14 @@ measured against the glyph size `hi`:
 | undrawn, over 0.15 em, in a file that draws its spaces | a **cell gap** (`cellGap`) when the next cell's start (or its end, for right-aligned numbers) lines up on **two other rows** within 12 lines (`columnEdge`) — a bare HTML table is 3 pt apart; LibreOffice puts rows five lines apart |
 | the size jumps (×1.6) | yes: a title and its subtitle on one baseline |
 
+**A file that draws its spaces** (`regions.spacedDoc`, `_spacedDoc`): of the word-wide gaps of running prose, the
+share that holds a space glyph — over 0.75 of 20 gaps or more. Until 2.7 only a gap before a lowercase letter, drawn
+left to right, was counted: Persian and Arabic letters have no case and are drawn right to left, so a right-to-left
+document was never measured, the per-page fallback (spaces over a tenth of the glyphs) said no on a page of figures,
+and no **cell gap** was cut — a borderless table's header row came out as headings, its cells as one line. An
+Arabic-script letter after the gap now counts as well, in either drawing order (`lohtml-rtl--fa-report`: its table
+1.6 → 35.3).
+
 The cell-gap rule has exceptions learnt one by one: in a right-to-left line, the run after the gap ending at the
 line's own end is no evidence (every flush-right line ends at the margin: a link and the bold word after it, a
 word space apart, were cut as two cells beside a float); not after a list marker alone at the line's
