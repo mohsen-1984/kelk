@@ -413,7 +413,7 @@
 
     const CSS = '.report-info{margin:.5rem 0}.report-info>summary{cursor:pointer;font-weight:600}' +
         '.report-info table{width:100%;margin-top:.35rem}.report-info th[scope=row]{text-align:start;font-weight:500;white-space:nowrap;padding-inline-end:.75rem;vertical-align:top}' +
-        '.report-info td{overflow-wrap:anywhere}.report-info .fi-group th{text-align:start;padding-top:.6rem}.report-info .fi-ev{display:block;opacity:.75;font-size:.85em}';
+        '.report-info th[scope=row],.report-info td{padding:.2rem 0;border-bottom:1px solid var(--line)}.report-info td{overflow-wrap:anywhere}.report-info .fi-group th{text-align:start;padding-top:.6rem}.report-info .fi-ev{display:block;opacity:.75;font-size:.85em}';
 
     function render(box, info) {
         if (!any(info) || typeof document === 'undefined') return null;

@@ -9,6 +9,9 @@ All notable changes to Kelk. Dates are those of the release tags.
 - **One copy button per report panel**: *Copy report* copies the whole report as Markdown — the findings as a list,
   the pages not read in full and the file's information as GFM tables. File information's own *Copy as a table*
   button is gone (it sat at the panel's far end).
+- **The import report reads more easily**: the same *Copy report* in every import's panel (PDF, DOCX, HTML, XLSX);
+  more room between findings, the file information's rows ruled like the pages table, and the panel's body a little
+  taller on small screens (never under 160 px), the editor's foot still on screen at 800 px high.
 
 ### Fixed
 

@@ -78,13 +78,13 @@
 .import-report.collapsed .report-brief { display: block; flex: 0 1 auto; }
 .import-report.collapsed .report-name { flex: 0 1 auto; }
 @media (max-width: 600px) { .import-report.collapsed .report-name { display: none; } }
-/* tall enough for the summary, a few findings and three page rows on a desktop screen (800 px high: 308), the
-   text below it shorter while the report is open (still on screen with the editor's foot); one column (phones):
-   the page scrolls, a share of the screen. Shadows at an edge where more content is (scroll-shadow: the covers
+/* tall enough for the summary, a few findings and three page rows on a desktop screen (800 px high: 320; 2.8:
+   never under 160 px, 120 showed four lines), the text below it shorter while the report is open (still on screen
+   with the editor's foot); one column (phones): the page scrolls, a share of the screen. Shadows at an edge where more content is (scroll-shadow: the covers
    move with the content, the shadows stay with the box). Each row its full height (max-content): a part that
    scrolls sideways (the Excel summary's table) would otherwise shrink to a row and scroll inside the body's scroll */
 .report-body {
-  max-height: clamp(120px, calc(100vh - 492px), 380px); overflow: auto; display: grid; gap: 8px; align-content: start;
+  max-height: clamp(160px, calc(100vh - 480px), 400px); overflow: auto; display: grid; gap: 8px; align-content: start;
   grid-auto-rows: max-content;
   background:
     linear-gradient(var(--panel-2) 30%, transparent) top / 100% 28px no-repeat local,
@@ -95,9 +95,9 @@
 }
 .editor-body:has(> .import-report:not([hidden])) .editor-wrap { min-height: 110px; }
 @media (max-width: 900px) {
-  .report-body { max-height: clamp(140px, 40vh, 340px); }
+  .report-body { max-height: clamp(160px, 40vh, 340px); }
 }
-.report-entry { display: grid; gap: 6px; }
+.report-entry { display: grid; gap: 8px; }
 .report-entry + .report-entry { border-top: 1px dashed var(--line); padding-top: 8px; }
 .report-file, .report-sub { margin: 0; font-size: 12.5px; font-weight: 700; color: var(--accent-ink); }
 .report-summary, .report-safe-note { margin: 0; color: var(--muted); }
@@ -108,7 +108,7 @@
 .report-body:focus { outline: none; }
 .report-body:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .report-pages .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
-.report-findings { margin: 0; padding-inline-start: 18px; display: grid; gap: 3px; }
+.report-findings { margin: 0; padding-inline-start: 18px; display: grid; gap: 6px; }
 .report-findings li.warn::marker { color: var(--warn); }
 .report-findings li.info::marker { color: var(--accent); }
 .report-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
