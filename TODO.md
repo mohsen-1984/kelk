@@ -85,11 +85,10 @@ In this order, one pull request each (3 and 4 may split in two):
      Arabic font's marks named wrongly («ٍ» at word ends, «:» for shadda) — 2.8
    - **3b, Chromium** (`pdf/2.7-rtl-tables`): the RTL fuzz files' tables (Chromium 74) and quotes (80), against
      ≈ 88 and ≈ 87 left to right
-   - **The lab's own limit**: wkhtmltopdf embeds none of the fuzz set's `@font-face` fonts, so its right-to-left fuzz
-     files (9 of 44 in `dev`) carry their Persian and Arabic text as outlines, with no text layer (total ≈ 26, words
-     ≈ 29 %): no rule can read them, and they hold the RTL fuzz mean down (Chromium's RTL files ≈ 88.5). The fix is the
-     generator's (installed fonts for wkhtmltopdf, as `make-rtl.js` does), with a new `GENERATOR` and the fuzz
-     baseline rebuilt by a CI run with `baseline` ticked — 2.8
+   - **The lab's own limit, fixed first** (`lab/2.7-wk-fonts`, generator 5): wkhtmltopdf drew the fuzz set's
+     `@font-face` fonts as outlines, no text layer (its 9 right-to-left `dev` files: total ≈ 26). It now takes them as
+     installed fonts: those files 26 → 56, the RTL `dev` mean 75.7 → 82.0, with no change to the importer — the mean
+     3b is measured on
 4. **A designed booklet** (designed documents from browsers: heading, box and figure rules shared by every Chromium
    file in the lab) — **lab:** `chrome-booklet--booklet-cards-fa` (45.4). Cards, badges and coloured boxes:
    - a table of contents — a number badge, the title, dot leaders drawn as a dashed rule, no page number — comes

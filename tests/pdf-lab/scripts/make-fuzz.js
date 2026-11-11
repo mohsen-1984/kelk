@@ -22,7 +22,7 @@ const LAB = path.join(__dirname, '..'), FUZZ = require('./env.js').FUZZ, fileUrl
 // compare means across it (it is part of the manifest's env)
 // 1: the first draw; 2: + headCase, tagged; 3: two-column content fits its column;
 // 4: + the right-to-left documents (4 of 9: dir rtl, Persian / Arabic body fonts, digits), tracking (letter-spacing)
-const GENERATOR = 4;
+const GENERATOR = 5;
 // The held-out split's first seed. It rotates (tests/pdf-lab/HELDOUT.md, "Rotation"): every 6 months, or as soon as a held-out
 // file was opened (run-fuzz.js heldout --show, logged in tests/pdf-lab/heldout-opened.log) — then it moves up by 100000
 // (the next unused block: 200001, 300001, …), HELDOUT_ROTATION goes up by one, a row is added below, and the gate's
@@ -146,6 +146,9 @@ function drawStyle(seed) {
   delete s.rtlFont;
   // what the producer cannot do is recorded as what it did (wkhtmltopdf: no CSS columns, no Chrome header/footer)
   if (s.producer === 'wkhtmltopdf') { s.columns = '1'; s.headerFooter = 'off'; s.tagged = 'no'; }
+  // (and right to left, generator 5: wkhtmltopdf draws an @font-face font's text as outlines, no text layer at all, so it
+  // takes the right-to-left font as an installed one, whose own Latin letters set the Latin text: `own`)
+  if (s.producer === 'wkhtmltopdf' && s.dir === 'rtl') s.latinFont = 'own';
   return s;
 }
 
@@ -154,9 +157,12 @@ function css(s, faces) {
   const pt = s.size, hs = HEAD_SCALE[s.headScale], rtl = s.dir === 'rtl';
   // right-to-left: the right-to-left font first (it holds the Arabic letters; a Latin font such as DejaVu would take
   // them too), the Latin one after it for what it lacks; headings in a sans / serif pair of the same kind
-  const body = rtl ? `"${RTL_FONTS[s.font].face}",${FONTS[s.latinFont]}` : FONTS[s.font];
-  const hf = s.headFont === 'sans' ? (rtl ? '"Fuzz Vazirmatn","Liberation Sans",sans-serif' : '"Liberation Sans",sans-serif')
-    : s.headFont === 'serif' ? (rtl ? '"Fuzz Naskh","Liberation Serif",serif' : '"Liberation Serif",serif') : 'inherit';
+  // (wkhtmltopdf right to left: the installed families, no @font-face — see `style`, generator 5; its fontconfig holds the TTFs)
+  const wk = rtl && s.producer === 'wkhtmltopdf';
+  if (wk) faces = '';
+  const body = wk ? `"${RTL_FONTS[s.font].family}",sans-serif` : rtl ? `"${RTL_FONTS[s.font].face}",${FONTS[s.latinFont]}` : FONTS[s.font];
+  const hf = s.headFont === 'sans' ? (wk ? '"Vazirmatn",sans-serif' : rtl ? '"Fuzz Vazirmatn","Liberation Sans",sans-serif' : '"Liberation Sans",sans-serif')
+    : s.headFont === 'serif' ? (wk ? '"Noto Naskh Arabic",serif' : rtl ? '"Fuzz Naskh","Liberation Serif",serif' : '"Liberation Serif",serif') : 'inherit';
   // a code block is left to right in either direction: its sheet is never mirrored (its bar stays on the left)
   const codeBlock = { box: 'pre{background:#f4f5f7;border:1px solid #d5d8dc;padding:8px;font-size:.85em}',
     bar: 'pre{border-left:3px solid #888;padding-left:8px;font-size:.85em}',
@@ -251,6 +257,11 @@ const HF = `<div style="font-size:7px;width:100%;display:flex;justify-content:sp
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'kelk-fuzz-'));
   const browser = await chromium.launch(), page = await browser.newPage();
   const rf = await rtlFaces(tmp), allFaces = Object.values(rf.faces).join('\n');
+  // wkhtmltopdf's fonts: the system's, and the right-to-left TTFs written to tmp (rtlFaces) as installed ones
+  const fontsConf = path.join(tmp, 'fonts.conf');
+  fs.writeFileSync(fontsConf, '<?xml version="1.0"?><!DOCTYPE fontconfig SYSTEM "fonts.dtd"><fontconfig>' +
+    '<include ignore_missing="yes">/etc/fonts/fonts.conf</include><dir>' + tmp + '</dir><cachedir>' + path.join(tmp, 'fc-cache') + '</cachedir></fontconfig>');
+  const wkEnv = Object.assign({}, process.env, { FONTCONFIG_FILE: fontsConf });
   // the environment: the same seed gives the same PDF only with the same browser, wkhtmltopdf and fonts —
   // the gate compares stored scores only when this matches (gate.js)
   const env = { generator: GENERATOR, chromium: browser.version(), wkhtmltopdf: null, fonts: {} };
@@ -305,8 +316,8 @@ const HF = `<div style="font-size:7px;width:100%;display:flex;justify-content:sp
     } else {
       const hp = path.join(tmp, name + '.html'); fs.writeFileSync(hp, html);
       const m = MARGIN[s.margin].replace('cm', '0mm');
-      // (local files: the right-to-left fonts' @font-face urls)
-      cp.execFileSync('wkhtmltopdf', ['--quiet', '--enable-local-file-access', '-s', s.paper, '-T', m, '-B', m, '-L', m, '-R', m, hp, out], { stdio: ['ignore', 'ignore', 'pipe'] });
+      // (the right-to-left fonts as installed ones: wkEnv's fontconfig adds tmp, where rtlFaces wrote the TTFs)
+      cp.execFileSync('wkhtmltopdf', ['--quiet', '--enable-local-file-access', '-s', s.paper, '-T', m, '-B', m, '-L', m, '-R', m, hp, out], { stdio: ['ignore', 'ignore', 'pipe'], env: wkEnv });
     }
     manifest.samples.push(Object.assign({ name, seed }, s));
     process.stdout.write('.');
