@@ -38,6 +38,8 @@ All notable changes to Kelk. Dates are those of the release tags.
   slants them: that text is italic now (it came back plain).
 - **PDF import: a quote in italic** (a stylesheet's `blockquote { font-style: italic }`) is a quote again where it
   stood right after a list, or was two short lines: it had become the last item's text or a plain paragraph.
+- **PDF import, right to left: borderless tables** — a Persian or Arabic document is known to draw its word spaces
+  again, so a gap with no space in it can be a cell boundary (some tables had come out as one line per row).
 
 ## [2.6] — 2026-11-10
 

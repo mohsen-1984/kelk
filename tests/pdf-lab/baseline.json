@@ -1,5 +1,5 @@
 {
- "written": "2026-11-11T08:26:46.823Z",
+ "written": "2026-11-11T11:06:21.324Z",
  "note": "scripts/gate.js --update; the fuzz means hold only for their env",
  "corpus": {
   "acrobat-word--booklet-fa": {
@@ -1827,17 +1827,17 @@
    "markup": 0,
    "pic": 0,
    "mix": 0,
-   "recall": 0.9385,
-   "order": 0.9303,
+   "recall": 0.998,
+   "order": 0.998,
    "headings": 0.8889,
    "lists": 1,
-   "tables": 0.0165,
+   "tables": 0.3529,
    "code": 1,
-   "total": 0.7957,
-   "rtl": 0.9681,
+   "total": 0.873,
+   "rtl": 0.9978,
    "zwnj": 1,
    "yehKaf": 0.9912,
-   "digits": 0.8811,
+   "digits": 1,
    "brackets": 1
   },
   "lowriter--merged": {
@@ -2919,6 +2919,7 @@
    "regions.columnLeftMirrored",
    "regions.hiddenPicture",
    "regions.pageBorder",
+   "regions.spacedDoc",
    "regions.startFlushPartial",
    "regions.tableDirByLetters",
    "regions.tableRuled"
@@ -3353,6 +3354,7 @@
    "regions.bodyLead",
    "regions.columnLeftMirrored",
    "regions.dotMarkerTask",
+   "regions.spacedDoc",
    "regions.startFlushPartial"
   ],
   "chrome-card--receipt": [
@@ -3388,7 +3390,9 @@
    "extract.thinRectRule",
    "extract.zwnjFromZeroSpace",
    "lines.calliBaseline",
+   "lines.cutCell",
    "lines.furnitureRepeat",
+   "lines.loneBulletJoined",
    "lines.sideNumberRepeat",
    "lines.wordSpaceInserted",
    "order.columnRule",
@@ -3398,6 +3402,7 @@
    "regions.bodyFromLongLines",
    "regions.bodyLead",
    "regions.columnLeftMirrored",
+   "regions.spacedDoc",
    "regions.startFlushPartial"
   ],
   "chrome-float-tagged--infobox": [
@@ -3455,6 +3460,7 @@
    "order.ruledTable",
    "regions.bodyFromLongLines",
    "regions.columnLeftMirrored",
+   "regions.spacedDoc",
    "regions.tableDirByLetters",
    "regions.tableNote",
    "regions.tableRuled",
@@ -3855,7 +3861,8 @@
    "regions.bodyFromLongLines",
    "regions.columnRightMirrored",
    "regions.tableDirByLetters",
-   "regions.tableRuled"
+   "regions.tableRuled",
+   "regions.unspacedDoc"
   ],
   "chrome-headtable--report": [
    "blocks.breakBigGap",
@@ -4039,6 +4046,7 @@
    "regions.columnLeftMirrored",
    "regions.dotMarker",
    "regions.pictureOut",
+   "regions.spacedDoc",
    "regions.startFlushPartial"
   ],
   "chrome-pictures--inline": [
@@ -4086,7 +4094,8 @@
    "regions.bodyFromLongLines",
    "regions.bodyLead",
    "regions.columnLeftMirrored",
-   "regions.dotMarker"
+   "regions.dotMarker",
+   "regions.spacedDoc"
   ],
   "chrome-pictures--slides": [
    "blocks.breakMarker",
@@ -4284,7 +4293,8 @@
    "order.rtlPage",
    "regions.bodyFromLongLines",
    "regions.bodyLead",
-   "regions.columnLeftMirrored"
+   "regions.columnLeftMirrored",
+   "regions.unspacedDoc"
   ],
   "chrome-quote-italic--fa-quote-italic": [
    "blocks.brShortLine",
@@ -4307,6 +4317,7 @@
    "regions.bodyFromLongLines",
    "regions.bodyLead",
    "regions.columnLeftMirrored",
+   "regions.spacedDoc",
    "regions.startFlushPartial"
   ],
   "chrome-rtl-github-bg--ar-article": [
@@ -4335,6 +4346,7 @@
    "regions.bodyLead",
    "regions.columnLeftMirrored",
    "regions.dotMarker",
+   "regions.spacedDoc",
    "regions.startFlushPartial",
    "regions.tableDirByLetters",
    "regions.tableRuled"
@@ -4370,6 +4382,7 @@
    "regions.bodyLead",
    "regions.columnLeftMirrored",
    "regions.dotMarker",
+   "regions.spacedDoc",
    "regions.startFlushPartial",
    "regions.tableDirByLetters",
    "regions.tableRuled"
@@ -4387,9 +4400,10 @@
    "extract.thinRectRule",
    "extract.zwnjFromZeroSpace",
    "lines.calliBaseline",
-   "lines.cutWideGap",
+   "lines.cutCell",
    "lines.furnitureHeadRowKept",
    "lines.furnitureRuledKept",
+   "lines.rowCell",
    "order.cellShadingJoined",
    "order.hr",
    "order.rtlPage",
@@ -4398,6 +4412,7 @@
    "regions.bodyLead",
    "regions.columnLeftMirrored",
    "regions.dotMarker",
+   "regions.spacedDoc",
    "regions.tableDirByLetters",
    "regions.tableRuled"
   ],
@@ -4436,6 +4451,7 @@
    "regions.columnLeftMirrored",
    "regions.dotMarker",
    "regions.dotMarkerTask",
+   "regions.spacedDoc",
    "regions.startFlushPartial",
    "regions.tableDirByLetters",
    "regions.tableRuled"
@@ -4453,14 +4469,12 @@
    "extract.thinRectRule",
    "extract.zwnjFromZeroSpace",
    "lines.calliBaseline",
-   "lines.cutCell",
    "lines.cutDigits",
    "lines.cutWideGap",
    "lines.furnitureHeadRowKept",
    "lines.furnitureRepeat",
    "lines.furnitureRuledKept",
    "lines.furnitureRulesDropped",
-   "lines.rowCell",
    "order.cellShadingJoined",
    "order.hr",
    "order.rtlPage",
@@ -4468,7 +4482,8 @@
    "regions.bodyFromLongLines",
    "regions.columnRightMirrored",
    "regions.tableDirByLetters",
-   "regions.tableRuled"
+   "regions.tableRuled",
+   "regions.unspacedDoc"
   ],
   "chrome-rtl-plain-hf--ar-article": [
    "blocks.breakBigGap",
@@ -4502,6 +4517,7 @@
    "regions.bodyLead",
    "regions.columnLeftMirrored",
    "regions.dotMarker",
+   "regions.spacedDoc",
    "regions.startFlushPartial"
   ],
   "chrome-rtl-plain-hf--fa-article": [
@@ -4542,6 +4558,7 @@
    "regions.codeWrapJoined",
    "regions.columnLeftMirrored",
    "regions.dotMarker",
+   "regions.spacedDoc",
    "regions.startFlushPartial"
   ],
   "chrome-rtl-plain-hf--fa-brackets": [
@@ -4570,7 +4587,8 @@
    "regions.bodyFromLongLines",
    "regions.bodyLead",
    "regions.columnLeftMirrored",
-   "regions.dotMarker"
+   "regions.dotMarker",
+   "regions.spacedDoc"
   ],
   "chrome-rtl-plain-hf--fa-features": [
    "blocks.breakBigGap",
@@ -4612,6 +4630,7 @@
    "regions.columnLeftMirrored",
    "regions.dotMarker",
    "regions.dotMarkerTask",
+   "regions.spacedDoc",
    "regions.startFlushPartial"
   ],
   "chrome-rtl-plain-hf--fa-report": [
@@ -4638,7 +4657,8 @@
    "order.xyRowsTable",
    "regions.bodyFromAllLines",
    "regions.bodyLead",
-   "regions.columnRightMirrored"
+   "regions.columnRightMirrored",
+   "regions.unspacedDoc"
   ],
   "chrome-rtl-tagged--ar-article": [
    "blocks.breakBigGap",
@@ -4668,6 +4688,7 @@
    "regions.bodyLead",
    "regions.columnLeftMirrored",
    "regions.dotMarker",
+   "regions.spacedDoc",
    "regions.startFlushPartial",
    "regions.tableDirByLetters",
    "regions.tableRuled"
@@ -4706,6 +4727,7 @@
    "regions.bodyLead",
    "regions.columnLeftMirrored",
    "regions.dotMarker",
+   "regions.spacedDoc",
    "regions.startFlushPartial",
    "regions.tableDirByLetters",
    "regions.tableRuled"
@@ -4736,6 +4758,7 @@
    "regions.bodyLead",
    "regions.columnLeftMirrored",
    "regions.dotMarker",
+   "regions.spacedDoc",
    "regions.tableDirByLetters",
    "regions.tableRuled"
   ],
@@ -4775,6 +4798,7 @@
    "regions.columnLeftMirrored",
    "regions.dotMarker",
    "regions.dotMarkerTask",
+   "regions.spacedDoc",
    "regions.startFlushPartial",
    "regions.tableDirByLetters",
    "regions.tableRuled"
@@ -4807,7 +4831,8 @@
    "regions.bodyFromLongLines",
    "regions.columnRightMirrored",
    "regions.tableDirByLetters",
-   "regions.tableRuled"
+   "regions.tableRuled",
+   "regions.unspacedDoc"
   ],
   "chrome-rtl-varfont--fa-weights": [
    "blocks.breakBigGap",
@@ -4820,7 +4845,8 @@
    "lines.calliBaseline",
    "order.rtlPage",
    "regions.bodyFromAllLines",
-   "regions.columnLeftMirrored"
+   "regions.columnLeftMirrored",
+   "regions.spacedDoc"
   ],
   "chrome-tagged--article": [
    "blocks.brShortLine",
@@ -5044,11 +5070,13 @@
    "extract.textOnCover",
    "extract.thinRectRule",
    "extract.zwnjFromZeroSpace",
+   "lines.cutCell",
    "lines.cutWideGap",
    "lines.furnitureDrawnDropped",
    "lines.furnitureHeadRowKept",
    "lines.furnitureRepeat",
    "lines.furnitureRulesDropped",
+   "lines.rowCell",
    "order.besideFloat",
    "order.borderlessTable",
    "order.boxCard",
@@ -5060,7 +5088,8 @@
    "order.xyRowsTable",
    "regions.bodyFromLongLines",
    "regions.bodyLead",
-   "regions.columnLeftMirrored"
+   "regions.columnLeftMirrored",
+   "regions.spacedDoc"
   ],
   "edge--real-readme-en": [
    "blocks.breakBigGap",
@@ -5144,7 +5173,8 @@
    "regions.columnLeftMirrored",
    "regions.columnRightMirrored",
    "regions.tableDirByHeader",
-   "regions.tableRuled"
+   "regions.tableRuled",
+   "regions.unspacedDoc"
   ],
   "excel2024--real-sheet-plain-fa": [
    "blocks.headingSize",
@@ -5323,6 +5353,7 @@
    "regions.bodyLead",
    "regions.columnLeftMirrored",
    "regions.letterHead",
+   "regions.spacedDoc",
    "regions.startFlushPartial"
   ],
   "kelk--ar-article": [
@@ -5353,7 +5384,8 @@
    "regions.dotMarker",
    "regions.startFlushPartial",
    "regions.tableDirByLetters",
-   "regions.tableRuled"
+   "regions.tableRuled",
+   "regions.unspacedDoc"
   ],
   "kelk--article": [
    "blocks.breakBigGap",
@@ -5433,7 +5465,8 @@
    "regions.dotMarker",
    "regions.startFlushPartial",
    "regions.tableDirByLetters",
-   "regions.tableRuled"
+   "regions.tableRuled",
+   "regions.unspacedDoc"
   ],
   "kelk--fa-brackets": [
    "blocks.breakBigGap",
@@ -5458,7 +5491,8 @@
    "regions.columnLeftMirrored",
    "regions.dotMarker",
    "regions.tableDirByLetters",
-   "regions.tableRuled"
+   "regions.tableRuled",
+   "regions.unspacedDoc"
   ],
   "kelk--fa-features": [
    "blocks.breakBigGap",
@@ -5498,7 +5532,8 @@
    "regions.dotMarkerTask",
    "regions.startFlushPartial",
    "regions.tableDirByLetters",
-   "regions.tableRuled"
+   "regions.tableRuled",
+   "regions.unspacedDoc"
   ],
   "kelk--fa-math": [
    "blocks.breakBigGap",
@@ -5516,7 +5551,8 @@
    "order.xyCutFreesColumns",
    "regions.bodyFromAllLines",
    "regions.columnLeftMirrored",
-   "regions.dotMarker"
+   "regions.dotMarker",
+   "regions.unspacedDoc"
   ],
   "kelk--fa-report": [
    "blocks.breakBigGap",
@@ -5544,7 +5580,8 @@
    "regions.bodyLead",
    "regions.columnRightMirrored",
    "regions.tableDirByLetters",
-   "regions.tableRuled"
+   "regions.tableRuled",
+   "regions.unspacedDoc"
   ],
   "kelk--features": [
    "blocks.breakBigGap",
@@ -5747,6 +5784,7 @@
    "regions.cellPiecesJoined",
    "regions.columnLeftMirrored",
    "regions.columnRightMirrored",
+   "regions.spacedDoc",
    "regions.startFlushPartial",
    "regions.tableDirByLetters",
    "regions.tableRuled"
@@ -5835,6 +5873,7 @@
    "order.xySlabRun",
    "regions.bodyFromLongLines",
    "regions.bodyLead",
+   "regions.spacedDoc",
    "regions.startFlushPartial",
    "regions.tableDirByLetters",
    "regions.tableRuled"
@@ -5864,6 +5903,7 @@
    "regions.bodyFromLongLines",
    "regions.bodyLead",
    "regions.columnLeftMirrored",
+   "regions.spacedDoc",
    "regions.tableDirByLetters",
    "regions.tableRuled"
   ],
@@ -5914,7 +5954,8 @@
    "regions.columnLeftMirrored",
    "regions.startFlushPartial",
    "regions.tableDirByLetters",
-   "regions.tableRuled"
+   "regions.tableRuled",
+   "regions.unspacedDoc"
   ],
   "kelkdocx-lo--fa-report": [
    "blocks.breakBigGap",
@@ -5929,12 +5970,13 @@
    "extract.textOnCover",
    "extract.zwnjFromZeroSpace",
    "lines.bracketsLogical",
+   "lines.cutCell",
    "lines.cutDigits",
    "lines.cutWideGap",
    "lines.furnitureHeadRowKept",
    "lines.furnitureRuledKept",
    "lines.justifiedGap",
-   "lines.streamColumnCut",
+   "lines.rowCell",
    "lines.wordSpaceInserted",
    "order.besideFloat",
    "order.cellShadingJoined",
@@ -5945,6 +5987,7 @@
    "order.xySlabRun",
    "regions.bodyFromAllLines",
    "regions.columnRightMirrored",
+   "regions.spacedDoc",
    "regions.tableDirByLetters",
    "regions.tableRuled"
   ],
@@ -6284,6 +6327,7 @@
    "regions.columnLeftMirrored",
    "regions.columnRightMirrored",
    "regions.headFamilies",
+   "regions.spacedDoc",
    "regions.startFlushPartial"
   ],
   "lohtml-rtl--fa-article": [
@@ -6324,6 +6368,7 @@
    "regions.bodyLead",
    "regions.columnRightMirrored",
    "regions.headFamilies",
+   "regions.spacedDoc",
    "regions.startFlushPartial"
   ],
   "lohtml-rtl--fa-brackets": [
@@ -6355,6 +6400,7 @@
    "regions.bodyFromLongLines",
    "regions.columnRightMirrored",
    "regions.headFamilies",
+   "regions.spacedDoc",
    "regions.startFlushPartial"
   ],
   "lohtml-rtl--fa-features": [
@@ -6392,6 +6438,7 @@
    "regions.bodyFromLongLines",
    "regions.columnRightMirrored",
    "regions.headFamilies",
+   "regions.spacedDoc",
    "regions.startFlushPartial"
   ],
   "lohtml-rtl--fa-report": [
@@ -6416,13 +6463,9 @@
    "lines.furnitureHeadRowKept",
    "lines.furnitureRepeat",
    "lines.furnitureRulesDropped",
-   "lines.lineWithoutSpaces",
    "lines.rowCell",
-   "lines.wordSpaceBare",
-   "lines.wordSpaceFontSpace",
    "order.besideFloat",
    "order.borderlessTable",
-   "order.gridCellSplit",
    "order.gridWrapMerged",
    "order.hr",
    "order.leafCellWrap",
@@ -6435,6 +6478,7 @@
    "regions.bodyFromLongLines",
    "regions.columnRightMirrored",
    "regions.headFamilies",
+   "regions.spacedDoc",
    "regions.startFlushPartial"
   ],
   "lowriter--merged": [
@@ -6447,6 +6491,7 @@
    "order.ruledTable",
    "regions.bodyFromAllLines",
    "regions.columnLeftMirrored",
+   "regions.spacedDoc",
    "regions.tableDirByLetters",
    "regions.tableNoteLabelled",
    "regions.tableRuled",
@@ -7097,7 +7142,8 @@
    "regions.columnRightMirrored",
    "regions.dotMarker",
    "regions.fwdLies",
-   "regions.lyingBack"
+   "regions.lyingBack",
+   "regions.spacedDoc"
   ],
   "pptx-rtl--slides-rtl": [
    "blocks.brCentredShort",
@@ -7121,7 +7167,8 @@
    "lines.wordSpaceOwnGap",
    "order.rtlPage",
    "regions.bodyFromAllLines",
-   "regions.headFamilies"
+   "regions.headFamilies",
+   "regions.unspacedDoc"
   ],
   "prince-letter--letter-dash": [
    "blocks.brShortLine",
@@ -7137,7 +7184,8 @@
    "regions.bodyFromAllLines",
    "regions.bodyLead",
    "regions.columnLeftMirrored",
-   "regions.columnRightMirrored"
+   "regions.columnRightMirrored",
+   "regions.spacedDoc"
   ],
   "prince-letter--prince-table": [
    "blocks.brCentredShort",
@@ -7170,6 +7218,7 @@
    "regions.columnLeftMirrored",
    "regions.columnRightMirrored",
    "regions.letterHead",
+   "regions.spacedDoc",
    "regions.tableDirByLetters",
    "regions.tableOneRow",
    "regions.tableRuled"
@@ -7184,7 +7233,8 @@
    "order.rtlPage",
    "regions.bodyFromLongLines",
    "regions.bodyLead",
-   "regions.columnLeftMirrored"
+   "regions.columnLeftMirrored",
+   "regions.spacedDoc"
   ],
   "wk-github--article": [
    "blocks.breakBigGap",
@@ -7551,6 +7601,7 @@
    "order.ruledTable",
    "regions.bodyFromLongLines",
    "regions.dotMarker",
+   "regions.spacedDoc",
    "regions.startFlushPartial",
    "regions.tableDirByLetters",
    "regions.tableRuled"
@@ -7584,6 +7635,7 @@
    "order.ruledTable",
    "regions.bodyFromLongLines",
    "regions.dotMarker",
+   "regions.spacedDoc",
    "regions.startFlushPartial",
    "regions.tableDirByLetters",
    "regions.tableRuled"
@@ -7610,6 +7662,7 @@
    "order.ruledTable",
    "regions.bodyFromLongLines",
    "regions.dotMarker",
+   "regions.spacedDoc",
    "regions.startFlushPartial",
    "regions.tableDirByLetters",
    "regions.tableRuled"
@@ -7649,6 +7702,7 @@
    "regions.bodyFromLongLines",
    "regions.dotMarker",
    "regions.dotMarkerTask",
+   "regions.spacedDoc",
    "regions.startFlushPartial",
    "regions.tableDirByLetters",
    "regions.tableRuled"
@@ -7662,10 +7716,12 @@
    "blocks.joinTableDownColumns",
    "extract.textOnCover",
    "extract.thinRectRule",
+   "lines.cutCell",
    "lines.cutDigits",
    "lines.cutWideGap",
    "lines.furnitureHeadRowKept",
    "lines.furnitureRuledKept",
+   "lines.rowCell",
    "lines.zwnjFromSpace",
    "order.boxFillsJoined",
    "order.cellShadingJoined",
@@ -7674,6 +7730,7 @@
    "order.ruledTable",
    "regions.bodyFromLongLines",
    "regions.columnRightMirrored",
+   "regions.spacedDoc",
    "regions.startFlushPartial",
    "regions.tableDirByLetters",
    "regions.tableRuled"
@@ -7702,6 +7759,7 @@
    "regions.cellItems",
    "regions.cellPiecesJoined",
    "regions.columnLeftMirrored",
+   "regions.spacedDoc",
    "regions.tableDirByLetters",
    "regions.tableRuled"
   ],
@@ -7728,6 +7786,7 @@
    "regions.columnRightMirrored",
    "regions.headFamilies",
    "regions.pageBorder",
+   "regions.spacedDoc",
    "regions.startFlushPartial"
   ],
   "word-form--form-box-fa": [
@@ -7748,15 +7807,14 @@
    "regions.columnLeftMirrored",
    "regions.tableDirByLetters",
    "regions.tableRuled",
-   "regions.tableSpanAcross"
+   "regions.tableSpanAcross",
+   "regions.unspacedDoc"
   ],
   "word-form--form-row-fa": [
    "extract.formFromCmap",
-   "lines.cutCell",
    "lines.cutDigits",
    "lines.cutWideGap",
    "lines.furnitureHeadRowKept",
-   "lines.rowCell",
    "lines.wordSpaceFontSpace",
    "order.hrFrameEdge",
    "order.ruledTable",
@@ -7769,7 +7827,8 @@
    "regions.tablePreamble",
    "regions.tableRuled",
    "regions.tableSpanAcross",
-   "regions.tableTitleSubtitle"
+   "regions.tableTitleSubtitle",
+   "regions.unspacedDoc"
   ],
   "word-frame--frame-table-fa": [
    "blocks.breakBigGap",
@@ -7788,6 +7847,7 @@
    "regions.borderTableEdgeKept",
    "regions.columnLeftMirrored",
    "regions.pageBorder",
+   "regions.spacedDoc",
    "regions.tableDirByLetters",
    "regions.tableRuled"
   ],
@@ -7818,6 +7878,7 @@
    "regions.cellItemLone",
    "regions.cellItems",
    "regions.cellPiecesJoined",
+   "regions.spacedDoc",
    "regions.startFlushPartial",
    "regions.tableDirByLetters",
    "regions.tableRuled"
@@ -7841,7 +7902,6 @@
    "extract.formFromCmap",
    "lines.calliBaseline",
    "lines.cutCell",
-   "lines.cutSizeJump",
    "lines.cutWideGap",
    "lines.furnitureDrawnDropped",
    "lines.furnitureHeadRowKept",
@@ -7856,7 +7916,8 @@
    "regions.bodyLead",
    "regions.calliZwnjDropped",
    "regions.columnLeftMirrored",
-   "regions.letterHead"
+   "regions.letterHead",
+   "regions.spacedDoc"
   ],
   "word-merged--merged-cells-fa": [
    "blocks.headingSize",
@@ -7875,7 +7936,8 @@
    "regions.tableDirByLetters",
    "regions.tableRuled",
    "regions.tableSpanAcross",
-   "regions.tableSpanDown"
+   "regions.tableSpanDown",
+   "regions.unspacedDoc"
   ],
   "word-nitro--scrambled-fa": [
    "blocks.breakBigGap",
@@ -7905,7 +7967,8 @@
    "order.quoteBarsJoined",
    "order.rtlPage",
    "regions.bodyFromAllLines",
-   "regions.columnLeftMirrored"
+   "regions.columnLeftMirrored",
+   "regions.spacedDoc"
   ],
   "word-plan--plan-fa": [
    "blocks.breakBigGap",
@@ -7980,6 +8043,7 @@
    "regions.bodyLead",
    "regions.columnLeftMirrored",
    "regions.headFamilies",
+   "regions.spacedDoc",
    "regions.tableDirByLetters",
    "regions.tableRowSplit",
    "regions.tableRuled",
@@ -8017,7 +8081,8 @@
    "order.xyCutFreesColumns",
    "regions.bodyFromLongLines",
    "regions.bodyLead",
-   "regions.columnLeftMirrored"
+   "regions.columnLeftMirrored",
+   "regions.spacedDoc"
   ],
   "word-sides--sides-fa": [
    "blocks.brCentredShort",
@@ -8040,6 +8105,7 @@
    "regions.bodyFromAllLines",
    "regions.columnLeftMirrored",
    "regions.columnRightMirrored",
+   "regions.spacedDoc",
    "regions.tableDirByLetters",
    "regions.tableRuled"
   ],
@@ -8055,6 +8121,7 @@
    "regions.bodyFromAllLines",
    "regions.columnLeftMirrored",
    "regions.columnRightMirrored",
+   "regions.spacedDoc",
    "regions.tableDirByLetters",
    "regions.tableRuled",
    "regions.tableSpanAcross",
@@ -8171,7 +8238,8 @@
    "order.xyCutFreesColumns",
    "regions.bodyFromLongLines",
    "regions.bodyLead",
-   "regions.columnLeftMirrored"
+   "regions.columnLeftMirrored",
+   "regions.spacedDoc"
   ]
  },
  "meta": {
@@ -9979,7 +10047,7 @@
   }
  },
  "realHeldout": {
-  "at": "2026-11-11T08:26:38.225Z",
+  "at": "2026-11-11T11:06:12.514Z",
   "n": 17,
   "errors": 0,
   "docs": [

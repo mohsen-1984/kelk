@@ -87,11 +87,10 @@ In this order, one pull request each (3 and 4 may split in two):
      (Chrome's synthetic italic of Vazirmatn, Sahel, Noto Naskh), and a quote set in and in italic is told from the
      list or paragraph beside it (lab: `chrome-quote-italic--fa-quote-italic` 77.8 → 100; fuzz quotes dev +6.9,
      held-out +3.6)
-   - **3c, Chromium's tables** (`pdf/2.7-rtl-tables`): borderless right-to-left tables (fuzz `none` 44, `zebra` 52,
-     against 76 and 67 left to right). What is known: a first column marked `:---` stays left-aligned in a
-     right-to-left table, so its text stands 9 pt from the next column's right-aligned numbers — a word's gap — and
-     the rows read as text before any rows leaf (`_rowsLeaf`) sees them (`fz50-chr--fa-article`: the table came
-     out as paragraphs, two cells to a line); the region step is where to look
+   - **3c, right-to-left tables** (`pdf/2.7-rtl-tables`): a right-to-left document is now measured as drawing its
+     word spaces (`_spacedDoc` counted lowercase letters only), so a gap with no space in it is a cell boundary there
+     too (`lohtml-rtl--fa-report` 79.6 → 87.3). The rest moves to 2.8 (the owner's decision of 2026-11-11: bigger than
+     two pull requests) — see «Right-to-left borderless tables» there
    - **The lab's own limit, fixed first** (`lab/2.7-wk-fonts`, generator 5): wkhtmltopdf drew the fuzz set's
      `@font-face` fonts as outlines, no text layer (its 9 right-to-left `dev` files: total ≈ 26). It now takes them as
      installed fonts: those files 26 → 56, the RTL `dev` mean 75.7 → 82.0, with no change to the importer — the mean
@@ -133,6 +132,13 @@ fixed: its score is the case's measure).
    draw «.» as a thousands separator — a reader takes «3.004» for three and a bit. The three fonts come into the
    repository with 2.5 (item 1); the owner attaches a sample PDF when the item starts, and a lab file of our own
    follows from it
+
+**Right-to-left borderless tables** (from 2.7, item 3c): Chromium's right-to-left fuzz files lose most borderless
+tables (`none` ≈ 44, `zebra` ≈ 52, against ≈ 76 and ≈ 67 left to right; `fz50-chr--fa-article`, `fz17-chr--fa-mixed`:
+0). The rows are known, the cells are cut, and still no rows leaf (`_rowsLeaf`) reads them: the table comes out as
+paragraphs, its header row bold with «·» between the cells. The region step is where to look — what classifies the
+table's region before the leaf. Also: a short page (under 20 prose gaps) is never measured as drawing its spaces,
+and its borderless table's header row breaks off as headings (left to right the same page reads whole).
 
 **The stress check's margin** (CI's *lab*, `run-stress.js`: the whole lab joined in one PDF must never hold the page
 a second at once): 836 ms on CI after 2.7's `fa-brackets` files, against the 1,000 ms limit (main had stood at 684–776).
