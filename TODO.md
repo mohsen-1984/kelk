@@ -58,26 +58,29 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
   break, scrolling sideways in their own block (`kelk-wide`: the columns' longest words do not fit the pane).
 - Each view has its own sample (about, slides, excel). Settings → Excel's words load with the Excel module.
 
-**2.7 — the slides view on demand, then PDF import from real files** (the next release; moved from 2.6, the owner's
-decision of 2026-11-09).
+**2.7 — PDF import from the synthetic lab** (the next release; the owner's decisions of 2026-11-11). No real
+samples in this release: only what the lab can cover, with new lab files of our own where needed (no personal
+metadata in them: author, company, user names). The lab's gate, the golden files and the held-out checks stay green.
+In this order, one pull request each (3 and 4 may split in two):
 
-**The slides view on demand** (moved from 2.5, the owner's decision of 2026-11-09): PptxBuilder (170 KB) and
-`scripts/slides.js` (30 KB) load with the page, though a user who writes documents never needs them; load them on
-the first switch to Slides (and for a PPTX export, the Slides settings' theme lists, a deck sample), as the PDF
-importer is (`config.libs`, `Kelk.libs.need`). Already on demand: PptxGenJS and JSZip (`libs.pptx`), the slide
-check (`scripts/slidecheck.js`), the icon set. Still at startup: `lib/PptxBuilder.js` (`scripts/settings.js` reads
-its theme lists to fill Settings → Slides) and `scripts/slides.js` (the view toggle, the export hooks). Its startup
-bytes come back to the budget.
-
-**PDF import, from real files.** Each case is reproduced by a lab PDF of our own (failing on purpose until
-fixed: its score is the case's measure), in this order.
-
-1. **Numbers in Persian report fonts** — B Nazanin, B Mitra and B Titr: a report's amounts read «3.004» (the file's
-   text has a period between the thousands; the page shows a comma-like mark): **to examine** whether these fonts
-   draw «.» as a thousands separator — a reader takes «3.004» for three and a bit. The three fonts come into the
-   repository with 2.5 (item 1); the owner attaches a sample PDF when the item starts, and a lab file of our own
-   follows from it
-2. **A designed booklet** (designed documents from browsers: heading, box and figure rules shared by every Chromium
+1. **Every progress state names its step** (`ui/2.7-progress`). The rule: no generic progress anywhere in Kelk —
+   every task, import or export, says the step under way, in fa / en / ar (`Kelk.ui.steps`; `Kelk.ui.task` refuses
+   an empty step). Imports: the libraries loading on first use, reading the file, opening the PDF, then the
+   importer's own steps. Exports: the library, the fonts, the formulas, the build, the fonts embedded, the package.
+   The page repaints before each long step that holds it (a builder), so its name shows. Step names only: the bar
+   does not move inside a builder (see «Export progress inside the builders» below)
+2. **The imported file's information in the import report** (`pdf/2.7-file-info`): a table in the report panel,
+   collapsed, with what the file says — for a PDF its Info and XMP fields (title, author, subject, keywords,
+   creator, producer, dates as written, PDF version, pages, page size, language, tagged, outline, page labels,
+   fonts), for a DOCX / XLSX `docProps` (core, app), for an HTML `<title>` and its generator. What Kelk infers
+   (the maker, the engine, the production path) is its own group, labelled a guess, with its evidence; the
+   operating system only when the file names it (a browser's User-Agent, Quartz's «macOS Version», «(Windows)»,
+   Microsoft Print to PDF) — never from the fonts. DOCX, XLSX and HTML imports get the same report panel as a PDF
+   (the same component, `reportOpenMs`), shown only when there is something to show
+3. **Right to left** (`pdf/2.7-rtl`): RTL fuzz files ≈ 77 against LTR ≈ 93, tables (62) and quotes (61) weakest;
+   the LibreOffice-path RTL files (`lohtml-rtl--*` 51–69, `kelkdocx-lo--*` 56–82) lose brackets (mirrored), lists
+   and tables. Each fix with a lab file of its own
+4. **A designed booklet** (designed documents from browsers: heading, box and figure rules shared by every Chromium
    file in the lab) — **lab:** `chrome-booklet--booklet-cards-fa` (45.4). Cards, badges and coloured boxes:
    - a table of contents — a number badge, the title, dot leaders drawn as a dashed rule, no page number — comes
      back as headings or a table with each number a bold paragraph after its title; expected a numbered list
@@ -92,8 +95,35 @@ fixed: its score is the case's measure), in this order.
    - two cards side by side, each a bold title over its text, become a two-column table (or headings): expected
      each card's title in bold over its text, the start side first
    Risk: high (the size and box rules decide headings and quotes for every web page in the lab)
+5. If time allows: Persian digits that share a glyph with Arabic-Indic ones come back Arabic-Indic; bordered form
+   boxes as tables
+6. Release 2.7
 
-**High (2.1)**
+**2.8 — PDF import from real files, the slides view on demand** (moved from 2.7, the owner's decision of 2026-11-11).
+
+**The slides view on demand** (moved from 2.5, then 2.7; the owner's decisions of 2026-11-09 and 2026-11-11): PptxBuilder (170 KB) and
+`scripts/slides.js` (30 KB) load with the page, though a user who writes documents never needs them; load them on
+the first switch to Slides (and for a PPTX export, the Slides settings' theme lists, a deck sample), as the PDF
+importer is (`config.libs`, `Kelk.libs.need`). Already on demand: PptxGenJS and JSZip (`libs.pptx`), the slide
+check (`scripts/slidecheck.js`), the icon set. Still at startup: `lib/PptxBuilder.js` (`scripts/settings.js` reads
+its theme lists to fill Settings → Slides) and `scripts/slides.js` (the view toggle, the export hooks). Its startup
+bytes come back to the budget.
+
+**PDF import, from real files.** Each case is reproduced by a lab PDF of our own (failing on purpose until
+fixed: its score is the case's measure).
+
+1. **Numbers in Persian report fonts** — B Nazanin, B Mitra and B Titr: a report's amounts read «3.004» (the file's
+   text has a period between the thousands; the page shows a comma-like mark): **to examine** whether these fonts
+   draw «.» as a thousands separator — a reader takes «3.004» for three and a bit. The three fonts come into the
+   repository with 2.5 (item 1); the owner attaches a sample PDF when the item starts, and a lab file of our own
+   follows from it
+
+**Export progress inside the builders** (from 2.7's progress item): DocxBuilder, PdfBuilder, HtmlBuilder and
+WordHtmlBuilder build in one synchronous run, so during «building the document» the step name shows but the bar
+stands still. A moving bar needs the builders to yield between parts (sections, pages; PdfBuilder's two layout
+passes with a table of contents) and report them, as the slides build does.
+
+**High**
 
 - PDF import, right to left: RTL fuzz files score well below English ones (RTL ≈ 77–81 against LTR ≈ 92–93; tables
   and quotes weakest, then `zwnj`); LibreOffice-path RTL files lose brackets (mirrored), lists and tables; Chrome's
@@ -105,7 +135,7 @@ fixed: its score is the case's measure), in this order.
 - Release: GitHub Pages served from the app's set (`tools/build-release.sh`) rather than from the whole repository
   (no `.nojekyll`, no cache-busting today)
 
-**Medium (2.2)**
+**Medium**
 
 - PDF import: put the calibrated thresholds to use (1,007 registered, none switched to calibrated yet); fonts with no
   ToUnicode at all; Persian digits that share a glyph with Arabic-Indic ones come back Arabic-Indic; bordered form boxes
