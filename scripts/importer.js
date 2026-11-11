@@ -58,15 +58,18 @@
     }
 
     /** A zip's documents (into docs), its images (into pics, by their path) and what cannot come in (into skipped). */
-    async function unzip(file, docs, pics, skipped, t, maxMB) {
+    async function unzip(file, docs, pics, skipped, t, maxMB, step) {
         t.label(K.i18n.t('taskZip', file.name));
-        await K.libs.need('jszip');                  // loaded on the first .zip
+        if (!K.libs.loaded('jszip')) { step('libs', 0, 1); await K.libs.need('jszip'); }   // loaded on the first .zip
+        step('file', 0, 1);
         const zip = await JSZip.loadAsync(await readBuffer(file));
         const X = K.config.extensions, known = [].concat(X.markdown, X.html, X.docx, X.pdf, X.csv);
         const entries = Object.keys(zip.files).map(function (k) { return zip.files[k]; })
             .filter(function (e) { return !e.dir && !/(^|\/)(__MACOSX|\.)/.test(e.name); });
-        for (const e of entries) {
+        for (let i = 0; i < entries.length; i++) {
+            const e = entries[i];
             if (t.signal.aborted) return;
+            step('zip', i, entries.length);
             const x = ext(e.name), base = e.name.split('/').pop();
             const size = e._data && e._data.uncompressedSize;
             const image = /^\.(png|jpe?g|gif|webp|svg|bmp)$/.test(x);
@@ -127,14 +130,38 @@
         }).replace(/\n{3,}$/, '\n');
     }
 
+    /**
+     * The steps of a document's import (Kelk.ui.steps: every one named), each kind its own: the library on first use
+     * (named only when it loads), the file read, the conversion; a PDF's are in fromPdf. Rough shares, not measured.
+     */
+    const DOC_STEPS = { libs: 0.1, file: 0.1, images: 0.2, convert: 0.6 };
+    const DOC_KEYS = { libs: 'imp_docxLibs', file: 'imp_file', images: 'imp_mdImages', convert: 'imp_html' };
+
     /** One document → { md, converted } (a PDF: and report, bytes); null when its kind is not known. */
     async function convert(file, name, t, o) {
         const e = ext(name), X = K.config.extensions;
-        if (X.markdown.indexOf(e) >= 0) return { md: await takeDataImages(await readText(file)), converted: false };
-        if (X.html.indexOf(e) >= 0) return { md: importer().fromHtml(await readText(file)).markdown, converted: true };
-        if (X.docx.indexOf(e) >= 0) {
-            await K.libs.need('mammoth');            // loaded on the first .docx import
-            const r = await importer().fromDocx(await readBuffer(file));
+        const docx = X.docx.indexOf(e) >= 0;
+        const step = K.ui.steps(t, DOC_STEPS, Object.assign({}, DOC_KEYS, docx ? { convert: 'imp_docx' } : {}));
+        if (X.markdown.indexOf(e) >= 0) {
+            step('file', 0, 1);
+            const text = await readText(file);
+            if (/\]:[ \t]*<?data:image\//i.test(text)) step('images', 0, 1);          // pictures carried in the file (Kelk's MD export)
+            return { md: await takeDataImages(text), converted: false };
+        }
+        if (X.html.indexOf(e) >= 0) {
+            step('file', 0, 1);
+            const text = await readText(file);
+            step('convert', 0, 1);
+            await K.ui.paint();                      // the conversion holds the page: its name first
+            return { md: importer().fromHtml(text).markdown, converted: true };
+        }
+        if (docx) {
+            if (!K.libs.loaded('mammoth')) { step('libs', 0, 1); await K.libs.need('mammoth'); }   // loaded on the first .docx import
+            step('file', 0, 1);
+            const buf = await readBuffer(file);
+            step('convert', 0, 1);
+            await K.ui.paint();
+            const r = await importer().fromDocx(buf);
             if (r.messages && r.messages.length) console.info('mammoth:', r.messages);
             return { md: r.markdown, converted: true };
         }
@@ -156,9 +183,20 @@
      */
     async function fromPdf(file, name, t, o) {
         const mode = o && o.mode;
-        await K.libs.need('pdfjs');                  // loaded on the first .pdf import
-        await K.libs.need('pdfimport');              // PdfImporter and its parts, after pdf.js (as its header says)
+        // the bar runs through every step (config.importProgress), not only the pages: after the last page
+        // is read the font repairs, the layout and the Markdown still take most of the time; each step is named
+        // (the page under way for the counted ones)
+        const step = K.ui.steps(t, K.config.importProgress, {
+            libs: 'imp_pdfLibs', file: 'imp_file', open: 'imp_pdfOpen', read: 'taskPage', fonts: 'taskFonts',
+            lines: 'taskLines', layout: 'taskLayout', markdown: 'taskMarkdown'
+        }, ['read', 'lines', 'layout']);
+        if (!K.libs.loaded('pdfjs') || !K.libs.loaded('pdfimport')) {
+            step('libs', 0, 1);
+            await K.libs.need('pdfjs');              // loaded on the first .pdf import
+            await K.libs.need('pdfimport');          // PdfImporter and its parts, after pdf.js (as its header says)
+        }
         const set = K.store.getUi('importer'), base = name.replace(/\.[^.]+$/, '');
+        step('file', 0, 1);
         const buf = await readBuffer(file), bytes = o && o.keepBytes ? new Uint8Array(buf.slice(0)) : null;
         // the import's messages come once, at its end (K.ui.batch), and its pictures are stored once
         return K.ui.batch(async function () {
@@ -187,23 +225,7 @@
                         } catch (err) { return uri; }
                     }
                 };
-                // the bar runs through every step (config.importProgress), not only the pages: after the last page
-                // is read the font repairs, the layout and the Markdown still take most of the time
-                const W = K.config.importProgress, ORDER = ['read', 'fonts', 'lines', 'layout', 'markdown'];
-                const hooks = {
-                    onStage: function (stage, done, total) {
-                        const k = ORDER.indexOf(stage);
-                        if (k < 0) return;
-                        let before = 0;
-                        for (let j = 0; j < k; j++) before += W[ORDER[j]];
-                        const share = before + W[stage] * (total > 0 ? Math.min(done, total) / total : 0);
-                        const label = stage === 'read' ? K.i18n.t('taskPage', done, total)
-                            : stage === 'fonts' ? K.i18n.t('taskFonts')
-                            : stage === 'lines' ? K.i18n.t('taskLines', done, total)
-                            : stage === 'layout' ? K.i18n.t('taskLayout', done, total) : K.i18n.t('taskMarkdown');
-                        t.progress(Math.round(share * 1000), 1000, label);
-                    }
-                };
+                const hooks = { onStage: step };          // 'open', 'read', 'fonts', 'lines', 'layout', 'markdown'
                 if (mode) opts.mode = hooks.mode = mode;
                 const r = await PdfImporter.create(opts).fromArrayBuffer(buf, hooks);
                 if (r.messages && r.messages.length) console.info('PdfImporter:', r.messages);
@@ -275,8 +297,11 @@
             try {
                 set = await K.ui.task(K.i18n.t(files.length === 1 && !zipped ? 'taskImport' : 'taskZip', first), async function (t) {
                     const docs = [], pics = {}, skipped = [];
+                    const step = K.ui.steps(t, { list: 0.05, libs: 0.05, file: 0.1, zip: 0.8 },
+                        { list: 'imp_list', libs: 'imp_zipLibs', file: 'imp_file', zip: 'imp_zipEntry' }, 'zip');
+                    step('list', 0, 1);
                     for (const f of files) {
-                        if (ext(f.name) === '.zip') await unzip(f, docs, pics, skipped, t, maxMB);
+                        if (ext(f.name) === '.zip') await unzip(f, docs, pics, skipped, t, maxMB, step);
                         else if (K.images.isImage(f)) continue;
                         else if (files.length > 1 && X.xlsx.indexOf(ext(f.name)) >= 0) skipped.push({ name: f.name, path: f.name, size: f.size, reason: 'xlsx' });
                         else if (files.length > 1 && known.indexOf(ext(f.name)) < 0) skipped.push({ name: f.name, path: f.name, size: f.size, reason: 'type' });
@@ -315,9 +340,9 @@
                     for (let i = 0; i < docs.length; i++) {
                         const d = docs[i];
                         t.label(docs.length > 1 ? K.i18n.t('taskImportN', d.name, i + 1, docs.length) : K.i18n.t('taskImport', d.name));
-                        t.progress(0, 0, '');
                         const r = await convert(d.file, d.name, t, co);
                         if (r == null) continue;
+                        if (Object.keys(set.pics).length) t.progress(1000, 1000, K.i18n.t('imp_pics'));   // the zip's pictures the text names
                         out.push({ name: d.name, md: await placeImages(r.md, d.path, set.pics), converted: r.converted, report: r.report, bytes: r.bytes });
                     }
                     return out;

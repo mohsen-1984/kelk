@@ -15,7 +15,9 @@
         maxSheetCells: 100000,          // CSV / XLSX import: more cells than this and typing in the editor slows (2.6, measured)
         // a PDF import's progress bar: each step's share of the bar (they add up to 1), measured on large files —
         // after the last page is read, the font repairs, the layout and the Markdown still take about two thirds of the time
-        importProgress: { read: 0.33, fonts: 0.17, lines: 0.08, layout: 0.37, markdown: 0.05 },
+        // (libs: pdf.js and the importer on the first PDF; file: the file read into memory; open: pdf.js opens the
+        // document, its metadata and structure tree — not measured, small)
+        importProgress: { libs: 0.02, file: 0.01, open: 0.02, read: 0.31, fonts: 0.17, lines: 0.08, layout: 0.34, markdown: 0.05 },
         // a PowerPoint export's progress bar (slides.js blob): each step's share, measured on decks of 200–430 slides
         // (libs: PptxGenJS on the first export, not measured)
         pptxProgress: { libs: 0.02, model: 0.05, build: 0.03, write: 0.5, slides: 0.22, zip: 0.2 },

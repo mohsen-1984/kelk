@@ -9,6 +9,9 @@ All notable changes to Kelk. Dates are those of the release tags.
 - **Every progress state names its step** (the rule since 2.7: no generic progress anywhere in Kelk): one step helper for
   every task, in fa / en / ar; a state without its step is refused. The slides preview's window shows the step named
   before it opened (it opened with an empty line).
+- **Imports name every step**: the PDF reader and importer loading on first use, reading the file, opening the PDF,
+  then each page; a Word file's reader and its conversion; a zip's files one by one; CSV and XLSX reading, the
+  Markdown, the editor and the Excel view.
 
 ## [2.6] — 2026-11-10
 
