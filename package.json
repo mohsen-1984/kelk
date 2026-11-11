@@ -1,6 +1,6 @@
 {
   "name": "kelk",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "private": true,
   "description": "Client-side Markdown ⇄ DOCX / DOC / PDF / HTML converter, Persian / Arabic first. No build step: the app runs from index.html; this file holds the dev tooling only.",
   "license": "MIT",

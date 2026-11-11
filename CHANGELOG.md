@@ -4,6 +4,10 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+## [2.7] — 2026-11-11
+
+PDF import, right to left, and the imported file's information; every progress step named.
+
 ### Added
 
 - **The imported file's information** in the import report, closed under it: what the file says, as written — for a
@@ -17,14 +21,6 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Changed
 
-- **The import report stays open 5 seconds** after an import (was 3), then collapses to its head line.
-- **The Excel samples show an LTR sheet next to RTL ones**: the Persian and Arabic samples' *Products* sheet is all
-  English, so it opens left to right; the English sample has no Persian sheet, only a small *Other scripts* sheet with
-  a few Persian and Arabic cells (it opens right to left, by the rule of any RTL cell).
-- **Excel: wrapping split in two** (Settings → Excel): *Wrap text in header rows* (default: all cells) and *Wrap text in
-  other rows* (default: none, as before), in the page and in `XlsxBuilder` (`excel.wrapHead`, `excel.wrap`). Columns
-  keep their widths; a header wraps when its column is narrower than its text or it holds a `<br>`, and only then
-  loses its fixed height.
 - **Every progress state names its step** (the rule since 2.7: no generic progress anywhere in Kelk): one step helper for
   every task, in fa / en / ar; a state without its step is refused. The slides preview's window shows the step named
   before it opened (it opened with an empty line).
@@ -34,6 +30,16 @@ All notable changes to Kelk. Dates are those of the release tags.
 - **Exports name every step**: the library on first use, the fonts, the formulas' font, the build, the fonts
   embedded (by name); the page repaints before a builder holds it, so its step shows. The bar stands still while a
   builder works (a moving bar: TODO.md).
+- **The import report stays open 5 seconds** after an import (was 3), then collapses to its head line.
+- **The Excel samples show an LTR sheet next to RTL ones**: the Persian and Arabic samples' *Products* sheet is all
+  English, so it opens left to right; the English sample has no Persian sheet, only a small *Other scripts* sheet with
+  a few Persian and Arabic cells (it opens right to left, by the rule of any RTL cell).
+- **Excel: wrapping split in two** (Settings → Excel): *Wrap text in header rows* (default: all cells) and *Wrap text in
+  other rows* (default: none, as before), in the page and in `XlsxBuilder` (`excel.wrapHead`, `excel.wrap`). Columns
+  keep their widths; a header wraps when its column is narrower than its text or it holds a `<br>`, and only then
+  loses its fixed height.
+- **The PDF lab** (`tests/pdf-lab/`): 204 PDFs (8 new, made by our own scripts, with no personal metadata), a fifth
+  wkhtmltopdf fuzz generator; the gate passed with no file worse.
 
 ### Fixed
 
