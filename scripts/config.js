@@ -30,7 +30,7 @@
         progressDelayMs: 300,
         // the import report (PDF, PPTX, Excel …): stays open this long (ms) after an import, then collapses to its
         // toggle line; 0: stays open
-        reportOpenMs: 3000,
+        reportOpenMs: 5000,
         maxImageMB: 5,
         maxLogoPx: 256,                 // uploaded logos are scaled down to this height
         autosaveMs: 600,
@@ -99,7 +99,7 @@
                       decoration: 'auto', bullet: '•', logo: 'all' },
             // Excel (lib/XlsxBuilder: its DEFAULTS, the same values) and the Excel view's preview (previewRows)
             excel: { sheets: 'each', gap: 2, titleRow: true, direction: 'auto', zeros: true, links: true, breaks: true,
-                     wrap: 'none', thousands: false, headerColor: '#E4E9EF', stripes: true, stripeColor: '#F5F7FA',
+                     wrapHead: 'all', wrap: 'none', thousands: false, headerColor: '#E4E9EF', stripes: true, stripeColor: '#F5F7FA',
                      headerBorder: 'all', headerBorderWidth: 'thin', headerBorderColor: '#A9B5C4',
                      bodyBorder: 'all', bodyBorderWidth: 'thin', bodyBorderColor: '#A9B5C4', headerHeight: 21,
                      filter: true, freeze: true, columns: 'content', paper: 'A4', orientation: 'auto', margins: 'kelk',

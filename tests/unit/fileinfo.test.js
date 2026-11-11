@@ -108,6 +108,11 @@ test('a PDF: the file’s words, then the guesses; the OS only when the file nam
     FI.lines(r).join('\n'),
     /Operating system: Windows \(evidence: Microsoft Print to PDF exists on Windows only\)/
   );
+  // the table's Copy button: GFM, the file's words then the guesses, pipes escaped
+  const md = FI.gfm(FI.fromPdf({ info: { title: 'A | B', pages: 2 }, profile: provenance({ producer: 'Microsoft: Print To PDF', creator: '' }) }));
+  assert.match(md, /^\| Field \| Value \|\n\| --- \| --- \|\n\| Title \| A \\\| B \|\n\| Pages \| 2 \|\n/);
+  assert.match(md, /\| Field \| Value \| Evidence \|\n\| --- \| --- \| --- \|\n/);
+  assert.match(md, /\| Operating system \| Windows \| Microsoft Print to PDF exists on Windows only \|/);
   // nothing known: nothing to show
   assert.equal(FI.any(FI.fromPdf({ info: {}, profile: {} })), false);
 });
@@ -156,6 +161,7 @@ test('an HTML import shows its information in the report panel, closed; a bare o
   assert.match(d.textContent, /TitleA page/);
   assert.match(d.textContent, /GeneratorKelk 2\.6/);
   assert.match(K.ui.report.text(), /- Generator: Kelk 2\.6/);
+  assert.equal(d.querySelector('.fi-actions button').textContent, 'Copy as a table', 'the table’s Copy button');
   await K.importer.fromFile(new w.File(['<p>Only a paragraph</p>'], 'bare.html', { type: 'text/html' }));
   assert.equal(box.hidden, true, 'nothing to show: no panel');
   assert.deepEqual(errors, []);

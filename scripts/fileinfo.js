@@ -12,6 +12,7 @@
  *   KelkFileInfo.render(box, info)     a closed <details> in the report panel: a table of the file's words, then the guesses
  *   KelkFileInfo.brief(info)           the panel's head line for a file with nothing else to report
  *   KelkFileInfo.lines(info)           the same as plain text (Copy report)
+ *   KelkFileInfo.gfm(info)             the same as GFM tables, the file's words then the guesses (the table's Copy button)
  *   KelkFileInfo.STRINGS               its words (fi_*), fa / en / ar: added to Kelk.i18n's tables when it loads
  *
  * info = { kind: 'pdf' | 'office' | 'html', said: [[key, value]], guess: [[key, value, evidence]] }: keys are
@@ -24,6 +25,10 @@
     const STRINGS = {
         fa: {
             fi_head: 'اطلاعات فایل',
+            fi_copy: 'رونوشت به‌صورت جدول',
+            fi_field: 'ویژگی',
+            fi_value: 'مقدار',
+            fi_evidenceCol: 'شاهد',
             fi_guessHead: 'برداشت Kelk (حدس؛ در خود فایل نوشته نشده)',
             fi_title: 'عنوان',
             fi_author: 'نویسنده',
@@ -79,6 +84,10 @@
         },
         en: {
             fi_head: 'File information',
+            fi_copy: 'Copy as a table',
+            fi_field: 'Field',
+            fi_value: 'Value',
+            fi_evidenceCol: 'Evidence',
             fi_guessHead: 'Kelk’s reading (a guess: not written in the file)',
             fi_title: 'Title',
             fi_author: 'Author',
@@ -134,6 +143,10 @@
         },
         ar: {
             fi_head: 'معلومات الملف',
+            fi_copy: 'نسخ كجدول',
+            fi_field: 'الخاصية',
+            fi_value: 'القيمة',
+            fi_evidenceCol: 'الدليل',
             fi_guessHead: 'قراءة Kelk (تخمين؛ غير مكتوب في الملف)',
             fi_title: 'العنوان',
             fi_author: 'المؤلف',
@@ -403,7 +416,7 @@
 
     const CSS = '.report-info{margin:.5rem 0}.report-info>summary{cursor:pointer;font-weight:600}' +
         '.report-info table{width:100%;margin-top:.35rem}.report-info th[scope=row]{text-align:start;font-weight:500;white-space:nowrap;padding-inline-end:.75rem;vertical-align:top}' +
-        '.report-info td{overflow-wrap:anywhere}.report-info .fi-group th{text-align:start;padding-top:.6rem}.report-info .fi-ev{display:block;opacity:.75;font-size:.85em}';
+        '.report-info td{overflow-wrap:anywhere}.report-info .fi-actions{margin:.4rem 0 0}.report-info .fi-group th{text-align:start;padding-top:.6rem}.report-info .fi-ev{display:block;opacity:.75;font-size:.85em}';
 
     function render(box, info) {
         if (!any(info) || typeof document === 'undefined') return null;
@@ -434,7 +447,31 @@
             g.colSpan = 2; g.scope = 'colgroup';
             info.guess.forEach(row);
         }
+        // the table to the clipboard as Markdown (GFM), in the interface language
+        const b = el(el(d, 'p', 'fi-actions'), 'button', 'btn', t('fi_copy'));
+        b.type = 'button';
+        b.addEventListener('click', function () {
+            const k = K(), ok = function () { k.ui.toast(t('copied')); }, no = function (e) { k.ui.toast(t('failed', (e && e.message) || ''), 'error'); };
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(gfm(info)).then(ok, no);
+                else no();
+            } catch (e) { no(e); }
+        });
         return d;
+    }
+
+    /** a GFM table cell: no line break, its pipes escaped */
+    const cellMd = function (v) { return String(v).replace(/\r?\n/g, ' ').replace(/\|/g, '\\|').trim(); };
+
+    function gfm(info) {
+        if (!any(info)) return '';
+        const out = ['| ' + t('fi_field') + ' | ' + t('fi_value') + ' |', '| --- | --- |'];
+        info.said.forEach(function (r) { out.push('| ' + cellMd(t(r[0])) + ' | ' + cellMd(shown(r[1])) + ' |'); });
+        if (info.guess.length) {
+            out.push('', '**' + cellMd(t('fi_guessHead')) + '**', '', '| ' + t('fi_field') + ' | ' + t('fi_value') + ' | ' + t('fi_evidenceCol') + ' |', '| --- | --- | --- |');
+            info.guess.forEach(function (r) { out.push('| ' + cellMd(t(r[0])) + ' | ' + cellMd(shown(r[1])) + ' | ' + cellMd(shown(r[2])) + ' |'); });
+        }
+        return out.join('\n') + '\n';
     }
 
     function lines(info) {
@@ -454,7 +491,7 @@
         Object.keys(STRINGS).forEach(function (l) { if (all[l]) Object.assign(all[l], STRINGS[l]); });
     }
 
-    const api = { fromPdf: fromPdf, fromOffice: fromOffice, fromHtml: fromHtml, any: any, render: render, brief: brief, lines: lines,
+    const api = { fromPdf: fromPdf, fromOffice: fromOffice, fromHtml: fromHtml, any: any, render: render, brief: brief, lines: lines, gfm: gfm,
         STRINGS: STRINGS, _date: date, _pageSize: pageSize };
     root.KelkFileInfo = api;
     if (root.Kelk) root.Kelk.fileInfo = api;
