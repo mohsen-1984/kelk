@@ -36,6 +36,8 @@ All notable changes to Kelk. Dates are those of the release tags.
   joined PDF: its longest stretch about a third shorter).
 - **PDF import: italic from a slanted font** — most Persian and Arabic fonts have no italic face, and a browser
   slants them: that text is italic now (it came back plain).
+- **PDF import: a quote in italic** (a stylesheet's `blockquote { font-style: italic }`) is a quote again where it
+  stood right after a list, or was two short lines: it had become the last item's text or a plain paragraph.
 
 ## [2.6] — 2026-11-10
 
