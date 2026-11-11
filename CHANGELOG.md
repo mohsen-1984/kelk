@@ -10,6 +10,11 @@ All notable changes to Kelk. Dates are those of the release tags.
   the pages not read in full and the file's information as GFM tables. File information's own *Copy as a table*
   button is gone (it sat at the panel's far end).
 
+### Fixed
+
+- **The Excel import's summary** has *Copy report* too (the sheets as a GFM table with their totals, then each XLSX's
+  information), and its table shows whole: it had shrunk to one row with a scroll bar of its own inside the panel's.
+
 ## [2.7] — 2026-11-11
 
 PDF import, right to left, and the imported file's information; every progress step named.

@@ -14,7 +14,8 @@
  *       «##» heading and one table in the editor, then the Excel view and the summary. Several CSVs: the order
  *       dialog, each with its rows, columns, encoding and separator; CSVs beside documents: the user picks one kind
  *       (the documents chosen go back to the importer: { docs }). Over Kelk.config.maxSheetCells: refused.
- *   KelkSheets.summary(rows, empty, infos)   the report panel: a table of the sheets — the text's tables, or rows given;
+ *   KelkSheets.summary(rows, empty, infos)   the report panel: a table of the sheets — the text's tables, or rows given
+ *       (Copy report: the same as Markdown, 2.8);
  *       infos [{ name, info }]: each imported XLSX's own information (scripts/fileinfo.js), closed under the table
  *   KelkSheets.looksLikeCsv(text)      pasted text that is CSV or tab-separated (2+ lines, the same separator count
  *       on each, not a Markdown table) — synchronous: the paste event decides on it
@@ -555,16 +556,33 @@
             if (txt != null) e.textContent = txt;
             return e;
         };
+        const head = function () {
+            return ['#', t('xs_colSheet')].concat(src ? [t('xs_colSource')] : [], [t('xs_colRows'), t('xs_colCols')], csv ? [t('xs_colEnc'), t('xs_colSep')] : []);
+        };
+        /** Copy report (2.8): the same as Markdown — the sheets a GFM table with its totals, the note, each XLSX's information */
+        const copy = function () {
+            const cells = rows.map(function (r, i) {
+                return [i + 1, r.name].concat(src ? [r.source || ''] : [], [r.rows, r.cols], csv ? [r.encoding || '', r.separator || ''] : []);
+            });
+            cells.push(['', t('xs_total') + ': ' + t('xs_count', rows.length)].concat(src ? [''] : [], [total, t('xs_most', most)], csv ? ['', ''] : []));
+            const out = ['## ' + t('xs_sumTitle'), ''].concat(k.importReport.gfmTable(head(), cells));
+            if (empty && empty.length) out.push('', t('xs_emptySheets', empty.join('، ')));
+            out.push('', t('xs_sumNote'));
+            (infos || []).forEach(function (x) {
+                out.push('', '**' + t('fi_head') + (infos.length > 1 ? ' — ' + x.name : '') + '**', '', k.fileInfo.gfm(x.info).replace(/\n$/, ''));
+            });
+            return out.join('\n').replace(/[\u2066-\u2069]/g, '') + '\n';
+        };
         return k.ui.report.custom({
             icon: 'sheet',
             title: function () { return t('xs_sumTitle'); },
             brief: function () { return t('xs_sumBrief', rows.length, total); },
+            copy: copy,
             body: function (box) {
                 const wrap = el(box, 'div', 'xs-sum-wrap');
                 const table = el(wrap, 'table', 'xs-sum');
-                const head = ['#', t('xs_colSheet')].concat(src ? [t('xs_colSource')] : [], [t('xs_colRows'), t('xs_colCols')], csv ? [t('xs_colEnc'), t('xs_colSep')] : []);
                 const tr = el(el(table, 'thead'), 'tr');
-                head.forEach(function (h) { el(tr, 'th', '', h).scope = 'col'; });
+                head().forEach(function (h) { el(tr, 'th', '', h).scope = 'col'; });
                 const body = el(table, 'tbody');
                 rows.forEach(function (r, i) {
                     const row = el(body, 'tr');

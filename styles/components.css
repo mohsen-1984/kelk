@@ -81,9 +81,11 @@
 /* tall enough for the summary, a few findings and three page rows on a desktop screen (800 px high: 308), the
    text below it shorter while the report is open (still on screen with the editor's foot); one column (phones):
    the page scrolls, a share of the screen. Shadows at an edge where more content is (scroll-shadow: the covers
-   move with the content, the shadows stay with the box) */
+   move with the content, the shadows stay with the box). Each row its full height (max-content): a part that
+   scrolls sideways (the Excel summary's table) would otherwise shrink to a row and scroll inside the body's scroll */
 .report-body {
   max-height: clamp(120px, calc(100vh - 492px), 380px); overflow: auto; display: grid; gap: 8px; align-content: start;
+  grid-auto-rows: max-content;
   background:
     linear-gradient(var(--panel-2) 30%, transparent) top / 100% 28px no-repeat local,
     linear-gradient(transparent, var(--panel-2) 70%) bottom / 100% 28px no-repeat local,

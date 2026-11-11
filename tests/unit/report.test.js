@@ -305,6 +305,17 @@ test('the panel: focus in on open, back on close (×, Escape); Copy report; Re-i
   assert.ok(copied.includes(K.i18n.t('pdf_printNoLinks')));
   assert.doesNotMatch(copied, /<|\b(rep|pdf)_\w+/, 'Markdown, no HTML, no keys');
   assert.ok(toasts(w).some((t) => t.includes(K.i18n.t('copied'))));
+  // a custom view (the Excel summary): Copy report copies its copy(); without one, no Copy report (2.8)
+  const view = { icon: 'sheet', title: () => 'Sheets', brief: () => '1 sheet', body: function (el) { el.textContent = 'x'; }, buttons: [] };
+  K.ui.report.custom(Object.assign({ copy: () => '## Sheets\n\n| # | Sheet |\n| --- | --- |\n| 1 | A \\| B |\n' }, view));
+  assert.equal(d.getElementById('report-copy').hidden, false, 'a view with copy(): Copy report');
+  d.getElementById('report-copy').click();
+  await new Promise((r) => setTimeout(r, 0));
+  assert.equal(copied, '## Sheets\n\n| # | Sheet |\n| --- | --- |\n| 1 | A \\| B |\n');
+  K.ui.report.custom(view);
+  assert.equal(d.getElementById('report-copy').hidden, true, 'no copy(): no Copy report');
+  K.ui.report.close();
+  assert.deepEqual(K.importReport.gfmTable(['a', 'b'], [['x|y', 'line\nbreak']]), ['| a | b |', '| --- | --- |', '| x\\|y | line break |']);
 
   // Re-import in safe mode: its action runs, the panel closes; a report that ran in safe mode has no button
   let safe = 0;
