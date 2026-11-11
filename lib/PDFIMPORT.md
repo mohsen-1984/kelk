@@ -176,6 +176,17 @@ desktop strings are tested on the pure function (`tests/pdf-lab/scripts/profile.
 from real files — Word on Windows and on a Mac, Safari, Print to PDF, InDesign, Distiller, PDFMaker,
 Ghostscript and iLovePDF over a maker, an OCR layer, XMP without Info …).
 
+`os.stated` (2.7) keeps apart what the file itself names — a User-Agent, Quartz, a platform in a tool's
+name, Print to PDF — from the fonts' hints: `{ value, evidence[] }` before the fonts vote, or null. The
+import report shows an OS only from it.
+
+**The file's own words, `r.info`** (2.7): what the Info dictionary and a few XMP fields say, as written —
+title, author, subject, keywords, creator, producer, `xmp:CreatorTool`, `pdf:Producer`, the XMP history's
+tools, the dates, the PDF version, pages, the first page's size (points), language, tagged, outline items,
+page labels, encryption, the fonts' names (a subset prefix dropped; `*` not embedded). Nothing inferred and
+no rule reads it: it is for the import report's file information (`scripts/fileinfo.js`, which lays the
+dates out without converting them and puts the profile's guesses in a group of their own).
+
 What it is for: the user's message ("made by Microsoft Print to PDF: its links are not in the file"),
 the test matrix (which engine × OS × path a set of real files covers), and the priors of the steps to
 come (the structure tree weighed by how much its producer is trusted). None of these is wired yet.

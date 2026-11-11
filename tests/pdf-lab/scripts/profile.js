@@ -1,7 +1,8 @@
 // The provenance profile (PdfImporter.provenance, PDFIMPORT.md §2a), tested two ways:
 //   1. the pure function on the Info / XMP / fonts of producers the lab cannot make (Word, Quartz, a
 //      desktop Chrome's User-Agent, InDesign, Distiller, Ghostscript over Word, an OCR layer …) — strings
-//      taken from real files of those kinds
+//      taken from real files of those kinds; os.stated (what the import report may show) only from the file's
+//      own words, never from the fonts
 //   2. every PDF of pdf/ (and fuzz/dev when made) through the importer: the engine its file name promises, the
 //      structure tree's trust, and the tree's headings against the source's
 //   node scripts/profile.js [--all]      --all prints each lab file's whole profile
@@ -12,6 +13,8 @@ const PdfImporter = require(path.join(KELK, 'lib', 'PdfImporter.js'));
 const P = PdfImporter.provenance;
 const { structure } = require('./score.js');
 let failed = 0;
+// the Author a lab PDF may carry: the placeholders the lab's own tools write (python-docx, openpyxl), never a person
+const LAB_AUTHORS = /^(Un-named|openpyxl)$/;
 const check = (name, got, want) => {
   const bad = Object.keys(want).filter((k) => {
     const g = k.split('.').reduce((o, x) => (o == null ? o : o[x]), got), w = want[k];
@@ -25,7 +28,7 @@ const check = (name, got, want) => {
 console.log('— the pure function, on producers from real files\n');
 const CASES = [
   ['Chrome on Windows, Save as PDF', { producer: 'Skia/PDF m141', creator: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36' },
-    { engine: 'skia', app: 'Chrome', 'os.value': 'windows', version: '141.0.0.0', path: 'export', hyphenates: false }],
+    { engine: 'skia', app: 'Chrome', 'os.value': 'windows', 'os.stated.value': 'windows', version: '141.0.0.0', path: 'export', hyphenates: false }],
   ['Edge on Windows', { producer: 'Skia/PDF m140', creator: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0' },
     { engine: 'skia', app: 'Edge', 'os.value': 'windows' }],
   ['Chrome on macOS', { producer: 'Skia/PDF m141', creator: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36' },
@@ -40,14 +43,14 @@ const CASES = [
   ['Safari on iPhone', { producer: 'iOS Version 18.1 (Build 22B83) Quartz PDFContext', creator: '' }, { engine: 'quartz', 'os.value': 'ios' }],
   ['Word on Windows, Save as PDF', { producer: 'Microsoft® Word for Microsoft 365', creator: 'Microsoft® Word for Microsoft 365', marked: true,
     fonts: ['BCDEEE+BNazanin', 'BCDFEE+Calibri', 'BCDGEE+Segoe UI Symbol'] },
-    { engine: 'word', app: 'Word', path: 'export', 'os.value': 'windows', 'os.confidence': (c) => c < 0.6, hyphenates: false }],
+    { engine: 'word', app: 'Word', path: 'export', 'os.value': 'windows', 'os.confidence': (c) => c < 0.6, 'os.stated': null, hyphenates: false }],
   ['Excel 2019', { producer: 'Microsoft® Excel® 2019', creator: 'Microsoft® Excel® 2019' }, { engine: 'excel', app: 'Excel' }],
   ['Microsoft Print to PDF', { producer: 'Microsoft: Print To PDF', creator: 'Microsoft Word - report.docx' },
-    { engine: 'gdi', path: 'print', 'os.value': 'windows', 'os.confidence': 0.95 }],
+    { engine: 'gdi', path: 'print', 'os.value': 'windows', 'os.confidence': 0.95, 'os.stated.value': 'windows' }],
   ['LibreOffice Writer, DejaVu fonts', { producer: 'LibreOffice 24.2', creator: 'Writer', fonts: ['AAAAAA+DejaVuSans', 'BAAAAA+DejaVuSerif'] },
-    { engine: 'libreoffice', app: 'Writer', 'os.value': 'linux', 'os.confidence': (c) => c <= 0.4 }],
+    { engine: 'libreoffice', app: 'Writer', 'os.value': 'linux', 'os.confidence': (c) => c <= 0.4, 'os.stated': null }],
   ['InDesign on a Mac', { producer: 'Adobe PDF Library 17.0', creator: 'Adobe InDesign 19.0 (Macintosh)' },
-    { engine: 'indesign', 'os.value': 'macos', hyphenates: true }],
+    { engine: 'indesign', 'os.value': 'macos', 'os.stated.value': 'macos', hyphenates: true }],
   ['Distiller on Windows', { producer: 'Acrobat Distiller 23.0 (Windows)', creator: 'PScript5.dll Version 5.2.2' },
     { engine: 'distiller', 'os.value': 'windows', path: 'print' }],
   ['Word through Acrobat PDFMaker', { producer: 'Adobe PDF Library 23.1.175', creator: 'Acrobat PDFMaker 23 for Word' }, { engine: 'distiller', app: 'Word' }],
@@ -74,14 +77,14 @@ const CASES = [
     xmp: '<stEvt:softwareAgent>Microsoft® Word for Microsoft 365</stEvt:softwareAgent><stEvt:softwareAgent>Adobe Acrobat Pro (64-bit) 24.2.0</stEvt:softwareAgent>' },
     { engine: 'word', path: 'postprocessed' }],
   ['A Mac font set, no other evidence', { producer: 'Unknown Writer 1.0', creator: '', fonts: ['ABCDEF+HelveticaNeue', 'ABCDEG+Menlo-Regular'] },
-    { 'os.value': 'macos', 'os.confidence': 0.55 }],
+    { 'os.value': 'macos', 'os.confidence': 0.55, 'os.stated': null }],
   ['Nothing at all', { producer: '', creator: '' }, { engine: 'unknown', 'os.value': null, path: 'unknown', hyphenates: true }],
   // (the lab's real producers, pdf/real-producers: Office LTSC 2024 on Windows 11, November 2026 — make-real.ps1, make-real.js)
   ['Word 2024, Save as PDF', { producer: 'Microsoft® Word 2024', creator: 'Microsoft® Word 2024', marked: true }, { engine: 'word', app: 'Word', path: 'export' }],
   ['Excel LTSC, Save as PDF', { producer: 'Microsoft® Excel® LTSC', creator: 'Microsoft® Excel® LTSC' }, { engine: 'excel', app: 'Excel', path: 'export' }],
   ['PowerPoint 2024, Save as PDF', { producer: 'Microsoft® PowerPoint® 2024', creator: 'Microsoft® PowerPoint® 2024' }, { engine: 'powerpoint', app: 'PowerPoint', path: 'export' }],
   ['Microsoft Print to PDF (no Creator: Excel, PowerPoint)', { producer: 'Microsoft: Print To PDF', creator: '' },
-    { engine: 'gdi', path: 'print', 'os.value': 'windows', 'os.confidence': 0.95 }],
+    { engine: 'gdi', path: 'print', 'os.value': 'windows', 'os.confidence': 0.95, 'os.stated.value': 'windows' }],
   ['Edge headless (--print-to-pdf)', { producer: 'Skia/PDF m156', creator: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36 Edg/156.0.0.0' },
     { engine: 'skia', app: 'Edge', 'os.value': 'windows', version: '156.0.0.0' }],
   ['Firefox 152 printing (WebDriver BiDi)', { producer: 'cairo 1.18.4 (https://cairographics.org)', creator: 'Mozilla Firefox 152.0.3' }, { engine: 'cairo', app: 'Firefox' }]
@@ -113,12 +116,17 @@ const heldOut = (dir, f) => path.basename(dir) === 'real-producers' && HELD_OUT_
       const prof = await page.evaluate(async (b64) => {
         const bin = atob(b64), u = new Uint8Array(bin.length);
         for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
-        try { const r = await PdfImporter.create({ images: 'drop' }).fromArrayBuffer(u.buffer); return Object.assign({}, r.profile, { _structure: r.structure }); } catch (e) { return { error: String(e) }; }
+        try { const r = await PdfImporter.create({ images: 'drop' }).fromArrayBuffer(u.buffer); return Object.assign({}, r.profile, { _structure: r.structure, _info: r.info }); } catch (e) { return { error: String(e) }; }
       }, b64);
       const rule = PREFIX.find(([re]) => re.test(f0));
       const key = prof.error ? 'ERROR' : [prof.engine, prof.app, prof.os.value || '-', prof.path, prof.tagged.structTree ? 'struct' : 'nostruct'].join(' · ');
       tally[key] = (tally[key] || 0) + 1;
       if (prof.error) { failed++; console.log('✗', f, prof.error); continue; }
+      // r.info, the file's own words for the import report: there, with its pages — and no person in a lab file
+      // (the owner's rule for lab files, 2026-11-11: no author, company or user name; the tools' own placeholders only)
+      const inf = prof._info || {};
+      if (!(inf.pages >= 1)) { failed++; console.log('✗', f.padEnd(44), 'r.info.pages ' + inf.pages); }
+      if (inf.author && !LAB_AUTHORS.test(inf.author)) { failed++; console.log('✗', f.padEnd(44), 'a personal name in Author (r.info.author)'); }
       if (rule) { const bad = Object.keys(rule[1]).filter((k) => prof[k] !== rule[1][k]);
         if (bad.length) { failed++; console.log('✗', f.padEnd(44), bad.map((k) => k + ': ' + prof[k] + ' ≠ ' + rule[1][k]).join('; ')); } }
       // the structure tree (PdfImporter._structure): trust as the audit expects, headings as the source has them
