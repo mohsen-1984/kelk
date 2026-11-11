@@ -18,6 +18,9 @@ All notable changes to Kelk. Dates are those of the release tags.
 ### Changed
 
 - **The import report stays open 5 seconds** after an import (was 3), then collapses to its head line.
+- **The Excel samples show an LTR sheet next to RTL ones**: the Persian and Arabic samples' *Products* sheet is all
+  English, so it opens left to right; the English sample has no Persian sheet, only a small *Other scripts* sheet with
+  a few Persian and Arabic cells (it opens right to left, by the rule of any RTL cell).
 - **Every progress state names its step** (the rule since 2.7: no generic progress anywhere in Kelk): one step helper for
   every task, in fa / en / ar; a state without its step is refused. The slides preview's window shows the step named
   before it opened (it opened with an empty line).

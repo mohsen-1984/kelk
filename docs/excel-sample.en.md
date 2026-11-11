@@ -4,28 +4,29 @@ This text is the **Excel** view's sample: each Markdown table becomes a sheet, n
 
 What to look for in the sheets:
 
-- Latin text is left-aligned, Persian text right-aligned in a Persian font, numbers centered; a sheet with even one Persian cell opens right to left.
-- The code `0012` keeps its leading zeros (text), and a number of more than 15 digits stays text too, since Excel keeps only 15 digits exactly.
-- Dates stay as they are written (text), Persian or Gregorian.
+- Latin text is left-aligned, numbers centered; Persian and Arabic text is right-aligned in its own font.
+- A sheet with even one Persian or Arabic cell opens right to left: here only *Other scripts*, while *Products* and *Monthly report* open left to right.
+- The code `00045` keeps its leading zeros (text), and a number of more than 15 digits stays text too, since Excel keeps only 15 digits exactly.
+- Dates stay as they are written (text), Gregorian or Persian.
 - Links stay links in Excel.
 - `<br>` in a cell is a line break inside that cell.
 - A wide table scrolls sideways inside its own block in the preview; in the file, each column is as wide as its content.
 
 ## Products
 
-| SKU | Product | Unit price | Barcode | Account number | Date | Link |
-|---|---|---|---|---|---|---|
-| 00045 | Notebook A5 | 12.5 | 6260123456789 | 6037991234567890123 | 2025-11-10 | [Kelk](https://mohsen-1984.github.io/kelk/) |
-| 00046 | Pen, blue | 1.2 | 6260123456796 | 6037991234567890456 | 2025-11-11 | [GitHub](https://github.com/mohsen-1984/kelk) |
-| 01200 | Desk lamp | 34.9 | 6260123456802 | 6037991234567890789 | 2025-11-12 | |
+| SKU | Product | Unit price | Barcode | Account number | Date | Notes | Link |
+|---|---|---|---|---|---|---|---|
+| 00045 | Notebook A5 | 12.5 | 6260123456789 | 6037991234567890123 | 2025-11-10 | Lined pages<br>80 sheets | [Kelk](https://mohsen-1984.github.io/kelk/) |
+| 00046 | Pen, blue | 1.2 | 6260123456796 | 6037991234567890456 | 2025-11-11 | Box of 12 | [GitHub](https://github.com/mohsen-1984/kelk) |
+| 01200 | Desk lamp | 34.9 | 6260123456802 | 6037991234567890789 | 2025-11-12 | | |
 
-## فروش شعبه‌ها
+## Other scripts
 
-| شعبه | کد شعبه | تاریخ | فروش (ریال) | یادداشت |
-|---|---|---|---|---|
-| مشهد مرکزی | 0012 | 1404/08/19 | 1250000000 | Persian and English<br>in one cell |
-| تهران، ونک | 0045 | 1404/08/20 | 980000000 | |
-| شیراز | 0107 | 1404/08/21 | 715500000 | |
+| Language | Greeting | Date | Notes |
+|---|---|---|---|
+| Persian | سلام | 1404/08/19 | Persian and English<br>in one cell: فارسی |
+| Arabic | مرحبا | 1447/05/19 | العربية and English in one cell |
+| English | Hello | 2025-11-10 | |
 
 **Monthly report:**
 
