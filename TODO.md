@@ -83,8 +83,15 @@ In this order, one pull request each (3 and 4 may split in two):
      set flush left (lab: `*--fa-brackets`). Still lost there: tables of `lohtml-rtl--fa-article`, `--fa-report`,
      `--ar-article` (two columns run together; a header cell over two lines split off), quotes; on `ar-article` an
      Arabic font's marks named wrongly («ٍ» at word ends, «:» for shadda) — 2.8
-   - **3b, Chromium** (`pdf/2.7-rtl-tables`): the RTL fuzz files' tables (Chromium 74) and quotes (80), against
-     ≈ 88 and ≈ 87 left to right
+   - **3b, Chromium's quotes** (`pdf/2.7-rtl-quotes`): a font with no italic face slanted by the producer is italic
+     (Chrome's synthetic italic of Vazirmatn, Sahel, Noto Naskh), and a quote set in and in italic is told from the
+     list or paragraph beside it (lab: `chrome-quote-italic--fa-quote-italic` 77.8 → 100; fuzz quotes dev +6.9,
+     held-out +3.6)
+   - **3c, Chromium's tables** (`pdf/2.7-rtl-tables`): borderless right-to-left tables (fuzz `none` 44, `zebra` 52,
+     against 76 and 67 left to right). What is known: a first column marked `:---` stays left-aligned in a
+     right-to-left table, so its text stands 9 pt from the next column's right-aligned numbers — a word's gap — and
+     the rows read as text before any rows leaf (`_rowsLeaf`) sees them (`fz50-chr--fa-article`: the table came
+     out as paragraphs, two cells to a line); the region step is where to look
    - **The lab's own limit, fixed first** (`lab/2.7-wk-fonts`, generator 5): wkhtmltopdf drew the fuzz set's
      `@font-face` fonts as outlines, no text layer (its 9 right-to-left `dev` files: total ≈ 26). It now takes them as
      installed fonts: those files 26 → 56, the RTL `dev` mean 75.7 → 82.0, with no change to the importer — the mean

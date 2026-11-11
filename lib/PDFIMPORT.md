@@ -711,6 +711,10 @@ them. Before, a Persian letter began with `# g`.
 
 - **From the name** first: `Bold`, `Black`, `Semibold`, `Italic`, `Oblique`; TeX names (`CMBX12`, `CMTI10`,
   `CMTT10`, cm-super's `EC…`).
+- **From the text matrix** (2.7, per glyph): a font with no italic face — most Persian and Arabic fonts: Vazirmatn,
+  Sahel, Noto Naskh — is slanted by its producer (Chrome's synthetic italic shears the text matrix by about 0.2).
+  `extract.js` keeps the shear over the height (`g.slant`, where there is one); `lines.js` reads a slant over
+  `linSlantItalic` (0.1) as italic. The fonts' own flags said nothing, and a quote styled in italic was plain text.
 - **Fonts named without a style** (Microsoft Print to PDF: `CIDFont+F1`, `F2` …): the embedded font
   program's own name table and OS/2 (weight, fsSelection, PANOSE for monospace).
 - **jsPDF (Kelk) writes four styles under one name**: styles come from glyph widths and bounding
@@ -1688,7 +1692,13 @@ wrapped lines are never taken for a quote.
   quote's first line had run on from the outer one's; a line set in that runs to the quote's far side, the next
   one back at the quote's edge, is a first-line indent. **A quote set wholly in italic** (a stylesheet's
   `blockquote { font-style: italic }`) is italic by its style, not by markup: its words come back plain, as a
-  heading's do. The lines **end** on their reading side's far end: the left in a right-to-left run (flush-right
+  heading's do. **Italic tells such a quote from the text around it** (2.7, `blocks.quoteItalicSetIn`,
+  `itemTextItalicBreak`): lines set in and all in italic, between lines that are not, are a quote even when they show
+  neither a wrap nor the quote's measure (two short lines, its source under it); a line all in italic under a list
+  item that is not is no part of the item's text (set in as far as the items' text, with paragraphs set close,
+  `margin: 0`, the quote had become the last item's); and a run of set-in lines stops where the italic starts or
+  ends (a quote had taken in the plain paragraph under it, first-line indent and all). Lab:
+  `chrome-quote-italic--fa-quote-italic` (77.8 → 100), the fuzz sets' `italic-indent` quotes. The lines **end** on their reading side's far end: the left in a right-to-left run (flush-right
   numbered items, ragged left, ending at the right edge "together" were a quote). A run whose every line is
   **centred** in the column is a centred title or verse, no quote. **One line** counts only when it is indented deeper than a first-line indent
   (2.2 em), fills half the column, is not centred, and has lines at the column's edge with a paragraph

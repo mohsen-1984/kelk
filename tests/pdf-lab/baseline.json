@@ -1,5 +1,5 @@
 {
- "written": "2026-11-11T07:12:50.152Z",
+ "written": "2026-11-11T08:26:46.823Z",
  "note": "scripts/gate.js --update; the fuzz means hold only for their env",
  "corpus": {
   "acrobat-word--booklet-fa": {
@@ -723,6 +723,23 @@
    "order": 1,
    "headings": 1,
    "code": 1,
+   "total": 1,
+   "rtl": 1,
+   "zwnj": 1,
+   "yehKaf": 1,
+   "digits": 1
+  },
+  "chrome-quote-italic--fa-quote-italic": {
+   "error": null,
+   "markup": 0,
+   "pic": 0,
+   "mix": 0,
+   "recall": 1,
+   "order": 1,
+   "headings": 1,
+   "lists": 1,
+   "code": 1,
+   "quotes": 1,
    "total": 1,
    "rtl": 1,
    "zwnj": 1,
@@ -4269,6 +4286,29 @@
    "regions.bodyLead",
    "regions.columnLeftMirrored"
   ],
+  "chrome-quote-italic--fa-quote-italic": [
+   "blocks.brShortLine",
+   "blocks.breakBigGap",
+   "blocks.breakBoldHead",
+   "blocks.breakIndent",
+   "blocks.breakMarker",
+   "blocks.breakQuoteEdge",
+   "blocks.breakStopRoom",
+   "blocks.breakStyle",
+   "blocks.headingSize",
+   "blocks.itemTextItalicBreak",
+   "blocks.quoteItalicPlain",
+   "blocks.quoteItalicSetIn",
+   "blocks.quoteRun",
+   "extract.fontType3InstanceBold",
+   "extract.zwnjFromZeroSpace",
+   "lines.calliBaseline",
+   "order.rtlPage",
+   "regions.bodyFromLongLines",
+   "regions.bodyLead",
+   "regions.columnLeftMirrored",
+   "regions.startFlushPartial"
+  ],
   "chrome-rtl-github-bg--ar-article": [
    "blocks.breakBigGap",
    "blocks.breakLeftOfItem",
@@ -5696,6 +5736,7 @@
    "order.cellShadingJoined",
    "order.hrFrameEdge",
    "order.lineShadingJoined",
+   "order.quoteStyleItalic",
    "order.rowsLeaf",
    "order.rtlPage",
    "order.ruledTable",
@@ -5786,6 +5827,7 @@
    "order.hrFrameEdge",
    "order.lineShadingJoined",
    "order.quoteBarFrameEdge",
+   "order.quoteStyleItalic",
    "order.rtlPage",
    "order.ruledTable",
    "order.unframedCode",
@@ -5858,6 +5900,7 @@
    "order.columnRule",
    "order.hr",
    "order.hrFrameEdge",
+   "order.quoteStyleItalic",
    "order.rowsLeaf",
    "order.rtlPage",
    "order.ruledTable",
@@ -9936,7 +9979,7 @@
   }
  },
  "realHeldout": {
-  "at": "2026-11-11T07:12:43.244Z",
+  "at": "2026-11-11T08:26:38.225Z",
   "n": 17,
   "errors": 0,
   "docs": [
