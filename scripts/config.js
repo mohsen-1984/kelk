@@ -30,7 +30,7 @@
         progressDelayMs: 300,
         // the import report (PDF, PPTX, Excel …): stays open this long (ms) after an import, then collapses to its
         // toggle line; 0: stays open
-        reportOpenMs: 3000,
+        reportOpenMs: 5000,
         maxImageMB: 5,
         maxLogoPx: 256,                 // uploaded logos are scaled down to this height
         autosaveMs: 600,

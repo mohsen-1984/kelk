@@ -15,6 +15,7 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Changed
 
+- **The import report stays open 5 seconds** after an import (was 3), then collapses to its head line.
 - **Every progress state names its step** (the rule since 2.7: no generic progress anywhere in Kelk): one step helper for
   every task, in fa / en / ar; a state without its step is refused. The slides preview's window shows the step named
   before it opened (it opened with an empty line).
