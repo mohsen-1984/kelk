@@ -467,6 +467,13 @@ What stays unknown after the repairs is **dropped**: a stray Latin Extended lett
      and a Persian or Arabic-Indic code stays as it is. The one exception is the case above: a font whose
      ToUnicode names its digit glyphs in two systems at once (Word's «4-۳»), where the file itself is
      inconsistent and the font's own cmap decides between the two;
+   - **a bracket named by the logical character where no table of the font can say otherwise** (2.7,
+     `lines._bracketsLogical`): LibreOffice names the ")" shape at the right end of «(NAS)» "(", and its fonts'
+     codes are no glyph ids (a CIDToGIDMap of its own), so neither the cmap nor the outline is read. In logical
+     order, before step 3 mirrors them, logical names read «( … )» and shape names «) … (»: a line's pairs decide,
+     and a line with none (a span broken across lines) follows what the same fonts' earlier lines showed, else the
+     shapes, as before. ( ) [ ] { } only. Lab: `lohtml-rtl--*`, `kelkdocx-lo--*` (brackets 0 → 100),
+     `*--fa-brackets` (pairs, nesting, square brackets, braces, a span over two lines, lists, a table);
    - **a bracket the ToUnicode names by the other of its pair**: InDesign's Dana-Bold names the "(" glyph ")",
      Dana-Regular in the same file names it "(" — «)نمونه(». The **outline** decides (glyf, simple glyphs):
      a bracket whose ink at mid-height lies left of its middle looks like ( [ { < «, the other way like its
