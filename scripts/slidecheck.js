@@ -10,7 +10,7 @@
  * are notes. Words are counted outside fenced code, front matter, HTML comments, link targets and table rules.
  *
  *   KelkSlideCheck.show(res, onAnyway)   (in the page) the report panel says why the Slides view did not open
- *       (Kelk.ui.report.custom): the findings, «Make slides anyway» (onAnyway) and «Copy the prompt».
+ *       (Kelk.ui.report.custom): the findings, «Make slides anyway» (onAnyway), «Copy the prompt» and Copy report (2.8).
  *   KelkSlideCheck.incoming()            (in the page) after a paste or an import in the Slides view: a text plainly not
  *       in slide format switches the view to the document, with the same report (a toast instead when an import's
  *       report is on screen). Editing never switches the view.
@@ -147,6 +147,12 @@
             icon: 'presentation',
             title: function () { return t('sc_title'); },
             brief: function () { return t(W[1]); },
+            // Copy report (2.8, as every report panel): the same as Markdown
+            copy: function () {
+                return ['## ' + t('sc_title'), '', t(W[0]), '', '**' + t('rep_findingsHead') + '**', '']
+                    .concat(res.findings.map(function (f) { return '- ' + t(KEYS[f.code], f.n, f.of); }), ['', t('sc_prompt')])
+                    .join('\n') + '\n';
+            },
             body: function (box) {
                 add(box, 'p', 'report-summary', t(W[0]));
                 const ul = add(box, 'ul', 'report-findings');

@@ -286,6 +286,10 @@ Arabic — indicative only — dev 86.0 (ltr 92.4, rtl 78.0, `rtl` 91.0), held-o
 93.0), where generator 3 there gave 95.8 / 93.9. Weak: right-to-left headings (dev 68) and quotes (67);
 `tracking: loose` (dev 75.4: ltr 80.7 against 96.2 untracked); Noto Naskh Arabic, and its fallback here.
 
+Generator 5 (wkhtmltopdf's right-to-left fonts installed, so they keep a text layer) is the baseline's since 2.8,
+built on the CI runner (the *pdf-lab* workflow run by hand with «baseline»; its fuzz part only): dev 89.3 (ltr 93.2,
+rtl 84.4, `rtl` 92.3), held-out 88.9 (ltr 91.9, rtl 85.2, `rtl` 90.6). Weakest: quotes (dev 78.7) and tables (80.9).
+
 **A paired test.** `--tagged=all` / `--tagged=none` force one value of `tagged` on every Chromium file:
 the same styles with and without a structure tree, in folders of their own (such a set is no dev or
 held-out split):
