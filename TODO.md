@@ -77,9 +77,19 @@ In this order, one pull request each (3 and 4 may split in two):
    operating system only when the file names it (a browser's User-Agent, Quartz's «macOS Version», «(Windows)»,
    Microsoft Print to PDF) — never from the fonts. DOCX, XLSX and HTML imports get the same report panel as a PDF
    (the same component, `reportOpenMs`), shown only when there is something to show
-3. **Right to left** (`pdf/2.7-rtl`): RTL fuzz files ≈ 77 against LTR ≈ 93, tables (62) and quotes (61) weakest;
-   the LibreOffice-path RTL files (`lohtml-rtl--*` 51–69, `kelkdocx-lo--*` 56–82) lose brackets (mirrored), lists
-   and tables. Each fix with a lab file of its own
+3. **Right to left**, in two pull requests:
+   - **3a, the LibreOffice path** (`pdf/2.7-rtl`): brackets named by the logical character (0 → 100 on every
+     `lohtml-rtl--*` and `kelkdocx-lo--*` file), a list's bullet or number set against its word, right-to-left items
+     set flush left (lab: `*--fa-brackets`). Still lost there: tables of `lohtml-rtl--fa-article`, `--fa-report`,
+     `--ar-article` (two columns run together; a header cell over two lines split off), quotes; on `ar-article` an
+     Arabic font's marks named wrongly («ٍ» at word ends, «:» for shadda) — 2.8
+   - **3b, Chromium** (`pdf/2.7-rtl-tables`): the RTL fuzz files' tables (Chromium 74) and quotes (80), against
+     ≈ 88 and ≈ 87 left to right
+   - **The lab's own limit**: wkhtmltopdf embeds none of the fuzz set's `@font-face` fonts, so its right-to-left fuzz
+     files (9 of 44 in `dev`) carry their Persian and Arabic text as outlines, with no text layer (total ≈ 26, words
+     ≈ 29 %): no rule can read them, and they hold the RTL fuzz mean down (Chromium's RTL files ≈ 88.5). The fix is the
+     generator's (installed fonts for wkhtmltopdf, as `make-rtl.js` does), with a new `GENERATOR` and the fuzz
+     baseline rebuilt by a CI run with `baseline` ticked — 2.8
 4. **A designed booklet** (designed documents from browsers: heading, box and figure rules shared by every Chromium
    file in the lab) — **lab:** `chrome-booklet--booklet-cards-fa` (45.4). Cards, badges and coloured boxes:
    - a table of contents — a number badge, the title, dot leaders drawn as a dashed rule, no page number — comes
@@ -126,7 +136,7 @@ passes with a table of contents) and report them, as the slides build does.
 **High**
 
 - PDF import, right to left: RTL fuzz files score well below English ones (RTL ≈ 77–81 against LTR ≈ 92–93; tables
-  and quotes weakest, then `zwnj`); LibreOffice-path RTL files lose brackets (mirrored), lists and tables; Chrome's
+  and quotes weakest, then `zwnj` — see 2.7 item 3 for what is done and what the wkhtmltopdf files are); Chrome's
   browser-default style loses quotes and code in fa / ar while the text is right
 - PDF import: wkhtmltopdf Persian (`zwnj` 0, `yehKaf` 53–68 — a broken ToUnicode in the file); the narrow-space → ZWNJ
   rule hurts those files

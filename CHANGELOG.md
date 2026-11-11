@@ -25,6 +25,16 @@ All notable changes to Kelk. Dates are those of the release tags.
   embedded (by name); the page repaints before a builder holds it, so its step shows. The bar stands still while a
   builder works (a moving bar: TODO.md).
 
+### Fixed
+
+- **PDF import, right to left: brackets from LibreOffice** the right way round: its files name a bracket by the logical
+  character, not the shape drawn, and came out «)NAS(» (every bracket of the LibreOffice-path lab files: 0 → 100).
+- **PDF import, right to left: LibreOffice's lists** — a bullet or a number set right against the item's first word
+  («•نسخهٔ روزانه», «1.نسخهٔ اصلی») is the item's mark; the lists had come out as paragraphs.
+- **PDF import, right to left: lists set flush left** are one level: every shorter item had been read a level deeper.
+- **PDF import of a long document** holds the page less: a pause between the steps that read every page (the lab's
+  joined PDF: its longest stretch about a third shorter).
+
 ## [2.6] — 2026-11-10
 
 Excel and CSV: the standalone CSV / Markdown ⇆ XLSX page joins Kelk.

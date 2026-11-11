@@ -467,6 +467,13 @@ What stays unknown after the repairs is **dropped**: a stray Latin Extended lett
      and a Persian or Arabic-Indic code stays as it is. The one exception is the case above: a font whose
      ToUnicode names its digit glyphs in two systems at once (Word's «4-۳»), where the file itself is
      inconsistent and the font's own cmap decides between the two;
+   - **a bracket named by the logical character where no table of the font can say otherwise** (2.7,
+     `lines._bracketsLogical`): LibreOffice names the ")" shape at the right end of «(NAS)» "(", and its fonts'
+     codes are no glyph ids (a CIDToGIDMap of its own), so neither the cmap nor the outline is read. In logical
+     order, before step 3 mirrors them, logical names read «( … )» and shape names «) … (»: a line's pairs decide,
+     and a line with none (a span broken across lines) follows what the same fonts' earlier lines showed, else the
+     shapes, as before. ( ) [ ] { } only. Lab: `lohtml-rtl--*`, `kelkdocx-lo--*` (brackets 0 → 100),
+     `*--fa-brackets` (pairs, nesting, square brackets, braces, a span over two lines, lists, a table);
    - **a bracket the ToUnicode names by the other of its pair**: InDesign's Dana-Bold names the "(" glyph ")",
      Dana-Regular in the same file names it "(" — «)نمونه(». The **outline** decides (glyf, simple glyphs):
      a bracket whose ink at mid-height lies left of its middle looks like ( [ { < «, the other way like its
@@ -1395,6 +1402,14 @@ gap** that frees a region with columns. Learnt the hard way:
   not bold — starts a line of its own in its paragraph (a box of fields: «موضوع طرح: …», «زبان طرح: …»).
 - **A dash against its word** («-مدیر …», no space) is a list's mark too, before a letter (a minus is before a
   number); a lone bullet or dash a few points off its item (under 1.2 em: Prince's column cut) joins it again.
+- **A bullet or a number against its word, right to left** (2.7, `blocks.numGluedBullet`, `numGluedNumber`):
+  LibreOffice's list from HTML sets «•» and «1.» right beside the item's first letter, no gap, no space
+  («•نسخهٔ روزانه», «1.نسخهٔ اصلی»); on a right-to-left line they are its mark (a number only before an
+  Arabic-script letter). Lab: `lohtml-rtl--fa-brackets`, `lohtml-rtl--fa-report` (lists 0 → 100).
+- **Right-to-left items set flush left** (2.7, `blocks.listFlushLeftRtl`): the same lists draw each item's bullet at
+  its own line's right end and every line from the left margin — the right ends follow the text's length, and every
+  shorter item had gone a level deeper. Three single-line right-to-left items or more whose left ends agree
+  (`blkListFlushLeftTolPt`, 1.5 pt) and whose indents differ are one level (the PDF keeps no nesting to read).
 - **A centred block of short lines keeps its breaks** (`_groupLines`): two lines under 60 % of the column whose
   middles stand at one x (half an em) and whose widths differ by an em or more — a letter's signature, name over
   title — no wrap sets lines so. **A paragraph goes on with the list item above it** only when it is set in about as

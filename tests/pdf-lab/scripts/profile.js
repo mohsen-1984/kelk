@@ -13,8 +13,9 @@ const PdfImporter = require(path.join(KELK, 'lib', 'PdfImporter.js'));
 const P = PdfImporter.provenance;
 const { structure } = require('./score.js');
 let failed = 0;
-// the Author a lab PDF may carry: the placeholders the lab's own tools write (python-docx, openpyxl), never a person
-const LAB_AUTHORS = /^(Un-named|openpyxl)$/;
+// the Author a lab PDF may carry: the placeholders the lab's own tools write (python-docx, openpyxl) and Kelk's own name
+// (its DOCX through LibreOffice), never a person
+const LAB_AUTHORS = /^(Un-named|openpyxl|Kelk [\d.]+)$/;
 const check = (name, got, want) => {
   const bad = Object.keys(want).filter((k) => {
     const g = k.split('.').reduce((o, x) => (o == null ? o : o[x]), got), w = want[k];
