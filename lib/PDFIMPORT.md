@@ -1406,6 +1406,10 @@ gap** that frees a region with columns. Learnt the hard way:
   LibreOffice's list from HTML sets «•» and «1.» right beside the item's first letter, no gap, no space
   («•نسخهٔ روزانه», «1.نسخهٔ اصلی»); on a right-to-left line they are its mark (a number only before an
   Arabic-script letter). Lab: `lohtml-rtl--fa-brackets`, `lohtml-rtl--fa-report` (lists 0 → 100).
+- **Right-to-left items set flush left** (2.7, `blocks.listFlushLeftRtl`): the same lists draw each item's bullet at
+  its own line's right end and every line from the left margin — the right ends follow the text's length, and every
+  shorter item had gone a level deeper. Three single-line right-to-left items or more whose left ends agree
+  (`blkListFlushLeftTolPt`, 1.5 pt) and whose indents differ are one level (the PDF keeps no nesting to read).
 - **A centred block of short lines keeps its breaks** (`_groupLines`): two lines under 60 % of the column whose
   middles stand at one x (half an em) and whose widths differ by an em or more — a letter's signature, name over
   title — no wrap sets lines so. **A paragraph goes on with the list item above it** only when it is set in about as

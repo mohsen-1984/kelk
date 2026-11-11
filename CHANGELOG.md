@@ -31,6 +31,7 @@ All notable changes to Kelk. Dates are those of the release tags.
   character, not the shape drawn, and came out «)NAS(» (every bracket of the LibreOffice-path lab files: 0 → 100).
 - **PDF import, right to left: LibreOffice's lists** — a bullet or a number set right against the item's first word
   («•نسخهٔ روزانه», «1.نسخهٔ اصلی») is the item's mark; the lists had come out as paragraphs.
+- **PDF import, right to left: lists set flush left** are one level: every shorter item had been read a level deeper.
 
 ## [2.6] — 2026-11-10
 
