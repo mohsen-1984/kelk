@@ -95,23 +95,7 @@ In this order, one pull request each (3 and 4 may split in two):
      `@font-face` fonts as outlines, no text layer (its 9 right-to-left `dev` files: total ≈ 26). It now takes them as
      installed fonts: those files 26 → 56, the RTL `dev` mean 75.7 → 82.0, with no change to the importer — the mean
      3b is measured on
-4. **A designed booklet** (designed documents from browsers: heading, box and figure rules shared by every Chromium
-   file in the lab) — **lab:** `chrome-booklet--booklet-cards-fa` (45.4). Cards, badges and coloured boxes:
-   - a table of contents — a number badge, the title, dot leaders drawn as a dashed rule, no page number — comes
-     back as headings or a table with each number a bold paragraph after its title; expected a numbered list
-   - a chapter's head — a number badge beside the title, a small coloured subtitle under it: the badge a bold
-     paragraph before the title, the title a bold paragraph on one page and a heading on the next, the levels
-     jumping (`####` then `######`); expected «## 1. title» on every chapter, the subtitle bold under it
-   - a drop cap (the first letter large, beside the first lines) splits the first word («ب یشتر») and the paragraph
-   - a callout — a tinted box, a small square icon and a bold label over its text — comes back as a task item
-     («- [ ] **label** …»): the icon read as a checkbox; expected a quote with its bold label
-   - a formula drawn as boxes with «+» and «=» between them, each box a word and its English gloss: each word a
-     heading, «+» and «=» headings; expected one line, «**نشانه** (cue) + **کار** (routine) = **عادت** (habit)»
-   - two cards side by side, each a bold title over its text, become a two-column table (or headings): expected
-     each card's title in bold over its text, the start side first
-   Risk: high (the size and box rules decide headings and quotes for every web page in the lab)
-5. If time allows: Persian digits that share a glyph with Arabic-Indic ones come back Arabic-Indic; bordered form
-   boxes as tables
+4. ~~A designed booklet~~ and 5. ~~digits and form boxes~~ — moved to 2.8 (the owner's decision of 2026-11-11)
 6. Release 2.7
 
 **2.8 — PDF import from real files, the slides view on demand** (moved from 2.7, the owner's decision of 2026-11-11).
@@ -146,6 +130,34 @@ a second at once): 836 ms on CI after 2.7's `fa-brackets` files, against the 1,0
 or `_toHtml`, up to about 0.8 s on a slow machine) and the lines' and furniture steps. Each real-sample lab file of 2.8
 adds to the joined PDF: if the check comes near the limit again, look for the step that holds the page
 (`_layoutPage`'s steps) rather than leave files out of the lab.
+
+**A designed booklet** (moved from 2.7) (designed documents from browsers: heading, box and figure rules shared by every Chromium
+   file in the lab) — **lab:** `chrome-booklet--booklet-cards-fa` (45.4). Cards, badges and coloured boxes:
+   - a table of contents — a number badge, the title, dot leaders drawn as a dashed rule, no page number — comes
+     back as headings or a table with each number a bold paragraph after its title; expected a numbered list
+   - a chapter's head — a number badge beside the title, a small coloured subtitle under it: the badge a bold
+     paragraph before the title, the title a bold paragraph on one page and a heading on the next, the levels
+     jumping (`####` then `######`); expected «## 1. title» on every chapter, the subtitle bold under it
+   - a drop cap (the first letter large, beside the first lines) splits the first word («ب یشتر») and the paragraph
+   - a callout — a tinted box, a small square icon and a bold label over its text — comes back as a task item
+     («- [ ] **label** …»): the icon read as a checkbox; expected a quote with its bold label
+   - a formula drawn as boxes with «+» and «=» between them, each box a word and its English gloss: each word a
+     heading, «+» and «=» headings; expected one line, «**نشانه** (cue) + **کار** (routine) = **عادت** (habit)»
+   - two cards side by side, each a bold title over its text, become a two-column table (or headings): expected
+     each card's title in bold over its text, the start side first
+   Risk: high (the size and box rules decide headings and quotes for every web page in the lab)
+   What 2.7 found (a first pull request tried, then dropped; nothing merged):
+   - a number badge right of a right-to-left title is not joined to it (`lines.badgeJoined` looks only to the badge's
+     right, left to right): its mirror is needed by the rest
+   - a table of contents of badges as a numbered list — the rule «a badge number at a line's start is an item's
+     number» made `fz75-chr--report` worse (lists 33.3 → 18.2: lines like «126 tagging», numbers in badges left to
+     right, became items): a list of badges must be told from numbered lines first
+   - a chapter title that is a question («…؟») was refused as a heading (`blocks.headingFieldVeto` takes «?» / «؟» for a
+     sentence's end)
+   - **by design** (the owner's decision of 2026-11-11): a badge that draws only «1» comes back «## 1 title» — Kelk
+     writes what the file says and adds no period; the lab's expected «## 1. title» counts it a mismatch, and stays so
+
+**Digits and form boxes** (moved from 2.7): Persian digits that share a glyph with Arabic-Indic ones come back Arabic-Indic; bordered form boxes as tables
 
 **Export progress inside the builders** (from 2.7's progress item): DocxBuilder, PdfBuilder, HtmlBuilder and
 WordHtmlBuilder build in one synchronous run, so during «building the document» the step name shows but the bar
