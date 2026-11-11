@@ -711,6 +711,10 @@ them. Before, a Persian letter began with `# g`.
 
 - **From the name** first: `Bold`, `Black`, `Semibold`, `Italic`, `Oblique`; TeX names (`CMBX12`, `CMTI10`,
   `CMTT10`, cm-super's `EC…`).
+- **From the text matrix** (2.7, per glyph): a font with no italic face — most Persian and Arabic fonts: Vazirmatn,
+  Sahel, Noto Naskh — is slanted by its producer (Chrome's synthetic italic shears the text matrix by about 0.2).
+  `extract.js` keeps the shear over the height (`g.slant`, where there is one); `lines.js` reads a slant over
+  `linSlantItalic` (0.1) as italic. The fonts' own flags said nothing, and a quote styled in italic was plain text.
 - **Fonts named without a style** (Microsoft Print to PDF: `CIDFont+F1`, `F2` …): the embedded font
   program's own name table and OS/2 (weight, fsSelection, PANOSE for monospace).
 - **jsPDF (Kelk) writes four styles under one name**: styles come from glyph widths and bounding
