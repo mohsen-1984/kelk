@@ -14,7 +14,8 @@
  *       «##» heading and one table in the editor, then the Excel view and the summary. Several CSVs: the order
  *       dialog, each with its rows, columns, encoding and separator; CSVs beside documents: the user picks one kind
  *       (the documents chosen go back to the importer: { docs }). Over Kelk.config.maxSheetCells: refused.
- *   KelkSheets.summary(rows)           the report panel: a table of the sheets — the text's tables, or rows given
+ *   KelkSheets.summary(rows, empty, infos)   the report panel: a table of the sheets — the text's tables, or rows given;
+ *       infos [{ name, info }]: each imported XLSX's own information (scripts/fileinfo.js), closed under the table
  *   KelkSheets.looksLikeCsv(text)      pasted text that is CSV or tab-separated (2+ lines, the same separator count
  *       on each, not a Markdown table) — synchronous: the paste event decides on it
  *   KelkSheets.pasteCsv(text)          such a paste → a heading and a table at the cursor, then the summary
@@ -440,11 +441,14 @@
         await k.ui.task(t('xs_reading', o.first), async function (task) {
             const step = k.ui.steps(task, { libs: 0.2, read: 0.8 }, { libs: 'xs_libs', read: 'xs_readN' }, 'read');
             const xl = sheets.some(isXlsx);
-            if (!k.libs.loaded('sheetimport') || (xl && !k.libs.loaded('xlsx'))) {
+            if (!k.libs.loaded('sheetimport') || (xl && !k.libs.loaded('xlsx')) || (xl && !k.libs.loaded('fileinfo'))) {
                 step('libs', 0, 1);
                 await k.libs.need('sheetimport');
                 if (xl) await k.libs.need('xlsx');
             }
+            // an XLSX's own information (docProps) for the summary panel (scripts/fileinfo.js): without it, the import goes on
+            let fi = null;
+            if (xl) { try { fi = await k.libs.need('fileinfo'); } catch (e) { fi = null; } }
             for (let i = 0; i < sheets.length; i++) {
                 const d = sheets[i];
                 if (task.signal.aborted) return;
@@ -454,6 +458,7 @@
                 const bytes = new Uint8Array(await d.file.arrayBuffer());
                 if (isXlsx(d)) {
                     d.book = SheetImporter.readXlsx(bytes, { mergedRows: k.store.getUi('importer.mergedRows') });   // Settings → Import
+                    if (fi) { try { d.fileInfo = await fi.fromOffice(bytes); } catch (e) { d.fileInfo = null; } }
                 } else {
                     d.csv = SheetImporter.readCsv(bytes, { persianLetters: k.store.getUi('importer.persianLetters') !== false });
                     const z = SheetImporter.size(d.csv.rows);
@@ -521,7 +526,8 @@
         summary(list.map(function (x) {
             const z = SheetImporter.size(x.rows);
             return { name: x.name, source: x.source, rows: z.rows, cols: z.cols, encoding: x.encoding ? ENC[x.encoding] || x.encoding : '', separator: x.separator ? sepName(x.separator) : '' };
-        }), empty);
+        }), empty, chosen.filter(function (d) { return d.fileInfo && k.fileInfo && k.fileInfo.any(d.fileInfo); })
+            .map(function (d) { return { name: d.name, info: d.fileInfo }; }));
         return null;
     }
 
@@ -529,7 +535,7 @@
      * The report panel: a table of the sheets (a row each: name, source, rows, columns — and for a CSV its encoding
      * and separator), their totals, the empty sheets left out. rows: given by an import, else the text's tables.
      */
-    function summary(rows, empty) {
+    function summary(rows, empty, infos) {
         const k = K();
         if (!rows) {
             let plans = [];
@@ -575,6 +581,11 @@
                 if (csv) { el(foot, 'td', '', ''); el(foot, 'td', '', ''); }
                 if (empty && empty.length) el(box, 'p', 'report-summary', t('xs_emptySheets', empty.join('، ')));
                 el(box, 'p', 'report-summary', t('xs_sumNote'));
+                // each XLSX's own information (docProps), closed under the table, as in every import report
+                (infos || []).forEach(function (x) {
+                    if (infos.length > 1) el(box, 'h4', 'report-file', x.name).dir = 'auto';
+                    k.fileInfo.render(box, x.info);
+                });
             },
             buttons: []
         });

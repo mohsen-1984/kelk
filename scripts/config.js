@@ -194,6 +194,7 @@
             jszip: { src: 'vendor/jszip.min_3.10.2.js', global: 'JSZip' },
             fontembed: { src: 'lib/FontEmbed.js', global: 'FontEmbed' },           // Settings → Fonts → Embed fonts
             slidecheck: { src: 'scripts/slidecheck.js', global: 'KelkSlideCheck' },      // on the first switch to slides
+            fileinfo: { src: 'scripts/fileinfo.js', global: 'KelkFileInfo' },          // the import report's file information
             // the Excel view (its preview, the no-tables report, the exports): on the first switch to Excel
             sheets: { src: ['lib/XlsxBuilder.js', 'scripts/sheets.js'], global: 'KelkSheets' },
             xlsx: { src: ['vendor/jszip.min_3.10.2.js', 'vendor/xlsx.full.min_0.20.3.js'], global: 'XLSX' },     // an XLSX export or import

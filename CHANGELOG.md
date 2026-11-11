@@ -4,6 +4,15 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+### Added
+
+- **The imported file's information** in the import report, closed under it: what the file says, as written — for a
+  PDF its title, author, application and producer, dates, PDF version, pages, page size, language, tags, bookmarks
+  and fonts; for a DOCX or an XLSX its document properties; for an HTML page its title and generator. What Kelk infers
+  (the application, the drawing engine, the production path) is a group of its own, labelled a guess, with its
+  evidence; the operating system only when the file itself names it, never from the fonts. DOCX and HTML imports
+  get the same report panel when they have something to show.
+
 ### Changed
 
 - **Every progress state names its step** (the rule since 2.7: no generic progress anywhere in Kelk): one step helper for

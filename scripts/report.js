@@ -13,7 +13,11 @@
  *   Kelk.importReport.worth(rep)      something to tell: a page not 'full', a flag, a note that is not quiet
  *                                     (kelkSource, kelkMath, monoBody alone are not news: the import went as it
  *                                     should).
+ *   Kelk.importReport.none()          an empty report: a file with nothing to report but its information (2.7).
  *   Kelk.importReport.text(entries)   the report as plain text (Copy report).
+ *   An entry ({ name, report }) may carry info and kind: the file's information (scripts/fileinfo.js, loaded by the
+ *     import), shown under the report in a closed <details> and copied with it; kind 'docx', 'xlsx', 'html' … names
+ *     the panel «Import report» instead of «PDF import report».
  *   Kelk.ui.report(rep | [{ name, report }] | null, { name, onSafe })
  *     shows #import-report for every PDF import, the same way whatever the file: a clean one too (its summary, the
  *     calm color), one with something to tell in the warning color (worth). Open for config.reportOpenMs, then
@@ -173,13 +177,19 @@
         return out;
     }
 
+    function none() {
+        return { mode: null, summary: { pages: 0, full: 0, simplified: 0, textContent: 0, ocr: 0, failed: 0, conf: null }, pages: [], flags: [], notes: [] };
+    }
+    const titleKey = function (entries) { return entries.some(function (e) { return e.kind && e.kind !== 'pdf'; }) ? 'rep_titleImport' : 'rep_title'; };
+    const infoOf = function (e) { return e.info && K.fileInfo && K.fileInfo.any(e.info) ? e.info : null; };
+
     function entriesOf(rep, o) {
         if (Array.isArray(rep)) return rep.filter(function (e) { return e && e.report; });
         return rep ? [{ name: (o && o.name) || '', report: rep }] : [];
     }
 
     function text(entries) {
-        const lines = [t('rep_title')];
+        const lines = [t(titleKey(entries))];
         entries.forEach(function (e) {
             const rep = e.report;
             lines.push('');
@@ -199,11 +209,12 @@
                         (p.why.length ? ' — ' + p.why.map(whyName).join(sep()) : ''));
                 });
             }
+            if (infoOf(e)) { lines.push(''); Array.prototype.push.apply(lines, K.fileInfo.lines(e.info)); }
         });
         return lines.join('\n').replace(/[⁦-⁩]/g, '') + '\n';        // plain text: no bidi isolates
     }
 
-    K.importReport = { fromResult: fromResult, worth: worth, text: text, FLAGS: FLAGS, NOTES: NOTES, MODES: MODES, MODE_KEYS: MODE_KEYS, WHY: WHY_KEYS };
+    K.importReport = { fromResult: fromResult, worth: worth, text: text, none: none, FLAGS: FLAGS, NOTES: NOTES, MODES: MODES, MODE_KEYS: MODE_KEYS, WHY: WHY_KEYS };
 
     // ---- the panel ---------------------------------------------------------------------------------------------
     const state = { entries: [], o: {}, back: null, doc: null, timer: 0, view: null };
@@ -218,7 +229,7 @@
     /** the panel's title, icon and buttons: an import's report or another module's view (report.custom) */
     function kind() {
         const v = state.view, h = K.$('#import-report-title'), acts = K.$('#import-report .report-actions');
-        if (h) { h.querySelector('span').textContent = v ? v.title() : t('rep_title'); K.ui.setIcon(h, v ? v.icon : 'file-text'); }
+        if (h) { h.querySelector('span').textContent = v ? v.title() : t(titleKey(state.entries)); K.ui.setIcon(h, v ? v.icon : 'file-text'); }
         const copyB = K.$('#report-copy'); if (copyB) copyB.hidden = !!v;
         if (!acts) return;
         acts.querySelectorAll('.report-custom').forEach(function (b) { b.remove(); });
@@ -279,6 +290,7 @@
                     tr.appendChild(el('td', 'why', p.why.map(whyName).join(sep())));
                 });
             }
+            if (infoOf(e)) K.fileInfo.render(sec, e.info);
         });
         const safe = K.$('#report-safe'), hint = K.$('#report-safe-hint');
         // (a clean import has nothing safe mode would do better: no button)
@@ -289,7 +301,8 @@
         if (name) name.textContent = state.entries.length === 1 ? state.entries[0].name : '';
         // the head's own line, read while the panel is collapsed: the summary of one file, or how many files
         const brief = K.$('#import-report-brief');
-        if (brief) brief.textContent = state.entries.length === 1 ? summaryText(state.entries[0].report) : t('rep_files', state.entries.length);
+        const one = state.entries.length === 1 ? state.entries[0] : null;
+        if (brief) brief.textContent = one ? summaryText(one.report) || (infoOf(one) ? K.fileInfo.brief(one.info) : '') : t('rep_files', state.entries.length);
         box.classList.toggle('clean', !state.entries.some(function (e) { return worth(e.report); }));
         toggleButton();
     }
