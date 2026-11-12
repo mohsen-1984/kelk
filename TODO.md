@@ -106,17 +106,14 @@ requests (see each item's *PR*); the booklet only if time allows.
    (`fz23`, `fz53`, `fz62`); the short page above.
 3. **A lighter startup: the slides view and the builders on first use** (moved from 2.5, then 2.7; the owner's
    decisions of 2026-11-09 and 2026-11-11). *PR:* `ui/2.8-startup`, its own (it touches every export).
-   - The slides view: PptxBuilder (170 KB) and `scripts/slides.js` (30 KB) load with the page, though a user who
-     writes documents never needs them; load them on the first switch to Slides (and for a PPTX export, the Slides
-     settings' theme lists, a deck sample), as the PDF importer is (`config.libs`, `Kelk.libs.need`). Already on
-     demand: PptxGenJS and JSZip (`libs.pptx`), the slide check (`scripts/slidecheck.js`), the icon set. Still at
-     startup: `lib/PptxBuilder.js` (`scripts/settings.js` reads its theme lists to fill Settings → Slides) and
-     `scripts/slides.js` (the view toggle, the export hooks).
-   - The builders (DocxBuilder, PdfBuilder, WordHtmlBuilder with its template, HtmlBuilder): loaded on the first
-     export that needs each, its step named («loading the library, first time only»). PreviewBuilder and the cores
-     the preview uses stay at startup.
-   - Drop the unused `vendor/lucide.min_1.48.0.js` and the duplicate highlight.js stylesheet.
-   - The bytes saved come off `tools/size-budget.json` (its `maxBytes` lowered, the reason in `_about`).
+   **Done in 2.8**: startup 1,649,960 → 1,046,588 bytes (budget 1,050,000).
+   - The slides: `scripts/slides.js` keeps the view switch; the deck moved to `scripts/deck.js`, which loads with
+     PptxBuilder (`config.libs.slides`) on the first switch to Slides, PowerPoint export or Settings → Slides opened.
+   - DocxBuilder, PdfBuilder and WordHtmlBuilder load on their first export, the step named. HtmlBuilder and the Word
+     template stay: PreviewBuilder extends HtmlBuilder, and BuilderBase reads the template's defaults.
+   - Found on the way: `vendor/lucide.min_1.48.0.js` is not unused — the slides' icons (`:name:`) load it on first use
+     (`config.slides.icons`); it stays. The startup's highlight.js stylesheet is not a duplicate either: HtmlBuilder's
+     stylesheet has every token color but not plain code text's (#24292e); it stays. `default.min` (never loaded) went.
 4. **A designed booklet** (moved from 2.7; only if time allows — high risk). *PR:* `pdf/2.8-booklet`, its own.
    Designed documents from browsers: heading, box and figure rules shared by every Chromium file in the lab —
    **lab:** `chrome-booklet--booklet-cards-fa` (45.4). Cards, badges and coloured boxes:
@@ -183,7 +180,6 @@ from each):
   and quotes weakest, then `zwnj` — see `CHANGELOG.md` 2.7 for what is done); Chrome's
   browser-default style loses quotes and code in fa / ar while the text is right
 - PDF import: wkhtmltopdf Persian — 2.9, item 2
-- Startup: the builders (≈ 1.3 MB with PowerPoint) load before the first paint — 2.8, item 3
 - Release: GitHub Pages served from the app's set (`tools/build-release.sh`) rather than from the whole repository
   (no `.nojekyll`, no cache-busting today)
 

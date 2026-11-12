@@ -12,6 +12,7 @@ All notable changes to Kelk. Dates are those of the release tags.
 - **A lighter startup: the export builders on first use.** The Word (.docx, .doc) and PDF builders (420 KB) load on
   their first export, its step named («Loading the Word library (first time only)»). The files they make are the same,
   byte for byte. The preview's own builder (HTML) stays at startup.
+- **The startup budget** is lowered to 1,050,000 bytes: the page now loads 1.05 MB at startup instead of 1.65 MB.
 - **One copy button per report panel**: *Copy report* copies the whole report as Markdown — the findings as a list,
   the pages not read in full and the file's information as GFM tables. File information's own *Copy as a table*
   button is gone (it sat at the panel's far end).
