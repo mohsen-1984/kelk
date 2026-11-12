@@ -197,6 +197,11 @@
             // the Slides view's deck and the PowerPoint builder (2.8: not with the page): the first switch to Slides, PowerPoint
             // export or Settings → Slides opened (scripts/slides.js)
             slides: { src: ['lib/PptxBuilder.js', 'scripts/deck.js'], global: 'KelkDeck' },
+            // the export builders (2.8: not with the page; HtmlBuilder stays, the preview is built on it): the first export
+            // of each, after its library (docx, jspdf), its step named (scripts/exporter.js)
+            docxBuilder: { src: 'lib/DocxBuilder.js', global: 'DocxBuilder' },
+            pdfBuilder: { src: 'lib/PdfBuilder.js', global: 'PdfBuilder' },
+            docBuilder: { src: 'lib/WordHtmlBuilder.js', global: 'WordHtmlBuilder' },
             fileinfo: { src: 'scripts/fileinfo.js', global: 'KelkFileInfo' },          // the import report's file information
             // the Excel view (its preview, the no-tables report, the exports): on the first switch to Excel
             sheets: { src: ['lib/XlsxBuilder.js', 'scripts/sheets.js'], global: 'KelkSheets' },
