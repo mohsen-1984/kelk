@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BiDi Lab 2.7 — BidiCore + BidiView</title>
+<title>BiDi Lab 2.8 — BidiCore + BidiView</title>
 <style>
   /* Vazirmatn: installed → local copy in a Kelk checkout → CDN */
   @font-face{font-family:'Vazirmatn';font-weight:100 900;font-display:swap;
@@ -145,7 +145,7 @@
  * BidiCore - Shared direction & BiDi analysis for WordHtmlBuilder, DocxBuilder and PdfBuilder
  * ==============================================================================
  *
- * Version: 2.7
+ * Version: 2.8
  *
  * One engine, two renderers. Everything here DECIDES; nothing here renders:
  *
@@ -1664,7 +1664,7 @@
 /**
  * BidiView - direction for HTML shown in a browser (preview, standalone HTML)
  * ============================================================================
- * Version: 2.7
+ * Version: 2.8
  *
  * The browser already runs the Unicode BiDi Algorithm; BidiView applies the
  * decisions of BidiCore — the same ones the .doc / .docx / .pdf builders
@@ -1834,7 +1834,7 @@
     ].join('\n');
   }
 
-  var BidiView = { version: '2.7', apply: apply, clear: clear, css: css, toAttributes: toAttributes };
+  var BidiView = { version: '2.8', apply: apply, clear: clear, css: css, toAttributes: toAttributes };
 
   if (typeof module !== 'undefined' && module.exports) module.exports = BidiView;
   else if (typeof define === 'function' && define.amd) define([], function () { return BidiView; });
