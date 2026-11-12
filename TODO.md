@@ -71,50 +71,25 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
 - Excel: header rows and the other rows wrap separately (`excel.wrapHead` all, `excel.wrap` none by default); any RTL
   cell still makes the whole sheet RTL (2.6), so each sample keeps an all-English sheet to show one left to right.
 
-**2.8 — the report panels, right-to-left borderless tables, a lighter startup** (the next release; the owner's scope of
-2026-11-11: synthetic lab files and interface work only, no real samples — those wait for 2.9). In order of the pull
-requests (see each item's *PR*); the booklet only if time allows.
+**Standing rules from 2.8** (the owner's decisions; done — `CHANGELOG.md` 2.8):
 
-1. **The report panels: one Copy report, as Markdown, in every panel** (the owner's decisions of 2026-11-11). *PR:*
-   `ui/2.8-reports`, one commit for each of a–c.
-   - a. **The Excel import's summary** («Sheets summary», `KelkSheets.summary` through `Kelk.ui.report.custom`) has no
-     Copy report (a custom view hides `#report-copy`): give it one, copying the sheets table (#, sheet, file, rows) as a
-     GFM table, then the XLSX's own information when it has some. Its table area is too short — one row shows, and
-     the sideways scroll bar sits over it: make it show several rows before it scrolls (as the editor's height allows).
-   - b. **One copy button per panel.** File information's own «Copy as a table» (`fi_copy`, `scripts/fileinfo.js`) is
-     hard to reach at the panel's end: remove it. The panel's Copy report copies the whole report as Markdown — its
-     head (the report, the file), the findings, then the file's information as GFM tables (`KelkFileInfo.gfm`: the
-     file's words, then the guesses with their evidence). Today Copy report copies plain text (`report.text`) and
-     leaves the information out.
-   - c. **The same in every report panel**: PDF, DOCX, HTML and XLSX imports, and the Excel summary — the same
-     button, the same place, the same Markdown. While there, the PDF report's readability and scrolling: its body
-     shows about four lines before it scrolls; give it more room and clearer gaps between findings, file information
-     and the buttons, if a screenshot shows it is needed (the owner checks by eye).
-2. **Right-to-left borderless tables** (from 2.7, item 3c). *PR:* `pdf/2.8-rtl-tables`, its own (the importer).
-   Chromium's right-to-left fuzz files lose most borderless tables (`none` ≈ 44, `zebra` ≈ 52, against ≈ 76 and ≈ 67
-   left to right; `fz50-chr--fa-article`, `fz17-chr--fa-mixed`: 0). The rows are known, the cells are cut, and still
-   no rows leaf (`_rowsLeaf`) reads them: the table comes out as paragraphs, its header row bold with «·» between the
-   cells. The region step is where to look — what classifies the table's region before the leaf. Also: a short page
-   (under 20 prose gaps) is never measured as drawing its spaces, and its borderless table's header row breaks off as
-   headings (left to right the same page reads whole). What 2.7 found: the spaces are measured only from gaps before
-   lowercase letters, which right-to-left scripts do not have (#63 fixed the measure for LibreOffice's files).
-   **Done in 2.8** (`pdf/2.8-rtl-tables`): a table at the text's own pitch whose «left»-aligned first column meets
-   right-aligned numbers — the cells only their padding apart (9 pt), under a column's gap — is cut out by
-   `baselineRun` when its rows are cut cells (`rowCell`): lab `chrome-rtl-rows--fa-rows` (80.0 → 100), fuzz `none`
-   right to left 45.6 → 73.6 (`fz50` and `fz17`, tables 0 → 100 and 96). **Left:** `zebra` right to left (≈ 52):
-   wider tables whose cells wrap onto two or three lines (`fz42-chr--fa-report`), and two-column pages
-   (`fz23`, `fz53`, `fz62`); the short page above.
-3. **A lighter startup: the slides view and the builders on first use** (moved from 2.5, then 2.7; the owner's
-   decisions of 2026-11-09 and 2026-11-11). *PR:* `ui/2.8-startup`, its own (it touches every export).
-   **Done in 2.8**: startup 1,649,960 → 1,046,588 bytes (budget 1,050,000).
-   - The slides: `scripts/slides.js` keeps the view switch; the deck moved to `scripts/deck.js`, which loads with
-     PptxBuilder (`config.libs.slides`) on the first switch to Slides, PowerPoint export or Settings → Slides opened.
-   - DocxBuilder, PdfBuilder and WordHtmlBuilder load on their first export, the step named. HtmlBuilder and the Word
-     template stay: PreviewBuilder extends HtmlBuilder, and BuilderBase reads the template's defaults.
-   - Found on the way: `vendor/lucide.min_1.48.0.js` is not unused — the slides' icons (`:name:`) load it on first use
-     (`config.slides.icons`); it stays. The startup's highlight.js stylesheet is not a duplicate either: HtmlBuilder's
-     stylesheet has every token color but not plain code text's (#24292e); it stays. `default.min` (never loaded) went.
-4. **A designed booklet** (moved from 2.7; only if time allows — high risk). *PR:* `pdf/2.8-booklet`, its own.
+- Every report panel has one copy button, *Copy report*, the same in each: the whole report as Markdown (findings a
+  list, pages and file information GFM tables). The «no tables» message has none.
+- Scroll sync applies only side by side; in one column it is ignored, the setting kept.
+- Code that only some users need loads on first use, from file:// too (`Kelk.libs.need`, script tags): the export
+  builders, the slides deck with PptxBuilder; the step is named while it loads. HtmlBuilder and the Word template stay
+  at startup (the preview is built on them).
+
+**2.9 — real samples, then the designed booklet** (the next release; its own session: the owner attaches the samples
+there, and a lab file of our own follows from each; the booklet moved from 2.8, 2026-11-12):
+
+1. **Numbers in Persian report fonts** — B Nazanin, B Mitra and B Titr: a report's amounts read «3.004» (the file's
+   text has a period between the thousands; the page shows a comma-like mark): **to examine** whether these fonts
+   draw «.» as a thousands separator — a reader takes «3.004» for three and a bit.
+2. **wkhtmltopdf Persian** (`zwnj` 0, `yehKaf` 53–68 — a broken ToUnicode in the file); the narrow-space → ZWNJ rule
+   hurts those files.
+
+3. **A designed booklet** (moved from 2.7, then 2.8; high risk). *PR:* `pdf/2.9-booklet`, its own.
    Designed documents from browsers: heading, box and figure rules shared by every Chromium file in the lab —
    **lab:** `chrome-booklet--booklet-cards-fa` (45.4). Cards, badges and coloured boxes:
    - a table of contents — a number badge, the title, dot leaders drawn as a dashed rule, no page number — comes
@@ -140,32 +115,16 @@ requests (see each item's *PR*); the booklet only if time allows.
      sentence's end)
    - **by design** (the owner's decision of 2026-11-11): a badge that draws only «1» comes back «## 1 title» — Kelk
      writes what the file says and adds no period; the lab's expected «## 1. title» counts it a mismatch, and stays so
-5. **Small items.**
-   - a. **The lab's baseline** (`tests/pdf-lab/baseline.json`): its fuzz means are still generator 4's. Write a new
-     one from CI (the *PDF lab* workflow run by hand with «baseline» ticked → the artifact `baseline-candidate`), take
-     its fuzz numbers only, and commit them. Before item 2, so its gate compares with a current reference.
-     *PR:* `lab/2.8-baseline`, its own (a lab change runs CI's *lab* check).
-   - b. **The stress check's margin** (CI's *lab*, `run-stress.js`: the whole lab joined in one PDF must never hold
-     the page a second at once): 836 ms on CI after 2.7's `fa-brackets` files, against the 1,000 ms limit (main had
-     stood at 684–776). 2.7 put a pause between the whole-document steps; what is left is one page's own layout (one
-     call of `_layoutPage` or `_toHtml`, up to about 0.8 s on a slow machine) and the lines' and furniture steps. Look
-     for the step that holds the page (`_layoutPage`'s steps) rather than leave files out of the lab. *PR:* a commit
-     of its own in `pdf/2.8-rtl-tables` if item 2 brings the check near the limit; otherwise `pdf/2.8-stress`, after
-     item 2.
-   - c. **The Excel screenshots** (`docs/screenshots/kelk-excel-{en,fa,ar}.png`) still show 2.6's single wrap option
-     and the old samples: retaken in fa / en / ar once items 1 and 3 are merged (the owner takes them; a session here
-     has no browser), committed with the release pull request.
-
-**2.9 — from real samples** (its own session; the owner attaches the samples there, and a lab file of our own follows
-from each):
-
-1. **Numbers in Persian report fonts** — B Nazanin, B Mitra and B Titr: a report's amounts read «3.004» (the file's
-   text has a period between the thousands; the page shows a comma-like mark): **to examine** whether these fonts
-   draw «.» as a thousands separator — a reader takes «3.004» for three and a bit.
-2. **wkhtmltopdf Persian** (`zwnj` 0, `yehKaf` 53–68 — a broken ToUnicode in the file); the narrow-space → ZWNJ rule
-   hurts those files.
 
 **Not placed in a release yet** (moved out of 2.8's scope, 2026-11-11):
+
+- **Right-to-left borderless tables, what is left** (2.8 fixed the tables at the text's own pitch: fuzz `none` right
+  to left 45.6 → 73.6): `zebra` right to left (≈ 52) — wider tables whose cells wrap onto two or three lines
+  (`fz42-chr--fa-report`) and two-column pages (`fz23`, `fz53`, `fz62`); a short page (under 20 prose gaps) is never
+  measured as drawing its spaces, and its borderless table's header row breaks off as headings.
+- **The stress check's margin** (CI's *lab*, `run-stress.js`: never hold the page a second at once): 836 ms on CI
+  (2.7 and 2.8), against the 1,000 ms limit. What is left is one page's own layout (one call of `_layoutPage` or
+  `_toHtml`) and the lines' and furniture steps: look for the step that holds the page rather than leave files out.
 
 - **Digits and form boxes** (moved from 2.7): Persian digits that share a glyph with Arabic-Indic ones come back
   Arabic-Indic; bordered form boxes as tables.

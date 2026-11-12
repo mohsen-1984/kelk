@@ -2,38 +2,29 @@
 
 All notable changes to Kelk. Dates are those of the release tags.
 
-## [Unreleased]
+## [2.8] — 2026-11-12
 
 ### Changed
 
-- **A lighter startup: the slides on first use.** The PowerPoint builder and the slides deck (170 KB and 20 KB) load on
-  the first switch to Slides, PowerPoint export or Settings → Slides opened, no longer with the page; a reload in the
-  Slides view loads them at once. The slides and their export are the same.
-- **A lighter startup: the export builders on first use.** The Word (.docx, .doc) and PDF builders (420 KB) load on
-  their first export, its step named («Loading the Word library (first time only)»). The files they make are the same,
-  byte for byte. The preview's own builder (HTML) stays at startup.
-- **The startup budget** is lowered to 1,050,000 bytes: the page now loads 1.05 MB at startup instead of 1.65 MB.
-- **One copy button per report panel**: *Copy report* copies the whole report as Markdown — the findings as a list,
-  the pages not read in full and the file's information as GFM tables. File information's own *Copy as a table*
-  button is gone (it sat at the panel's far end).
-- **The import report reads more easily**: the same *Copy report* in every import's panel (PDF, DOCX, HTML, XLSX);
-  more room between findings, the file information's rows ruled like the pages table, and the panel's body a little
-  taller on small screens (never under 160 px), the editor's foot still on screen at 800 px high.
-- **The slide-format check's panel** has *Copy report* too: its summary, findings and advice as Markdown.
-- **The PDF lab's baseline**: its fuzz means are now the current generator's (5; they were generator 4's), written on
-  the CI runner. The corpus, golden and held-out numbers are unchanged.
+- **One Copy report per report panel**, the same in every panel (PDF, DOCX, HTML and XLSX imports, the Excel summary,
+  the slide-format check): the whole report as Markdown — the findings as a list; the pages not read in full and the
+  file's information as GFM tables. File information's own *Copy as a table* button is gone.
+- **The import report reads more easily**: more room between findings, the file information's rows ruled, and the
+  panel a little taller on small screens.
+- **A lighter startup**: 1.05 MB instead of 1.65 MB. The Word and PDF builders load on their first export, the
+  PowerPoint builder and the slides on the first use of the Slides view; the first export names the step («… (first
+  time only)»). The exported files are the same, byte for byte.
+- **The PDF lab's baseline**: its fuzz means come from the current fuzz generator, written on the CI runner.
 
 ### Fixed
 
-- **Scroll sync only side by side**: in one column (a narrow window or a phone, or the Single column layout) the editor
-  and the preview no longer scroll together, even with *Sync editor and preview scrolling* ticked; the setting is kept,
-  and applies again side by side. Its label says so («side by side only»).
-- **PDF import, right to left: borderless tables at the text's own line height** come back as tables. Where a «left»-
-  aligned first column meets right-aligned numbers, the cells stand only their padding apart, under a column's gap, and
-  no gap cut the table from the paragraph under it: its rows came back as paragraphs. Rows already cut into cells now
-  need only a cell's gap (lab: a new Persian file, tables 0 → 100; fuzz: two files, +14 each; no file worse).
-- **The Excel import's summary** has *Copy report* too (the sheets as a GFM table with their totals, then each XLSX's
-  information), and its table shows whole: it had shrunk to one row with a scroll bar of its own inside the panel's.
+- **PDF import, right to left: borderless tables at the text's own line height** come back as tables, not paragraphs
+  (a «left»-aligned first column against right-aligned numbers left the cells only their padding apart). Lab: a new
+  Persian file, tables 0 → 100; two fuzz files +14 each; no file worse.
+- **The Excel import's summary** shows its whole table (it had shrunk to one row with a scroll bar of its own) and has
+  *Copy report*.
+- **Scroll sync only side by side**: in one column (a narrow window, a phone, or the Single column layout) the editor
+  and the preview no longer scroll together; the setting is kept and applies again side by side. Its label says so.
 
 ## [2.7] — 2026-11-11
 
