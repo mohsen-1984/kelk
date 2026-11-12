@@ -188,6 +188,12 @@
                         build: EXPORT_BUILD[kind] || 'exp_docx', embed: 'exp_embed'
                     });
                     const paintStep = async function (name, args) { step(name, 0, 1, args); await K.ui.paint(); };
+                    // the libraries of this output (its vendor library, its builder), on their first use: the step named only then
+                    const libs = async function (names) {
+                        if (names.every(function (n) { return K.libs.loaded(n); })) return;
+                        step('libs', 0, 1);
+                        for (const n of names) await K.libs.need(n);
+                    };
                     // DOCX, PPTX: the fonts they use, embedded (Settings → Fonts)
                     const onEmbed = kind === 'pptx'
                         ? function (names) { t.progress(1000, 1000, K.i18n.t('exp_embed', names.join(K.i18n.t('listSep')))); return K.ui.paint(); }
@@ -200,16 +206,17 @@
                     // Word / PDF: a formula with right-to-left \text embeds the web font in its image
                     if (kind !== 'html' && /data-tex="[^"]*[֐-ࣿ]/.test(html)) { step('math', 0, 1); await K.fonts.forHtml(md); }
                     if (kind === 'docx') {
-                        if (!K.libs.loaded('docx')) { step('libs', 0, 1); await K.libs.need('docx'); }
+                        await libs(['docx', 'docxBuilder']);
                         await paintStep('build');
                         return embed(configure(DocxBuilder.create(), 'docx').addFromHtml(html).toBlob());
                     }
                     if (kind === 'doc') {
+                        await libs(['docBuilder']);
                         await paintStep('build');
                         return configure(WordHtmlBuilder.create(), 'doc').addFromHtml(html).toBlob();
                     }
                     if (kind === 'pdf') {
-                        if (!K.libs.loaded('jspdf')) { step('libs', 0, 1); await K.libs.need('jspdf'); }
+                        await libs(['jspdf', 'pdfBuilder']);
                         step('fonts', 0, 1);
                         await K.fonts.forPdf(md);
                         await paintStep('build');

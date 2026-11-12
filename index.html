@@ -808,7 +808,7 @@
        https://registry.npmjs.org/@mathjax/mathjax-newcm-font/-/mathjax-newcm-font-4.1.3.tgz        input/tex + extensions,
        https://registry.npmjs.org/@mathjax/mathjax-mhchem-font-extension/-/mathjax-mhchem-font-extension-4.1.3.tgz
                                                                               output/svg, ui/safe, fonts/…/svg; loaded on first formula)
-     highlight.js theme: vendor/highlight.js/github.min_11.11.1.css (the preview's colors; default.min kept for reference) -->
+     highlight.js theme: vendor/highlight.js/github.min_11.11.1.css (the preview's colors; plain code text #24292e, which the builders' stylesheet leaves to the page) -->
 <script src="vendor/marked.umd.min_18.0.14.js"></script>
 <script src="vendor/purify.min_3.4.16.js"></script>
 <script src="vendor/highlight.js/highlight.min_11.12.0.js"></script>
@@ -817,19 +817,17 @@
 <script src="vendor/turndown/turndown-plugin-gfm_1.0.2.js"></script>
 
 <!-- library (standalone; the PDF fonts load on first PDF export; lib/PdfImporter.js and lib/pdfimport/*.js on
-     the first PDF import: Kelk.libs.need('pdfimport'), scripts/config.js) -->
+     the first PDF import: Kelk.libs.need('pdfimport'), scripts/config.js). The export builders (DocxBuilder,
+     PdfBuilder, WordHtmlBuilder) load on their first export, PptxBuilder with scripts/deck.js on the first use of
+     the slides (2.8); HtmlBuilder stays: the preview is built on it -->
 <script src="lib/ImageCore.js"></script>
 <script src="lib/MathCore.js"></script>
 <script src="lib/BidiCore.js"></script>
 <script src="lib/BidiView.js"></script>
 <script src="lib/msOfficeWordHtmlTemplate.js"></script>
 <script src="lib/BuilderBase.js"></script>
-<script src="lib/WordHtmlBuilder.js"></script>
-<script src="lib/DocxBuilder.js"></script>
-<script src="lib/PdfBuilder.js"></script>
 <script src="lib/HtmlBuilder.js"></script>
 <script src="lib/PreviewBuilder.js"></script>
-<script src="lib/PptxBuilder.js"></script>
 <script src="lib/MarkdownImporter.js"></script>
 
 <!-- page -->

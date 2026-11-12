@@ -29,10 +29,10 @@ const DYNAMIC = [
     // PdfImporter's errors → a toast: PDF_ERRORS holds each key in full
     { file: 'scripts/importer.js', prefix: 'pdf_' },
     // PptxBuilder's warnings → the slides pane: WARN_KEYS holds each key in full
-    { file: 'scripts/slides.js', prefix: 'sw_' },
-    // the PowerPoint export's steps (slides.js blob): pptx_ + the step's name
-    { file: 'scripts/slides.js', prefix: 'pptx_' },
-    { file: 'scripts/slides.js', prefix: 'sp_' },
+    { file: 'scripts/deck.js', prefix: 'sw_' },
+    // the PowerPoint export's steps (deck.js blob): pptx_ + the step's name
+    { file: 'scripts/deck.js', prefix: 'pptx_' },
+    { file: 'scripts/deck.js', prefix: 'sp_' },
     // the steps of every import and export (Kelk.ui.steps, scripts/ui.js): their tables hold each key in full
     { file: 'scripts/ui.js', arg: 'KEY[name]' },
     { file: 'scripts/importer.js', prefix: 'imp_' },

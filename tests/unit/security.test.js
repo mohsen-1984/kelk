@@ -224,7 +224,7 @@ test('after the prefix, <a name> anchors, image maps and <area> links still work
 
 test('DOCX bookmarks: ids alike in their first 24 characters stay distinct', async function () {
   const { window: w } = await appWindow(OPENED);
-  const bm = w.DocxBuilder._bookmarkName;
+  const bm = (await w.Kelk.libs.need('docxBuilder'))._bookmarkName;   // loaded on its first export (2.8)
   const a = bm('user-content-introduction-to-the-topic-a'),
     b = bm('user-content-introduction-to-the-topic-b');
   assert.notEqual(a, b, a + ' / ' + b);

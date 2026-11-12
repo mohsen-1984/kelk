@@ -1,201 +1,39 @@
 /**
- * Kelk.slides — the Slides view and the PowerPoint export.
- * The same Markdown, read as slides (lib/PptxBuilder, convention: lib/SLIDES.md):
- *   view     Document | Slides — the preview pane's toggle (ui.view)
- *   render   the slides preview: PptxBuilder's model drawn in #slides, warnings per slide
- *   blob     the .pptx (PptxGenJS loads on the first export, with JSZip)
- *   present  the slides full screen (arrows, space, Esc)
- * The builder is configured like the Word export (Kelk.exporter._configure: Word fonts, direction,
- * images, the document's title and author) plus Settings → Slides.
+ * Kelk.slides — the preview's views (Document | Slides | Excel) and the way to the deck.
+ * At startup: the view toggle (ui.view), the switch with its checks (the slide check, the Excel tables check), the
+ * export buttons of the view, and the prompt (Settings → Slides). The deck itself — the slides preview, the .pptx,
+ * the full-screen show, the settings a deck sets itself — is scripts/deck.js with lib/PptxBuilder.js, loaded on its
+ * first use (Kelk.config.libs.slides: the switch to Slides, a PowerPoint export, Settings → Slides opened; 2.8).
  */
 (function (K) {
     'use strict';
 
-    const STALE = {};                                   // thrown by a build's step once a newer build or the document view took over
-    let gen = 0, built = false, model = null, icons = null, iconsLoading = null, observer = null, store = null, deckMeta = {}, progress = null;
-    const EAGER = 2;                 // slides drawn at once; the rest as they near the view (IntersectionObserver)
-
-    const pascal = function (n) { return n.split('-').map(function (p) { return p.charAt(0).toUpperCase() + p.slice(1); }).join(''); };
-
-    /**
-     * Icons (:name: before a lead): the full Lucide set (vendor), loaded on the first icon. The page's own
-     * icons (assets/icons.js) keep window.lucide: the full library is read and the page's object put back.
-     */
-    /** the text names a Lucide icon and the icon set is not loaded yet (its first use) */
-    function iconsWanted(md) { return !icons && /(^|\n)\s*(?:[-*+]|\d+[.)])\s+:[a-z0-9-]+:/.test(md); }
-
-    function needIcons(md) {
-        if (!iconsWanted(md)) return Promise.resolve();
-        if (!iconsLoading) {
-            const keep = window.lucide;
-            iconsLoading = K.ui.loadScript(K.config.slides.icons).then(function () {
-                const full = window.lucide;
-                window.lucide = keep;
-                const set = full && full.icons ? full.icons : {};
-                icons = function (name) {
-                    const node = set[pascal(name)];
-                    if (!node || !node.map) return null;
-                    return node.map(function (n) {
-                        const a = n[1] || {};
-                        return '<' + n[0] + Object.keys(a).filter(function (k) { return k !== 'key'; })
-                            .map(function (k) { return ' ' + k + '="' + String(a[k]).replace(/"/g, '&quot;') + '"'; }).join('') + '/>';
-                    }).join('');
-                };
-            }).catch(function () { window.lucide = keep; iconsLoading = null; });
-        }
-        return iconsLoading;
-    }
-
-    /** Words the slides need, by the deck's language (the builder picks: Persian, Arabic or English). */
-    function labels() {
-        return {
-            rtl: { continued: '(ادامه)', image: 'جای تصویر', agenda: 'فهرست', part: 'بخش', presenter: 'ارائه‌دهنده', intro: 'آغاز' },
-            ar: { continued: '(تابع)', image: 'مكان الصورة', agenda: 'المحتويات', part: 'القسم', presenter: 'المقدِّم', intro: 'البداية' },
-            ltr: { continued: '(continued)', image: 'Image', agenda: 'Agenda', part: 'Part', presenter: 'Presenter', intro: 'Opening' }
-        };
-    }
-
-    function options() {
-        const s = K.store.settings().slides || {}, D = K.config.defaults.slides;
-        const pick = function (k) { return s[k] == null ? D[k] : s[k]; };
-        return {
-            theme: pick('theme'), primary: s.primary || null, accent: s.accent || null, titleStyle: pick('titleStyle'),
-            aspect: pick('aspect'), size: pick('size'), numbers: !!pick('numbers'), notes: !!pick('notes'),
-            autoLayout: !!pick('autoLayout'), timeline: pick('timeline'), split: !!pick('split'), sectionNumbers: !!pick('sectionNumbers'), sections: !!pick('sections'),
-            decoration: pick('decoration') || 'auto', bullet: pick('bullet') || '•', logo: pick('logo') || 'all',
-            logoSrc: (K.store.logo && K.store.logo()) || null,
-            footer: s.footer == null ? null : s.footer,
-            labels: labels(), icons: icons || undefined
-        };
-    }
-
-    /** The builder for the text on screen (configured; content and deck set). */
-    function builder() {
-        const md = K.editor.value();
-        const r = PptxBuilder.markdownToHtml(md, { breaks: K.store.get('text.breaks') !== false });
-        // (a document of its own, with no window: its pictures are not fetched — the slides sample's
-        // ![…](placeholder) was requested as a file named placeholder on every render)
-        const box = document.implementation.createHTMLDocument('').createElement('div');
-        box.innerHTML = typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(r.html, { ADD_ATTR: ['target', 'dir', 'align', 'data-kelk-comment'] }) : r.html;
-        if (typeof hljs !== 'undefined') {
-            K.$$('pre code', box).forEach(function (code) {
-                const declared = /(?:^|\s)language-\S/.test(code.className);
-                try { hljs.highlightElement(code); } catch (e) { /* unknown language */ }
-                if (!declared) code.className = code.className.replace(/(?:^|\s)language-\S+/g, '').trim();
-            });
-        }
-        // one image store for every render: icons, formulas and pictures are read (and rasterized) once
-        const b = PptxBuilder.create();
-        if (typeof ImageCore !== 'undefined') { store = store || ImageCore.createStore(); b._images = store; }
-        K.exporter._configure(b, 'pptx');
-        // logo: in the front matter may name a registered picture (a dropped image, or "logo": the document's logo)
-        const meta = Object.assign({}, r.meta);
-        // what the user picked for this deck overrides the deck's own value (the deck's value is the default)
-        const ov = overrides(), opts = options();
-        Object.keys(ov).forEach(function (k) { if (DECK_KEYS.indexOf(k) >= 0 && owns0(r.meta, k)) { delete meta[k]; opts[k] = ov[k] === '' && k !== 'footer' ? null : ov[k]; } });
-        if (meta.logo && !/^(data:|https?:|blob:)/i.test(meta.logo) && K.images && K.images.get(meta.logo)) meta.logo = K.images.get(meta.logo);
-        deckMeta = r.meta;
-        return b.configure({ slides: opts }).addFromHtml(box.innerHTML).setDeck(meta);
-    }
-
-    /**
-     * A deck's own settings (front matter) are its defaults: what the user then picks in Settings → Slides
-     * overrides them for this document only (ui.deckOverrides, cleared when another document comes in);
-     * the stored settings — the user's defaults for every other deck — stay as they were.
-     */
-    const DECK_KEYS = ['theme', 'primary', 'accent', 'decoration', 'bullet', 'aspect', 'footer'];
-    const overrides = function () { return K.store.getUi('deckOverrides') || {}; };
-    const owns = function (k) { return deckMeta[k] != null && deckMeta[k] !== ''; };
-    /** The value a field shows for a key the deck sets: the user's override, else the deck's. */
-    function deckValue(k) {
-        const o = overrides();
-        if (o[k] != null) return o[k];
-        let v = String(deckMeta[k]);
-        if (k === 'theme' && typeof PptxBuilder !== 'undefined') v = PptxBuilder.THEMES[v] ? v : (PptxBuilder.THEME_ALIAS[v] || v);
-        if ((k === 'primary' || k === 'accent') && /^#?[0-9a-f]{6}$/i.test(v)) v = '#' + v.replace('#', '').toLowerCase();
-        return v;
-    }
-
-    /** Under the theme: the settings this deck brings itself, and a way back to them; the fields show the deck's values. */
-    function deckNote() {
-        const el = K.$('#slides-deck-note');
-        if (!el) return;
-        const keys = DECK_KEYS.concat(['logo']).filter(owns);
-        const o = overrides();
-        el.hidden = !keys.length;
-        el.textContent = '';
-        if (keys.length) {
-            const sep = K.i18n.lang === 'en' ? ', ' : '، ';
-            el.appendChild(document.createTextNode(K.i18n.t('slidesDeckNote', keys.map(function (k) {
-                return k + (k === 'logo' ? '' : ': ' + String(deckMeta[k]).slice(0, 40)) + (o[k] != null ? ' → ' + String(o[k]).slice(0, 40) : '');
-            }).join(sep))));
-            if (Object.keys(o).length) {
-                const b = document.createElement('button');
-                b.type = 'button'; b.className = 'link-btn'; b.textContent = ' ' + K.i18n.t('slidesDeckBack');
-                b.addEventListener('click', function () { K.store.setUi('deckOverrides', null); K.preview.render(); });
-                el.appendChild(b);
-            }
-        }
-        // the fields show what this deck uses
-        const saved = K.store.settings().slides || {};
-        DECK_KEYS.forEach(function (k) {
-            const f = K.$('[data-setting="slides.' + k + '"]');
-            if (!f || document.activeElement === f || k === 'footer' && !owns(k)) return;
-            if (owns(k)) { f.value = deckValue(k); f.classList.remove('auto'); }
-            else if (k !== 'primary' && k !== 'accent') f.value = saved[k] == null ? (K.config.defaults.slides[k] || '') : saved[k];   // another deck's values go
-        });
-        if (K.settings && K.settings.slideColors) K.settings.slideColors(Object.assign({}, K.store.settings().slides || {}, K.slides.effective()));
-    }
-
-    const owns0 = function (m, k) { return m[k] != null && m[k] !== ''; };
-
-    // the interface's text of each PptxBuilder warning (its code with _ for -); a code without one keeps the builder's English
-    const WARN_KEYS = [
-        'sw_overflow', 'sw_directive', 'sw_layout', 'sw_chart_type', 'sw_chart_table', 'sw_chart_data',
-        'sw_bullets', 'sw_alerts', 'sw_title_blocks', 'sw_stats', 'sw_image', 'sw_icon', 'sw_list_block',
-        'sw_math_inline', 'sw_layout_content'
-    ];
-    function warnText(w) {
-        const key = 'sw_' + w.code.replace(/-/g, '_');
-        const t = WARN_KEYS.indexOf(key) >= 0 ? K.i18n.t(key, w.arg == null ? '' : w.arg) : '';
-        return t && t !== key ? t : (PptxBuilder.WARNINGS[w.code] || w.code).replace('{0}', w.arg == null ? '' : w.arg);
-    }
+    /** the deck once it is here (scripts/deck.js), else null; deck() loads it */
+    const loaded = function () { return K.libs.loaded('slides') ? window.KelkDeck : null; };
+    const deck = function () { return K.libs.need('slides'); };
 
     K.slides = {
         init: function () {
-            const st = document.createElement('style');
-            st.id = 'kelk-slides-css';
-            st.textContent = PptxBuilder.previewCss();
-            document.head.appendChild(st);
             const self = this;
             K.$$('[data-view]').forEach(function (b) {
                 b.addEventListener('click', function () { self.setView(b.getAttribute('data-view')); });
             });
             const present = K.$('#btn-present');
             if (present) present.addEventListener('click', function () { self.present(); });
+            // Settings → Slides: its color pickers show the theme's colors (PptxBuilder's), so the deck comes when it opens
+            const group = K.$('#slides-group');
+            if (group) group.addEventListener('toggle', function () { if (group.open && !loaded()) deck().then(function () { K.settings.slideColors(Object.assign({}, K.store.settings().slides || {}, K.slides.effective())); }, function () {}); });
             this.applyView();
         },
 
-        /** The front matter of the text on screen (after the last render). */
-        deckMeta: function () { return deckMeta; },
-
+        /** The front matter of the text on screen (after the last render; nothing before the deck is here). */
+        deckMeta: function () { const d = loaded(); return d ? d.deckMeta() : {}; },
         /** Does the deck on screen set this setting itself (slides.theme …)? Then a change is an override for this deck. */
-        deckOwns: function (path) {
-            const k = String(path).replace(/^slides\./, '');
-            return this.active() && /^slides\./.test(path) && DECK_KEYS.indexOf(k) >= 0 && owns(k);
-        },
+        deckOwns: function (path) { const d = loaded(); return !!d && d.deckOwns(path); },
         /** Override a deck's own setting for this document (null: back to the deck's). */
-        override: function (path, v) {
-            const k = String(path).replace(/^slides\./, ''), o = Object.assign({}, overrides());
-            if (v == null) delete o[k]; else o[k] = v;
-            K.store.setUi('deckOverrides', Object.keys(o).length ? o : null);
-        },
+        override: function (path, v) { const d = loaded(); if (d) d.override(path, v); },
         /** The values this deck uses for the keys it sets (for the color pickers). */
-        effective: function () {
-            const out = {};
-            DECK_KEYS.forEach(function (k) { if (owns(k)) out[k] = deckValue(k); });
-            return out;
-        },
+        effective: function () { const d = loaded(); return d ? d.effective() : {}; },
 
         active: function () { return K.store.getUi('view') === 'slides'; },
         /** The preview's view: 'document' | 'slides' | 'excel' (the Excel view: scripts/sheets.js, loaded on its first use). */
@@ -234,7 +72,7 @@
                 }
             }
             if (K.ui.report.isCustom()) K.ui.report.close(false);
-            if (!slides) { gen++; if (progress) progress.end(); }   // a slides build under way stops: the other views build none
+            if (!slides && loaded()) loaded().stop();          // a slides build under way stops: the other views build none
             K.store.setUi('view', v);
             this.applyView();
             // a sample on screen: each view has its own (the about document, the slides sample, the Excel sample)
@@ -278,147 +116,20 @@
             if (K.names && K.names.setExt) K.names.setExt({ slides: 'pptx', excel: 'xlsx' }[v] || 'docx');
         },
 
-        /**
-         * The slides preview (async: formulas, images and icons are read first; a newer render wins).
-         * The first slides are drawn at once, the others when they come near the view.
-         */
-        render: async function () {
-            const box = K.$('#slides');
-            if (!box || typeof PptxBuilder === 'undefined' || !this.active()) return;     // the document view builds no slides
-            const md = K.editor.value();
-            const my = ++gen;
-            const count = K.$('#slides-count');
-            if (!md.trim()) {
-                if (progress) progress.end();
-                box.innerHTML = ''; box.setAttribute('dir', K.i18n.lang === 'en' ? 'ltr' : 'rtl'); model = null;
-                if (count) count.textContent = '';
-                deckMeta = {}; deckNote();
-                K.names.refresh(); return;
-            }
-            // the work's steps in the progress window, not modal, shown only when it takes longer than a moment
-            // (Kelk.ui.bar): the icon set on its first use, formulas, pictures and icons, then each slide's layout
-            const bar = progress || (progress = K.ui.bar());
-            const KEY = { libs: 'sp_libs', math: 'sp_math', images: 'sp_images', layout: 'sp_layout' };
-            const W = Object.assign({}, K.config.slidesProgress);
-            if (!iconsWanted(md)) delete W.libs;
-            const step = K.ui.steps(bar, W, KEY, 'layout');
-            // a build overtaken by a newer one, or by the switch to the document view, stops at its next step
-            const live = function (name, done, total) { if (my !== gen) throw STALE; step(name, done, total); return K.ui.paint(); };
-            // the first build is long (the libraries, the formulas, every slide's layout): its window opens at once
-            step(W.libs ? 'libs' : 'math', 0, 1);                  // named before the window opens (at once on the first build)
-            bar.start(K.i18n.t('sp_busy'), !built);
-            try {
-                if (!built) await K.ui.paint();
-                await needIcons(md);
-                const b = builder();
-                const m = await b.model({ onProgress: live });
-                if (my !== gen) return;
-                bar.end();
-                model = m; built = true;
-                const opts = { notesLabel: K.i18n.t('speakerNotes'), warnText: warnText, uiDir: K.i18n.lang === 'en' ? 'ltr' : 'rtl' };
-                box.innerHTML = PptxBuilder.previewHtml(m, Object.assign({ eager: EAGER }, opts));
-                box.setAttribute('dir', m.dir);
-                const checked = function (sl) {
-                    if (!PptxBuilder.markOverflow(sl).length) return;
-                    const meta = sl.parentNode.querySelector('.kelk-slide-meta');
-                    if (meta && !meta.querySelector('.w')) meta.insertAdjacentHTML('beforeend', '<span class="w">⚠ ' + K.i18n.t('sw_overflow') + '</span>');
-                };
-                K.$$('.kelk-slide:not([data-lazy])', box).forEach(checked);
-                if (observer) observer.disconnect();
-                if (typeof IntersectionObserver !== 'undefined') {
-                    observer = new IntersectionObserver(function (entries) {
-                        entries.forEach(function (en) {
-                            if (!en.isIntersecting || model !== m) return;
-                            const sl = en.target;
-                            observer.unobserve(sl);
-                            sl.innerHTML = PptxBuilder.previewSlide(m, +sl.getAttribute('data-i'), opts);
-                            sl.removeAttribute('data-lazy');
-                            checked(sl);
-                        });
-                    }, { root: K.$('.preview-scroll'), rootMargin: '900px 0px' });
-                    K.$$('.kelk-slide[data-lazy]', box).forEach(function (sl) { observer.observe(sl); });
-                } else K.$$('.kelk-slide[data-lazy]', box).forEach(function (sl) {
-                    sl.innerHTML = PptxBuilder.previewSlide(m, +sl.getAttribute('data-i'), opts); sl.removeAttribute('data-lazy'); checked(sl);
-                });
-                if (count) count.textContent = K.i18n.t('slidesCount', m.slides.length);
-                deckNote();
-                K.names.refresh();
-            } catch (e) {
-                if (my !== gen || e === STALE) return;
-                bar.end();
-                console.error(e);
-                box.innerHTML = '<p class="slides-error">' + String(e && e.message || e).replace(/[<&]/g, '') + '</p>';
-            }
+        /** The slides preview (the deck first, on the first switch to Slides). */
+        render: function () {
+            if (!this.active()) return Promise.resolve();       // the document view builds no slides
+            return deck().then(function (d) { return d.render(); }, function (e) { console.error(e); K.ui.toast(K.i18n.t('failed', e.message), 'error'); });
         },
-
-        /**
-         * The .pptx of the text on screen. t: the export's task (Kelk.ui.task) — its bar and detail line follow the steps, each its share
-         * of the bar (config.pptxProgress, measured on large decks).
-         */
+        /** The .pptx of the text on screen (t: the export's task; the deck and PptxGenJS on the first export, the step named). */
         blob: async function (t) {
-            const md = K.editor.value();
-            const KEY = { libs: 'pptx_libs', model: 'pptx_model', build: 'pptx_build', write: 'pptx_write', slides: 'pptx_slides', zip: 'pptx_zip' };
-            const step = K.ui.steps(t, K.config.pptxProgress, KEY, 'slides');
-            // PptxGenJS on the first export, the icon set on the first icon: named only when they load
-            if (!K.libs.loaded('pptx')) { step('libs', 0, 1); await K.libs.need('pptx'); }
-            step('model', 0, 1);
-            await needIcons(md);
-            const b = builder();
-            const m = await b.model();
-            await K.ui.paint();
-            return b.toBlob(m, { onProgress: step });
+            const first = !loaded();
+            if (first) t.progress(0, 1000, K.i18n.t('pptx_libs'));     // the step named while the deck loads (its blob names it again)
+            return (await deck()).blob(t, first);
         },
-
-        /** The slides full screen: → / Space / PageDown next, ← / PageUp back, Home / End, Esc closes. */
-        present: async function (from) {
-            if (!model) await this.render();
-            if (!model || !model.slides.length) { K.ui.toast(K.i18n.t('emptyDoc'), 'warn'); return; }
-            const html = PptxBuilder.previewHtml(model, { notes: false });
-            const wrap = document.createElement('div');
-            wrap.className = 'present';
-            wrap.innerHTML = html;
-            const slides = Array.prototype.slice.call(wrap.querySelectorAll('.kelk-slide-wrap'));
-            let i = Math.max(0, Math.min(from || 0, slides.length - 1));
-            const counter = document.createElement('div');
-            counter.className = 'present-count';
-            wrap.appendChild(counter);
-            const show = function () {
-                slides.forEach(function (s, k) { s.hidden = k !== i; });
-                counter.textContent = (i + 1) + ' / ' + slides.length;
-            };
-            const close = function () {
-                document.removeEventListener('keydown', keys, true);
-                if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
-                wrap.remove();
-            };
-            const rtl = model.dir === 'rtl';
-            const next = ['ArrowDown', 'PageDown', ' ', 'Enter', rtl ? 'ArrowLeft' : 'ArrowRight'];
-            const prev = ['ArrowUp', 'PageUp', 'Backspace', rtl ? 'ArrowRight' : 'ArrowLeft'];
-            const keys = function (e) {
-                if (next.indexOf(e.key) >= 0) i = Math.min(slides.length - 1, i + 1);
-                else if (prev.indexOf(e.key) >= 0) i = Math.max(0, i - 1);
-                else if (e.key === 'Home') i = 0;
-                else if (e.key === 'End') i = slides.length - 1;
-                else if (e.key === 'Escape') close();
-                else return;
-                e.preventDefault(); e.stopPropagation();
-                show();
-            };
-            wrap.addEventListener('click', function (e) {
-                const r = wrap.getBoundingClientRect(), back = rtl ? e.clientX > r.width / 2 : e.clientX < r.width / 2;
-                i = back ? Math.max(0, i - 1) : Math.min(slides.length - 1, i + 1);
-                show();
-            });
-            document.body.appendChild(wrap);
-            document.addEventListener('keydown', keys, true);
-            document.addEventListener('fullscreenchange', function off() {
-                if (!document.fullscreenElement) { document.removeEventListener('fullscreenchange', off); if (wrap.isConnected) close(); }
-            });
-            show();
-            if (wrap.requestFullscreen) wrap.requestFullscreen().catch(function () {});
-        },
-
-        model: function () { return model; },
+        /** The slides full screen. */
+        present: async function (from) { return (await deck()).present(from); },
+        model: function () { const d = loaded(); return d ? d.model() : null; },
 
         /** The slide convention as a prompt for AI models (Settings → Slides → copy): short, English, plain text. */
         prompt: [
@@ -460,6 +171,5 @@
             'Speaker notes',
             '- End every slide with an HTML comment <!-- ... --> holding what the speaker says, in full sentences. Explanations go into the notes, not onto the slide. No other HTML.'
         ].join('\n'),
-        _builder: builder
     };
 })(window.Kelk = window.Kelk || {});
