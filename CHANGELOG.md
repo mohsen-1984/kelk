@@ -6,6 +6,9 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Changed
 
+- **A lighter startup: the slides on first use.** The PowerPoint builder and the slides deck (170 KB and 20 KB) load on
+  the first switch to Slides, PowerPoint export or Settings → Slides opened, no longer with the page; a reload in the
+  Slides view loads them at once. The slides and their export are the same.
 - **One copy button per report panel**: *Copy report* copies the whole report as Markdown — the findings as a list,
   the pages not read in full and the file's information as GFM tables. File information's own *Copy as a table*
   button is gone (it sat at the panel's far end).

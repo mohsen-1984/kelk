@@ -18,13 +18,13 @@
         // (libs: pdf.js and the importer on the first PDF; file: the file read into memory; open: pdf.js opens the
         // document, its metadata and structure tree — not measured, small)
         importProgress: { libs: 0.02, file: 0.01, open: 0.02, read: 0.31, fonts: 0.17, lines: 0.08, layout: 0.34, markdown: 0.05 },
-        // a PowerPoint export's progress bar (slides.js blob): each step's share, measured on decks of 200–430 slides
+        // a PowerPoint export's progress bar (deck.js blob): each step's share, measured on decks of 200–430 slides
         // (libs: PptxGenJS on the first export, not measured)
         pptxProgress: { libs: 0.02, model: 0.05, build: 0.03, write: 0.5, slides: 0.22, zip: 0.2 },
         // the other exports' bars (exporter.js): rough shares, not measured — what each step shows is its name; the
         // builders run in one synchronous step, so the bar stands still while they work (TODO: a moving bar)
         exportProgress: { math: 0.05, libs: 0.1, fonts: 0.15, build: 0.6, embed: 0.1 },
-        // the slides preview's bar (slides.js render): the icon set on first use, formulas, pictures, the layout; shown
+        // the slides preview's bar (deck.js render): the icon set on first use, formulas, pictures, the layout; shown
         // only for work longer than progressDelayMs
         slidesProgress: { libs: 0.3, math: 0.1, images: 0.1, layout: 0.5 },
         progressDelayMs: 300,
@@ -194,6 +194,9 @@
             jszip: { src: 'vendor/jszip.min_3.10.2.js', global: 'JSZip' },
             fontembed: { src: 'lib/FontEmbed.js', global: 'FontEmbed' },           // Settings → Fonts → Embed fonts
             slidecheck: { src: 'scripts/slidecheck.js', global: 'KelkSlideCheck' },      // on the first switch to slides
+            // the Slides view's deck and the PowerPoint builder (2.8: not with the page): the first switch to Slides, PowerPoint
+            // export or Settings → Slides opened (scripts/slides.js)
+            slides: { src: ['lib/PptxBuilder.js', 'scripts/deck.js'], global: 'KelkDeck' },
             fileinfo: { src: 'scripts/fileinfo.js', global: 'KelkFileInfo' },          // the import report's file information
             // the Excel view (its preview, the no-tables report, the exports): on the first switch to Excel
             sheets: { src: ['lib/XlsxBuilder.js', 'scripts/sheets.js'], global: 'KelkSheets' },
