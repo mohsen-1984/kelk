@@ -1374,6 +1374,12 @@ gap** that frees a region with columns. Learnt the hard way:
 - **A table at the text's own line pitch** has no gap to cut at: a run of three baselines or more, each
   of short cells sharing gutters, is cut out (`baselineRun`) — but a list marker and its item are no
   two cells.
+  Its cells need a column's gap (0.9 em) between them, except on rows the lines step cut at two cell gaps
+  or more (`rowCell`): those need only a cell's gap (`ordBaselineRunHeadGapEm` / `Pt`, as its header row).
+  A right-to-left table whose first column is «left»-aligned (GFM `:---`) and its numbers right-aligned
+  meets at their shared side, only the cells' padding apart (Chromium, 6 px: 9 pt, under 0.9 em from 10 pt
+  type); at a tight line height no gap cut the table from the paragraph under it, and its rows came back as
+  paragraphs (2.8; lab `chrome-rtl-rows--fa-rows`, fuzz `fz50`, `fz17`: tables 0 → 100, 96).
 - **A slide's two columns of a few lines**: three items will do across a wide gutter (≥ 2 em) when one
   side is a column of text (two lines a line pitch apart) — a single "label … value" row is not.
 - **A short last column** (the end of a LaTeX article) fails the side-by-side test, because the long
