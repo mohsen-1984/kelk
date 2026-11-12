@@ -18,6 +18,9 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Fixed
 
+- **Scroll sync only side by side**: in one column (a narrow window or a phone, or the Single column layout) the editor
+  and the preview no longer scroll together, even with *Sync editor and preview scrolling* ticked; the setting is kept,
+  and applies again side by side. Its label says so («side by side only»).
 - **PDF import, right to left: borderless tables at the text's own line height** come back as tables. Where a «left»-
   aligned first column meets right-aligned numbers, the cells stand only their padding apart, under a column's gap, and
   no gap cut the table from the paragraph under it: its rows came back as paragraphs. Rows already cut into cells now

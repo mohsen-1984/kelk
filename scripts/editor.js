@@ -85,17 +85,22 @@
     }
 
     /**
-     * Proportional scroll sync editor ↔ preview (side layout, both visible). The pane the reader is moving —
-     * the last one touched by the wheel, a pointer (its scrollbar's thumb too), a finger or the keyboard —
+     * Proportional scroll sync editor ↔ preview (side by side, both visible; never in one column). The pane the
+     * reader is moving — the last one touched by the wheel, a pointer (its scrollbar's thumb too), a finger or the keyboard —
      * leads, and only its scrolling moves the other; the other's own scroll events (the echo of being moved)
      * are ignored. Moved once a frame, not on every event: dragging the preview's scrollbar fast had the two
      * panes answering each other — the thumb shook and the drag lagged behind.
      */
     function scrollSync(preview) {
         let lead = null, raf = 0;
+        // only side by side (2.8): in one column — the Single column layout, or a narrow window whatever the layout —
+        // the setting is left as it is but not applied (the two panes one above the other moving together confused
+        // users); side by side again, it applies as set
         function active() {
             const ws = K.$('#workspace');
-            return K.store.getUi('scrollSync') && !ws.classList.contains('stack') && !ws.classList.contains('editor-closed');
+            if (!K.store.getUi('scrollSync') || ws.classList.contains('stack') || ws.classList.contains('editor-closed')) return false;
+            const a = area.getBoundingClientRect(), b = preview.getBoundingClientRect();
+            return a.top < b.bottom && b.top < a.bottom;   // the panes share a row
         }
         function apply() {
             raf = 0;
