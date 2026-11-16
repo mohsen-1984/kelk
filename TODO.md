@@ -170,7 +170,7 @@ against cmap), each behind its own gate: when both are missing or wrong nothing 
    - **by design** (the owner's decision of 2026-11-11): a badge that draws only «1» comes back «## 1 title» — Kelk
      writes what the file says and adds no period; the lab's expected «## 1. title» counts it a mismatch, and stays so
    **Decided for it (2026-11-16):** a figure made of pieces with short labels woven in is one picture — its region
-   cropped from the page, the labels in its alt text in reading order («![آغاز · پایان](…)»), back as one plain line
+   cropped from the page, the labels in its alt text in reading order (`![آغاز · پایان](picture)`), back as one plain line
    when pictures are off; a wrapped or body line in the region stops the merge (text wins), a caption stays a
    paragraph; pieces that touch merge with no text at all. A long thin strip with no text on it (under 1.5 em, 15 : 1
    or more) is a drawn rule: `---` where the rule's own tests hold, else dropped. Three or more fills of one size
