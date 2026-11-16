@@ -742,6 +742,31 @@ lines at body size.
 
 ---
 
+### Fontprints (the data and its code; not read by the importer yet)
+
+A subset keeps each glyph's outline as its font has it, whatever codes, glyph names or ToUnicode the file gives it.
+So a glyph can be known by its outline: `lib/pdfimport/fontprint.js` hashes every contour's points (thousandths of the
+em, on or off the curve; a composite laid out by its components' offsets and scales) into a **fontprint** of eight
+characters, and `lib/pdfimport/fontprints.js` holds, per face Kelk knows, the fontprint of each glyph with the
+character the font's own cmap gives it (through its GSUB for a joining form or a ligature the cmap does not name)
+and the other letters or digits that name the same glyph. Hashes and characters only: no font is in the file.
+
+- **The faces**: Vazirmatn, Sahel and the B fonts, from the font zip (`src: kelk`, made again by
+  `tools/build-fontprints.js`, which `npm run check:fresh` runs), and faces of fonts that are not in the repository
+  (`src: supplied`, kept as they are until supplied again — `--add <folder>`, or `tools/fontprints.html`, which
+  makes the file in a browser from font files dropped on it).
+- **Kept**: Basic Latin and Latin-1, general punctuation, the Arabic blocks and their presentation forms.
+- **`match(hashes, data, name)`**: the face that knows most of a file's font. Two families can share their outlines
+  (one design under two names): the file's font name settles the tie.
+- **What a fontprint cannot tell**: two characters of one outline — ي and ی, ك and ک, 4 ٤ ۴ where a font draws them
+  with one glyph (the table lists them as the glyph's others); a space or a ZWNJ (no outline); a glyph of a CFF or
+  Type 3 font; a font rebuilt with other outlines. Two faces never give one fontprint two characters: the build
+  stops if they would.
+
+The importer does not load either file yet (Kelk 2.9's font arbiter will, on first need); `tests/unit/fontprint*.test.js`
+hold them to the lab's files: a Word file whose ToUnicode is wrong and a print driver's renumbered fonts are both
+known glyph for glyph.
+
 ## 6. Lines and segments
 
 ### Visual lines

@@ -122,17 +122,26 @@ against cmap), each behind its own gate: when both are missing or wrong nothing 
   headings); after a short line the next is no wrap when its first word would have fitted (a bold sub-label was glued
   to the item before it).
 
-1. **The lab** — *PR:* `pdf/2.9-lab` (this one: no importer change). **lab:** `word-bfonts--faces-fa` (100, the
+1. **The lab** — *PR:* `pdf/2.9-lab` (merged, #73: no importer change). **lab:** `word-bfonts--faces-fa` (100, the
    control), `word-bfonts--tounicode-fa` (69.2), `word-bfonts--parens-fa` (98.7: «م‌وابسته», «4.518.260»),
    `driver-print--renumbered-fa` (0.6), `driver-print--renumbered-en` (1.3), `word-hidden--hidden-fa` (37.5),
    `word-contact--contact-fa` (97.5, links 75), `word-labels--labels-fa` (82.5); `expect.json`, what each file's
    report must say (pending until item 3).
-2. **Fontprints** — *PR:* `pdf/2.9-fontprints`: the generator, `lib/pdfimport/fontprints.js` (loaded on first need),
-   a tool page that makes the data from TTF files dropped on it. No importer change.
+2. **Fontprints** — *PR:* `pdf/2.9-fontprints` (no importer change): `lib/pdfimport/fontprint.js` (the hash of a
+   glyph's outline, a face's table, the match), `lib/pdfimport/fontprints.js` (29 faces, 11,591 fontprints, 141 KB:
+   Vazirmatn, Sahel, the B fonts from the font zip; the nine «2 …» faces supplied), `tools/build-fontprints.js`
+   (`npm run check:fresh` runs it) and `tools/fontprints.html` (the same from font files dropped on a page). Neither
+   file is loaded by the app yet: item 4 loads them on first need. Measured on the six samples' embedded Persian
+   fonts, with this code: 1,375 of 1,416 glyphs with an outline known (97 %; the rest `.notdef` boxes, private-use
+   glyphs and characters the table does not keep). Two families can share their outlines («2 Mitra» and «B Mitra»
+   bold are one table): the file's font name settles which is named. Limits: TrueType outlines only (no CFF, no
+   Type 3); a font rebuilt with other outlines, or another version of one, is known only where its outlines are
+   the same (one sample's B Nazanin differs from ours in one glyph).
 3. **Trust** — *PR:* `pdf/2.9-trust`: the judge as a detector, the hidden-text block and its setting, lost text, alerts
    in the exports. **Found by the lab, to fix here:** a garbled file of two pages crashes `_joinStream` (`b.lines[0]`
-   undefined, blocks.js: the run-on test across columns) — `make-fonts29-rtl.py` keeps `renumbered-fa` on one page
-   until then; make it two again. The white title on a dark band of `hidden-fa` reads as a quote (expected a heading).
+   undefined, blocks.js: the run-on test across columns) — `make-fonts29-rtl.py` keeps `renumbered-fa` on one page;
+   fix the crash and add the two-page file to the lab as its regression test (the owner, 2026-11-16: the one-page
+   file stays). The white title on a dark band of `hidden-fa` reads as a quote (expected a heading).
 4. **The font arbiter** — *PR:* `pdf/2.9-font-arbiter`: the readings and the judge deciding; `tounicode-fa`,
    `parens-fa`, `renumbered-fa`. With it the two items 2.8 left: **numbers in the B fonts** — answered by the lab:
    the glyph drawn between the thousands is the font's comma, and the file's ToUnicode names it «.» (the page shows a
