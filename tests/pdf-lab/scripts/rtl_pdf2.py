@@ -146,4 +146,5 @@ HIDDEN = {
 def hidden_md(lang, items):
     """items: [(page, reason key, text)] → the block's Markdown"""
     head, label, why = HIDDEN[lang]
-    return head + ''.join('\n' + label % (p, why[r]) + '\n\n```text\n' + t + '\n```\n' for p, r, t in items)
+    q = lambda lines: '\n'.join('> ' + l if l else '>' for l in lines) + '\n'
+    return head + ''.join(q(['', label % (p, why[r]), '', '```text'] + t.split('\n') + ['```']) for p, r, t in items)

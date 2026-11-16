@@ -13,7 +13,9 @@ All notable changes to Kelk. Dates are those of the release tags.
 - **Hidden text in a PDF is shown, not dropped or mixed into the text**: text off the page, white on white, too small
   to read, or invisible with no picture under it comes in a marked block — at the end of the document, in place, or
   left out (Settings → Import → Hidden text) — and the report names it. Such text can carry hidden instructions for AI
-  tools: check it, and in most cases delete it.
+  tools: check it, and in most cases delete it. The block is one quote, its pieces code blocks inside it, so it is
+  seen and deleted as one and nothing in it is rendered. Its note is in the document's language; when the document's
+  text cannot be read (garbled fonts), in the language the file declares or the interface's.
 - **GitHub alerts in every export**: `> [!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]` and `[!CAUTION]` come out as a
   quote with a bold label in the quote's language (Persian, Arabic or English) in HTML, Word and PDF — no raw
   «[!WARNING]» text. The preview and the HTML export draw them as GitHub does: the kind's colour and icon, a title.

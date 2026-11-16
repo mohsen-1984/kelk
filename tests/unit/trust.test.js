@@ -62,7 +62,7 @@ test('judge: too little text is not judged; code and math are not prose; a word 
   assert.deepEqual(T.judge([run(FA, 'a', 3).concat(run(' ' + FA, 'a', 4))]).a.pages, [3, 4]);
 });
 
-test('hidden text: the block is the one the lab expects, in the page\'s language', function () {
+test('hidden text: the block is the one the lab expects — one quote, the pieces code blocks in it', function () {
   const fa = T.hiddenMd('fa', [
     { page: 1, why: 'off', text: 'lab hidden line: this text is drawn above the page' },
     { page: 1, why: 'white', text: 'این جمله سفید روی سفید نوشته شده است.' },
@@ -71,11 +71,32 @@ test('hidden text: the block is the one the lab expects, in the page\'s language
   assert.ok(corpus('hidden-fa.md').endsWith(fa), fa);
   const en = T.hiddenMd('en', [{ page: 1, why: 'off', text: 'id000000 lab print driver - unregistered copy' }]);
   assert.ok(corpus('renumbered-en.md').endsWith(en), en);
-  assert.match(T.hiddenMd('ar', [{ page: 2, why: 'white', text: 'x' }]), /^> \[!WARNING\]\n> \*\*\u0646\u0635 \u0645\u062E\u0641\u064A \(hidden text\)\*\*[^\n]+\n\n\u0627\u0644\u0635\u0641\u062D\u0629 2 \u2014 \u0623\u0628\u064A\u0636 \u0639\u0644\u0649 \u0623\u0628\u064A\u0636:\n\n```text\nx\n```\n$/);
+  assert.match(T.hiddenMd('ar', [{ page: 2, why: 'white', text: 'x' }]), /^> \[!WARNING\]\n> \*\*\u0646\u0635 \u0645\u062E\u0641\u064A \(hidden text\)\*\*[^\n]+\n>\n> \u0627\u0644\u0635\u0641\u062D\u0629 2 \u2014 \u0623\u0628\u064A\u0636 \u0639\u0644\u0649 \u0623\u0628\u064A\u0636:\n>\n> ```text\n> x\n> ```\n$/);
   assert.equal(T.hiddenMd('xx', [{ page: 1, why: 'off', text: 'x' }]), T.hiddenMd('en', [{ page: 1, why: 'off', text: 'x' }]));
 });
 
 test('hidden text: a piece holding backticks gets a longer fence', function () {
   const md = T.hiddenMd('en', [{ page: 1, why: 'off', text: 'a ``` b' }]);
-  assert.ok(md.indexOf('\n````text\na ``` b\n````\n') > 0, md);
+  assert.ok(md.indexOf('\n> ````text\n> a ``` b\n> ````\n') > 0, md);
+});
+
+test('hidden text: every line of a piece stays behind the quote\'s mark and inside the fence', function () {
+  const md = T.hiddenMd('en', [{ page: 1, why: 'off', text: 'first\n\n[a link](https://example.org) ![x](y)\n# not a heading' }]);
+  assert.ok(md.split('\n').slice(0, -1).every(function (l) { return l === '>' || l.indexOf('> ') === 0; }), md);
+  assert.ok(md.indexOf('> ```text\n> first\n>\n> [a link](https://example.org) ![x](y)\n> # not a heading\n> ```\n') > 0, md);
+});
+
+test('the note\'s language: the trusted text, then a Persian or Arabic /Lang, then the interface, then English', function () {
+  const P = PdfImporter.prototype || Object.getPrototypeOf(PdfImporter.create({}));
+  const page = function (text, font) { return { glyphs: run(text, font) }; };
+  const lang = function (o, pages) { return P._noteLang.call(Object.assign({ options: {}, _lang: '', _garbled: null }, o), pages); };
+  assert.equal(lang({}, [page(FA, 'a')]), 'fa');
+  assert.equal(lang({ options: { uiLang: 'fa' } }, [page('The reading club met every week. '.repeat(8), 'a')]), 'en', 'the document, not the interface');
+  // every font garbled: its letters say nothing
+  const gibberish = [page('qzx wvk jjq xzq '.repeat(20), 'bad')], bad = { _garbled: { why: { bad: ['la.unseen'] } } };
+  assert.equal(lang(Object.assign({ options: { uiLang: 'fa' } }, bad), gibberish), 'fa', 'the interface');
+  assert.equal(lang(Object.assign({ _lang: 'ar-SA', options: { uiLang: 'fa' } }, bad), gibberish), 'ar', 'a declared Arabic');
+  assert.equal(lang(Object.assign({ _lang: 'en-US', options: { uiLang: 'fa' } }, bad), gibberish), 'fa', 'a declared English is a default');
+  assert.equal(lang(bad, gibberish), 'en');
+  assert.equal(lang({}, [page('سلام بر شما', 'a')]), 'ar', 'a few letters still tell when nothing else does');
 });

@@ -808,8 +808,16 @@ before the fonts are classified. After the layout each piece is read into lines 
 written out (`_hiddenItems`). `options.hiddenText` (Settings → Import → Hidden text): `'end'` — one block at the
 document's end (the default); `'inPlace'` — a block between the blocks where the piece lies (a one-word paragraph
 marks the place through the HTML → Markdown step), never inside a paragraph or a cell; `'drop'` — left out. The
-block: a `> [!WARNING]` alert in the page's language (fa, ar, en), then each piece under «page N — reason:» as a
-`text` code block, so nothing in it is rendered, and a reader — a person or a model — sees it fenced off.
+block is one quote, seen and deleted as one: a `> [!WARNING]` alert, then each piece under «page N — reason:» as a
+`text` code block inside the quote. Every line of a piece stands behind the quote's mark and inside the fence (longer
+than any run of backticks in the piece), so nothing in it is rendered — a link or a picture in the hidden text stays
+text — and a reader, a person or a model, sees it fenced off.
+
+The note's language (`_noteLang`: fa, ar, en), in order: the document's own text — what stays on the pages in fonts
+the judge trusts, with enough letters to tell (`trustMinLetters`); the language the file declares, when that is
+Persian or Arabic (English is every program's default and says little); the interface's language
+(`options.uiLang`, which the app passes); English. A page's own text is not asked: a Persian file whose fonts read
+as Latin gibberish got an English note.
 
 ## 6. Lines and segments
 

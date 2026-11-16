@@ -107,9 +107,10 @@ against cmap), each behind its own gate: when both are missing or wrong nothing 
 - **Hidden text is shown, not dropped**: text off the page, white on white with nothing painted under it, under 1 pt,
   or invisible (render mode 3 / 7, fully transparent) with no picture under it — never an OCR layer, which is the
   page's content. It comes back in a block at the document's end (default), in place between blocks, or left out
-  (Settings → Import → Hidden text); finding `hiddenText` in all three. The block: a `> [!WARNING]` alert in the page's
-  language (fa, ar, en), then each piece under «page N — reason» as a `text` code block (`rtl_pdf2.py` `hidden_md`
-  writes the lab's). Text too small to read (`_tinyText`: under 2 pt on a page of reading-size text) is hidden text
+  (Settings → Import → Hidden text); finding `hiddenText` in all three. The block: one quote — a `> [!WARNING]` alert
+  in the document's language (fa, ar, en: the trusted text, then a Persian or Arabic `/Lang`, then the interface), then
+  each piece under «page N — reason» as a `text` code block inside the quote (`rtl_pdf2.py` `hidden_md` writes the
+  lab's). Text too small to read (`_tinyText`: under 2 pt on a page of reading-size text) is hidden text
   too, not dropped unsaid.
 - **Alerts in every export**: only the slides read `> [!WARNING]` today; DOCX, PDF, HTML and DOC get the marker line
   as a bold label in the document's language, in the quote. A document without alerts exports byte for byte as before.

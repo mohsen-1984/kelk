@@ -191,7 +191,8 @@ list number at a line's end), `.tcBrackets` (brackets named logically, renamed a
 | `_hiddenNote` | `fromArrayBuffer` | The note `hiddenText`, with its pages |
 | `_hiddenMarks` | `fromArrayBuffer` | `'inPlace'`: a one-word paragraph between the blocks where each piece lies |
 | `_hiddenMarkdown` | `fromArrayBuffer` | The blocks in the Markdown: in the marks' places, the rest — or all — at the end |
-| `PdfImporter._trust.hiddenMd` (pure) | `_hiddenMarkdown` | The block's Markdown: the note in the page's language, each piece under its page and reason as a `text` code block |
+| `PdfImporter._trust.hiddenMd` (pure) | `_hiddenMarkdown` | The block's Markdown, one quote: the note, each piece under its page and reason as a `text` code block in the quote |
+| `_noteLang` | `_hiddenItems` | The language of a note Kelk writes into the document: the trusted text, a Persian or Arabic `/Lang`, the interface (`options.uiLang`), English |
 
 `_hiddenText` (the marking) is `extract.js`'s, after `_watermark`.
 
