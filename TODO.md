@@ -144,17 +144,18 @@ against cmap), each behind its own gate: when both are missing or wrong nothing 
    that runs over the page's edge (a heading wider than its page, a right-to-left page wkhtmltopdf shifts) is the
    page's text, not hidden; a print proof's slug is left to the page furniture (a page with printer's marks outside
    its box); an invisible copy of text the page shows is no hidden text.
-   **Left for a pull request of its own in 2.9:** **lost text** (`lostText`) — the first try counted a page's letters
-   against its blocks' and was not sound (blocks do not all carry their page; one glyph can hold several letters):
-   it needs the layout to count what each step drops (furniture, doubles, ornaments). And the white title on a dark
-   band of `hidden-fa`, which reads as a quote (expected a heading).
 4. **The font arbiter** — *PR:* `pdf/2.9-font-arbiter`: the readings and the judge deciding; `tounicode-fa`,
    `parens-fa`, `renumbered-fa`. With it the two items 2.8 left: **numbers in the B fonts** — answered by the lab:
    the glyph drawn between the thousands is the font's comma, and the file's ToUnicode names it «.» (the page shows a
    comma, the text says «3.004»); the fontprint says comma — and **wkhtmltopdf Persian** (`zwnj` 0, `yehKaf` 53–68, a broken ToUnicode; the narrow-space → ZWNJ rule
    hurts those files): to try against the fontprints (`wk-rtl--fa-article` must be reported garbled or read).
 5. **Lines** — *PR:* `pdf/2.9-lines`: `word-contact--contact-fa`, `word-labels--labels-fa`; and a name glued to the
-   line before it in a side box of short lines (**lab to make**, once its cause is traced).
+   line before it in a side box of short lines (**lab to make**, once its cause is traced). And the white title on a dark
+   band of `word-hidden--hidden-fa`, which reads as a quote (expected a heading).
+6. **Lost text** — *PR:* `pdf/2.9-lost-text`, its own, before the 2.9 release: the finding `lostText`, report only.
+   The first try (in `pdf/2.9-trust`) counted a page's letters against its blocks' and was not sound (blocks do not
+   all carry their page; one glyph can hold several letters): it needs the layout to count what each step drops
+   (furniture, doubles, ornaments).
 
 **2.10 — designed pages, tables, fonts Kelk does not know** (moved out of 2.9, 2026-11-16):
 
