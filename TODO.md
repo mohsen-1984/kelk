@@ -109,8 +109,8 @@ against cmap), each behind its own gate: when both are missing or wrong nothing 
   page's content. It comes back in a block at the document's end (default), in place between blocks, or left out
   (Settings → Import → Hidden text); finding `hiddenText` in all three. The block: a `> [!WARNING]` alert in the page's
   language (fa, ar, en), then each piece under «page N — reason» as a `text` code block (`rtl_pdf2.py` `hidden_md`
-  writes the lab's). Open: text in the slug outside a CropBox (crop marks, a job line — the metamorphic `cropbox`)
-  is print furniture and stays dropped; text under 1 pt is dropped unsaid today (`_tinyText`).
+  writes the lab's). Text too small to read (`_tinyText`: under 2 pt on a page of reading-size text) is hidden text
+  too, not dropped unsaid.
 - **Alerts in every export**: only the slides read `> [!WARNING]` today; DOCX, PDF, HTML and DOC get the marker line
   as a bold label in the document's language, in the quote. A document without alerts exports byte for byte as before.
 - **Lost text**: the page's glyphs against the glyphs its blocks used (furniture, hidden text and doubles aside):
@@ -137,11 +137,17 @@ against cmap), each behind its own gate: when both are missing or wrong nothing 
    bold are one table): the file's font name settles which is named. Limits: TrueType outlines only (no CFF, no
    Type 3); a font rebuilt with other outlines, or another version of one, is known only where its outlines are
    the same (one sample's B Nazanin differs from ours in one glyph).
-3. **Trust** — *PR:* `pdf/2.9-trust`: the judge as a detector, the hidden-text block and its setting, lost text, alerts
-   in the exports. **Found by the lab, to fix here:** a garbled file of two pages crashes `_joinStream` (`b.lines[0]`
-   undefined, blocks.js: the run-on test across columns) — `make-fonts29-rtl.py` keeps `renumbered-fa` on one page;
-   fix the crash and add the two-page file to the lab as its regression test (the owner, 2026-11-16: the one-page
-   file stays). The white title on a dark band of `hidden-fa` reads as a quote (expected a heading).
+3. **Trust** — *PR:* `pdf/2.9-trust`: the judge as a detector (`lib/pdfimport/trust.js`, `letterstats.js`; the note
+   `garbledText`, the pages' confidence), the hidden-text block and its setting (Settings → Import → Hidden text), alerts
+   in the exports (`BuilderBase.alertLabels`), the crash of a garbled file of two pages fixed (**lab:**
+   `driver-print--renumbered-pages-fa`, its regression file). What the lab's files showed while it was made: a line
+   that runs over the page's edge (a heading wider than its page, a right-to-left page wkhtmltopdf shifts) is the
+   page's text, not hidden; a print proof's slug is left to the page furniture (a page with printer's marks outside
+   its box); an invisible copy of text the page shows is no hidden text.
+   **Left for a pull request of its own in 2.9:** **lost text** (`lostText`) — the first try counted a page's letters
+   against its blocks' and was not sound (blocks do not all carry their page; one glyph can hold several letters):
+   it needs the layout to count what each step drops (furniture, doubles, ornaments). And the white title on a dark
+   band of `hidden-fa`, which reads as a quote (expected a heading).
 4. **The font arbiter** — *PR:* `pdf/2.9-font-arbiter`: the readings and the judge deciding; `tounicode-fa`,
    `parens-fa`, `renumbered-fa`. With it the two items 2.8 left: **numbers in the B fonts** — answered by the lab:
    the glyph drawn between the thousands is the font's comma, and the file's ToUnicode names it «.» (the page shows a
