@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kelk — fontprints from font files</title>
+<!--
+  Adds fonts to lib/pdfimport/fontprints.js without a shell (what tools/build-fontprints.js --add does): drop .ttf
+  files here, download the new fontprints.js, and put it in lib/pdfimport/ (a pull request). Works from file://;
+  nothing leaves the page, and only the hashes of the glyph outlines and their characters go into the file — never
+  the fonts. The faces already in the file are kept; a dropped face of the same family and face replaces its entry.
+-->
+<style>
+  body { font: 15px/1.5 system-ui, sans-serif; max-width: 56rem; margin: 2rem auto; padding: 0 1rem; color: #1b1f24; background: #fff; }
+  h1 { font-size: 1.35rem; margin: 0 0 .25rem; }
+  p { margin: .5rem 0; }
+  #drop { border: 2px dashed #5b6470; border-radius: .5rem; padding: 1.5rem; text-align: center; margin: 1rem 0; }
+  #drop.over { background: #eef4ff; border-color: #1f5fbf; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+  th, td { border-bottom: 1px solid #d0d7de; padding: .3rem .5rem; text-align: left; }
+  td.n { text-align: right; font-variant-numeric: tabular-nums; }
+  button { font: inherit; padding: .45rem .9rem; border: 1px solid #1f5fbf; border-radius: .35rem; background: #1f5fbf; color: #fff; cursor: pointer; }
+  button[disabled] { background: #e6e9ed; border-color: #b6bdc6; color: #4b5560; cursor: default; }
+  .note { color: #4b5560; }
+  .bad { color: #a40e26; }
+</style>
+</head>
+<body>
+<h1>Fontprints from font files</h1>
+<p>Kelk reads a PDF's glyph by its outline when the file's own names are missing or wrong. For that it keeps, per font,
+the hash of each glyph's outline and its character — in <code>lib/pdfimport/fontprints.js</code>. This page adds fonts
+to that file.</p>
+<ol>
+  <li>Drop the fonts' <code>.ttf</code> files below (regular, bold … each is a face of its own).</li>
+  <li>Check the table, then press <b>Download fontprints.js</b>.</li>
+  <li>Put the downloaded file in <code>lib/pdfimport/</code> of the repository, in place of the old one (on GitHub:
+      a new branch, <i>Add file → Upload files</i>, then a pull request).</li>
+</ol>
+<p class="note">Nothing is uploaded: the fonts are read in this page only. The file holds hashes and characters, no font.</p>
+
+<div id="drop">
+  <label for="files">Drop <code>.ttf</code> files here, or choose them:</label>
+  <input id="files" type="file" accept=".ttf,.TTF,font/ttf" multiple>
+</div>
+
+<p id="status" role="status" aria-live="polite">Faces in the file now: <span id="count">…</span></p>
+<table>
+  <caption class="note">The faces the downloaded file will hold</caption>
+  <thead><tr><th scope="col">Family</th><th scope="col">Face</th><th scope="col">Source</th><th scope="col">Glyphs with an outline</th><th scope="col">Fontprints kept</th><th scope="col">State</th></tr></thead>
+  <tbody id="rows"></tbody>
+</table>
+<p><button id="save" type="button" disabled>Download fontprints.js</button> <span id="size" class="note"></span></p>
+<p id="errors" class="bad" role="alert"></p>
+
+<script src="../lib/PdfImporter.js"></script>
+<script src="../lib/pdfimport/fontprint.js"></script>
+<script src="../lib/pdfimport/fontprints.js"></script>
+<script>
+(function () {
+    'use strict';
+    const F = PdfImporter._fontprint, $ = function (id) { return document.getElementById(id); };
+    // the faces as the file has them now, each with its state on this page
+    const faces = ((window.KelkPdfFontprints || {}).faces || []).map(function (f) { return { family: f.family, face: f.face, src: f.src, glyphs: f.glyphs, prints: f.prints, state: 'in the file' }; });
+    const key = function (f) { return f.family + '|' + f.face; };
+    let changed = false;
+
+    function conflicts() {
+        const where = {}, out = [];
+        faces.forEach(function (f) {
+            const t = F.unpack(f.prints);
+            Object.keys(t).forEach(function (h) {
+                const c = t[h][0].normalize('NFKC');
+                if (where[h] && where[h][1] !== c) out.push('«' + where[h][1] + '» in ' + where[h][0] + ' and «' + c + '» in ' + f.family + ' ' + f.face);
+                else where[h] = [f.family + ' ' + f.face, c];
+            });
+        });
+        return out;
+    }
+
+    function show() {
+        const sorted = faces.slice().sort(function (a, b) { return key(a) < key(b) ? -1 : key(a) > key(b) ? 1 : 0; });
+        $('rows').textContent = '';
+        sorted.forEach(function (f) {
+            const tr = document.createElement('tr');
+            [f.family, f.face, f.src === 'kelk' ? 'the repository' : 'supplied', f.glyphs, f.prints ? f.prints.split(' ').length : 0, f.state].forEach(function (v, k) {
+                const td = document.createElement('td'); td.textContent = v; if (k === 3 || k === 4) td.className = 'n'; tr.appendChild(td);
+            });
+            $('rows').appendChild(tr);
+        });
+        $('count').textContent = faces.length;
+        const bad = conflicts();
+        $('save').disabled = !changed || bad.length > 0;
+        $('size').textContent = changed ? Math.round(new Blob([F.source(faces)]).size / 1024) + ' KB' : 'No change yet.';
+        if (bad.length) $('errors').textContent = 'One outline, two characters — the file is not made: ' + bad.slice(0, 5).join('; ');
+    }
+
+    async function take(list) {
+        const errors = [];
+        for (const file of Array.from(list)) {
+            try {
+                const bytes = new Uint8Array(await file.arrayBuffer());
+                const tag = bytes.length > 12 ? (bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3]) >>> 0 : 0;
+                if (tag !== 0x00010000 && tag !== 0x74727565) throw new Error('not a TrueType font file (.ttf)');
+                const f = F.face(bytes);
+                if (!f.family) throw new Error('no family name in its name table');
+                if (!f.prints.length) throw new Error('no TrueType outlines (an OpenType / CFF font, a collection or not a font)');
+                const face = { family: f.family, face: f.face || 'Regular', src: 'supplied', glyphs: f.glyphs, prints: F.pack(f.prints), state: 'new' };
+                const old = faces.findIndex(function (x) { return key(x) === key(face); });
+                if (old >= 0) {
+                    if (faces[old].prints === face.prints) { faces[old].state = 'in the file, the same'; continue; }
+                    face.src = faces[old].src; face.state = 'replaced'; faces[old] = face;
+                } else faces.push(face);
+                changed = true;
+            } catch (e) { errors.push(file.name + ': ' + e.message); }
+        }
+        $('errors').textContent = errors.join(' · ');
+        show();
+    }
+
+    $('files').addEventListener('change', function () { take(this.files); });
+    const drop = $('drop');
+    ['dragenter', 'dragover'].forEach(function (n) { drop.addEventListener(n, function (e) { e.preventDefault(); drop.classList.add('over'); }); });
+    ['dragleave', 'drop'].forEach(function (n) { drop.addEventListener(n, function (e) { e.preventDefault(); drop.classList.remove('over'); }); });
+    drop.addEventListener('drop', function (e) { take(e.dataTransfer.files); });
+    $('save').addEventListener('click', function () {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([F.source(faces)], { type: 'text/javascript' }));
+        a.download = 'fontprints.js';
+        document.body.appendChild(a); a.click(); a.remove();
+    });
+    show();
+})();
+</script>
+</body>
+</html>

@@ -250,3 +250,18 @@ list number at a line's end), `.tcBrackets` (brackets named logically, renamed a
 | `_toHtml` | `fromArrayBuffer` | 6. blocks to semantic HTML for MarkdownImporter |
 | ↳ `_inline` | `_toHtml` | 6. inline HTML of glyphs: bold, italic, code, links, escapes |
 | ↳ `_listHtml` | `_toHtml` | a list (nested by level) as <ul> / <ol> |
+
+## fontprint.js and fontprints.js — a glyph known by its outline (not loaded by the importer yet)
+
+Not one of `PdfImporter.PARTS`: Kelk 2.9's font arbiter will load both on first need. `fontprint.js` adds
+`PdfImporter._fontprint` (pure functions over a font program's bytes); `fontprints.js` is its data, generated
+(`tools/build-fontprints.js`, `tools/fontprints.html`). See *Fontprints* in [`../PDFIMPORT.md`](../PDFIMPORT.md).
+
+| Function | Used by | Step |
+|---|---|---|
+| `hashes` | `face`, the tests | A TrueType program's glyphs → the fontprint of each outline |
+| `names` | `face` | The family and face of the name table |
+| `face` | the build script, the tool page | A reference font → its table: fontprint, character, the others of the same glyph |
+| `pack`, `unpack` | the build script, `match` | The table as a string and back |
+| `match` | the tests (the font arbiter) | The face of the data that knows most of a file's font, and what it says of each glyph |
+| `source` | the build script, the tool page | `fontprints.js` as text — the one writer of that file |
