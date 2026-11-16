@@ -48,7 +48,9 @@ const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
         const r = await PdfImporter.create({ images: 'markdown', onImage: (src, o) => 'img-' + o.page + '-' + o.index, asciiNumbers: false, persianLetters: false, mode }).fromArrayBuffer(u.buffer);
         const q = (r.quality && r.quality.pages) || [];
         const cov = q.reduce((a, x) => [a[0] + x.covered, a[1] + x.glyphs], [0, 0]);
-        return { markdown: r.markdown, html: r.html, messages: r.messages, pic: cov[1] ? cov[0] / cov[1] : 0, rules: r.rules, ladder: r.report && r.report.summary };
+        return { markdown: r.markdown, html: r.html, messages: r.messages, pic: cov[1] ? cov[0] / cov[1] : 0, rules: r.rules, ladder: r.report && r.report.summary,
+          // the report's finding codes (flags and notes): what expect.json is checked against (report-expect.js)
+          findings: r.report ? (r.report.flags || []).concat(r.report.notes || []).map((x) => x.code) : null };
       } catch (e) { return { error: e.stack || String(e) }; }
     }, { b64, mode });
     const ms = Date.now() - t0;
@@ -87,6 +89,8 @@ const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
     }
     row.markup = markupLoss(r.html, r.markdown).lost;         // inline markup the Markdown lost (should be 0)
     row.pic = +r.pic.toFixed(4);                               // text under a cropped figure (r.quality): should be 0
+    if (r.ladder && typeof r.ladder.conf === 'number') row.conf = r.ladder.conf;   // the report's confidence
+    if (r.findings) row.findings = r.findings;                 // … and its finding codes (expect.json)
     row.mix = mix; row.figs = figs;                            // lines with a picture and words (should be 0); pictures
     rows.push(row);
   }

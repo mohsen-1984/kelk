@@ -1,0 +1,18 @@
+{
+  "_about": "What the import report must say of a lab file (scripts/report-expect.js; the gate checks it). Codes: garbledText (a font's text is not language), hiddenText (text no reader sees), lostText (glyphs of the page missing from the Markdown) - Kelk 2.9's findings, not written by the importer yet: their expectations are pending until then.",
+  "never": ["garbledText"],
+  "neverExcept": ["wk-rtl--"],
+  "files": {
+    "word-bfonts--faces-fa": { "not": ["garbledText", "hiddenText", "lostText"] },
+    "word-bfonts--tounicode-fa": { "has": ["garbledText"], "confBelow": 0.5, "pending": "2.9 trust (until the font arbiter reads it: then `not`)" },
+    "word-bfonts--parens-fa": { "not": ["hiddenText"] },
+    "driver-print--renumbered-fa": { "has": ["garbledText", "hiddenText"], "confBelow": 0.5, "pending": "2.9 trust (garbledText until the font arbiter reads it)" },
+    "driver-print--renumbered-en": { "has": ["garbledText", "hiddenText"], "confBelow": 0.5, "pending": "2.9 trust" },
+    "word-hidden--hidden-fa": { "has": ["hiddenText"], "not": ["garbledText"], "pending": "2.9 trust" },
+    "word-contact--contact-fa": { "not": ["garbledText", "hiddenText", "lostText"] },
+    "word-labels--labels-fa": { "not": ["garbledText", "hiddenText", "lostText"] },
+    "wk-rtl--fa-article": { "has": ["garbledText"], "pending": "2.9 trust" },
+    "chrome-github-bg--symbols": { "not": ["garbledText"] },
+    "wk-github--symbols": { "not": ["garbledText"] }
+  }
+}
