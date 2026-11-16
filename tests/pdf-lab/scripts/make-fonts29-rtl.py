@@ -8,7 +8,8 @@
 #   · word-bfonts--parens-fa: B Nazanin with the mirrored bracket glyphs named «م» and a space and the comma glyph named
 #     «.» (amounts read «4.518.260»), B Nazanin Bold right; a line justified by tatweels, the tatweel named «ر»;
 #   · driver-print--renumbered-fa: B Titr Bold and B Nazanin Bold as a print driver's simple fonts — codes numbered in
-#     order of first use, no ToUnicode, no glyph names, a (1,0) cmap only — and a line in white Helvetica above the page.
+#     order of first use, no ToUnicode, no glyph names, a (1,0) cmap only — and a line in white Helvetica above the page;
+#     driver-print--renumbered-pages-fa: the same over two pages (the regression file of a crash).
 # IMITATED: we cannot run Word or a print driver here. The wrong ToUnicode tables are written by this script (our own
 # tables, after the kinds of error Word's files show), not produced by Word; the renumbered fonts are built by
 # rtl_pdf2.Renum, not by a driver.
@@ -110,5 +111,16 @@ C.line(1, TITLE, 770, 18, 0, 'T', center=C.w / 2)
 y = 730
 for p in (P1, P2, P3, P4, P5, P6, Q3): y = C.para(1, p, y, 13, R, M, 'NB') - 10
 C.write(out('driver-print--renumbered-fa.pdf'), b'Lab print driver', 'renumbered-fa')
+# … and the same over two pages: read by its codes, the first page's last paragraph and the second's first once crashed
+# the importer (a paragraph with no line, in the run-on test across columns) — the regression file of that fix
+C = Doc2({'T': Renum(Font(TITR, 'AAAAAA+BTitrBold,Bold')), 'NB': Renum(Font(NAZB, 'AAAAAB+BNazaninBold,Bold'))})
+for page, ps in ((1, (P1, P2, P3, P4)), (2, (P5, P6, Q3))):
+    C.base14(page, STAMP, 60, C.h + 100, 8, '1 g')
+    if page == 1: C.line(1, TITLE, 770, 18, 0, 'T', center=C.w / 2)
+    y = 730
+    for p in ps: y = C.para(page, p, y, 13, R, M, 'NB') - 10
+C.write(out('driver-print--renumbered-pages-fa.pdf'), b'Lab print driver', 'renumbered-pages-fa')
+corpus('renumbered-pages-fa.md', '# %s\n\n%s\n\n%s' % (TITLE, '\n\n'.join((P1, P2, P3, P4, P5, P6, Q3)),
+       hidden_md('fa', [(1, 'off', STAMP), (2, 'off', STAMP)])))
 corpus('renumbered-fa.md', '# %s\n\n%s\n\n%s' % (TITLE, '\n\n'.join((P1, P2, P3, P4, P5, P6, Q3)),
        hidden_md('fa', [(1, 'off', STAMP)])))
