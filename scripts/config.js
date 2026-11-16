@@ -47,7 +47,7 @@
             sampleLang: null,           // the about/sample document on screen (its language), if any
             view: 'document',           // the preview: document | slides | excel (Kelk.slides.view)
             sourceName: null,           // the imported (or sample) file's name: the exports' default name, kept across reloads
-            importer: { richPaste: true, nestedTables: 'extract', mergedRows: 'repeat', images: 'markdown', asciiNumbers: true, persianLetters: true,
+            importer: { richPaste: true, nestedTables: 'extract', mergedRows: 'repeat', hiddenText: 'end', images: 'markdown', asciiNumbers: true, persianLetters: true,
                         maxMB: '20', separator: 'name' }   // largest file to import (MB); between files: name | rule | none
         },
 
@@ -188,7 +188,8 @@
             pdfimport: {
                 src: ['lib/PdfImporter.js', 'lib/pdfimport/thresholds.js', 'lib/pdfimport/calibration.js',
                     'lib/pdfimport/extract.js', 'lib/pdfimport/lines.js', 'lib/pdfimport/regions.js',
-                    'lib/pdfimport/ladder.js', 'lib/pdfimport/order.js', 'lib/pdfimport/blocks.js'],
+                    'lib/pdfimport/ladder.js', 'lib/pdfimport/letterstats.js', 'lib/pdfimport/trust.js', 'lib/pdfimport/order.js',
+                    'lib/pdfimport/blocks.js'],
                 global: 'PdfImporter'
             },
             jszip: { src: 'vendor/jszip.min_3.10.2.js', global: 'JSZip' },

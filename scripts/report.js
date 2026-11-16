@@ -63,6 +63,8 @@
         printNoLinks: { key: 'pdf_printNoLinks' },
         ocrLayer: { key: 'pdf_ocrLayer' },
         watermarkDropped: { key: 'pdf_watermarkDropped' },
+        garbledText: { key: 'pdf_garbledText', warn: true },
+        hiddenText: { key: 'pdf_hiddenText', warn: true },
         kelkSource: { key: 'pdf_kelkSource', quiet: true },
         kelkMath: { key: 'pdf_kelkMath', quiet: true },
         monoBody: { key: 'pdf_monoBody', quiet: true },

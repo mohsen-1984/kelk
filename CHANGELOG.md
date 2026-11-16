@@ -2,6 +2,26 @@
 
 All notable changes to Kelk. Dates are those of the release tags.
 
+## [Unreleased]
+
+### Added
+
+- **PDF import says when a font's text cannot be read.** Some files do not name their letters right (a wrong or
+  missing ToUnicode): the text came out scrambled, and the report still showed a high confidence. Kelk now reads each
+  font's text and checks that it is language; when it is not, the report says so (the fonts and the pages) and those
+  pages' confidence falls. The text itself is not changed yet.
+- **Hidden text in a PDF is shown, not dropped or mixed into the text**: text off the page, white on white, too small
+  to read, or invisible with no picture under it comes in a marked block — at the end of the document, in place, or
+  left out (Settings → Import → Hidden text) — and the report names it. Such text can carry hidden instructions for AI
+  tools: check it, and in most cases delete it.
+- **GitHub alerts in every export**: `> [!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]` and `[!CAUTION]` come out as a
+  quote with a bold label in the quote's language (Persian, Arabic or English) in the preview, HTML, Word and PDF —
+  no raw «[!WARNING]» text. The slides keep their callouts.
+
+### Fixed
+
+- **PDF import**: a file of two pages whose text could not be read crashed the import.
+
 ## [2.8] — 2026-11-12
 
 ### Changed

@@ -221,6 +221,7 @@
                     images: set.images === 'drop' ? 'drop' : 'markdown',
                     asciiNumbers: set.asciiNumbers !== false, persianLetters: set.persianLetters !== false,
                     mergedRows: set.mergedRows === 'empty' ? 'empty' : 'repeat',
+                    hiddenText: set.hiddenText === 'inPlace' || set.hiddenText === 'drop' ? set.hiddenText : 'end',
                     markdownImporter: { nestedTables: set.nestedTables, mergedRows: set.mergedRows === 'empty' ? 'empty' : 'repeat', images: set.images, labels: labels() },
                     wasmBase: 'vendor/pdfjs/wasm/',
                     loadScript: K.ui.loadScript,

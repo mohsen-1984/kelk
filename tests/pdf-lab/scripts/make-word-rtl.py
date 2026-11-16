@@ -6,7 +6,7 @@
 #     origin falls, between two letters that join («پ‌یش» for «پیش‌بینی»)
 #   · a mirrored bracket is named by its logical character: the ')' shape at the right of «ماده (1)» is '('
 #   · one digit glyph is named in the Persian system, the others in ASCII: the cmap names all ASCII
-#   · 1-pt text (a code) in the letterhead; a letterhead line at the far left of the page (it pulled the mirrored right
+#   · 1-pt text (a code) in the letterhead (out of the text, back in the hidden-text block); a letterhead line at the far left of the page (it pulled the mirrored right
 #     margin out, and every flush-right line looked indented)
 #   · numbered clauses «2-1. …», one per line, flush right; one after a long line that ends a sentence
 #   · a bullet at the right of its text, a tab away; «C++» drawn left to right, its signs at its right
@@ -414,5 +414,10 @@ x = out.tell()
 out.write(b'xref\n0 %d\n0000000000 65535 f \n' % (len(objs) + 1) + b''.join(b'%010d 00000 n \n' % o for o in offs))
 out.write(b'trailer\n<< /Size %d /Root %d 0 R /Info %d 0 R >>\nstartxref\n%d\n%%%%EOF\n' % (len(objs) + 1, cat, info, x))
 open(os.path.join(LAB, 'pdf', 'producers', 'word-print--word-rtl.pdf'), 'wb').write(out.getvalue())
+# (the 1-pt code is text no reader sees: it comes back at the end, in the hidden-text block — Kelk 2.9)
+from rtl_pdf2 import hidden_md
+# (as the page draws it and names it: this script lays the code out letter by letter from the right, its figures
+# with it, and names the kaf as Word does — the lab reads with persianLetters off)
+EXPECTED = EXPECTED.rstrip('\n') + '\n\n' + hidden_md('fa', [(1, 'tiny', 'كد:7/2')])
 open(os.path.join(LAB, 'corpus', 'word-rtl.md'), 'w').write(EXPECTED)
 print('pdf/word-print--word-rtl.pdf', len(out.getvalue()), 'bytes; widths:', ', '.join('%.0f' % sum(a for _, _, a in layout(t, s)) for _, s, t, _ in LINES1))
