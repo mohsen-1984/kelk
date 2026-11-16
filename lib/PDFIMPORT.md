@@ -767,6 +767,50 @@ The importer does not load either file yet (Kelk 2.9's font arbiter will, on fir
 hold them to the lab's files: a Word file whose ToUnicode is wrong and a print driver's renumbered fonts are both
 known glyph for glyph.
 
+### Can the text be trusted: the judge, and hidden text (`trust.js`)
+
+**The judge.** The signs of a bad page (§7a) are structural; none reads the letters, and a font whose every letter is
+named wrong scored 1. After the layout, `_trustReport` reads each font's words over the whole document (`judge`,
+pure) and asks whether they are language:
+
+| Measure | What it is | Clean, at most (the lab, 2026-11) | Garbled |
+|---|---|---|---|
+| `ar.unseen` | letter pairs inside Arabic-script words that neither our Persian nor our Arabic text writes (`letterstats.js`, from our own corpus; the language that fits best) | 0.04 | 0.14 and more |
+| `ar.single` | one-letter words but «و» (forms named by spaces split words) | 0.03 | 0.13 and more |
+| `ar.punct` | words with an ASCII or Latin-1 sign between two Arabic letters | 0.06 | 0.09 and more |
+| `la.unseen` | the same share of pairs for Latin words, against our English | 0.01 | 0.18 |
+| `la.signs` | Latin words holding a Latin-1 sign (codes read as Latin-1) | 0.09 | 0.9 |
+| `la.odd` | Latin words with a sign between letters or digits, or of signs alone (codes read as ASCII) | 0.10 | 0.25 and more |
+
+A font is judged only with 150 letters or more; code and formulas are not prose and are left out; a word goes to the
+font that draws most of it (a producer can cut one font into several). `la.odd` is a verdict only when the font's
+program names no character (a simple font with a (1,0) or (3,0) cmap and no Unicode cmap: a print driver's): a font of
+figures and signs is odd too. A garbled font gives the note **`garbledText`** (its fonts and pages in the report) and
+lowers its pages' confidence: times (1 − s)³, s the share of the page's letters in garbled fonts, each weighed by how
+garbled its font is. **Report only**: the Markdown is as it was. What it does not catch: a font wrong for a few
+letters only (brackets named «م»: under every limit), a font with too little text.
+
+**Hidden text.** Text the file holds and no reader sees is not dropped unsaid, and not left in the text: it comes
+back in a marked block, and the report says so (**`hiddenText`**). `_hiddenText` (after the walk) marks a glyph:
+
+- **off** — wholly outside the page box, on a line with nothing inside it (a line a tool stamps above the page). A line
+  that runs over the page's edge is the page's text, cut by the paper. On a print proof (printer's marks drawn outside
+  the box) what is written in the slug is the printer's: left to the page furniture.
+- **white** — white, and what lies under it (the paper, or the last fill drawn before it) is white too. A white title on
+  a dark band, white text over a picture are seen: they stay.
+- **invisible** — render mode 3 or 7 with no picture under it. Over a picture it is an OCR layer, the page's text; a
+  copy of text the page shows is the same text twice, left to the rules that drop a copy; a layer that is most of the
+  page stays the page's text.
+- **tiny** — `_tinyText`'s (under 2 pt on a page of reading-size text): what it takes out is kept.
+
+The marked glyphs stay through the font repairs (they are read as the text is), then `_hiddenSplit` takes them out
+before the fonts are classified. After the layout each piece is read into lines by the page's own line builder and
+written out (`_hiddenItems`). `options.hiddenText` (Settings → Import → Hidden text): `'end'` — one block at the
+document's end (the default); `'inPlace'` — a block between the blocks where the piece lies (a one-word paragraph
+marks the place through the HTML → Markdown step), never inside a paragraph or a cell; `'drop'` — left out. The
+block: a `> [!WARNING]` alert in the page's language (fa, ar, en), then each piece under «page N — reason:» as a
+`text` code block, so nothing in it is rendered, and a reader — a person or a model — sees it fenced off.
+
 ## 6. Lines and segments
 
 ### Visual lines

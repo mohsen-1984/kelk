@@ -1,5 +1,5 @@
 {
- "written": "2026-11-16T10:11:37.657Z",
+ "written": "2026-11-16T18:26:04.426Z",
  "note": "scripts/gate.js --update; the fuzz means hold only for their env",
  "corpus": {
   "acrobat-word--booklet-fa": {
@@ -1163,29 +1163,46 @@
    "markup": 0,
    "pic": 0,
    "mix": 0,
-   "recall": 0.0357,
-   "order": 0.0306,
+   "recall": 0.2704,
+   "order": 0.2704,
    "headings": 0,
-   "code": 0,
-   "quotes": 0,
-   "total": 0.0133
+   "code": 1,
+   "quotes": 1,
+   "total": 0.5082
   },
   "driver-print--renumbered-fa": {
    "error": null,
    "markup": 0,
    "pic": 0,
    "mix": 0,
-   "recall": 0.0283,
-   "order": 0.004,
+   "recall": 0.0486,
+   "order": 0.0445,
    "headings": 0,
-   "code": 0,
+   "code": 1,
    "quotes": 0,
-   "total": 0.0065,
-   "rtl": 0.25,
+   "total": 0.2186,
+   "rtl": 0.375,
    "zwnj": 0,
    "yehKaf": 0,
    "digits": 1,
-   "brackets": 0
+   "brackets": 0.5
+  },
+  "driver-print--renumbered-pages-fa": {
+   "error": null,
+   "markup": 0,
+   "pic": 0,
+   "mix": 0,
+   "recall": 0.0736,
+   "order": 0.0698,
+   "headings": 0,
+   "code": 1,
+   "quotes": 0,
+   "total": 0.2287,
+   "rtl": 0.375,
+   "zwnj": 0,
+   "yehKaf": 0,
+   "digits": 1,
+   "brackets": 0.5
   },
   "edge--real-readme-en": {
    "error": null,
@@ -2650,17 +2667,17 @@
    "markup": 0,
    "pic": 0,
    "mix": 0,
-   "recall": 0.6667,
-   "order": 0.5392,
+   "recall": 1,
+   "order": 1,
    "headings": 0.6667,
-   "code": 0,
-   "quotes": 0,
-   "total": 0.3745,
-   "rtl": 0.3941,
-   "zwnj": 0.8889,
-   "yehKaf": 0.6875,
-   "digits": 0,
-   "brackets": 0
+   "code": 1,
+   "quotes": 0.6667,
+   "total": 0.8667,
+   "rtl": 1,
+   "zwnj": 1,
+   "yehKaf": 1,
+   "digits": 1,
+   "brackets": 1
   },
   "word-labels--labels-fa": {
    "error": null,
@@ -2776,6 +2793,7 @@
    "lists": 1,
    "tables": 1,
    "code": 1,
+   "quotes": 1,
    "total": 1,
    "rtl": 1,
    "zwnj": 1,
@@ -5261,10 +5279,13 @@
    "blocks.breakOutdent",
    "blocks.breakStyle",
    "blocks.headingSize",
+   "extract.hiddenText",
    "lines.bracketsLogical",
    "regions.bodyFromLongLines",
    "regions.bodyLead",
-   "regions.columnRightMirrored"
+   "regions.columnRightMirrored",
+   "trust.garbledFont",
+   "trust.hiddenText"
   ],
   "driver-print--renumbered-fa": [
    "blocks.breakBigGap",
@@ -5272,14 +5293,35 @@
    "blocks.breakIndent",
    "blocks.breakStyle",
    "blocks.headingBoldMinor",
-   "blocks.headingPushedVeto",
    "blocks.headingSize",
+   "extract.hiddenText",
    "regions.bodyFromLongLines",
    "regions.bodyLead",
    "regions.boldFace",
    "regions.columnLeftMirrored",
    "regions.columnRightMirrored",
-   "regions.startFlushPartial"
+   "regions.startFlushPartial",
+   "trust.garbledFont",
+   "trust.hiddenText"
+  ],
+  "driver-print--renumbered-pages-fa": [
+   "blocks.breakBigGap",
+   "blocks.breakFromFar",
+   "blocks.breakIndent",
+   "blocks.breakStyle",
+   "blocks.coverHeadingDemoted",
+   "blocks.headingBoldMinor",
+   "blocks.headingSize",
+   "blocks.leadBody",
+   "extract.hiddenText",
+   "regions.bodyFromLongLines",
+   "regions.bodyLead",
+   "regions.boldFace",
+   "regions.columnLeftMirrored",
+   "regions.columnRightMirrored",
+   "regions.startFlushPartial",
+   "trust.garbledFont",
+   "trust.hiddenText"
   ],
   "edge--real-readme-en": [
    "blocks.breakBigGap",
@@ -7828,7 +7870,8 @@
    "regions.spacedDoc",
    "regions.startFlushPartial",
    "regions.tableDirByLetters",
-   "regions.tableRuled"
+   "regions.tableRuled",
+   "trust.garbledFont"
   ],
   "wk-rtl--fa-brackets": [
    "blocks.breakBigGap",
@@ -7977,7 +8020,8 @@
    "regions.boldFace",
    "regions.columnLeftMirrored",
    "regions.columnRightMirrored",
-   "regions.spacedDoc"
+   "regions.spacedDoc",
+   "trust.garbledFont"
   ],
   "word-cells--cells-fa": [
    "blocks.headingSize",
@@ -8118,6 +8162,7 @@
    "blocks.headingSize",
    "blocks.justified",
    "extract.formFromCmap",
+   "extract.hiddenText",
    "extract.invisibleText",
    "extract.textOnCover",
    "extract.tinyTextDropped",
@@ -8126,7 +8171,9 @@
    "regions.bodyFromLongLines",
    "regions.bodyLead",
    "regions.columnLeftMirrored",
-   "regions.spacedDoc"
+   "regions.columnRightMirrored",
+   "regions.spacedDoc",
+   "trust.hiddenText"
   ],
   "word-labels--labels-fa": [
    "blocks.breakBigGap",
@@ -8341,7 +8388,8 @@
    "regions.tableSpanAcross",
    "regions.tableSpanDown",
    "regions.tableSpanNotRect",
-   "regions.tableTitle"
+   "regions.tableTitle",
+   "trust.hiddenText"
   ],
   "word-report--report-fa": [
    "blocks.breakBigGap",
@@ -10338,7 +10386,7 @@
   }
  },
  "realHeldout": {
-  "at": "2026-11-16T10:11:37.529Z",
+  "at": "2026-11-16T18:26:04.307Z",
   "n": 17,
   "errors": 0,
   "docs": [

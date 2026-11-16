@@ -35,6 +35,8 @@ module.exports = {
         { code: 'kelkSource' },
         { code: 'kelkMath' },
         { code: 'monoBody' },
+        { code: 'garbledText', pages: [5] },
+        { code: 'hiddenText', pages: [2, 6] },
         { code: 'pageSimplified', pages: [3, 4, 11] },
         { code: 'pageTextOnly', pages: [7] }
     ]
