@@ -390,6 +390,17 @@ if (realHeldout) {
 const mk = (run) => run && run.corpus ? Object.values(run.corpus).reduce((a, r) => a + (r.markup || 0), 0) : '-';
 console.log('inline markup lost'.padEnd(22), 'corpus', mk(cur), 'files' + (base ? ' (was ' + mk(base) + ')' : ''),
   ...['dev', 'heldout'].filter((s) => cur.fuzz[s]).map((s) => '· ' + s + ' ' + cur.fuzz[s].markup + (base && base.fuzz && base.fuzz[s] ? ' (was ' + (base.fuzz[s].markup || 0) + ')' : '')));
+// ---- what the report must say of a lab file (expect.json, report-expect.js): this run's rows only, no compared side ----
+{
+  const rowsNow = read(path.join(OUT, '_scores.json')), expectFile = path.join(LAB, 'expect.json');
+  if (rowsNow && fs.existsSync(expectFile)) {
+    const ex = require('./report-expect.js').checkExpect(rowsNow.filter((r) => !heldReal.has(r.name)), JSON.parse(fs.readFileSync(expectFile, 'utf8')));
+    ex.fails.forEach((f) => fails.push(f));
+    ex.notes.forEach((n) => notes.push(n));
+    if (ex.pending.length) notes.push('report: ' + ex.pending.length + ' expectation(s) pending (expect.json): ' + ex.pending.map((x) => x.replace(/^report: /, '')).join('; '));
+  }
+}
+
 if (notes.length) { console.log('\nnotes'); notes.forEach((n) => console.log('  · ' + n)); }
 if (fails.length) { console.log('\nFAILED (tolerance: ' + p1(TOL_FILE) + ' per corpus file, ' + p1(TOL_GOLDEN) + ' per golden file, ' + p1(TOL_MEAN) + ' per fuzz, meta, real held-out or held-out golden mean, ' + p1(TOL_HARD) + ' per hard transform)'); fails.forEach((f) => console.log('  ✗ ' + f)); }
 else console.log('\npassed');
