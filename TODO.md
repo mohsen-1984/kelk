@@ -80,16 +80,70 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
   builders, the slides deck with PptxBuilder; the step is named while it loads. HtmlBuilder and the Word template stay
   at startup (the preview is built on them).
 
-**2.9 — real samples, then the designed booklet** (the next release; its own session: the owner attaches the samples
-there, and a lab file of our own follows from each; the booklet moved from 2.8, 2026-11-12):
+**2.9 — can the text be trusted** (the next release; from six real samples the owner showed, 2026-11-15 — private:
+each problem below has a lab file of our own). Five pull requests, in order; the importer's Markdown changes only from
+the third on.
 
-1. **Numbers in Persian report fonts** — B Nazanin, B Mitra and B Titr: a report's amounts read «3.004» (the file's
-   text has a period between the thousands; the page shows a comma-like mark): **to examine** whether these fonts
-   draw «.» as a thousands separator — a reader takes «3.004» for three and a bit.
-2. **wkhtmltopdf Persian** (`zwnj` 0, `yehKaf` 53–68 — a broken ToUnicode in the file); the narrow-space → ZWNJ rule
-   hurts those files.
+*What the samples showed.* Page confidence counts structural signs only (U+FFFD, glued words, unclear gaps, guessed
+letters, the structure tree): nothing reads the letters, so a page whose every letter is named wrong scores 1
+(`driver-print--renumbered-fa`: confidence 1, 0.6 of 100). And the font repairs compare the file with itself (ToUnicode
+against cmap), each behind its own gate: when both are missing or wrong nothing is left.
 
-3. **A designed booklet** (moved from 2.7, then 2.8; high risk). *PR:* `pdf/2.9-booklet`, its own.
+*The decisions (the owner's, 2026-11-16).*
+
+- **Fontprints, not a rule per font.** A subset keeps each glyph's outline as the font has it: a glyph is known by its
+  outline's hash against the fonts Kelk knows (the B fonts, Vazirmatn, Sahel, and the «2 …» family the owner supplied —
+  only hashes enter the repository, never those fonts). Measured on the samples: every embedded Persian font matched
+  its reference on 99–100 % of its glyphs. Per font, every reading of a glyph is collected (ToUnicode, the font's cmap,
+  glyph names, ActualText, the fontprint); where they agree the font is trusted; where they differ a known font's
+  fontprint wins, else the **judge** (below) keeps the reading under which the text is language; none → the font is
+  reported unreadable. A fontprint overrides only a reading the judge rejected, never a digit the file names (Kelk
+  writes the codepoint the file names), and never tells ي from ی or ك from ک. The repairs of today stay; they retire
+  one by one, in later releases, when the lab shows the same output without them.
+- **The judge**: per font, over the document — letter pairs never seen in our own Persian and Arabic text (kept apart),
+  one-letter words but «و», ASCII punctuation inside words, a letter's share out of range; for Latin, symbols inside
+  words and pairs never seen in English. Statistics generated from our corpus (`lib/pdfimport/letterstats.js`).
+  Finding `garbledText` (fonts, pages), a heavy weight in the page's confidence. Report only: the Markdown stays.
+- **Hidden text is shown, not dropped**: text off the page, white on white with nothing painted under it, under 1 pt,
+  or invisible (render mode 3 / 7, fully transparent) with no picture under it — never an OCR layer, which is the
+  page's content. It comes back in a block at the document's end (default), in place between blocks, or left out
+  (Settings → Import → Hidden text); finding `hiddenText` in all three. The block: a `> [!WARNING]` alert in the page's
+  language (fa, ar, en), then each piece under «page N — reason» as a `text` code block (`rtl_pdf2.py` `hidden_md`
+  writes the lab's). Open: text in the slug outside a CropBox (crop marks, a job line — the metamorphic `cropbox`)
+  is print furniture and stays dropped; text under 1 pt is dropped unsaid today (`_tinyText`).
+- **Alerts in every export**: only the slides read `> [!WARNING]` today; DOCX, PDF, HTML and DOC get the marker line
+  as a bold label in the document's language, in the quote. A document without alerts exports byte for byte as before.
+- **Lost text**: the page's glyphs against the glyphs its blocks used (furniture, hidden text and doubles aside):
+  finding `lostText`. Report only. (A table's whole first column was lost, the page's confidence 0.99.)
+- **A line of its own by its alignment**: a centred line under a paragraph whose last line stops short at the start
+  side is no wrap; and a centred line holding both scripts takes its block's direction, not its letter count
+  («label: value» with a long Latin value read value first).
+- **A line that opens with a bullet mark is never a heading** («- **برنامه‌ها**» is a bold item; numbered headings stay
+  headings); after a short line the next is no wrap when its first word would have fitted (a bold sub-label was glued
+  to the item before it).
+
+1. **The lab** — *PR:* `pdf/2.9-lab` (this one: no importer change). **lab:** `word-bfonts--faces-fa` (100, the
+   control), `word-bfonts--tounicode-fa` (69.2), `word-bfonts--parens-fa` (98.7: «م‌وابسته», «4.518.260»),
+   `driver-print--renumbered-fa` (0.6), `driver-print--renumbered-en` (1.3), `word-hidden--hidden-fa` (37.5),
+   `word-contact--contact-fa` (97.5, links 75), `word-labels--labels-fa` (82.5); `expect.json`, what each file's
+   report must say (pending until item 3).
+2. **Fontprints** — *PR:* `pdf/2.9-fontprints`: the generator, `lib/pdfimport/fontprints.js` (loaded on first need),
+   a tool page that makes the data from TTF files dropped on it. No importer change.
+3. **Trust** — *PR:* `pdf/2.9-trust`: the judge as a detector, the hidden-text block and its setting, lost text, alerts
+   in the exports. **Found by the lab, to fix here:** a garbled file of two pages crashes `_joinStream` (`b.lines[0]`
+   undefined, blocks.js: the run-on test across columns) — `make-fonts29-rtl.py` keeps `renumbered-fa` on one page
+   until then; make it two again. The white title on a dark band of `hidden-fa` reads as a quote (expected a heading).
+4. **The font arbiter** — *PR:* `pdf/2.9-font-arbiter`: the readings and the judge deciding; `tounicode-fa`,
+   `parens-fa`, `renumbered-fa`. With it the two items 2.8 left: **numbers in the B fonts** — answered by the lab:
+   the glyph drawn between the thousands is the font's comma, and the file's ToUnicode names it «.» (the page shows a
+   comma, the text says «3.004»); the fontprint says comma — and **wkhtmltopdf Persian** (`zwnj` 0, `yehKaf` 53–68, a broken ToUnicode; the narrow-space → ZWNJ rule
+   hurts those files): to try against the fontprints (`wk-rtl--fa-article` must be reported garbled or read).
+5. **Lines** — *PR:* `pdf/2.9-lines`: `word-contact--contact-fa`, `word-labels--labels-fa`; and a name glued to the
+   line before it in a side box of short lines (**lab to make**, once its cause is traced).
+
+**2.10 — designed pages, tables, fonts Kelk does not know** (moved out of 2.9, 2026-11-16):
+
+1. **A designed booklet** (moved from 2.7, then 2.8, then 2.9; high risk). *PR:* `pdf/2.10-booklet`, its own.
    Designed documents from browsers: heading, box and figure rules shared by every Chromium file in the lab —
    **lab:** `chrome-booklet--booklet-cards-fa` (45.4). Cards, badges and coloured boxes:
    - a table of contents — a number badge, the title, dot leaders drawn as a dashed rule, no page number — comes
@@ -115,6 +169,26 @@ there, and a lab file of our own follows from each; the booklet moved from 2.8, 
      sentence's end)
    - **by design** (the owner's decision of 2026-11-11): a badge that draws only «1» comes back «## 1 title» — Kelk
      writes what the file says and adds no period; the lab's expected «## 1. title» counts it a mismatch, and stays so
+   **Decided for it (2026-11-16):** a figure made of pieces with short labels woven in is one picture — its region
+   cropped from the page, the labels in its alt text in reading order («![آغاز · پایان](…)»), back as one plain line
+   when pictures are off; a wrapped or body line in the region stops the merge (text wins), a caption stays a
+   paragraph; pieces that touch merge with no text at all. A long thin strip with no text on it (under 1.5 em, 15 : 1
+   or more) is a drawn rule: `---` where the rule's own tests hold, else dropped. Three or more fills of one size
+   stacked, the gaps between them holding lines of the same pattern, are a table's or a list's row backgrounds, never
+   quotes (separate tinted callouts stay quotes). A centred link drawn as a button is a link paragraph, not a quote.
+2. **Tables from reports** (high risk) — *PR:* `pdf/2.10-tables`: a header ruled column by column over a borderless
+   body of two-line cells centred vertically (the columns from the header's rules); a header spanning two rows (the
+   first column was lost whole). **lab to make.**
+3. **Fonts Kelk does not know** — the approximate path, marked «recovered, approximate» in the report; it must work
+   everywhere, phones included: candidates for every glyph by its drawn shape against Kelk's bundled fonts, votes from
+   OCR for the frequent glyphs (when the OCR phase arrives), the judge accepting only a plausible text. A spike
+   (2026-11-16, scratch code): **shape** against other typefaces — the top candidate right for 77–91 % of a text
+   face's glyphs (86–98 % within the first three), 36 % for a display face, 100 % against the same typeface, 10–15 ms a
+   glyph; **OCR votes** (Arabic data only, a plain aligner) — 80 % of the letters right from one page, 87 % from five,
+   half the distinct glyphs too rare to learn, most wrong votes گ پ ژ چ; 56 % on a kashida-justified page; 0.9 s a
+   page natively. Neither alone gives exact text. A font installed on the reader's system (drawn on a canvas by its
+   name) is an extra when it happens to be there: nothing depends on it (such fonts are rarely installed, never on a
+   phone).
 
 **Not placed in a release yet** (moved out of 2.8's scope, 2026-11-11):
 
@@ -138,7 +212,7 @@ there, and a lab file of our own follows from each; the booklet moved from 2.8, 
 - PDF import, right to left: RTL fuzz files score well below English ones (RTL ≈ 77–81 against LTR ≈ 92–93; tables
   and quotes weakest, then `zwnj` — see `CHANGELOG.md` 2.7 for what is done); Chrome's
   browser-default style loses quotes and code in fa / ar while the text is right
-- PDF import: wkhtmltopdf Persian — 2.9, item 2
+- PDF import: wkhtmltopdf Persian — 2.9, item 4
 - Release: GitHub Pages served from the app's set (`tools/build-release.sh`) rather than from the whole repository
   (no `.nojekyll`, no cache-busting today)
 
