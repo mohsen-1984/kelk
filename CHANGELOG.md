@@ -18,6 +18,7 @@ All notable changes to Kelk. Dates are those of the release tags.
   quote with a bold label in the quote's language (Persian, Arabic or English) in HTML, Word and PDF — no raw
   «[!WARNING]» text. The preview and the HTML export draw them as GitHub does: the kind's colour and icon, a title.
   The slides keep their callouts.
+- **A code block the fence calls text** (` ```text `) is labelled «text», not «code», in the preview and the exports.
 
 ### Fixed
 
