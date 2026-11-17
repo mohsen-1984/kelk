@@ -103,43 +103,15 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
 **3.0 — designed pages, tables, lines, fonts Kelk does not know** (moved out of 2.9, 2026-11-16;
 2.9's lines and lost text joined it, 2026-11-17):
 
-1. **A designed booklet** (moved from 2.7, then 2.8, then 2.9; high risk). *PR:* `pdf/3.0-booklet`, its own.
-   Designed documents from browsers: heading, box and figure rules shared by every Chromium file in the lab —
-   **lab:** `chrome-booklet--booklet-cards-fa` (45.4). Cards, badges and coloured boxes:
-   - a table of contents — a number badge, the title, dot leaders drawn as a dashed rule, no page number — comes
-     back as headings or a table with each number a bold paragraph after its title; expected a numbered list
-   - a chapter's head — a number badge beside the title, a small coloured subtitle under it: the badge a bold
-     paragraph before the title, the title a bold paragraph on one page and a heading on the next, the levels
-     jumping (`####` then `######`); expected «## 1. title» on every chapter, the subtitle bold under it
-   - a drop cap (the first letter large, beside the first lines) splits the first word («ب یشتر») and the paragraph
-   - a callout — a tinted box, a small square icon and a bold label over its text — comes back as a task item
-     («- [ ] **label** …»): the icon read as a checkbox; expected a quote with its bold label
-   - a formula drawn as boxes with «+» and «=» between them, each box a word and its English gloss: each word a
-     heading, «+» and «=» headings; expected one line, «**نشانه** (cue) + **کار** (routine) = **عادت** (habit)»
-   - two cards side by side, each a bold title over its text, become a two-column table (or headings): expected
-     each card's title in bold over its text, the start side first
-   Risk: high (the size and box rules decide headings and quotes for every web page in the lab).
-   What 2.7 found (a first pull request tried, then dropped; nothing merged):
-   - a number badge right of a right-to-left title is not joined to it (`lines.badgeJoined` looks only to the badge's
-     right, left to right): its mirror is needed by the rest
-   - a table of contents of badges as a numbered list — the rule «a badge number at a line's start is an item's
-     number» made `fz75-chr--report` worse (lists 33.3 → 18.2: lines like «126 tagging», numbers in badges left to
-     right, became items): a list of badges must be told from numbered lines first
-   - a chapter title that is a question («…؟») was refused as a heading (`blocks.headingFieldVeto` takes «?» / «؟» for a
-     sentence's end)
-   - **by design** (the owner's decision of 2026-11-11): a badge that draws only «1» comes back «## 1 title» — Kelk
-     writes what the file says and adds no period; the lab's expected «## 1. title» counts it a mismatch, and stays so
-   **Decided for it (2026-11-16):** a figure made of pieces with short labels woven in is one picture — its region
-   cropped from the page, the labels in its alt text in reading order (`![آغاز · پایان](picture)`), back as one plain line
-   when pictures are off; a wrapped or body line in the region stops the merge (text wins), a caption stays a
-   paragraph; pieces that touch merge with no text at all. A long thin strip with no text on it (under 1.5 em, 15 : 1
-   or more) is a drawn rule: `---` where the rule's own tests hold, else dropped. Three or more fills of one size
-   stacked, the gaps between them holding lines of the same pattern, are a table's or a list's row backgrounds, never
-   quotes (separate tinted callouts stay quotes). A centred link drawn as a button is a link paragraph, not a quote.
-   **lab** (added before the work, `make-designed.js`): `chrome-booklet--figure-labels-fa` (59.8: a figure with
-   labels and its caption, a thin strip, statements beside number badges, pieces that touch) and
-   `chrome-mail--mail-fa` (70.4: a printed web mail — tinted rows and link buttons read as quotes, a name glued to
-   the line before it in a side box, a footer's «label : value» lines joined, the print's own head).
+1. **A designed booklet** — *done* (`pdf/3.0-booklet`; `lib/PDFIMPORT.md`, «Designed pages (3.0)»): contents of
+   badges as a numbered list, badges joined right to left, leaders, drop caps, callouts, a question as a heading,
+   terms in boxes with signs, cards side by side, link buttons, tinted rows, thin strips, drawings with labels as one
+   picture (alt text), and the bold of a variable font at small sizes. **lab:** `chrome-booklet--booklet-cards-fa`
+   45.4 → 88.9, `chrome-booklet--figure-labels-fa` 59.8 → 80.0, `chrome-mail--mail-fa` 70.4 → 86.2. What is left:
+   - **by design** (2026-11-11): «## 1 title», no period added — the expected «## 1. title» stays a mismatch
+   - heading levels: a page whose largest heading is an `h2` comes back `#` (Kelk ranks the sizes it sees)
+   - the mail's print head (the subject, the sender and the date), its side box's names and its footer's «label :
+     value» lines — item 4
 2. **Tables from reports** (high risk) — *PR:* `pdf/3.0-tables`. **lab** (`make-tables30-rtl.py`):
    `word-report--ruled-header-fa` (79.8) — a header ruled column by column over a borderless body of one- and
    two-line cells centred vertically (the columns from the header's rules); `word-report--span-header-fa` (74.8) —
