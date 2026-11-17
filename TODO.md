@@ -81,8 +81,9 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
   at startup (the preview is built on them).
 
 **2.9 — can the text be trusted** (the next release; from six real samples the owner showed, 2026-11-15 — private:
-each problem below has a lab file of our own). Five pull requests, in order; the importer's Markdown changes only from
-the third on.
+each problem below has a lab file of our own). Merged or ready: the lab (#73), fontprints (#74), trust (#75), the
+lab's coverage for 2.9 and 2.10 (#76), the hidden-text block and the preview's alerts (#77), the font arbiter (#78).
+**Left for 2.9, in order:** `pdf/2.9-lines` (item 5), `pdf/2.9-lost-text` (item 6), then the release (item 7).
 
 *What the samples showed.* Page confidence counts structural signs only (U+FFFD, glued words, unclear gaps, guessed
 letters, the structure tree): nothing reads the letters, so a page whose every letter is named wrong scores 1
@@ -145,11 +146,27 @@ against cmap), each behind its own gate: when both are missing or wrong nothing 
    that runs over the page's edge (a heading wider than its page, a right-to-left page wkhtmltopdf shifts) is the
    page's text, not hidden; a print proof's slug is left to the page furniture (a page with printer's marks outside
    its box); an invisible copy of text the page shows is no hidden text.
-4. **The font arbiter** — *PR:* `pdf/2.9-font-arbiter`: the readings and the judge deciding; `tounicode-fa`,
-   `parens-fa`, `renumbered-fa`. With it the two items 2.8 left: **numbers in the B fonts** — answered by the lab:
-   the glyph drawn between the thousands is the font's comma, and the file's ToUnicode names it «.» (the page shows a
-   comma, the text says «3.004»); the fontprint says comma — and **wkhtmltopdf Persian** (`zwnj` 0, `yehKaf` 53–68, a broken ToUnicode; the narrow-space → ZWNJ rule
-   hurts those files): to try against the fontprints (`wk-rtl--fa-article` must be reported garbled or read).
+4. **The font arbiter** — *PR:* `pdf/2.9-font-arbiter` (`trust.js` `_arbiterPage`, `_fontArbiter`; the note
+   `fontprintRead`): per font with an embedded TrueType program a face of the fontprints knows — where the file's map
+   is sound, only a glyph named as another kind of character takes the face's (a bracket read «م», a comma read as a
+   stop: **numbers in the B fonts**, the item 2.8 left — the glyph between the thousands is the font's comma and the
+   file names it «.»); where the map is not the font's (a wrong ToUnicode, a print driver's renumbered codes), every
+   glyph the face knows takes the face's character, and a blank glyph is a space. **lab:** `word-bfonts--tounicode-fa`
+   69.2 → 100, `word-bfonts--parens-fa` 98.7 → 100, `driver-print--renumbered-fa` 48.4 → 97.7,
+   `driver-print--renumbered-pages-fa` 49.9 → 97.9; `driver-print--renumbered-en` (a font Kelk has no fontprints of)
+   stays reported garbled. What it found and left:
+   - **a stream's length read wrong** (`_rawStream`: «/Length 15 0 R» taken for a length of 1): the font programs of
+     such a file were hidden from every repair that reads them (LibreOffice's files). Mended for the arbiter's own
+     reading only: mended for all, `lohtml-rtl--fa-article`, `--fa-report` and two others read worse (list numbers
+     glued to their items, ZWNJs lost: the repairs act where they did not). To mend for all with those repairs
+     looked at — a pull request of its own.
+   - **wkhtmltopdf Persian** (`wk-rtl--fa-article`: `zwnj` 0, `yehKaf` 53–68, a broken ToUnicode; the narrow-space →
+     ZWNJ rule hurts those files): still reported garbled, not read — its fonts are not matched to a face. To look
+     at with the stream's length (above).
+   - a font with too little text to judge (under 150 letters) that no face knows stays as the file names it, unsaid
+     (a title font of a dozen glyphs): for 2.10's «fonts Kelk does not know».
+   - a blank glyph of no advance in a renumbered font is read as a ZWNJ; after a letter that never joins it is
+     redundant («بر‌گ»), harmless to the eye: to drop where the letter before it does not join.
 5. **Lines** — *PR:* `pdf/2.9-lines`: `word-contact--contact-fa`, `word-labels--labels-fa`, and
    `word-lines--heads-fa` (90.9): numbered bold titles in the body's size, the number a tab before the title (one a
    heading, one a list item), a «label: value» line glued to the full line before it, a bold title ending «Web (Web
@@ -160,6 +177,11 @@ against cmap), each behind its own gate: when both are missing or wrong nothing 
    The first try (in `pdf/2.9-trust`) counted a page's letters against its blocks' and was not sound (blocks do not
    all carry their page; one glyph can hold several letters): it needs the layout to count what each step drops
    (furniture, doubles, ornaments).
+
+7. **The release** — after items 5 and 6 are merged: the release pull request by `docs/RELEASING.md` (the version,
+   the changelog's date, the README's three languages: the fonts Kelk reads by their shapes, hidden text, alerts),
+   then the owner's steps. To check by eye before it: the six samples in the app (the report's notes, the hidden-text
+   block, the confidence), and an export of a document with alerts to each format.
 
 **2.10 — designed pages, tables, fonts Kelk does not know** (moved out of 2.9, 2026-11-16):
 
@@ -230,6 +252,11 @@ against cmap), each behind its own gate: when both are missing or wrong nothing 
 - **The stress check's margin** (CI's *lab*, `run-stress.js`: never hold the page a second at once): 836 ms on CI
   (2.7 and 2.8), against the 1,000 ms limit. What is left is one page's own layout (one call of `_layoutPage` or
   `_toHtml`) and the lines' and furniture steps: look for the step that holds the page rather than leave files out.
+  Found (2026-11-17): the second CI measured with the larger lab was no step of the importer — it starts before the
+  first page is read: pdf.js reads the file's structure on the main thread under `file://`, in one piece, a second
+  for the 22 MB the lab's files make together. `run-stress.js` now counts the opening apart (limit 3 s) and the
+  importer's steps keep their second (a breath was added after `_toHtml`). To lift the opening itself: pdf.js in a
+  worker where the page's origin allows one.
 
 - **Digits and form boxes** (moved from 2.7): Persian digits that share a glyph with Arabic-Indic ones come back
   Arabic-Indic; bordered form boxes as tables.
