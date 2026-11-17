@@ -149,9 +149,12 @@ against cmap), each behind its own gate: when both are missing or wrong nothing 
    the glyph drawn between the thousands is the font's comma, and the file's ToUnicode names it «.» (the page shows a
    comma, the text says «3.004»); the fontprint says comma — and **wkhtmltopdf Persian** (`zwnj` 0, `yehKaf` 53–68, a broken ToUnicode; the narrow-space → ZWNJ rule
    hurts those files): to try against the fontprints (`wk-rtl--fa-article` must be reported garbled or read).
-5. **Lines** — *PR:* `pdf/2.9-lines`: `word-contact--contact-fa`, `word-labels--labels-fa`; and a name glued to the
-   line before it in a side box of short lines (**lab to make**, once its cause is traced). And the white title on a dark
-   band of `word-hidden--hidden-fa`, which reads as a quote (expected a heading).
+5. **Lines** — *PR:* `pdf/2.9-lines`: `word-contact--contact-fa`, `word-labels--labels-fa`, and
+   `word-lines--heads-fa` (90.9): numbered bold titles in the body's size, the number a tab before the title (one a
+   heading, one a list item), a «label: value» line glued to the full line before it, a bold title ending «Web (Web
+   Writing)» read «(Web Writing) Web». A name glued to the line before it in a side box of short lines:
+   `chrome-mail--mail-fa` (below). And the white title on a dark band of `word-hidden--hidden-fa`, which reads as a
+   quote (expected a heading).
 6. **Lost text** — *PR:* `pdf/2.9-lost-text`, its own, before the 2.9 release: the finding `lostText`, report only.
    The first try (in `pdf/2.9-trust`) counted a page's letters against its blocks' and was not sound (blocks do not
    all carry their page; one glyph can hold several letters): it needs the layout to count what each step drops
@@ -192,9 +195,20 @@ against cmap), each behind its own gate: when both are missing or wrong nothing 
    or more) is a drawn rule: `---` where the rule's own tests hold, else dropped. Three or more fills of one size
    stacked, the gaps between them holding lines of the same pattern, are a table's or a list's row backgrounds, never
    quotes (separate tinted callouts stay quotes). A centred link drawn as a button is a link paragraph, not a quote.
-2. **Tables from reports** (high risk) — *PR:* `pdf/2.10-tables`: a header ruled column by column over a borderless
-   body of two-line cells centred vertically (the columns from the header's rules); a header spanning two rows (the
-   first column was lost whole). **lab to make.**
+   **lab** (added before the work, `make-designed.js`): `chrome-booklet--figure-labels-fa` (59.8: a figure with
+   labels and its caption, a thin strip, statements beside number badges, pieces that touch) and
+   `chrome-mail--mail-fa` (70.4: a printed web mail — tinted rows and link buttons read as quotes, a name glued to
+   the line before it in a side box, a footer's «label : value» lines joined, the print's own head).
+2. **Tables from reports** (high risk) — *PR:* `pdf/2.10-tables`. **lab** (`make-tables210-rtl.py`):
+   `word-report--ruled-header-fa` (79.8) — a header ruled column by column over a borderless body of one- and
+   two-line cells centred vertically (the columns from the header's rules); `word-report--span-header-fa` (74.8) —
+   a header spanning two rows, the first column lost whole: the table's double border lies a point from the page's
+   border of tiles, and its right edge goes with the page border (`_pageBorders`: the row rules end at the cells'
+   edge, short of the outer thin line, so the edge meets no rule); `word-report--tall-header-fa` (77.1) — header
+   cells of two to six short centred lines come back a row per line (`_tableRowSplit` takes them for a payslip's
+   rows); `word-report--group-header-fa` (77.6) — a group title over two columns lost, kashidas kept in the header;
+   `word-report--chart-fa` (80.0) — a chart drawn of rules and bars is one picture; the controls
+   `word-report--nested-rows-fa` (98.7) and `word-report--frame-head-fa` (100).
 3. **Fonts Kelk does not know** — the approximate path, marked «recovered, approximate» in the report; it must work
    everywhere, phones included: candidates for every glyph by its drawn shape against Kelk's bundled fonts, votes from
    OCR for the frequent glyphs (when the OCR phase arrives), the judge accepting only a plausible text. A spike
