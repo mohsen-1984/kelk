@@ -1443,8 +1443,8 @@ with boxes, badges and pieces of drawing. Lab: `chrome-booklet--booklet-cards-fa
 
 - **A right-to-left label decides a line's direction** (`_blockDir`, 3.0 lines): a «label: value» line whose label —
   one to three right-to-left words — is drawn at the line's right end, the colon at its left, is a right-to-left line,
-  however many Latin letters its value has (`blocks.dirByRtlLabel`). «تلفن: 05138001234» and «ایمیل دبیرخانه :
-  club@example.org» had been read value first (`word-contact--contact-fa`, `chrome-mail--mail-fa`).
+  however many Latin letters its value has (`blocks.dirByRtlLabel`). «تلفن: 05138001234» and `ایمیل دبیرخانه : club@example.org`
+  had been read value first (`word-contact--contact-fa`, `chrome-mail--mail-fa`).
 
 - **Numbered minor headings** (the document's blocks, 3.0 lines): when two bold lines of body size or more open with
   a number («1. معرفی», «2. برنامه»), the document numbers its headings of that rank. An unnumbered one among them is
@@ -1478,7 +1478,7 @@ with boxes, badges and pieces of drawing. Lab: `chrome-booklet--booklet-cards-fa
 
 - **A centred line after a flush one** (`_lineBreaks`, `blocks.breakCentredOwn`, 3.0 lines): under a line flush with
   the start edge (and short of the other), a line set in from both edges and centred is no wrap of it — a wrap starts
-  at that edge. An address centred on a line of its own after a paragraph («: https://…») had joined it, and was read
+  at that edge. An address centred on a line of its own after a paragraph (`: https://…`) had joined it, and was read
   in the paragraph's direction (`word-contact--contact-fa` 98.6 → 100).
 
 ### Forms
