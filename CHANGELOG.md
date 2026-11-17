@@ -14,6 +14,7 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Fixed
 
+- **PDF import removes a lone kashida** on a page whose other lines show kashidas stretching the words.
 - **PDF import keeps a table's tall header cells whole**: header cells of several centred lines came back a row
   per line.
 - **PDF import keeps a table's first column inside a page's tiled border**: the column was lost when the

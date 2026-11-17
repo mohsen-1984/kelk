@@ -1511,6 +1511,12 @@ with boxes, badges and pieces of drawing. Lab: `chrome-booklet--booklet-cards-fa
   cell has a line on none of the fullest cell's baselines: those cells are centred — a header's words, cells of one,
   two and six lines — and a header had come back a row per line (`word-report--tall-header-fa` 77.1 → 100).
 
+- **Kashidas, page by page** (`_kashidas`, `lines.kashidasPage`, 3.0 tables): a row with two kashidas or more inside
+  words shows them as stretching, not text, and they go; a lone one may be meant and stayed. Now, once any row of the
+  page shows the stretching, every kashida inside a word on that page goes, lone ones too: a report's header lost
+  them from «رشتـه تحصیلـی» but kept «مـدرک» and «آمـوزش» in the next cells (`word-report--group-header-fa` 77.6 →
+  78.4).
+
 ### Forms
 
 `_formRows` (order.js), before the ruled tables (a box with rules between its rows is no table of them): rows —
