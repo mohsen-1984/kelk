@@ -481,11 +481,6 @@ What stays unknown after the repairs is **dropped**: a stray Latin Extended lett
      Dana-Regular in the same file names it "(" — «)نمونه(». The **outline** decides (glyf, simple glyphs):
      a bracket whose ink at mid-height lies left of its middle looks like ( [ { < «, the other way like its
      mirror; the shape is what step 3 mirrors.
-   - **a bracket pair of Latin content against a Latin run** (3.0 lines, `bidiLevels` N0): on a right-to-left line, a
-     pair whose content is Latin takes the direction of the strong letter to its right; when a Latin run touches the
-     pair on its left (spaces between at most), the pair is that run's — «Web (Web Writing)» after Persian words is
-     one left-to-right phrase, drawn alike whichever way it was typed. It had been read «(Web Writing) Web»
-     (`word-lines--heads-fa`); Chromium's mixed Persian fuzz files rose with it (fz8, fz17, fz98: 97.9 → 100).
 10. **What cannot be repaired is shown, not hidden**: a glyph still mapped to a control character
    (wkhtmltopdf's colour emoji) becomes U+FFFD in the output.
 
@@ -1450,11 +1445,6 @@ with boxes, badges and pieces of drawing. Lab: `chrome-booklet--booklet-cards-fa
   one to three right-to-left words — is drawn at the line's right end, the colon at its left, is a right-to-left line,
   however many Latin letters its value has (`blocks.dirByRtlLabel`). «تلفن: 05138001234» and «ایمیل دبیرخانه :
   club@example.org» had been read value first (`word-contact--contact-fa`, `chrome-mail--mail-fa`).
-
-- **A run of «label: value» lines** (`_lineBreaks`, 3.0 lines): a line that opens with a plain label — one to three
-  words, no digit, a colon and its value — in a paragraph whose first line opened with one too starts a line of its
-  own (`blocks.brFieldRun`), even after a line that fills its measure. A workshop's «مدرس: …» ran into its «زمان: …»
-  (`word-lines--heads-fa`), a mail's footer fields into one line (`chrome-mail--mail-fa`).
 
 - **Numbered minor headings** (the document's blocks, 3.0 lines): when two bold lines of body size or more open with
   a number («1. معرفی», «2. برنامه»), the document numbers its headings of that rank. An unnumbered one among them is
