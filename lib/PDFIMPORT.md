@@ -1446,6 +1446,11 @@ with boxes, badges and pieces of drawing. Lab: `chrome-booklet--booklet-cards-fa
   however many Latin letters its value has (`blocks.dirByRtlLabel`). «تلفن: 05138001234» and «ایمیل دبیرخانه :
   club@example.org» had been read value first (`word-contact--contact-fa`, `chrome-mail--mail-fa`).
 
+- **A run of «label: value» lines** (`_lineBreaks`, 3.0 lines): a line that opens with a plain label — one to three
+  words, no digit, a colon and its value — in a paragraph whose first line opened with one too starts a line of its
+  own (`blocks.brFieldRun`), even after a line that fills its measure. A workshop's «مدرس: …» ran into its «زمان: …»
+  (`word-lines--heads-fa`), a mail's footer fields into one line (`chrome-mail--mail-fa`).
+
 ### Forms
 
 `_formRows` (order.js), before the ruled tables (a box with rules between its rows is no table of them): rows —

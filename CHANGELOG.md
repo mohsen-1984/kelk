@@ -14,6 +14,8 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Fixed
 
+- **PDF import keeps «label: value» lines apart**: a field after a line that fills the page's width, or a footer's
+  fields, ran into one paragraph.
 - **PDF import keeps «label: value» lines in order** when the value is Latin (a phone number, an e-mail address, a
   site) after a Persian label: they came back value first.
 
