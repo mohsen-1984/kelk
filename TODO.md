@@ -100,56 +100,19 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
   space; a number and a dash («1- …») is a paragraph. Markdown writes every ordered item «1.».
 - `---` in Markdown is a horizontal rule, never a page separator.
 
-**3.0 — designed pages, lines, tables** (moved out of 2.9, 2026-11-16; 2.9's lines joined it, 2026-11-17; the
-release's split decided 2026-11-17: the booklet, lines, tables, then the release PR):
+**Standing rules from 3.0** (the owner's decisions; done — `CHANGELOG.md` 3.0):
 
-1. **A designed booklet** — *done* (`pdf/3.0-booklet`; `lib/PDFIMPORT.md`, «Designed pages (3.0)»): contents of
-   badges as a numbered list, badges joined right to left, leaders, drop caps, callouts, a question as a heading,
-   terms in boxes with signs, cards side by side, link buttons, tinted rows, thin strips, drawings with labels as one
-   picture (alt text), and the bold of a variable font at small sizes. **lab:** `chrome-booklet--booklet-cards-fa`
-   45.4 → 88.9, `chrome-booklet--figure-labels-fa` 59.8 → 80.0, `chrome-mail--mail-fa` 70.4 → 86.2. What is left:
-   - **by design** (2026-11-11): «## 1 title», no period added — the expected «## 1. title» stays a mismatch
-   - heading levels: a page whose largest heading is an `h2` comes back `#` (Kelk ranks the sizes it sees)
-   - the mail's print head (the subject, the sender and the date), its side box's names and its footer's «label :
-     value» lines — item 2
-2. **Lines** — *done* (`pdf/3.0-lines`; `lib/PDFIMPORT.md`, «Designed pages (3.0)»): a mail's print head, a
-   right-to-left label deciding a «label: value» line's direction, numbered minor headings, a title reversed out of a
-   dark band, dash-marked labels and labels between items, a bold line in a box, a heading's subtitle, a centred line
-   after a flush one. **lab:** `chrome-mail--mail-fa` 86.2 → 100 (headings 20 → 100: the pass condition met),
-   `word-contact--contact-fa` 97.5 → 100, `word-hidden--hidden-fa` 86.7 → 100, `word-lines--heads-fa` 90.9 → 99.8,
-   `word-labels--labels-fa` 82.5 → 88.0. What is left:
-   - `word-labels--labels-fa`: its bold sub-labels between items still come out as minor headings (below);
-   - `word-lines--heads-fa`: «Web (Web Writing)» still reads «(Web Writing) Web» (below); its «label: value» lines and
-     the mail's footer fields are separate paragraphs since 3.0's tables PR (the owner's rule, 2026-11-17);
-   - the mail's rule under its subtitle is not kept.
-   **Dropped** (2026-11-17, agreement 12): a bold line of body size right under a list item, no more space above it
-   than under it, read as a label (bold text) rather than a minor heading — right for `word-labels--labels-fa`'s
-   sub-labels, but it took a real `#### Small print` after a list for one in seven *features* files (Chromium,
-   wkhtmltopdf, OCR; 100 → 99.2). Those sub-labels still come out as headings; another sign is needed.
-   **Dropped** (2026-11-17, agreement 12): a bracket pair of Latin content touching a Latin run on its left read as
-   that run's — right for «Web (Web Writing)» (`word-lines--heads-fa`), wrong for the golden `rtl-basic`, whose
-   source «نام سامانه (Business Process) BPMS» is drawn the same way and came back «BPMS (Business Process)». The two
-   cannot be told apart by their glyphs. **The owner's decision** (2026-11-17): when unsure, the golden `rtl-basic`
-   reading wins; the rule stays out. Kept as an idea: a sign that tells the two apart.
-
-3. **Tables from reports** — *done* (`pdf/3.0-tables`; `lib/PDFIMPORT.md`, «Designed pages (3.0)»): a header ruled
-   column by column over a borderless body, a table's frame a few points beyond its row rules, header cells centred
-   in their row, kashidas page by page, a dash standing alone at a line's end. **lab:** `word-report--ruled-header-fa`
-   79.8 → 100, `--span-header-fa` 74.8 → 100, `--tall-header-fa` 77.1 → 100, `--group-header-fa` 77.6 → 78.4; the
-   controls `--nested-rows-fa` and `--frame-head-fa` unchanged. What is left:
-   - `word-report--chart-fa` (80.0): **dropped** (2026-11-17, agreement 12) — a bar chart drawn of rules and bars
-     (three thin rules or more of one length evenly spaced, three filled bars or more on the lowest, the short labels
-     around) read as one picture: right for the chart, but it took `wk-github--report`'s «## Project status» and its
-     progress bars for one (100 → 98.4; fuzz `fz48-wk--report` 100 → 98.5). Another sign is needed.
-   - `word-report--group-header-fa`: **flagged** (agreement 14) — its expected Markdown keeps a band over the last two
-     columns («آموزش») in the header row, the cells under it a second header row; `word-merged--merged-cells-fa`
-     expects the same structure (a band over the last three columns, the first column's header merged down) as a bold
-     paragraph over the table, which Kelk does (`regions.mergeHeaderBand`). The two cannot both hold: the owner's call.
-   - `word-report--span-header-fa`: the table's outer double rules also come out as «---» above and under it (not
-     scored).
-
-4. **The release** — *PR:* `release/3.0`: version, `CHANGELOG.md`, the README in three languages, release notes
-   (`docs/RELEASING.md`).
+- One release per session; a change that makes another lab file worse is dropped, not tuned around; each importer PR
+  reports the lab; a lab expectation that looks wrong is flagged, not changed (the working agreements, 2026-11-17).
+- A chapter's number badge stays «## 1 title»: no period the PDF does not have (2026-11-11).
+- «label: value» lines are paragraphs of their own, everywhere; the pieces the field rule splits off keep their
+  joined paragraph's direction and are no heading.
+- A band over some of a table's columns is a column group: in the header, written once, the cells beside it repeated
+  under it; a band over all columns is the table's title.
+- A bracket pair of Latin content drawn after a Latin word stays the golden `rtl-basic`'s reading
+  («(Business Process) BPMS») when the glyphs cannot tell.
+- A drawing with short labels is one picture, its labels in the alt text; a mail's print head is its subject in bold,
+  then its sender and date.
 
 **3.1 — what the font arbiter left, lost text** (moved out of 3.0, 2026-11-17):
 
@@ -190,6 +153,16 @@ release's split decided 2026-11-17: the booklet, lines, tables, then the release
    phone).
 
 **Not placed in a release yet** (moved out of 2.8's scope, 2026-11-11):
+
+- **Left from 3.0** (ideas dropped under agreement 12; another sign is needed for each):
+  - a bold line right under a list item, at the list's pitch, as a label (bold text), not a minor heading
+    (`word-labels--labels-fa`, 88.0) — it took a real `#### Small print` for one in seven *features* files;
+  - a bracket pair of Latin content belonging to the Latin run on its left («Web (Web Writing)», `word-lines--heads-fa`
+    99.8) — `rtl-basic`'s reading wins when the glyphs cannot tell;
+  - a bar chart drawn of rules and bars as one picture (`word-report--chart-fa`, 80.0) — it took
+    `wk-github--report`'s «## Project status» and its progress bars for one;
+  - smaller: a table's outer double rules come out «---» around it (`word-report--span-header-fa`); the mail's rule
+    under its subtitle is lost; a page whose largest heading is an `h2` comes back `#`.
 
 - **Right-to-left borderless tables, what is left** (2.8 fixed the tables at the text's own pitch: fuzz `none` right
   to left 45.6 → 73.6): `zebra` right to left (≈ 52) — wider tables whose cells wrap onto two or three lines

@@ -2,43 +2,38 @@
 
 All notable changes to Kelk. Dates are those of the release tags.
 
-## [Unreleased]
+## [3.0] — 2026-11-17
 
 ### Added
 
-- **PDF import reads designed pages from browsers** (a booklet's chapters, a printed mail): a contents page of number
-  badges comes back as a numbered list; a chapter's badge and title as one heading; a drop cap as the first letter of
-  its word; a callout box as a quote with its bold label; terms drawn in boxes with «+» and «=» between them as one
-  line; cards side by side card by card; a drawing with short labels as one picture, its labels in the picture's alt
-  text; a thin drawn strip as a rule; a link drawn as a button as a plain link; tinted every-other rows as one list.
+- **PDF import reads designed pages from browsers** — a booklet's chapters, a printed mail: a contents page of number
+  badges comes back as a numbered list, a chapter's badge and title as one heading, a drop cap as its word's first
+  letter, a callout box as a quote with its bold label, cards side by side one after the other, terms drawn in boxes
+  with «+» and «=» as one line, a drawing with short labels as one picture (its labels in the picture's description),
+  a link drawn as a button as a plain link.
+- **PDF import reads a printed mail's head**: the subject as bold text, then the sender, the addressee and the date;
+  the mail's own headings keep their levels.
+- **PDF import reads report tables better**: a header ruled column by column over a borderless body, a table beside a
+  page's tiled border (its first column was lost), header cells of several centred lines (they came back a row per
+  line), a band over some columns kept in the header as a column group.
+
+### Changed
+
+- **«label: value» lines are paragraphs of their own** in PDF import, everywhere (a footer's fields, contact lines,
+  a workshop's «مدرس: …» and «زمان: …»).
+- **The PDF lab**: 227 PDFs; no file scores worse than in 2.9, and 14 read better — among them
+  `chrome-booklet--booklet-cards-fa` 45.4 → 88.9, `chrome-mail--mail-fa` 70.4 → 100, `word-hidden--hidden-fa`
+  86.7 → 100, the report tables `word-report--ruled-header-fa`, `--span-header-fa`, `--tall-header-fa` and
+  `--group-header-fa` 75–80 → 100; the corpus mean 94.6 → 95.7. Kelk's own golden snapshots `emoji` and
+  `symbol-fallback` keep their source's paragraphs apart.
 
 ### Fixed
 
-- **PDF import removes a lone kashida** on a page whose other lines show kashidas stretching the words.
-- **PDF import keeps a table's tall header cells whole**: header cells of several centred lines came back a row
-  per line.
-- **PDF import keeps a table's first column inside a page's tiled border**: the column was lost when the
-  table's frame stood a few points beyond its row rules.
-- **PDF import keeps the space after a dash that ends a line**, when the dash stands alone (Persian text).
-- **PDF import reads a table whose header alone is ruled**, column by column over a borderless body, as one
-  table, its cells of two lines kept whole.
-- **PDF import keeps «label: value» lines apart**, each a paragraph of its own: a field after a line that
-  fills the page's width, a footer's fields or contact lines ran into one paragraph.
-- **PDF import keeps a centred line after a paragraph apart from it** (an address on a line of its own).
-- **PDF import reads a centred subtitle under a centred title as bold text**, not a heading of its own.
-- **PDF import keeps a bold name in a side box apart** from the line before it.
-- **PDF import reads dash-marked bold labels as list items**, not headings with a dash before them, and keeps a bold
-  label between list items apart from the item before it.
-- **PDF import reads a white title on a dark band as a heading**, not a quote.
-- **PDF import reads numbered headings of the body's size as one set**: a bold title among them without a number is
-  bold text, and a numbered one whose number is not bold is a heading, not a list item.
-- **PDF import keeps «label: value» lines in order** when the value is Latin (a phone number, an e-mail address, a
-  site) after a Persian label: they came back value first.
-
-- **PDF import reads a printed mail's head**: the subject comes back as bold text, not a heading that pushed the mail's
-  own headings a level down; the sender, the addressee and the date come back in their order, without rules.
-- **PDF import reads bold in a variable font printed by Chromium at small sizes**: a booklet's bold subtitle, labels
-  and lead words came back plain (Vazirmatn's digits and spaces are as wide at every weight, and hid the bold).
+- **PDF import**: bold in a variable font at small sizes (Chromium's Vazirmatn) came back plain; a «label: value»
+  line with a Persian label and a Latin value read value first; numbered headings of the body's size came back half
+  headings, half list items; a white title on a dark band read as a quote; dash-marked bold labels read as headings
+  with a «\-»; a dash ending a line lost the space after it; a lone kashida stayed on a page whose other lines lost
+  theirs.
 
 ## [2.9] — 2026-11-17
 

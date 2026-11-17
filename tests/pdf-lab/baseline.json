@@ -1,5 +1,5 @@
 {
- "written": "2026-11-17T15:38:35.041Z",
+ "written": "2026-11-17T16:14:27.334Z",
  "note": "scripts/gate.js --update; the fuzz means hold only for their env",
  "corpus": {
   "acrobat-word--booklet-fa": {
@@ -2931,15 +2931,15 @@
    "markup": 0,
    "pic": 0,
    "mix": 0,
-   "recall": 0.9038,
-   "order": 0.9038,
+   "recall": 1,
+   "order": 1,
    "headings": 1,
-   "tables": 0.1111,
+   "tables": 1,
    "code": 1,
-   "total": 0.7838,
-   "rtl": 0.9688,
+   "total": 1,
+   "rtl": 1,
    "zwnj": 1,
-   "yehKaf": 0.875,
+   "yehKaf": 1,
    "digits": 1,
    "brackets": 1
   },
@@ -8756,7 +8756,7 @@
    "regions.bodyFromAllLines",
    "regions.columnLeftMirrored",
    "regions.mergeBandRow",
-   "regions.mergeHeaderBand",
+   "regions.mergeHeaderGroup",
    "regions.mergeRepeatDown",
    "regions.tableDirByLetters",
    "regions.tableRuled",
@@ -8944,7 +8944,8 @@
    "regions.bodyFromAllLines",
    "regions.cellPiecesJoined",
    "regions.columnLeftMirrored",
-   "regions.mergeHeaderBand",
+   "regions.mergeHeaderGroup",
+   "regions.mergeRepeatDown",
    "regions.tableDirByLetters",
    "regions.tableRuled",
    "regions.tableSpanDown",
@@ -11051,7 +11052,7 @@
   }
  },
  "realHeldout": {
-  "at": "2026-11-17T15:38:11.074Z",
+  "at": "2026-11-17T16:13:59.182Z",
   "n": 17,
   "errors": 0,
   "docs": [

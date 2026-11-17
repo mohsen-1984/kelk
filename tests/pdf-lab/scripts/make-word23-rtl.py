@@ -157,7 +157,10 @@ rowsmd += '| **%s** |  |  |  |\n' % band_mid
 for g in body2:
     (label, n), *rs = g
     for r in rs: rowsmd += '| %s | %s | %s | %s |\n' % (label, r[2], r[1], r[0])
-corpus('merged-cells-fa.md', '**جدول 3- روش اندازه‌گیری دارایی‌های کتابخانه**\n\n**اندازه‌گیری**\n\n| گروه | نوع دارایی | پایه | روش اندازه‌گیری |\n| --- | --- | --- | --- |\n' +
+# (the band over the last three columns is a column group: in the header row, written once; «گروه», merged down, is
+# repeated in the second header row — the owner's decision, 2026-11-17)
+corpus('merged-cells-fa.md', '**جدول 3- روش اندازه‌گیری دارایی‌های کتابخانه**\n\n| گروه | اندازه‌گیری |  |  |\n| --- | --- | --- | --- |\n'
+       '| **گروه** | **نوع دارایی** | **پایه** | **روش اندازه‌گیری** |\n' +
        rowsmd + '\nارزش کتاب‌های کمیاب هر سال به قیمت روز بازنگری می‌شود.\n')
 
 # ---- 3. a merged title row ---------------------------------------------------------------------------------------------
