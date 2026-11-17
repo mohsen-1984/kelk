@@ -116,16 +116,10 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
 
 **3.1 — what the font arbiter left, lost text** (moved out of 3.0, 2026-11-17):
 
-1. **What the font arbiter left** (2.9) — two pull requests: `pdf/3.1-stream-length` (the stream's length, below; first),
-   then `pdf/3.1-wk-fonts` (wkhtmltopdf Persian and the blank glyph read as a ZWNJ):
-   - **a stream's length read wrong** (`_rawStream`: «/Length 15 0 R» taken for a length of 1): the font programs of
-     such a file were hidden from every repair that reads them (LibreOffice's files). Mended for the arbiter's own
-     reading only: mended for all, `lohtml-rtl--fa-article`, `--fa-report` and two others read worse (list numbers
-     glued to their items, ZWNJs lost: the repairs act where they did not). To mend for all with those repairs
-     looked at — a pull request of its own.
+1. **What the font arbiter left** (2.9) — `pdf/3.1-wk-fonts` (wkhtmltopdf Persian and the blank glyph read as a
+   ZWNJ), after `pdf/3.1-stream-length` (a stream's length given as a reference, read right by every reader: done):
    - **wkhtmltopdf Persian** (`wk-rtl--fa-article`: `zwnj` 0, `yehKaf` 53–68, a broken ToUnicode; the narrow-space →
-     ZWNJ rule hurts those files): still reported garbled, not read — its fonts are not matched to a face. To look
-     at with the stream's length (above).
+     ZWNJ rule hurts those files): still reported garbled, not read — its fonts are not matched to a face.
    - a font with too little text to judge (under 150 letters) that no face knows: since 2.9, reported
      unreadable when its letters are mostly accented Latin in a document of Arabic script (a cover's title and year
      named by glyph indices: `word-cover--glyph-index-fa`); its text stays unread — 3.2;
@@ -136,7 +130,9 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
 2. **Lost text** (moved from 2.9, 2026-11-17) — *PR:* `pdf/3.1-lost-text`, its own: the finding `lostText`, report only.
    The first try (in `pdf/2.9-trust`) counted a page's letters against its blocks' and was not sound (blocks do not
    all carry their page; one glyph can hold several letters): it needs the layout to count what each step drops
-   (furniture, doubles, ornaments).
+   (furniture, doubles, ornaments). The owner's rule (2026-11-17): what a step drops on purpose — page furniture,
+   doubles, ornaments — is not lost text; `lostText` fires only for text dropped with no known reason. The
+   drops on purpose may appear in the report as plain counts at most, never as a warning.
 
 **3.2 — fonts Kelk does not know** (moved out of 3.0, 2026-11-17; a release of its own):
 

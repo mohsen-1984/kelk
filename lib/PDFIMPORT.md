@@ -813,10 +813,11 @@ face or not: a space when it has an advance. A producer that names each glyph by
 U+0003 (the space is glyph 3 of a TrueType font); it came out «�», a line of them for each blank line of a cover
 page set in a bold font Word draws twice (**lab:** `word-cover--glyph-index-fa`).
 
-`_rawStream(ref, exact)`: the arbiter reads a font's program with the stream's length read as a whole number. The
-older reading takes «/Length 15 0 R», a reference, for a length of 1 and loses the stream — which hides such a
-file's font programs from the repairs that read them (LibreOffice's files). Mended for all, four lab files read
-worse (those repairs act where they did not), so the other readers keep the old reading until they are looked at.
+`_rawStream(ref)` reads a stream's length only as a whole number. Before 3.1, «/Length 15 0 R» — a reference to an
+object numbered 10 or more, as LibreOffice writes every stream — was taken for a length of 1 and the stream was lost:
+a page's content went unread for its `/ActualText` (a ligature's letters lost), and such a file's font programs were
+hidden from the repairs that read them. The arbiter read them right since 2.9; every reader does since 3.1, and no lab
+file reads worse (in 2.9 four did: those repairs have changed since) (**lab:** `loref--length-ref`).
 
 ### Can the text be trusted: the judge, and hidden text (`trust.js`)
 

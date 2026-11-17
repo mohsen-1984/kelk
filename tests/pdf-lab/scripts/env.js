@@ -41,7 +41,7 @@ function importerFiles(where) {
 //               Chromium (chrome--: Playwright's own build, not a desktop Chrome), Firefox — our own documents (corpus/real-*) and the lab's office files (make-real.ps1, make-real.js)
 const PDF_GROUPS = [
   ['real-producers', /^(word2024-save|msprint-(word|excel|ppt)|excel2024|ppt2024|edge|chrome|firefox)--/],
-  ['producers', /^(word\d*-|driver-|pptx-|prince-|itext-|acrobat-|pdflib-)/],
+  ['producers', /^(word\d*-|driver-|loref-|pptx-|prince-|itext-|acrobat-|pdflib-)/],
   ['office', /^(calc--|impress--|lowriter--word-)/],
   ['pages', /^(chrome-(layout|layers|template|web-rtl|headtable|positioned|float-tagged|pictures|card|fa-links|form|letterhead|booklet|mail)--|wk-pictures--|lowriter--merged)/],
   ['rtl', /^(chrome-rtl-|wk-rtl--|lohtml-rtl--)|--(fa|ar)-/],
