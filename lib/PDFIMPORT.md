@@ -1481,6 +1481,11 @@ with boxes, badges and pieces of drawing. Lab: `chrome-booklet--booklet-cards-fa
   second name had been glued to the line before it (`chrome-mail--mail-fa`). Outside boxes a bold change at the
   body's size still makes no break.
 
+- **A heading's subtitle** (the document's blocks, `blocks.subtitleDemoted`, 3.0 lines): a bold line of body size
+  right under a larger heading, nothing between, both centred on one middle away from the column's edges, is bold
+  text, no heading of its own (a mail's «کتاب‌خوانی در محله، برای همه» under its title). A section's first
+  sub-heading, set at the start side, stays a heading. `chrome-mail--mail-fa` headings 88.9 → 100.
+
 ### Forms
 
 `_formRows` (order.js), before the ruled tables (a box with rules between its rows is no table of them): rows —

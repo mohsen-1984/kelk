@@ -14,6 +14,7 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Fixed
 
+- **PDF import reads a centred subtitle under a centred title as bold text**, not a heading of its own.
 - **PDF import keeps a bold name in a side box apart** from the line before it.
 - **PDF import reads dash-marked bold labels as list items**, not headings with a dash before them, and keeps a bold
   label between list items apart from the item before it.
