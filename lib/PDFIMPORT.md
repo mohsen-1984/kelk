@@ -1462,6 +1462,12 @@ with boxes, badges and pieces of drawing. Lab: `chrome-booklet--booklet-cards-fa
   item that goes on with their numbers — its number set in the list's regular face — is one of them
   (`blocks.numberedHeadingFromItem`: «3. نام‌نویسی» had come out a list item). `word-lines--heads-fa` 91.1 → 100.
 
+- **A title reversed out of its band** (`_pbBoxBlocks`, `order.boxTitleBandReversed`, 3.0 lines): a fill as wide as
+  most of the column, darker than 0.4 in luminance, holding one short line whose letters are all lighter than 0.75, is a
+  section's title band — a heading — whatever lies under it (a title band otherwise needs a box, a table or a form
+  under it). Word's shaded heading, white on dark blue over plain paragraphs, had been read as a quote
+  (`word-hidden--hidden-fa` 86.7 → 100).
+
 ### Forms
 
 `_formRows` (order.js), before the ruled tables (a box with rules between its rows is no table of them): rows —

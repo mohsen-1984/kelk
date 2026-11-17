@@ -14,6 +14,7 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Fixed
 
+- **PDF import reads a white title on a dark band as a heading**, not a quote.
 - **PDF import reads numbered headings of the body's size as one set**: a bold title among them without a number is
   bold text, and a numbered one whose number is not bold is a heading, not a list item.
 - **PDF import keeps a Latin phrase with brackets in order** in Persian text: «Web (Web Writing)» came back
