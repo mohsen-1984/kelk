@@ -2,6 +2,14 @@
 
 All notable changes to Kelk. Dates are those of the release tags.
 
+## [Unreleased]
+
+### Fixed
+
+- **PDF import reads every stream whose length is a reference** («/Length 12 0 R», as LibreOffice writes them): it
+  was taken for a length of 1 and the stream lost — a page's /ActualText went unread (a ligature's letters lost), and
+  the repairs that read a font's program skipped such files.
+
 ## [3.0] — 2026-11-17
 
 ### Added
