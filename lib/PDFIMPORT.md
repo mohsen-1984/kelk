@@ -1496,6 +1496,9 @@ with boxes, badges and pieces of drawing. Lab: `chrome-booklet--booklet-cards-fa
   column, are the body down to a line that crosses a gap, grouped into rows by the gaps between them (a cell of two
   lines centred against cells of one keeps them together). The header had come out a table of one row, the body as
   tables of its own with its two-line cells split (`word-report--ruled-header-fa` 79.8 → 100).
+- **A dash standing alone at a line's end** (`_joinLines`, 3.0 tables): «رئیس هیئت امنا -» over «غیر موظف» keeps the
+  space after the dash; only a dash glued to its word («e-» over «mail») joins the next line without one.
+
 ### Forms
 
 `_formRows` (order.js), before the ruled tables (a box with rules between its rows is no table of them): rows —

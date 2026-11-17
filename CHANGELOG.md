@@ -14,6 +14,7 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Fixed
 
+- **PDF import keeps the space after a dash that ends a line**, when the dash stands alone (Persian text).
 - **PDF import reads a table whose header alone is ruled**, column by column over a borderless body, as one
   table, its cells of two lines kept whole.
 - **PDF import keeps «label: value» lines apart**, each a paragraph of its own: a field after a line that
