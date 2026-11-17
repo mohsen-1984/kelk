@@ -2,7 +2,7 @@
 
 All notable changes to Kelk. Dates are those of the release tags.
 
-## [Unreleased]
+## [2.9] — 2026-11-17
 
 ### Added
 
@@ -20,7 +20,7 @@ All notable changes to Kelk. Dates are those of the release tags.
   pages' confidence falls. (A font Kelk does not know stays as the file names it.)
 - **Hidden text in a PDF is shown, not dropped or mixed into the text**: text off the page, white on white, too small
   to read, or invisible with no picture under it comes in a marked block — at the end of the document, in place, or
-  left out (Settings → Import → Hidden text) — and the report names it. Such text can carry hidden instructions for AI
+  left out (Settings → Hidden text in a PDF) — and the report names it. Such text can carry hidden instructions for AI
   tools: check it, and in most cases delete it. The block is one quote, its pieces code blocks inside it, so it is
   seen and deleted as one and nothing in it is rendered. Its note is in the document's language; when the document's
   text cannot be read (garbled fonts), in the language the file declares or the interface's.
@@ -29,6 +29,18 @@ All notable changes to Kelk. Dates are those of the release tags.
   «[!WARNING]» text. The preview and the HTML export draw them as GitHub does: the kind's colour and icon, a title.
   The slides keep their callouts.
 - **A code block the fence calls text** (` ```text `) is labelled «text», not «code», in the preview and the exports.
+
+### Changed
+
+- **The PDF lab** (`tests/pdf-lab/`): 227 PDFs (22 new, made by our own scripts from the habits of real files, with
+  no personal metadata): Word's B fonts with a wrong ToUnicode, print drivers' renumbered fonts, hidden text, lists
+  typed every way, a cover page in an unknown font — and, ahead of 3.0, report tables, designed pages and lines,
+  failing on purpose until that work. No file scores worse than in 2.8; read better: `driver-print--renumbered-fa`
+  0.6 → 97.7, `word-bfonts--tounicode-fa` 69.2 → 100, `word-hidden--hidden-fa` 37.5 → 86.7,
+  `driver-print--renumbered-en` 1.3 → 51.0 (reported garbled: a font Kelk does not know). `expect.json` says what each
+  file's report must say.
+- **The stress check** counts opening a file apart from the import's own steps: pdf.js reads a large file's structure
+  in one piece, which no step of Kelk can break.
 
 ### Fixed
 

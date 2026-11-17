@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="fa" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="generator" content="Kelk HtmlBuilder 2.8">
-<title>Images</title>
+<meta name="generator" content="Kelk HtmlBuilder 2.9">
+<title>Document</title>
 <style>
 @font-face{font-family:"Vazirmatn";src:url(data:font/woff2;base64,[111152 bytes sha256 4e3fa217d38f]) format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Vazir Code Hack";src:url(data:font/woff2;base64,[113056 bytes sha256 7cac2a79c75f]) format("woff2");font-weight:400;font-style:normal;font-display:swap}
 *{box-sizing:border-box}
 html{background:#f4f4f2}
 body{margin:0;padding:24px 12px;color:#1c1b1a}
@@ -30,13 +31,13 @@ body{margin:0;padding:24px 12px;color:#1c1b1a}
 .doc table{border-collapse:collapse;margin:.5em auto 1em;max-width:100%}.doc table.kelk-fit{table-layout:fixed}
 .doc th,.doc td{padding:3pt 6pt;vertical-align:top;line-height:1.45}
 .doc th:not([align]),.doc.bd-root th:not([align]):is(.bd-ltr,.bd-rtl){text-align:center}
-.doc blockquote{margin:.5em 0;margin-inline-start:14.15pt;padding:.2em 0;padding-inline-start:12pt;border-inline-start:3.5pt solid #1F6F5C;color:#4A4A4A;background:#F6F9F8;padding-block:.35em;padding-inline-end:.7em;border-radius:3px 8px 8px 3px;border-start-start-radius:3px;border-end-start-radius:3px;border-start-end-radius:8px;border-end-end-radius:8px}
+.doc blockquote{margin:.5em 0;margin-inline-start:14.15pt;padding:.2em 0;padding-inline-start:12pt;border-inline-start:5pt solid #2F5496;color:#1F3864;background:#F6F9F8;padding-block:.35em;padding-inline-end:.7em;border-radius:3px 8px 8px 3px;border-start-start-radius:3px;border-end-start-radius:3px;border-start-end-radius:8px;border-end-end-radius:8px}
 .doc blockquote p{margin:.2em 0}
 .doc .alert-title::before{content:"";display:inline-block;width:1em;height:1em;margin-inline-end:.35em;vertical-align:-.15em;background:currentColor;-webkit-mask:var(--i) center/contain no-repeat;mask:var(--i) center/contain no-repeat}.doc .alert-note{border-color:#0969da}.doc .alert-note .alert-title{color:#0969da;--i:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm-.75 6h1.5v5h-1.5zm0-3h1.5v1.5h-1.5z'/%3E%3C/svg%3E")}.doc .alert-tip{border-color:#1a7f37}.doc .alert-tip .alert-title{color:#1a7f37;--i:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M8 1a5 5 0 0 0-3 9v2h6v-2a5 5 0 0 0-3-9zM6 13.5h4V15H6z'/%3E%3C/svg%3E")}.doc .alert-important{border-color:#8250df}.doc .alert-important .alert-title{color:#8250df;--i:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M2 2h12v9H9l-3 3v-3H2zm5.25 2v4h1.5V4zm0 5v1.5h1.5V9z'/%3E%3C/svg%3E")}.doc .alert-warning{border-color:#9a6700}.doc .alert-warning .alert-title{color:#9a6700;--i:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M8 1.5 15 14H1zm-.75 5v4h1.5v-4zm0 5V13h1.5v-1.5z'/%3E%3C/svg%3E")}.doc .alert-caution{border-color:#cf222e}.doc .alert-caution .alert-title{color:#cf222e;--i:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M5 1h6l4 4v6l-4 4H5l-4-4V5zm2.25 3v5h1.5V4zm0 6v1.5h1.5V10z'/%3E%3C/svg%3E")}
 .doc code{font-family:"Vazir Code Hack",ui-monospace,Consolas,monospace;font-size:10.0pt;background:#f4f2ee;padding:.05em .3em;border-radius:3px}
 .doc code :is(.bd-iso-rtl){font-family:"Vazir Code Hack",ui-monospace,Consolas,monospace}
-.doc .code{margin:.6em 0;border:0.75pt solid #d4d0c8;background:#FCFCFC;color:#1c1b1a;direction:ltr;border-radius:6px;overflow:hidden}
-.doc .code-lang{background:#E7F1EE;border-bottom:0.75pt solid #d4d0c8;color:#595959;font:8.0pt "Vazir Code Hack",ui-monospace,Consolas,monospace;padding:2pt 6pt;text-align:left}
+.doc .code{margin:.6em 0;border:0.75pt solid #2f3b52;background:#F7F9FC;color:#1c1b1a;direction:ltr;border-radius:6px;overflow:hidden}
+.doc .code-lang{background:#2F3B52;border-bottom:0.75pt solid #2f3b52;color:#E8E8E8;font:8.0pt "Vazir Code Hack",ui-monospace,Consolas,monospace;padding:2pt 6pt;text-align:left}
 .doc pre{margin:0;padding:6pt 8pt;overflow-x:auto;direction:ltr;text-align:left;line-height:1.45}
 .doc pre code{background:none;padding:0;font-size:10.0pt}
 .doc img{max-width:100%;height:auto}.doc hr{border:0;border-top:1px solid #a0a0a0}
@@ -50,7 +51,7 @@ body{margin:0;padding:24px 12px;color:#1c1b1a}
 .hf-table{width:100%;border-collapse:collapse}.hf-table td{padding:3pt 5pt;vertical-align:middle;text-align:center}
 .hf-table td.hf-author{text-align:start}.hf-title{font-weight:700}
 .hf-simple{text-align:center;margin:0}
-.doc .code-nested{display:inline-block;width:100%;border:1px solid #d4d0c8;border-radius:3px;padding:1px 5px;margin:1px 0;vertical-align:top}
+.doc .code-nested{display:inline-block;width:100%;border:1px solid #2f3b52;border-radius:3px;padding:1px 5px;margin:1px 0;vertical-align:top}
 .bd-doc-rtl{direction:rtl}.bd-doc-ltr{direction:ltr}
 .bd-ltr,.bd-ltr-table{direction:ltr}.bd-rtl{direction:rtl}
 .bd-root :is(p,h1,h2,h3,h4,h5,h6,li,blockquote,ul,ol,dt,dd):is(.bd-ltr,.bd-rtl){text-align:start}
