@@ -751,16 +751,17 @@ characters, and `lib/pdfimport/fontprints.js` holds, per face Kelk knows, the fo
 character the font's own cmap gives it (through its GSUB for a joining form or a ligature the cmap does not name)
 and the other letters or digits that name the same glyph. Hashes and characters only: no font is in the file.
 
-- **The faces** (121, 2026-11-17): Vazirmatn, Sahel and the B fonts of the font zip (`src: kelk`, made again by
+- **The faces** (156, 2026-11-17): Vazirmatn, Sahel and the B fonts of the font zip (`src: kelk`, made again by
   `tools/build-fontprints.js`, which `npm run check:fresh` runs), and faces of fonts that are not in the repository
   (`src: supplied`, kept as they are until supplied again — `--add <folder>`, or `tools/fontprints.html`, which
-  makes the file in a browser from font files dropped on it): the «2 …» fonts (85 faces), IRANSans (6 weights),
+  makes the file in a browser from font files dropped on it): the B fonts' other 35 faces, the «2 …» fonts (85
+  faces), IRANSans (6 weights),
   IRANYekan (8), IranNastaliq (versions 1 and 2, the first named «Regular v1.001»).
 - **Written once**: a face that shares nine tenths of its fontprints with one written before it (the same design
   under two names) keeps only the records the other lacks and names it as its `base`, the
   first such face in the file's order (by family) — so a face depends only on faces before it, and a family taken
   out takes no other face's records with it. `table(face, faces)` reads a face whole, `expand(data)` the whole file (what
-  the build and `fontprints.html` read back). The file: 473 KB, loaded with the importer (not at startup).
+  the build and `fontprints.html` read back). The file: 478 KB, loaded with the importer (not at startup).
 - **When two faces disagree**: a letter or a digit one outline names two ways stops the build; two signs (a dash and
   a longer dash, a quote and a prime: two weights of one family) leave the table — the file's name stands. Digits
   of one value (۴ ٤ 4) are one character. A joining form a font's tables give with a kashida after it («ﻋـ») is the

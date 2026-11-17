@@ -11,8 +11,8 @@ All notable changes to Kelk. Dates are those of the release tags.
   «2 …» faces), each glyph is named by its outline instead. In a font the file names right but for a few glyphs,
   only those are corrected: brackets read as «م», a thousands comma read as a stop in the B fonts. The report says
   when it was done.
-- **PDF import knows more Persian fonts by their shapes**: IRANSans, IRANYekan, IranNastaliq (both versions) and the
-  «2 …» fonts — 121 faces in all —, so a file that names their letters wrong is read right. The table of shapes
+- **PDF import knows more Persian fonts by their shapes**: IRANSans, IRANYekan, IranNastaliq (both versions), the
+  «2 …» fonts and the other B fonts — 156 faces in all —, so a file that names their letters wrong is read right. The table of shapes
   writes a font shared under two names once.
 - **PDF import says when a font's text cannot be read.** Some files do not name their letters right (a wrong or
   missing ToUnicode): the text came out scrambled, and the report still showed a high confidence. Kelk now reads each
