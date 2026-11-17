@@ -1,5 +1,5 @@
 {
- "written": "2026-11-16T20:10:00.188Z",
+ "written": "2026-11-17T03:12:48.019Z",
  "note": "scripts/gate.js --update; the fuzz means hold only for their env",
  "corpus": {
   "acrobat-word--booklet-fa": {
@@ -1210,15 +1210,15 @@
    "markup": 0,
    "pic": 0,
    "mix": 0,
-   "recall": 0.2097,
-   "order": 0.2097,
-   "headings": 0,
+   "recall": 0.9435,
+   "order": 0.9435,
+   "headings": 1,
    "code": 1,
    "quotes": 1,
-   "total": 0.4839,
-   "rtl": 0.57,
-   "zwnj": 0.069,
-   "yehKaf": 0.2111,
+   "total": 0.9774,
+   "rtl": 0.9094,
+   "zwnj": 0.7931,
+   "yehKaf": 0.8444,
    "digits": 1,
    "brackets": 1
   },
@@ -1227,15 +1227,15 @@
    "markup": 0,
    "pic": 0,
    "mix": 0,
-   "recall": 0.2462,
-   "order": 0.2462,
-   "headings": 0,
+   "recall": 0.9462,
+   "order": 0.9462,
+   "headings": 1,
    "code": 1,
    "quotes": 1,
-   "total": 0.4985,
-   "rtl": 0.5722,
-   "zwnj": 0.069,
-   "yehKaf": 0.2198,
+   "total": 0.9785,
+   "rtl": 0.9098,
+   "zwnj": 0.7931,
+   "yehKaf": 0.8462,
    "digits": 1,
    "brackets": 1
   },
@@ -1619,14 +1619,14 @@
    "markup": 0,
    "pic": 0,
    "mix": 0,
-   "recall": 0.7819,
-   "order": 0.7819,
-   "headings": 0.8,
+   "recall": 0.8138,
+   "order": 0.8138,
+   "headings": 1,
    "lists": 0.1538,
    "tables": 0.3947,
    "code": 1,
    "quotes": 0,
-   "total": 0.5589,
+   "total": 0.5966,
    "rtl": 0.9204,
    "yehKaf": 0.7612,
    "digits": 1,
@@ -1711,16 +1711,16 @@
    "markup": 0,
    "pic": 0,
    "mix": 0,
-   "recall": 0.9898,
-   "order": 0.9857,
+   "recall": 0.998,
+   "order": 0.9939,
    "headings": 1,
    "lists": 0,
    "tables": 1,
    "code": 1,
-   "total": 0.8292,
-   "rtl": 0.9831,
-   "zwnj": 0.95,
-   "yehKaf": 0.9825,
+   "total": 0.832,
+   "rtl": 0.9978,
+   "zwnj": 1,
+   "yehKaf": 0.9912,
    "digits": 1,
    "brackets": 1
   },
@@ -1848,14 +1848,14 @@
    "markup": 0,
    "pic": 0,
    "mix": 0,
-   "recall": 0.7819,
-   "order": 0.7766,
+   "recall": 0.8032,
+   "order": 0.7926,
    "headings": 1,
    "lists": 0.125,
    "tables": 0.0588,
    "code": 1,
    "quotes": 0,
-   "total": 0.5346,
+   "total": 0.5399,
    "rtl": 0.9154,
    "yehKaf": 0.7463,
    "digits": 1,
@@ -1867,17 +1867,17 @@
    "markup": 0,
    "pic": 0,
    "mix": 0,
-   "recall": 0.9949,
-   "order": 0.9949,
+   "recall": 0.9974,
+   "order": 0.9974,
    "headings": 1,
    "lists": 0.4444,
    "tables": 0,
    "code": 0.75,
    "quotes": 0,
-   "total": 0.5977,
-   "rtl": 0.9984,
+   "total": 0.5985,
+   "rtl": 1,
    "zwnj": 1,
-   "yehKaf": 0.9936,
+   "yehKaf": 1,
    "digits": 1,
    "brackets": 1,
    "links": 1
@@ -2575,14 +2575,14 @@
    "markup": 0,
    "pic": 0,
    "mix": 0,
-   "recall": 0.9744,
-   "order": 0.9744,
+   "recall": 1,
+   "order": 1,
    "headings": 1,
    "code": 1,
-   "total": 0.9872,
-   "rtl": 0.8389,
+   "total": 1,
+   "rtl": 0.85,
    "zwnj": 1,
-   "yehKaf": 0.9556,
+   "yehKaf": 1,
    "digits": 1,
    "brackets": 0.4
   },
@@ -2591,15 +2591,15 @@
    "markup": 0,
    "pic": 0,
    "mix": 0,
-   "recall": 0.2293,
-   "order": 0.2293,
+   "recall": 1,
+   "order": 1,
    "headings": 1,
    "lists": 1,
    "code": 1,
-   "total": 0.6917,
-   "rtl": 0.2159,
-   "zwnj": 0.25,
-   "yehKaf": 0.1818
+   "total": 1,
+   "rtl": 1,
+   "zwnj": 1,
+   "yehKaf": 1
   },
   "word-cells--cells-fa": {
    "error": null,
@@ -5515,37 +5515,34 @@
   "driver-print--renumbered-fa": [
    "blocks.breakBigGap",
    "blocks.breakFromFar",
-   "blocks.breakIndent",
+   "blocks.breakStopRoom",
    "blocks.breakStyle",
-   "blocks.headingBoldMinor",
    "blocks.headingSize",
    "extract.hiddenText",
+   "order.rtlPage",
    "regions.bodyFromLongLines",
    "regions.bodyLead",
    "regions.boldFace",
    "regions.columnLeftMirrored",
-   "regions.columnRightMirrored",
-   "regions.startFlushPartial",
-   "trust.garbledFont",
+   "regions.spacedDoc",
+   "trust.fontprintGlyphs",
    "trust.hiddenText"
   ],
   "driver-print--renumbered-pages-fa": [
    "blocks.breakBigGap",
    "blocks.breakFromFar",
-   "blocks.breakIndent",
+   "blocks.breakStopRoom",
    "blocks.breakStyle",
-   "blocks.coverHeadingDemoted",
-   "blocks.headingBoldMinor",
    "blocks.headingSize",
    "blocks.leadBody",
    "extract.hiddenText",
+   "order.rtlPage",
    "regions.bodyFromLongLines",
    "regions.bodyLead",
    "regions.boldFace",
    "regions.columnLeftMirrored",
-   "regions.columnRightMirrored",
-   "regions.startFlushPartial",
-   "trust.garbledFont",
+   "regions.spacedDoc",
+   "trust.fontprintGlyphs",
    "trust.hiddenText"
   ],
   "edge--real-readme-en": [
@@ -6205,13 +6202,11 @@
    "blocks.brShortLine",
    "blocks.breakBigGap",
    "blocks.breakBoldHead",
-   "blocks.breakIndent",
    "blocks.breakLeftOfItem",
    "blocks.breakMarker",
    "blocks.breakStyle",
    "blocks.headingTree",
    "blocks.numWordOBullet",
-   "blocks.treeParagraphJoined",
    "extract.fontMonoNotCode",
    "extract.textOnCover",
    "lines.bracketsLogical",
@@ -6221,6 +6216,8 @@
    "lines.cutDigits",
    "lines.cutWideGap",
    "lines.furnitureHeadRowKept",
+   "lines.kashidasRemoved",
+   "lines.markMerged",
    "lines.rowCell",
    "lines.rtlMarkerJoined",
    "lines.wordSpaceInserted",
@@ -6244,7 +6241,8 @@
    "regions.spacedDoc",
    "regions.startFlushPartial",
    "regions.tableDirByLetters",
-   "regions.tableRuled"
+   "regions.tableRuled",
+   "trust.fontprintGlyphs"
   ],
   "kelkdocx-lo--article": [
    "blocks.breakBigGap",
@@ -6311,6 +6309,7 @@
    "lines.cutWideGap",
    "lines.furnitureHeadRowKept",
    "lines.furnitureRuledKept",
+   "lines.markMerged",
    "lines.rowCell",
    "lines.rtlMarkerJoined",
    "lines.wordSpaceInserted",
@@ -6333,7 +6332,8 @@
    "regions.spacedDoc",
    "regions.startFlushPartial",
    "regions.tableDirByLetters",
-   "regions.tableRuled"
+   "regions.tableRuled",
+   "trust.fontprintGlyphs"
   ],
   "kelkdocx-lo--fa-brackets": [
    "blocks.breakBigGap",
@@ -6433,6 +6433,7 @@
    "lines.furnitureHeadRowKept",
    "lines.furnitureRuledKept",
    "lines.justifiedGap",
+   "lines.kashidasRemoved",
    "lines.rowCell",
    "lines.wordSpaceInserted",
    "order.besideFloat",
@@ -6446,7 +6447,8 @@
    "regions.columnRightMirrored",
    "regions.spacedDoc",
    "regions.tableDirByLetters",
-   "regions.tableRuled"
+   "regions.tableRuled",
+   "trust.fontprintGlyphs"
   ],
   "kelkdocx-lo--features": [
    "blocks.breakBigGap",
@@ -6769,8 +6771,8 @@
    "lines.bracketsLogical",
    "lines.cutCell",
    "lines.furnitureHeadRowKept",
+   "lines.markMerged",
    "lines.rowCell",
-   "lines.wordSpaceSpacedDoc",
    "order.besideFloat",
    "order.borderlessTable",
    "order.hr",
@@ -6785,7 +6787,8 @@
    "regions.columnRightMirrored",
    "regions.headFamilies",
    "regions.spacedDoc",
-   "regions.startFlushPartial"
+   "regions.startFlushPartial",
+   "trust.fontprintGlyphs"
   ],
   "lohtml-rtl--fa-article": [
    "blocks.breakBigGap",
@@ -6809,6 +6812,7 @@
    "lines.codeRun",
    "lines.cutCell",
    "lines.cutDigits",
+   "lines.markMerged",
    "lines.rowCell",
    "order.besideFloat",
    "order.borderlessTable",
@@ -6826,7 +6830,8 @@
    "regions.columnRightMirrored",
    "regions.headFamilies",
    "regions.spacedDoc",
-   "regions.startFlushPartial"
+   "regions.startFlushPartial",
+   "trust.fontprintGlyphs"
   ],
   "lohtml-rtl--fa-brackets": [
    "blocks.breakBigGap",
@@ -8224,7 +8229,8 @@
    "regions.bodyFromLongLines",
    "regions.bodyLead",
    "regions.columnLeftMirrored",
-   "regions.spacedDoc"
+   "regions.spacedDoc",
+   "trust.fontprintGlyphs"
   ],
   "word-bfonts--tounicode-fa": [
    "blocks.breakBigGap",
@@ -8234,19 +8240,15 @@
    "blocks.breakStopRoom",
    "blocks.breakStyle",
    "blocks.headingSize",
-   "extract.arTrustFont",
-   "extract.cmapArabicLetter",
    "extract.formFromCmap",
    "extract.letterFromCmap",
-   "lines.zwnjFromForm",
    "order.rtlPage",
    "regions.bodyFromLongLines",
    "regions.bodyLead",
    "regions.boldFace",
    "regions.columnLeftMirrored",
-   "regions.columnRightMirrored",
    "regions.spacedDoc",
-   "trust.garbledFont"
+   "trust.fontprintGlyphs"
   ],
   "word-cells--cells-fa": [
    "blocks.headingSize",
@@ -8998,9 +9000,9 @@
   "generator": 3,
   "env": {
    "qpdf": "qpdf version 11.9.0",
-   "qpdfPkg": "11.9.0-1.1build1",
+   "qpdfPkg": "11.9.0-1.1ubuntu0.1",
    "pdfLib": "1.17.1",
-   "chromium": "156.0.8078.4",
+   "chromium": "153.0.8010.12",
    "platform": "linux"
   },
   "transforms": {
@@ -9212,7 +9214,7 @@
     "v": 1,
     "env": {
      "qpdf": "qpdf version 11.9.0",
-     "qpdfPkg": "11.9.0-1.1build1"
+     "qpdfPkg": "11.9.0-1.1ubuntu0.1"
     },
     "n": 24,
     "same": 24,
@@ -9282,7 +9284,7 @@
     "v": 1,
     "env": {
      "qpdf": "qpdf version 11.9.0",
-     "qpdfPkg": "11.9.0-1.1build1"
+     "qpdfPkg": "11.9.0-1.1ubuntu0.1"
     },
     "n": 7,
     "same": 6,
@@ -9318,7 +9320,7 @@
     "v": 1,
     "env": {
      "qpdf": "qpdf version 11.9.0",
-     "qpdfPkg": "11.9.0-1.1build1"
+     "qpdfPkg": "11.9.0-1.1ubuntu0.1"
     },
     "n": 22,
     "same": 22,
@@ -9512,7 +9514,7 @@
     "v": 1,
     "env": {
      "qpdf": "qpdf version 11.9.0",
-     "qpdfPkg": "11.9.0-1.1build1"
+     "qpdfPkg": "11.9.0-1.1ubuntu0.1"
     },
     "n": 24,
     "same": 23,
@@ -9581,7 +9583,7 @@
     "v": 1,
     "env": {
      "qpdf": "qpdf version 11.9.0",
-     "qpdfPkg": "11.9.0-1.1build1"
+     "qpdfPkg": "11.9.0-1.1ubuntu0.1"
     },
     "n": 24,
     "same": 24,
@@ -9651,7 +9653,7 @@
     "v": 1,
     "env": {
      "qpdf": "qpdf version 11.9.0",
-     "qpdfPkg": "11.9.0-1.1build1"
+     "qpdfPkg": "11.9.0-1.1ubuntu0.1"
     },
     "n": 24,
     "same": 20,
@@ -9717,15 +9719,15 @@
     "v": 1,
     "env": {
      "qpdf": "qpdf version 11.9.0",
-     "qpdfPkg": "11.9.0-1.1build1"
+     "qpdfPkg": "11.9.0-1.1ubuntu0.1"
     },
     "n": 24,
-    "same": 11,
+    "same": 9,
     "errors": 0,
     "unexpected": 0,
     "relation": {},
-    "total": 0.5377,
-    "delta": -0.4613,
+    "total": 0.5207458333333334,
+    "delta": -0.4783,
     "files": {
      "chrome-github-bg--article": 0.1561,
      "chrome-plain-hf--report": 1,
@@ -9741,10 +9743,10 @@
      "calc--xl-sales": 0.2143,
      "impress--deck": 0.1667,
      "kelk--article": 1,
-     "word-print--word-rtl": 1,
+     "word-print--word-rtl": 0.8549,
      "chrome-rtl-tagged--ar-article": 0.1429,
      "chrome-rtl-github-bg--fa-report": 0.1701,
-     "kelk--fa-report": 1,
+     "kelk--fa-report": 0.7382,
      "word-memo--memo-fa": 1,
      "pptx-rtl--slides-rtl": 1,
      "prince-shapes--shapes-fa": 0.3333,
@@ -9758,8 +9760,6 @@
      "chrome-template--template",
      "chrome-web-rtl--web-rtl",
      "kelk--article",
-     "word-print--word-rtl",
-     "kelk--fa-report",
      "word-memo--memo-fa",
      "pptx-rtl--slides-rtl",
      "itext-word--circular-fa",
@@ -9981,7 +9981,7 @@
     "relation": {
      "words≠": 2
     },
-    "total": 0.9957708333333333,
+    "total": 0.9958125,
     "delta": -0.0032,
     "files": {
      "chrome-github-bg--article": 1,
@@ -9998,7 +9998,7 @@
      "calc--xl-sales": 1,
      "impress--deck": 0.9762,
      "kelk--article": 1,
-     "word-print--word-rtl": 0.9968,
+     "word-print--word-rtl": 0.9978,
      "chrome-rtl-tagged--ar-article": 1,
      "chrome-rtl-github-bg--fa-report": 1,
      "kelk--fa-report": 1,
@@ -10106,7 +10106,7 @@
     "via": "chromium",
     "v": 1,
     "env": {
-     "chromium": "156.0.8078.4",
+     "chromium": "153.0.8010.12",
      "platform": "linux"
     },
     "n": 5,
@@ -10114,7 +10114,7 @@
     "errors": 0,
     "unexpected": 0,
     "relation": {
-     "blocks±>1": 1
+     "blocks±>1": 0
     },
     "total": 1,
     "delta": 0,
@@ -10136,15 +10136,15 @@
     "via": "chromium",
     "v": 1,
     "env": {
-     "chromium": "156.0.8078.4",
+     "chromium": "153.0.8010.12",
      "platform": "linux"
     },
     "n": 5,
-    "same": 3,
+    "same": 4,
     "errors": 0,
     "unexpected": 0,
     "relation": {
-     "blocks±>1": 1
+     "blocks±>1": 0
     },
     "total": 1,
     "delta": 0,
@@ -10158,7 +10158,8 @@
     "exact": [
      "chrome-github-bg--article",
      "chrome-plain-hf--report",
-     "chrome-tagged--features"
+     "chrome-tagged--features",
+     "chrome-rtl-tagged--ar-article"
     ]
    },
    "pageSize": {
@@ -10166,15 +10167,15 @@
     "via": "chromium",
     "v": 1,
     "env": {
-     "chromium": "156.0.8078.4",
+     "chromium": "153.0.8010.12",
      "platform": "linux"
     },
     "n": 5,
-    "same": 3,
+    "same": 4,
     "errors": 0,
     "unexpected": 0,
     "relation": {
-     "blocks±>1": 1
+     "blocks±>1": 0
     },
     "total": 0.99616,
     "delta": -0.0038,
@@ -10188,7 +10189,8 @@
     "exact": [
      "chrome-github-bg--article",
      "chrome-plain-hf--report",
-     "chrome-tagged--features"
+     "chrome-tagged--features",
+     "chrome-rtl-tagged--ar-article"
     ]
    }
   }
@@ -10799,7 +10801,7 @@
   }
  },
  "realHeldout": {
-  "at": "2026-11-16T20:08:10.768Z",
+  "at": "2026-11-17T03:12:47.850Z",
   "n": 17,
   "errors": 0,
   "docs": [

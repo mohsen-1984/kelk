@@ -763,9 +763,38 @@ and the other letters or digits that name the same glyph. Hashes and characters 
   Type 3 font; a font rebuilt with other outlines. Two faces never give one fontprint two characters: the build
   stops if they would.
 
-The importer does not load either file yet (Kelk 2.9's font arbiter will, on first need); `tests/unit/fontprint*.test.js`
-hold them to the lab's files: a Word file whose ToUnicode is wrong and a print driver's renumbered fonts are both
-known glyph for glyph.
+Both files are parts of the importer (`PdfImporter.PARTS`): the font arbiter reads them (below).
+`tests/unit/fontprint*.test.js` hold them to the lab's files: a Word file whose ToUnicode is wrong and a print
+driver's renumbered fonts are both known glyph for glyph.
+
+### The font arbiter: who names a glyph (`trust.js`)
+
+A file names each glyph of a font — its ToUnicode, its cmap, its glyph names: pdf.js's reading. The font's own
+outlines name it too, when the font is one Kelk knows (a face of the fontprints). `_arbiterPage` works on each page's
+glyphs as pdf.js gives them, before any repair reads the names (a letter the file names as a space, a mark or a
+kashida is lost to the repairs that follow); a font is decided once the pages read so far hold enough of its glyphs,
+and `_fontArbiter`, after the last page, decides the fonts that had too few on every page and writes the note
+**`fontprintRead`**. Per font with an embedded TrueType program (of several under one name — a print driver embeds a
+subset per run of pages — the one whose advances are the font's widths):
+
+| The font | What happens |
+|---|---|
+| a face names under 0.8 of the glyphs it draws, or under 12 of them | nothing: the file's names stand (and the judge reports the font if its text is no language) |
+| known, and the file agrees with the face on 0.85 of them or more — **the map is sound** | only a glyph named as *another kind* of character takes the face's: a letter where the face has a sign (a bracket read «م», a comma read «ک»), a sign or a blank where the face has a letter («(» for «ل»), one ASCII sign for another (a stop for a comma). A letter for a letter stays the file's (a form's outline is often several letters': ه ە ھ), as do a digit the file names, a ZWNJ, a blank where the face has a mark, and the signs beyond ASCII |
+| known, and they agree on less — **the map is not this font's** (codes renumbered by a print driver, a ToUnicode of another subset) | every glyph the face knows takes the face's character; a glyph with no outline is a space (with no advance, a ZWNJ) |
+
+The file and the face agree on a glyph when they give the same character after folding, when the file's is one of
+the letters and digits that share the outline (ي and ی, ك and ک, 4 ٤ ۴: no outline tells them apart, the file's word
+stands), or when they are a bracket and its mirror (which side it opens to is read from the outline elsewhere).
+
+The lab (2026-11): a known face names every drawn glyph; a sound map agrees on 0.96 and more, a wrong one on 0.2 and
+less. What it does not do: a font Kelk has no fontprints of stays as the file names it (reported by the judge when it
+has text enough — `driver-print--renumbered-en`); a CFF or Type 3 font has no fontprint.
+
+`_rawStream(ref, exact)`: the arbiter reads a font's program with the stream's length read as a whole number. The
+older reading takes «/Length 15 0 R», a reference, for a length of 1 and loses the stream — which hides such a
+file's font programs from the repairs that read them (LibreOffice's files). Mended for all, four lab files read
+worse (those repairs act where they did not), so the other readers keep the old reading until they are looked at.
 
 ### Can the text be trusted: the judge, and hidden text (`trust.js`)
 
@@ -787,8 +816,9 @@ font that draws most of it (a producer can cut one font into several). `la.odd` 
 program names no character (a simple font with a (1,0) or (3,0) cmap and no Unicode cmap: a print driver's): a font of
 figures and signs is odd too. A garbled font gives the note **`garbledText`** (its fonts and pages in the report) and
 lowers its pages' confidence: times (1 − s)³, s the share of the page's letters in garbled fonts, each weighed by how
-garbled its font is. **Report only**: the Markdown is as it was. What it does not catch: a font wrong for a few
-letters only (brackets named «م»: under every limit), a font with too little text.
+garbled its font is. **Report only**: the Markdown is as it was (the font arbiter, above, is what changes names,
+before the layout; the judge reads what it left). What it does not catch: a font wrong for a few letters only
+(brackets named «م»: under every limit — the arbiter's, when the font is known), a font with too little text.
 
 **Hidden text.** Text the file holds and no reader sees is not dropped unsaid, and not left in the text: it comes
 back in a marked block, and the report says so (**`hiddenText`**). `_hiddenText` (after the walk) marks a glyph:

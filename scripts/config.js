@@ -188,7 +188,7 @@
             pdfimport: {
                 src: ['lib/PdfImporter.js', 'lib/pdfimport/thresholds.js', 'lib/pdfimport/calibration.js',
                     'lib/pdfimport/extract.js', 'lib/pdfimport/lines.js', 'lib/pdfimport/regions.js',
-                    'lib/pdfimport/ladder.js', 'lib/pdfimport/letterstats.js', 'lib/pdfimport/trust.js', 'lib/pdfimport/order.js',
+                    'lib/pdfimport/ladder.js', 'lib/pdfimport/letterstats.js', 'lib/pdfimport/fontprint.js', 'lib/pdfimport/fontprints.js', 'lib/pdfimport/trust.js', 'lib/pdfimport/order.js',
                     'lib/pdfimport/blocks.js'],
                 global: 'PdfImporter'
             },
