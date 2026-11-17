@@ -2,6 +2,13 @@
 
 All notable changes to Kelk. Dates are those of the release tags.
 
+## [Unreleased]
+
+### Fixed
+
+- **PDF import reads bold in a variable font printed by Chromium at small sizes**: a booklet's bold subtitle, labels
+  and lead words came back plain (Vazirmatn's digits and spaces are as wide at every weight, and hid the bold).
+
 ## [2.9] — 2026-11-17
 
 ### Added

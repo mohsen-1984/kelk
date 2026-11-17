@@ -729,6 +729,10 @@ them. Before, a Persian letter began with `# g`.
   tag whose letters are wider, character by character (the median of four or more), by 2 % or more is bold. A width or
   optical-size axis is not read so (at display sizes it narrows). Lab: `chrome-rtl-varfont--fa-weights`
   (`make-varfont.js`); the Chrome Persian corpus in Vazirmatn gained its bold too (`chrome-rtl-*`).
+  A glyph as wide at every weight (a tabular digit, the space) tells nothing, and is left out when four others remain
+  (3.0): a small bold run's median sat at 1 among them. And a tag is bold too when nine in ten of the glyphs that moved
+  are wider and their median is 1 % up: a short bold run at a small size, its advances rounded (a list's bold lead
+  words measured 1.019). A booklet's bold subtitle, labels and lead words read regular before (`chrome-booklet--*`).
 - **Monospace** from the pdf.js flag or the name — but **not** for an emoji or symbol font (all glyphs
   one width: NotoColorEmoji, OpenSymbol), and not for a font flagged fixed-pitch whose letters vary
   in width (LibreOffice flags Inter so), unless its name says monospace. A wrong monospace font turns
