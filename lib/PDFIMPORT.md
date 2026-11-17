@@ -1549,10 +1549,17 @@ gap** that frees a region with columns. Learnt the hard way:
   not bold — starts a line of its own in its paragraph (a box of fields: «موضوع طرح: …», «زبان طرح: …»).
 - **A dash against its word** («-مدیر …», no space) is a list's mark too, before a letter (a minus is before a
   number); a lone bullet or dash a few points off its item (under 1.2 em: Prince's column cut) joins it again.
-- **A bullet or a number against its word, right to left** (2.7, `blocks.numGluedBullet`, `numGluedNumber`):
-  LibreOffice's list from HTML sets «•» and «1.» right beside the item's first letter, no gap, no space
-  («•نسخهٔ روزانه», «1.نسخهٔ اصلی»); on a right-to-left line they are its mark (a number only before an
-  Arabic-script letter). Lab: `lohtml-rtl--fa-brackets`, `lohtml-rtl--fa-report` (lists 0 → 100).
+- **A bullet or a number against its word** (2.7 right to left, 2.9 either way; `blocks.numGluedBullet`,
+  `numGluedNumber`): LibreOffice's list from HTML sets «•» and «1.» right beside the item's first letter, no gap, no
+  space («•نسخهٔ روزانه», «1.نسخهٔ اصلی»); a Word document typed so has «1)…», «۳)…», «2.Item», «•Item». Before a
+  letter they are the item's mark, the same item as with a space: a number and its period or closing bracket
+  (ASCII, Persian or Arabic digits), a bullet, a dash (`numDashBullet`). The letter in any form: right to left the
+  line is read in its presentation forms here, and until 2.9 only a letter's base form was taken — «1)…» an item
+  where the first letter has no joining forms, «3)…» a paragraph where it has. A number and a dash («1- …») is no
+  item: a Persian paragraph's own numbering, kept as written. Markdown writes every ordered item «1.»: the delimiter
+  is the producer's, the number the item's (CommonMark's «1)» is a list of its own, and a document mixing the two
+  would break its lists). Lab: `lohtml-rtl--fa-brackets`, `lohtml-rtl--fa-report` (lists 0 → 100),
+  `word-lists--markers-fa` (lists 76.5 → 100), `word-lists--markers-en` (66.7 → 100).
 - **Right-to-left items set flush left** (2.7, `blocks.listFlushLeftRtl`): the same lists draw each item's bullet at
   its own line's right end and every line from the left margin — the right ends follow the text's length, and every
   shorter item had gone a level deeper. Three single-line right-to-left items or more whose left ends agree

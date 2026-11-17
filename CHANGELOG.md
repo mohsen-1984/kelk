@@ -32,6 +32,10 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Fixed
 
+- **PDF import**: a number with its period or closing bracket typed right against the item's word — «1)…», «۳)…»,
+  «2.Item» — and a bullet so typed («•Item») start a list item, the same as with a space, in either direction. Right
+  to left only some had (those whose first letter has no joining forms): a list came out half items, half paragraphs.
+  Every ordered item is written «1.» in Markdown, whatever its delimiter in the PDF.
 - **PDF import**: a file of two pages whose text could not be read crashed the import.
 - **PDF import**: blank lines of a cover page set in a bold font no longer come out as rows of «�» (a space the file
   names by its glyph number); a short title or a year in a font Kelk does not know, whose letters come out as
