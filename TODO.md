@@ -118,6 +118,10 @@ release's split decided 2026-11-17: the booklet, lines, tables, then the release
    Writing)» read «(Web Writing) Web». A name glued to the line before it in a side box of short lines:
    `chrome-mail--mail-fa`. And the white title on a dark band of `word-hidden--hidden-fa`, which reads as a
    quote (expected a heading).
+   **Dropped** (2026-11-17, agreement 12): a bold line of body size right under a list item, no more space above it
+   than under it, read as a label (bold text) rather than a minor heading — right for `word-labels--labels-fa`'s
+   sub-labels, but it took a real `#### Small print` after a list for one in seven *features* files (Chromium,
+   wkhtmltopdf, OCR; 100 → 99.2). Those sub-labels still come out as headings; another sign is needed.
    And the mail's print head (`chrome-mail--mail-fa`): its subject, now read bold, became a `##` heading and pushed
    the real headings a level down (headings 40 → 20 in 3.0's first PR). **Passes when** the mail's headings are 40 or
    more and its total 86.2 or more.

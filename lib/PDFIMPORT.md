@@ -1468,6 +1468,14 @@ with boxes, badges and pieces of drawing. Lab: `chrome-booklet--booklet-cards-fa
   under it). Word's shaded heading, white on dark blue over plain paragraphs, had been read as a quote
   (`word-hidden--hidden-fa` 86.7 → 100).
 
+- **Dash-marked labels** (`_textBlocks`, `blocks.dashLabelItem`, 3.0 lines): a one-line bold label opening with a
+  dash, typed with or without a space («-برنامه‌ها», «- پیشنهادها»), is a list item with its label bold — no heading
+  with «\-» before it. And under a plain item, an unmarked bold line that starts out at the item's marker, not at its
+  text, is a label of its own (`blocks.breakLabelAtMarker`): a report's bold sub-labels between its dash items had
+  been glued to the item before. `word-labels--labels-fa` 82.5 → 88.0. (Those sub-labels still come out as minor
+  headings; the rule that read a bold line at the list's own pitch as a label was dropped — it took a real
+  `#### Small print` for one in seven *features* files: `TODO.md`.)
+
 ### Forms
 
 `_formRows` (order.js), before the ruled tables (a box with rules between its rows is no table of them): rows —
