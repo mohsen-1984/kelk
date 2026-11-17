@@ -130,7 +130,9 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
 2. **Lost text** (moved from 2.9, 2026-11-17) — *PR:* `pdf/3.1-lost-text`, its own: the finding `lostText`, report only.
    The first try (in `pdf/2.9-trust`) counted a page's letters against its blocks' and was not sound (blocks do not
    all carry their page; one glyph can hold several letters): it needs the layout to count what each step drops
-   (furniture, doubles, ornaments).
+   (furniture, doubles, ornaments). The owner's rule (2026-11-17): what a step drops on purpose — page furniture,
+   doubles, ornaments — is not lost text; `lostText` fires only for text dropped with no known reason. The
+   drops on purpose may appear in the report as plain counts at most, never as a warning.
 
 **3.2 — fonts Kelk does not know** (moved out of 3.0, 2026-11-17; a release of its own):
 
