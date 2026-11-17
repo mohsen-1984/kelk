@@ -7,9 +7,10 @@ All notable changes to Kelk. Dates are those of the release tags.
 ### Added
 
 - **PDF import reads a font it knows by its shapes.** When a file names a font's letters wrong — a wrong ToUnicode,
-  or codes renumbered by a print driver — and the font is one Kelk knows (`lib/pdfimport/fontprints.js`), each
-  glyph is named by its outline instead. In a font the file names right but for a few glyphs, only those are
-  corrected: brackets read as «م», a thousands comma read as a stop. The report says when it was done.
+  or codes renumbered by a print driver — and the font is one Kelk knows (Vazirmatn, Sahel, the B fonts and nine
+  «2 …» faces), each glyph is named by its outline instead. In a font the file names right but for a few glyphs,
+  only those are corrected: brackets read as «م», a thousands comma read as a stop in the B fonts. The report says
+  when it was done.
 - **PDF import says when a font's text cannot be read.** Some files do not name their letters right (a wrong or
   missing ToUnicode): the text came out scrambled, and the report still showed a high confidence. Kelk now reads each
   font's text and checks that it is language; when it is not, the report says so (the fonts and the pages) and those
