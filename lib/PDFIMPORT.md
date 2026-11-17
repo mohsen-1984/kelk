@@ -1476,6 +1476,11 @@ with boxes, badges and pieces of drawing. Lab: `chrome-booklet--booklet-cards-fa
   headings; the rule that read a bold line at the list's own pitch as a label was dropped — it took a real
   `#### Small print` for one in seven *features* files: `TODO.md`.)
 
+- **A bold line in a box** (`_lineBreaks`, `blocks.breakBoldInBox`, 3.0 lines): in a quote or a card, a line wholly
+  bold after one wholly plain starts a paragraph, at the body's size too. A side box's names over their lines: the
+  second name had been glued to the line before it (`chrome-mail--mail-fa`). Outside boxes a bold change at the
+  body's size still makes no break.
+
 ### Forms
 
 `_formRows` (order.js), before the ruled tables (a box with rules between its rows is no table of them): rows —
