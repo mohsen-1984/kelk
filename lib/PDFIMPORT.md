@@ -1227,7 +1227,9 @@ edge (a right-to-left list item ending short of it split a tight list).
   **Other merged cells** (`_tableMerges`, Kelk 2.3; the owner's decisions): a cell merged over rows is
   repeated in each of its rows (left to its first row, the rows under it read as missing values) — not where
   the rows under it hold nothing else; a band over some columns above the header row, the header row's other
-  cells merged down into it, is a paragraph over the table and those cells' text the header row's; a band over
+  cells merged down into it, is a column group: it stays in the header row, written once, and those cells are
+  repeated in the row under it (3.0, the owner's decision of 2026-11-17 — until then the band went before the table
+  as a paragraph; `word-report--group-header-fa` 78.4 → 100; a band over all columns is the table's title, below); a band over
   some columns between rows, the rest of its row empty, is a row of its own, its text bold in the table's first
   cell (it stood in the middle of the row). Lab: `word-merged--merged-cells-fa` 76.6 → 100.0.
   **Rows drawn without rules** (a payslip: one ruled band whose columns hold an item a line): a grid row whose

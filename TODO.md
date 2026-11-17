@@ -135,16 +135,15 @@ release's split decided 2026-11-17: the booklet, lines, tables, then the release
 3. **Tables from reports** — *done* (`pdf/3.0-tables`; `lib/PDFIMPORT.md`, «Designed pages (3.0)»): a header ruled
    column by column over a borderless body, a table's frame a few points beyond its row rules, header cells centred
    in their row, kashidas page by page, a dash standing alone at a line's end. **lab:** `word-report--ruled-header-fa`
-   79.8 → 100, `--span-header-fa` 74.8 → 100, `--tall-header-fa` 77.1 → 100, `--group-header-fa` 77.6 → 78.4; the
+   79.8 → 100, `--span-header-fa` 74.8 → 100, `--tall-header-fa` 77.1 → 100, `--group-header-fa` 77.6 → 100; the
    controls `--nested-rows-fa` and `--frame-head-fa` unchanged. What is left:
    - `word-report--chart-fa` (80.0): **dropped** (2026-11-17, agreement 12) — a bar chart drawn of rules and bars
      (three thin rules or more of one length evenly spaced, three filled bars or more on the lowest, the short labels
      around) read as one picture: right for the chart, but it took `wk-github--report`'s «## Project status» and its
      progress bars for one (100 → 98.4; fuzz `fz48-wk--report` 100 → 98.5). Another sign is needed.
-   - `word-report--group-header-fa`: **flagged** (agreement 14) — its expected Markdown keeps a band over the last two
-     columns («آموزش») in the header row, the cells under it a second header row; `word-merged--merged-cells-fa`
-     expects the same structure (a band over the last three columns, the first column's header merged down) as a bold
-     paragraph over the table, which Kelk does (`regions.mergeHeaderBand`). The two cannot both hold: the owner's call.
+   - `word-report--group-header-fa`: decided (2026-11-17): a band over some columns is a column group, kept in the
+     header, written once; a band over all columns is the table's title. `word-merged--merged-cells-fa`'s expected
+     Markdown changed to match (approved); group-header 78.4 → 100 in the release PR.
    - `word-report--span-header-fa`: the table's outer double rules also come out as «---» above and under it (not
      scored).
 

@@ -14,6 +14,8 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Fixed
 
+- **PDF import keeps a column group in its table's header**: a band over some of the columns, written once, the
+  other header cells repeated under it (it came before the table as a paragraph).
 - **PDF import removes a lone kashida** on a page whose other lines show kashidas stretching the words.
 - **PDF import keeps a table's tall header cells whole**: header cells of several centred lines came back a row
   per line.
