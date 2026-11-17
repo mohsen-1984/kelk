@@ -14,6 +14,8 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Fixed
 
+- **PDF import reads a table whose header alone is ruled**, column by column over a borderless body, as one
+  table, its cells of two lines kept whole.
 - **PDF import keeps «label: value» lines apart**, each a paragraph of its own: a field after a line that
   fills the page's width, a footer's fields or contact lines ran into one paragraph.
 - **PDF import keeps a centred line after a paragraph apart from it** (an address on a line of its own).

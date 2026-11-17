@@ -1490,6 +1490,12 @@ with boxes, badges and pieces of drawing. Lab: `chrome-booklet--booklet-cards-fa
   and read its Persian lines reversed), and no heading (a lone bold field read as one). Golden snapshots
   `symbol-fallback` and `emoji` now keep the source's paragraphs apart there (the owner accepted both, 2026-11-17).
 
+- **A header ruled column by column** (`_pbHeadRuledTable`, `order.headRuledTable`, 3.0 tables): three short rules or
+  more side by side at one height, gaps between them, a header cell over each, over a borderless body (Word's bottom
+  border on the header cells only), are one table: the rules give the columns; the lines under them, each within one
+  column, are the body down to a line that crosses a gap, grouped into rows by the gaps between them (a cell of two
+  lines centred against cells of one keeps them together). The header had come out a table of one row, the body as
+  tables of its own with its two-line cells split (`word-report--ruled-header-fa` 79.8 → 100).
 ### Forms
 
 `_formRows` (order.js), before the ruled tables (a box with rules between its rows is no table of them): rows —
