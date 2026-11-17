@@ -729,6 +729,10 @@ them. Before, a Persian letter began with `# g`.
   tag whose letters are wider, character by character (the median of four or more), by 2 % or more is bold. A width or
   optical-size axis is not read so (at display sizes it narrows). Lab: `chrome-rtl-varfont--fa-weights`
   (`make-varfont.js`); the Chrome Persian corpus in Vazirmatn gained its bold too (`chrome-rtl-*`).
+  A glyph as wide at every weight (a tabular digit, the space) tells nothing, and is left out when four others remain
+  (3.0): a small bold run's median sat at 1 among them. And a tag is bold too when nine in ten of the glyphs that moved
+  are wider and their median is 1 % up: a short bold run at a small size, its advances rounded (a list's bold lead
+  words measured 1.019). A booklet's bold subtitle, labels and lead words read regular before (`chrome-booklet--*`).
 - **Monospace** from the pdf.js flag or the name — but **not** for an emoji or symbol font (all glyphs
   one width: NotoColorEmoji, OpenSymbol), and not for a font flagged fixed-pitch whose letters vary
   in width (LibreOffice flags Inter so), unless its name says monospace. A wrong monospace font turns
@@ -1378,6 +1382,56 @@ first line is an item: the rest of a list cut by a page break — when the row c
 opened by an item's number alone, its text hanging after a gap, is no form row (`_formRows`): a cell's items
 «1) title: …» in a column of their own were read as a form and left the table, each number a bold item of its own,
 and the table's part on the next page was not joined to it. Lab: `word-longcells--long-cells-fa` (59.0 → 80.0).
+
+### Designed pages (3.0)
+
+Pages a browser prints from a designed web page — a booklet's chapters, a printed mail — draw much of their structure
+with boxes, badges and pieces of drawing. Lab: `chrome-booklet--booklet-cards-fa` (45.4 → 88.9),
+`chrome-booklet--figure-labels-fa` (59.8 → 80.0), `chrome-mail--mail-fa` (70.4 → 86.2); `make-booklet.js`,
+`make-designed.js`. Each rule fires its own name (`_rules.json`).
+
+- **The paper's colour** (`_pbBoxes`, `order.paperFill`): an unstroked fill over the whole page is the page's printed
+  background, no box. As the outermost box it had swallowed every box on it — a callout read as a task item. A fill of
+  the paper's colour counts only when framed, as a white one does. (The metamorphic `pagebg` transform: 17 → 24 of 24.)
+- **A callout's icon** (`_pbBoxIcons`, after the markers): one task box beside a quote box's top line — bold, a short
+  label, no sentence — with no other item in the box is the label's icon: «> **نکته**», not «> - [ ] **نکته**».
+- **A drop cap** (`lines.js _dropCaps`, before the glyphs are grouped into lines): one letter, alone on its baseline,
+  2.2 times the size of two lines or more whose start is beside it, is the first line's first letter, set at that
+  line's size against its start. Its height had joined the first two lines into one row («ب‌یشترِ», a line a
+  paragraph). The lines beside it go on its paragraph (no first-line indent), and it joins the next letter though it
+  is drawn isolated (`repairArabic`: no ZWNJ).
+- **Badges, right to left** (`_joinSegments`): a badge right of a right-to-left title joins it, as one left of a
+  left-to-right title did. **Badges numbered in sequence** down one x — 1, 2, 3, each before a line of one size —
+  are a list's numbers (`lines.badgeList`, `blocks.numBadge`): a contents page. A badge alone, or badges that do not
+  count on, stay the line's text: a chapter's head is «## 1 title» (Kelk adds no period, 2.7), and 2.7's try — any
+  badge number at a line's start an item — spoiled a report's lines.
+- **A leader** (`_pbRules`, `order.hrLeader`): a dashed or dotted rule on a line's own height, running on from its
+  end, is the line's, no `---`.
+- **A question as a heading** (`_textBlocks`): «؟» / «?» ends a heading when it is one line set larger than the body
+  (a chapter's title); bold at the body's size, or over two lines, it is a sentence.
+- **Terms in boxes with signs between** (`_pbTermRow`): two boxes or more side by side at one height, each one or two
+  short lines, a sign alone between each two («+», «=», «→» …), are one line: «**نشانه** (cue) + **کار** (routine) =
+  **عادت** (habit)» — each box's first line in its own face, its second in brackets. Boxes side by side with nothing
+  between are cards.
+- **Cards side by side** (`_pbBoxBlocks`, `order.cardsSideBySide`): two cards or more at one height are read card by
+  card from the start side, each as a quote's text is (its title stays bold, no heading), their leading learnt over
+  them all — a card of three lines has too few pitches of its own.
+- **A link drawn as a button** (`order.boxButton`, `blocks.buttonLink`): one centred line, all of it one link, in a
+  filled box narrower than the column, is a link paragraph — no quote, no heading; its bold is the button's style.
+- **Tinted rows every other one** (`_pbFences`, `order.stripedRows`): three fills or more of one size and colour,
+  stacked at a steady pitch, one line in each and one line of the same pattern in each gap, are a list's or a table's
+  row backgrounds, no quotes. A mail's list came out in five pieces, every other one a quote.
+- **A thin strip** (`_pbStrips`): a path under 1.5 em tall and 15 times as long or more, with no text on it, is a
+  drawn rule for `_pbRules` (a `---` where a rule's tests hold, else nothing) — no figure.
+- **A drawing with labels** (`_pbDrawnFigures`): drawn pieces — paths, fills, strokes, small shapes — within an em and
+  a half of each other, and the short labels among them (24 letters at most, narrower than two fifths of the
+  column), are one picture: its region cropped, its labels in the alt text in reading order joined by « · », one
+  plain line when pictures are off. A line that is no label stops a merge where it would come in (text wins: a
+  caption stays a paragraph). It needs three paths at least — a table's rules and a layout's fills are no drawing —
+  and a mark in a line's band is the line's (a bullet, a task box), as is one between two pieces of a line's row (a
+  contents line's leader dots, drawn one by one: Kelk's own PDF). Three labels or more at one start edge are a
+  list's items: no drawing (wkhtmltopdf's task list, its boxes drawn as paths). With no text, three fills or more of
+  two colours that touch are one picture. The labels are not counted as text lost under a picture (`r.quality`).
 
 ### Forms
 

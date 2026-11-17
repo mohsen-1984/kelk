@@ -2,6 +2,21 @@
 
 All notable changes to Kelk. Dates are those of the release tags.
 
+## [Unreleased]
+
+### Added
+
+- **PDF import reads designed pages from browsers** (a booklet's chapters, a printed mail): a contents page of number
+  badges comes back as a numbered list; a chapter's badge and title as one heading; a drop cap as the first letter of
+  its word; a callout box as a quote with its bold label; terms drawn in boxes with «+» and «=» between them as one
+  line; cards side by side card by card; a drawing with short labels as one picture, its labels in the picture's alt
+  text; a thin drawn strip as a rule; a link drawn as a button as a plain link; tinted every-other rows as one list.
+
+### Fixed
+
+- **PDF import reads bold in a variable font printed by Chromium at small sizes**: a booklet's bold subtitle, labels
+  and lead words came back plain (Vazirmatn's digits and spaces are as wide at every weight, and hid the bold).
+
 ## [2.9] — 2026-11-17
 
 ### Added
