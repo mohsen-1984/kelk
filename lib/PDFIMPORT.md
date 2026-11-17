@@ -1486,6 +1486,11 @@ with boxes, badges and pieces of drawing. Lab: `chrome-booklet--booklet-cards-fa
   text, no heading of its own (a mail's «کتاب‌خوانی در محله، برای همه» under its title). A section's first
   sub-heading, set at the start side, stays a heading. `chrome-mail--mail-fa` headings 88.9 → 100.
 
+- **A centred line after a flush one** (`_lineBreaks`, `blocks.breakCentredOwn`, 3.0 lines): under a line flush with
+  the start edge (and short of the other), a line set in from both edges and centred is no wrap of it — a wrap starts
+  at that edge. An address centred on a line of its own after a paragraph («: https://…») had joined it, and was read
+  in the paragraph's direction (`word-contact--contact-fa` 98.6 → 100).
+
 ### Forms
 
 `_formRows` (order.js), before the ruled tables (a box with rules between its rows is no table of them): rows —
