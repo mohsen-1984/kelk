@@ -1481,6 +1481,42 @@ with boxes, badges and pieces of drawing. Lab: `chrome-booklet--booklet-cards-fa
   at that edge. An address centred on a line of its own after a paragraph (`: https://…`) had joined it, and was read
   in the paragraph's direction (`word-contact--contact-fa` 98.6 → 100).
 
+- **A run of «label: value» lines** (`_lineBreaks`, `blocks.breakFieldRun`, 3.0 tables; the owner's rule,
+  2026-11-17): a line that opens with a plain label — one to three words, no digit, a colon and its value — under
+  another such line starts a paragraph of its own, even after a line that fills its measure: «label: value» lines
+  come out as separate paragraphs everywhere (a workshop's «مدرس: …» and «زمان: …», a mail's footer, contact lines).
+  The pieces split off by this rule alone keep what their joined paragraph had: its direction, taken over all of them
+  (`blocks.dirByFieldPieces` — a paragraph of mixed Persian and English lines, split there, re-decided each piece's
+  and read its Persian lines reversed), and no heading (a lone bold field read as one). Golden snapshots
+  `symbol-fallback` and `emoji` now keep the source's paragraphs apart there (the owner accepted both, 2026-11-17).
+
+- **A header ruled column by column** (`_pbHeadRuledTable`, `order.headRuledTable`, 3.0 tables): three short rules or
+  more side by side at one height, gaps between them, a header cell over each, over a borderless body (Word's bottom
+  border on the header cells only), are one table: the rules give the columns; the lines under them, each within one
+  column, are the body down to a line that crosses a gap, grouped into rows by the gaps between them (a cell of two
+  lines centred against cells of one keeps them together). The header had come out a table of one row, the body as
+  tables of its own with its two-line cells split (`word-report--ruled-header-fa` 79.8 → 100).
+- **A dash standing alone at a line's end** (`_joinLines`, 3.0 tables): «رئیس هیئت امنا -» over «غیر موظف» keeps the
+  space after the dash; only a dash glued to its word («e-» over «mail») joins the next line without one.
+
+- **A table's frame beyond its row rules** (`_pageBorders`, `_tables`, 3.0 tables): Word's double border ends the
+  rows' rules at the cells' edge and draws the frame's thin line a few points beyond. Out by the page's edge, that
+  line met no rule and went with the page's ring of tiles, and the table, its first column left without a side, lost
+  it. Now a vertical rule on which two row rules or more end short — at one x, at most 5 pt
+  (`regBorderFrameShortPt`) — is the table's edge (`regions.borderFrameBeyondRules`), and the ruled table carries those
+  rules on to it (`regions.tableRulesToFrame`). `word-report--span-header-fa` 74.8 → 100.
+
+- **Header cells centred in their row** (`_tableRowSplit`, `regions.tableRowSplitCentred`, 3.0 tables): a row whose
+  cells hold several lines on shared baselines is split into rows, one per baseline (a payslip's items). Not when a
+  cell has a line on none of the fullest cell's baselines: those cells are centred — a header's words, cells of one,
+  two and six lines — and a header had come back a row per line (`word-report--tall-header-fa` 77.1 → 100).
+
+- **Kashidas, page by page** (`_kashidas`, `lines.kashidasPage`, 3.0 tables): a row with two kashidas or more inside
+  words shows them as stretching, not text, and they go; a lone one may be meant and stayed. Now, once any row of the
+  page shows the stretching, every kashida inside a word on that page goes, lone ones too: a report's header lost
+  them from «رشتـه تحصیلـی» but kept «مـدرک» and «آمـوزش» in the next cells (`word-report--group-header-fa` 77.6 →
+  78.4).
+
 ### Forms
 
 `_formRows` (order.js), before the ruled tables (a box with rules between its rows is no table of them): rows —

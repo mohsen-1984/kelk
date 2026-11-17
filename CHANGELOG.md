@@ -14,6 +14,16 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Fixed
 
+- **PDF import removes a lone kashida** on a page whose other lines show kashidas stretching the words.
+- **PDF import keeps a table's tall header cells whole**: header cells of several centred lines came back a row
+  per line.
+- **PDF import keeps a table's first column inside a page's tiled border**: the column was lost when the
+  table's frame stood a few points beyond its row rules.
+- **PDF import keeps the space after a dash that ends a line**, when the dash stands alone (Persian text).
+- **PDF import reads a table whose header alone is ruled**, column by column over a borderless body, as one
+  table, its cells of two lines kept whole.
+- **PDF import keeps «label: value» lines apart**, each a paragraph of its own: a field after a line that
+  fills the page's width, a footer's fields or contact lines ran into one paragraph.
 - **PDF import keeps a centred line after a paragraph apart from it** (an address on a line of its own).
 - **PDF import reads a centred subtitle under a centred title as bold text**, not a heading of its own.
 - **PDF import keeps a bold name in a side box apart** from the line before it.

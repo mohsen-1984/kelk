@@ -53,6 +53,8 @@ Sat, 3 Oct 2026 at 10:30
 
 [club@example.org](mailto:club@example.org)
 
-وب‌سایت : [https://example.org/2026](https://example.org/2026)\
-شماره تماس : 0515550102\
+وب‌سایت : [https://example.org/2026](https://example.org/2026)
+
+شماره تماس : 0515550102
+
 ایمیل دبیرخانه : [club@example.org](mailto:club@example.org)

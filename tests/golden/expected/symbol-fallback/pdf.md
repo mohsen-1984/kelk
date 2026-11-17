@@ -4,7 +4,9 @@
 
 **نمادها ✓ و ⚠️**
 
-وضعیت: ✓ انجام شد → مرحله بعد، ⚠️ هشدار، ☐ باز و ☑ بسته. Status: ✓ done → next step, ⚠️ warning, ☐ open, ★ rated, ∑ ≠ ≤ α β.
+وضعیت: ✓ انجام شد → مرحله بعد، ⚠️ هشدار، ☐ باز و ☑ بسته.
+
+Status: ✓ done → next step, ⚠️ warning, ☐ open, ★ rated, ∑ ≠ ≤ α β.
 
 **پررنگ ✓ ✓ bold** و *مورب ✓ ✓ italic* و `کد ✓ code →`.
 
