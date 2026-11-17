@@ -30,7 +30,7 @@ lib         ImageCore.js        images: registered names, data URIs, URLs, SVG �
             SheetImporter.js    .csv / .xlsx → Markdown: a heading and a table per sheet (PapaParse, SheetJS)
             MarkdownImporter.js .docx / HTML / pasted rich text → Markdown
             PdfImporter.js      .pdf → Markdown (needs vendor/pdfjs/, after MarkdownImporter; see PDFIMPORT.md)
-            pdfimport/*.js      its parts, after it: thresholds, calibration, extract, lines, regions, ladder, order, blocks (PdfImporter.PARTS); pdfimport/README.md maps their functions
+            pdfimport/*.js      its parts, after it: thresholds, calibration, extract, lines, regions, ladder, letterstats, fontprint, fontprints, trust, order, blocks (PdfImporter.PARTS); pdfimport/README.md maps their functions
 ```
 
 Load them in that order with plain `<script>` tags. In Node the files `require` each other
@@ -109,8 +109,15 @@ column widths from the content (`BidiCore.tableColumnShares`), one body alignmen
 language (justify; a paragraph holding a long URL or path starts instead), and the table of
 contents layout (after the opening H1: `<hr>`, contents, `<hr>`, an empty line).
 
+GitHub's alerts (`> [!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]`, `[!CAUTION]`): `addFromHtml` gives the quote a bold
+label in its own language, fa / ar / en, and marks it (`class="alert alert-warning"`, the label `alert-title`) —
+`BuilderBase.alertLabels(html)`, the same for every builder and the preview; HtmlBuilder's stylesheet draws the kind's
+colour and icon. HTML without an alert is untouched. `PptxBuilder` reads the marker itself (`OWN_ALERTS`: callouts).
+A code block whose fence says `text` (or `txt`, `plaintext`) is labelled so (`BidiCore.codeLabel`), not with the
+fallback label.
+
 File properties: `configure({ meta: { title, author, subject, keywords, creator } })` (or `setMeta`) — PDF Info,
-the .docx core properties, HTML `<meta name="author">`; the creator is "Kelk " + `BuilderBase.version` (2.8 now) unless set, the title the
+the .docx core properties, HTML `<meta name="author">`; the creator is "Kelk " + `BuilderBase.version` (2.9 now) unless set, the title the
 header's or the first H1 when left out.
 
 ## The builders
@@ -308,7 +315,7 @@ Any PDF with a text layer (Word, LibreOffice, browsers, LaTeX, Kelk …) → sem
 (`vendor/pdfjs/`, made by `tools/build-pdfjs.js`) and runs on the main thread, giving the thread back every 30 ms (the interface stays responsive); its image decoders
 (JPEG 2000, JBIG2) are local scripts too, loaded when an image needs one.
 
-The importer is a core and five parts, each a plain script that adds its stage's methods to the class —
+The importer is a core and its parts, each a plain script that adds its stage's methods (or its data) to the class —
 load them in this order (no build step; `PdfImporter.missingParts()` names any that did not load):
 
 ```html
@@ -319,6 +326,10 @@ load them in this order (no build step; `PdfImporter.missingParts()` names any t
 <script src="lib/pdfimport/lines.js"></script>     <!-- 3. lines, 3.5 page furniture -->
 <script src="lib/pdfimport/regions.js"></script>   <!-- 4. regions: tables, code boxes, figures -->
 <script src="lib/pdfimport/ladder.js"></script>    <!-- 4.9 confidence, the fallback ladder -->
+<script src="lib/pdfimport/letterstats.js"></script> <!-- data: letter pairs of our own text, by language -->
+<script src="lib/pdfimport/fontprint.js"></script> <!-- a glyph known by its outline's hash -->
+<script src="lib/pdfimport/fontprints.js"></script> <!-- data: the fontprints of the fonts Kelk knows (478 KB) -->
+<script src="lib/pdfimport/trust.js"></script>     <!-- the font arbiter, the judge, hidden text -->
 <script src="lib/pdfimport/order.js"></script>     <!-- 4. reading order (XY-cut) -->
 <script src="lib/pdfimport/blocks.js"></script>    <!-- 5. blocks, 6. HTML -->
 ```
@@ -326,11 +337,16 @@ load them in this order (no build step; `PdfImporter.missingParts()` names any t
 ```js
 const r = await PdfImporter.create({ images: 'markdown' }).fromArrayBuffer(buffer);
 r.markdown; r.notes;            // notes: 'noText' (a scan?), 'pageLimit', 'figureFailed', 'printNoLinks', 'ocrLayer', 'pageFailed',
-                                //   'lostGlyphs', 'suspectSpaces', 'textInPictures' (pages in r.quality.flags)
+                                //   'lostGlyphs', 'suspectSpaces', 'textInPictures' (pages in r.quality.flags),
+                                //   'garbledText' (a font whose text is no language: its fonts and pages), 'hiddenText'
+                                //   (text no reader sees), 'fontprintRead' (a font's characters read from its outlines)
 r.failedPages;                  // pages that could not be read or laid out (the others were)
 // options.signal: an AbortSignal — the import stops at the next page with err.code 'aborted'
 // options.asciiNumbers (true): ۰–۹ / ٠–٩ → 0–9, and inside a number ٬ ، → ',' · ٫ → '.' · ٪ → '%' (code untouched)
 // options.persianLetters (true): in a Persian document, ي ك ى → ی ک ی (an Arabic document keeps its letters)
+// options.hiddenText ('end'): text no reader sees — off the page, white on white, too small, invisible — in one quote
+//   at the document's end; 'inPlace' between the blocks where it stood; 'drop' left out (reported in all three)
+// options.uiLang (''): the interface's language, for a note Kelk writes when the document's own cannot be told
 r.info;                         // the file's own words, as written: { title, author, subject, keywords, creator, producer,
                                 //   creatorTool, xmpProducer, history, created, modified, pdfVersion, pages, pageSize,
                                 //   lang, tagged, outline, pageLabels, encrypted, fonts } (PDFIMPORT.md §2a)
@@ -347,7 +363,11 @@ r.features;                     // how it is drawn: { text, fonts, graphics, str
 It reads glyph positions (not PDF.js's text content), rebuilds lines in visual order and turns
 them into logical order with its own bidi pass (bracket pairs, numbers, code spans as LTR isolates);
 shaped Arabic letters go back to plain letters, lost ZWNJs come back where the shapes, the glyph order or the
-outlines show them; a ToUnicode is checked against the font's own cmap glyph by glyph.
+outlines show them; a ToUnicode is checked against the font's own cmap glyph by glyph, and — for a font Kelk knows
+(`fontprints.js`: the common Persian fonts) — against the font's own outlines: a file that names a font's letters
+wrong (a wrong ToUnicode, a print driver's renumbered codes) is read from the shapes. Each font's text is then judged:
+a font whose text is no language is reported (`garbledText`), not rewritten. Text no reader sees comes back in a
+marked block (`hiddenText`).
 Then: running headers/footers dropped, headings by size, paragraphs by spacing, lists by markers
 (bullets drawn or typed, numbers — also set off by a tab — task boxes; line breaks kept where a line ends short), tables from ruled grids and from borderless rows
 (common gutters; header rules and zebra shading count as the table's), code from monospace frames,
@@ -375,8 +395,8 @@ drawn after the next letter. A table cut by a page break comes back whole even w
 to show its columns (it is cut at the other part's gutters).
 
 > The whole story — every stage, what each producer does, what a PDF itself has lost, and how to test a
-> change — is in **[`PDFIMPORT.md`](PDFIMPORT.md)**. Tests: `tests/pdf-lab/` (144 PDFs of 62
-> documents from 49 producer variants, scored against their source, headless in seconds; style fuzzing, a
+> change — is in **[`PDFIMPORT.md`](PDFIMPORT.md)**. Tests: `tests/pdf-lab/` (227 PDFs from our own
+> generators and real producers, scored against their source, headless in seconds; style fuzzing, a
 > metamorphic net and a gate — [`tests/pdf-lab/README.md`](../tests/pdf-lab/README.md)), `tests/builder-suite.html`
 > (every Kelk test case: PDF from `PdfBuilder`, read back) and `tests/pdf-import-suite.html` (PDFs you pick,
 > scored in the browser, offline).
