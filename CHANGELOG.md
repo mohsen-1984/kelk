@@ -14,6 +14,9 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Fixed
 
+- **PDF import keeps «label: value» lines in order** when the value is Latin (a phone number, an e-mail address, a
+  site) after a Persian label: they came back value first.
+
 - **PDF import reads a printed mail's head**: the subject comes back as bold text, not a heading that pushed the mail's
   own headings a level down; the sender, the addressee and the date come back in their order, without rules.
 - **PDF import reads bold in a variable font printed by Chromium at small sizes**: a booklet's bold subtitle, labels

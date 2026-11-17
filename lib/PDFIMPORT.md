@@ -1441,6 +1441,11 @@ with boxes, badges and pieces of drawing. Lab: `chrome-booklet--booklet-cards-fa
   height, are no `---`. The subject, larger than the message's headings, had become a heading and pushed the
   message's own a level down (`chrome-mail--mail-fa` headings 20 → 88.9).
 
+- **A right-to-left label decides a line's direction** (`_blockDir`, 3.0 lines): a «label: value» line whose label —
+  one to three right-to-left words — is drawn at the line's right end, the colon at its left, is a right-to-left line,
+  however many Latin letters its value has (`blocks.dirByRtlLabel`). «تلفن: 05138001234» and «ایمیل دبیرخانه :
+  club@example.org» had been read value first (`word-contact--contact-fa`, `chrome-mail--mail-fa`).
+
 ### Forms
 
 `_formRows` (order.js), before the ruled tables (a box with rules between its rows is no table of them): rows —
