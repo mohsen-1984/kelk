@@ -1,5 +1,5 @@
 {
- "written": "2026-11-17T07:59:25.402Z",
+ "written": "2026-11-17T08:09:23.399Z",
  "note": "scripts/gate.js --update; the fuzz means hold only for their env",
  "corpus": {
   "acrobat-word--booklet-fa": {
@@ -2761,6 +2761,34 @@
    "yehKaf": 1,
    "digits": 1,
    "brackets": 1
+  },
+  "word-lists--markers-en": {
+   "error": null,
+   "markup": 0,
+   "pic": 0,
+   "mix": 0,
+   "recall": 1,
+   "order": 1,
+   "headings": 1,
+   "lists": 1,
+   "code": 1,
+   "total": 1
+  },
+  "word-lists--markers-fa": {
+   "error": null,
+   "markup": 0,
+   "pic": 0,
+   "mix": 0,
+   "recall": 1,
+   "order": 1,
+   "headings": 1,
+   "lists": 1,
+   "code": 1,
+   "total": 1,
+   "rtl": 1,
+   "zwnj": 1,
+   "yehKaf": 1,
+   "digits": 1
   },
   "word-longcells--long-cells-fa": {
    "error": null,
@@ -8468,6 +8496,41 @@
    "regions.columnLeftMirrored",
    "regions.spacedDoc"
   ],
+  "word-lists--markers-en": [
+   "blocks.breakBigGap",
+   "blocks.breakLeftOfItem",
+   "blocks.breakMarker",
+   "blocks.breakStyle",
+   "blocks.headingSize",
+   "blocks.itemTextColumn",
+   "blocks.numDashBullet",
+   "blocks.numGluedBullet",
+   "blocks.numGluedNumber",
+   "regions.bodyFromAllLines",
+   "regions.columnRightMirrored",
+   "regions.spacedDoc"
+  ],
+  "word-lists--markers-fa": [
+   "blocks.breakBigGap",
+   "blocks.breakBoldHead",
+   "blocks.breakEnum",
+   "blocks.breakLeftOfItem",
+   "blocks.breakMarker",
+   "blocks.breakStopRoom",
+   "blocks.breakStyle",
+   "blocks.headingSize",
+   "blocks.numDashBullet",
+   "blocks.numGluedBullet",
+   "blocks.numGluedNumber",
+   "extract.bracketByOutline",
+   "extract.formFromCmap",
+   "extract.letterFromCmap",
+   "order.rtlPage",
+   "regions.bodyFromAllLines",
+   "regions.bodyLead",
+   "regions.columnLeftMirrored",
+   "regions.spacedDoc"
+  ],
   "word-longcells--long-cells-fa": [
    "blocks.breakBigGap",
    "blocks.breakShortJustified",
@@ -10835,7 +10898,7 @@
   }
  },
  "realHeldout": {
-  "at": "2026-11-17T07:58:10.907Z",
+  "at": "2026-11-17T08:08:24.433Z",
   "n": 17,
   "errors": 0,
   "docs": [
