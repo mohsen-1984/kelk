@@ -742,7 +742,7 @@ lines at body size.
 
 ---
 
-### Fontprints (the data and its code; not read by the importer yet)
+### Fontprints (the data and its code)
 
 A subset keeps each glyph's outline as its font has it, whatever codes, glyph names or ToUnicode the file gives it.
 So a glyph can be known by its outline: `lib/pdfimport/fontprint.js` hashes every contour's points (thousandths of the
@@ -751,17 +751,27 @@ characters, and `lib/pdfimport/fontprints.js` holds, per face Kelk knows, the fo
 character the font's own cmap gives it (through its GSUB for a joining form or a ligature the cmap does not name)
 and the other letters or digits that name the same glyph. Hashes and characters only: no font is in the file.
 
-- **The faces**: Vazirmatn, Sahel and the B fonts, from the font zip (`src: kelk`, made again by
+- **The faces** (156, 2026-11-17): Vazirmatn, Sahel and the B fonts of the font zip (`src: kelk`, made again by
   `tools/build-fontprints.js`, which `npm run check:fresh` runs), and faces of fonts that are not in the repository
   (`src: supplied`, kept as they are until supplied again — `--add <folder>`, or `tools/fontprints.html`, which
-  makes the file in a browser from font files dropped on it).
+  makes the file in a browser from font files dropped on it): the B fonts' other 35 faces, the «2 …» fonts (85
+  faces), IRANSans (6 weights),
+  IRANYekan (8), IranNastaliq (versions 1 and 2, the first named «Regular v1.001»).
+- **Written once**: a face that shares nine tenths of its fontprints with one written before it (the same design
+  under two names) keeps only the records the other lacks and names it as its `base`, the
+  first such face in the file's order (by family) — so a face depends only on faces before it, and a family taken
+  out takes no other face's records with it. `table(face, faces)` reads a face whole, `expand(data)` the whole file (what
+  the build and `fontprints.html` read back). The file: 478 KB, loaded with the importer (not at startup).
+- **When two faces disagree**: a letter or a digit one outline names two ways stops the build; two signs (a dash and
+  a longer dash, a quote and a prime: two weights of one family) leave the table — the file's name stands. Digits
+  of one value (۴ ٤ 4) are one character. A joining form a font's tables give with a kashida after it («ﻋـ») is the
+  form.
 - **Kept**: Basic Latin and Latin-1, general punctuation, the Arabic blocks and their presentation forms.
 - **`match(hashes, data, name)`**: the face that knows most of a file's font. Two families can share their outlines
   (one design under two names): the file's font name settles the tie.
 - **What a fontprint cannot tell**: two characters of one outline — ي and ی, ك and ک, 4 ٤ ۴ where a font draws them
   with one glyph (the table lists them as the glyph's others); a space or a ZWNJ (no outline); a glyph of a CFF or
-  Type 3 font; a font rebuilt with other outlines. Two faces never give one fontprint two characters: the build
-  stops if they would.
+  Type 3 font; a font rebuilt with other outlines.
 
 Both files are parts of the importer (`PdfImporter.PARTS`): the font arbiter reads them (below).
 `tests/unit/fontprint*.test.js` hold them to the lab's files: a Word file whose ToUnicode is wrong and a print
@@ -791,6 +801,11 @@ The lab (2026-11): a known face names every drawn glyph; a sound map agrees on 0
 less. What it does not do: a font Kelk has no fontprints of stays as the file names it (reported by the judge when it
 has text enough — `driver-print--renumbered-en`); a CFF or Type 3 font has no fontprint.
 
+**A blank glyph named by a control character** (`_arbiterBlank`), in any font whose program is found, known to a
+face or not: a space when it has an advance. A producer that names each glyph by its glyph index names the space
+U+0003 (the space is glyph 3 of a TrueType font); it came out «�», a line of them for each blank line of a cover
+page set in a bold font Word draws twice (**lab:** `word-cover--glyph-index-fa`).
+
 `_rawStream(ref, exact)`: the arbiter reads a font's program with the stream's length read as a whole number. The
 older reading takes «/Length 15 0 R», a reference, for a length of 1 and loses the stream — which hides such a
 file's font programs from the repairs that read them (LibreOffice's files). Mended for all, four lab files read
@@ -818,7 +833,14 @@ figures and signs is odd too. A garbled font gives the note **`garbledText`** (i
 lowers its pages' confidence: times (1 − s)³, s the share of the page's letters in garbled fonts, each weighed by how
 garbled its font is. **Report only**: the Markdown is as it was (the font arbiter, above, is what changes names,
 before the layout; the judge reads what it left). What it does not catch: a font wrong for a few letters only
-(brackets named «م»: under every limit — the arbiter's, when the font is known), a font with too little text.
+(brackets named «م»: under every limit — the arbiter's, when the font is known).
+
+**A font too small to judge alone** (under `trustMinLetters`) is judged by the document: in a document whose trusted
+text is Arabic script (150 letters and more, four times its Latin letters), a font whose letters are mostly
+accented Latin (U+00C0–U+024F: six in ten, four at least — `trustForeignMin`) is garbled (`foreign`, severity 1): a
+title or a year in a font named by glyph indices (the lab's «ŒœŔ ŕŖŗ», «ÝÙÝÚ»). A French name in a Persian text has a few
+accented letters among plain ones. Its text stays as the file names it until Kelk reads fonts it does not know
+(TODO.md, 3.0).
 
 **Hidden text.** Text the file holds and no reader sees is not dropped unsaid, and not left in the text: it comes
 back in a marked block, and the report says so (**`hiddenText`**). `_hiddenText` (after the walk) marks a glyph:

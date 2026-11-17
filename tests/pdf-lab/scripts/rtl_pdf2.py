@@ -18,9 +18,10 @@ def brackets(gl):
     return [((0x29, n) if (c, n) == (0x28, '(') else (0x28, n) if (c, n) == (0x29, ')') else (c, n)) for c, n in gl]
 
 class Renum:
-    """a Font drawn through one-byte codes in order of first use"""
-    def __init__(self, font):
-        self.f, self.code = font, {}
+    """a Font drawn through one-byte codes in order of first use; names: None (no ToUnicode) or a function glyph id →
+    the text the file's ToUnicode gives that glyph"""
+    def __init__(self, font, names=None):
+        self.f, self.code, self.names = font, {}, names
         self.ps, self.upem, self.space = font.ps, font.upem, font.space
     def gid(self, c): return self.f.gid(c)
     def adv(self, c, size): return self.f.adv(c, size)
@@ -97,8 +98,14 @@ class Doc2:
                 prog = F.program(); ff = obj(stream(prog, '/Length1 %d' % len(prog)))
                 desc = obj('<< /Type /FontDescriptor /FontName /%s /Flags 4 /FontBBox [%d %d %d %d] /ItalicAngle 0 /Ascent 928 /Descent -236 /CapHeight 729 /StemV 80 /FontFile2 %d 0 R >>' % ((F.ps,) + box + (ff,)))
                 by = {code: g for g, code in F.code.items()}; last = max(by)
-                ref[k] = obj('<< /Type /Font /Subtype /TrueType /BaseFont /%s /FirstChar 32 /LastChar %d /Widths [%s] /FontDescriptor %d 0 R >>'
-                             % (F.ps, last, ' '.join(str(adv(by[c])) if c in by else '0' for c in range(32, last + 1)), desc))
+                tu = ''
+                if F.names:
+                    cm = ('/CIDInit /ProcSet findresource begin 12 dict begin begincmap /CMapName /%s def /CMapType 2 def 1 begincodespacerange <20> <FF> endcodespacerange\n'
+                          '%d beginbfchar\n%s\nendbfchar\nendcmap CMapName currentdict /CMap defineresource pop end end') % (
+                          F.ps, len(by), '\n'.join('<%02X> <%s>' % (c, u16(F.names(by[c]))) for c in sorted(by)))
+                    tu = ' /ToUnicode %d 0 R' % obj(stream(cm.encode()))
+                ref[k] = obj('<< /Type /Font /Subtype /TrueType /BaseFont /%s /FirstChar 32 /LastChar %d /Widths [%s] /FontDescriptor %d 0 R%s >>'
+                             % (F.ps, last, ' '.join(str(adv(by[c])) if c in by else '0' for c in range(32, last + 1)), desc, tu))
                 continue
             F.tounicode.setdefault(F.gid(0x20), ' ')
             ff = obj(stream(F.bytes, '/Length1 %d' % len(F.bytes)))

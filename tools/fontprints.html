@@ -60,7 +60,8 @@ to that file.</p>
     'use strict';
     const F = PdfImporter._fontprint, $ = function (id) { return document.getElementById(id); };
     // the faces as the file has them now, each with its state on this page
-    const faces = ((window.KelkPdfFontprints || {}).faces || []).map(function (f) { return { family: f.family, face: f.face, src: f.src, glyphs: f.glyphs, prints: f.prints, state: 'in the file' }; });
+    // (each face whole: a face written over a base gets the base's records back — F.source writes them once again)
+    const faces = F.expand(window.KelkPdfFontprints || {}).map(function (f) { return { family: f.family, face: f.face, src: f.src, glyphs: f.glyphs, prints: f.prints, state: 'in the file' }; });
     const key = function (f) { return f.family + '|' + f.face; };
     let changed = false;
 

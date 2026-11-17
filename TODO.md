@@ -163,8 +163,10 @@ against cmap), each behind its own gate: when both are missing or wrong nothing 
    - **wkhtmltopdf Persian** (`wk-rtl--fa-article`: `zwnj` 0, `yehKaf` 53–68, a broken ToUnicode; the narrow-space →
      ZWNJ rule hurts those files): still reported garbled, not read — its fonts are not matched to a face. To look
      at with the stream's length (above).
-   - a font with too little text to judge (under 150 letters) that no face knows stays as the file names it, unsaid
-     (a title font of a dozen glyphs): for 2.10's «fonts Kelk does not know».
+   - a font with too little text to judge (under 150 letters) that no face knows: since `pdf/2.9-cover`, reported
+     unreadable when its letters are mostly accented Latin in a document of Arabic script (a cover's title and year
+     named by glyph indices: `word-cover--glyph-index-fa`); its text stays unread — 3.0's «fonts Kelk does not know»;
+     its blank lines (the space named U+0003) are read as blank.
    - a blank glyph of no advance in a renumbered font is read as a ZWNJ; after a letter that never joins it is
      redundant («بر‌گ»), harmless to the eye: to drop where the letter before it does not join.
 5. **Lines** — *PR:* `pdf/2.9-lines`: `word-contact--contact-fa`, `word-labels--labels-fa`, and

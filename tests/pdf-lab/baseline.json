@@ -1,5 +1,5 @@
 {
- "written": "2026-11-17T03:12:48.019Z",
+ "written": "2026-11-17T07:59:25.402Z",
  "note": "scripts/gate.js --update; the fuzz means hold only for their env",
  "corpus": {
   "acrobat-word--booklet-fa": {
@@ -2632,6 +2632,21 @@
    "yehKaf": 1,
    "digits": 1,
    "links": 0.75
+  },
+  "word-cover--glyph-index-fa": {
+   "error": null,
+   "markup": 0,
+   "pic": 0,
+   "mix": 0,
+   "recall": 0.9664,
+   "order": 0.9664,
+   "headings": 0,
+   "code": 1,
+   "total": 0.7332,
+   "rtl": 0.6667,
+   "zwnj": 1,
+   "yehKaf": 1,
+   "digits": 0
   },
   "word-flyer--flyer-fa": {
    "error": null,
@@ -8293,6 +8308,25 @@
    "regions.spacedDoc",
    "regions.startFlushPartial"
   ],
+  "word-cover--glyph-index-fa": [
+   "blocks.breakBigGap",
+   "blocks.breakShortJustified",
+   "blocks.breakStopRoom",
+   "blocks.breakStyle",
+   "blocks.headingBoldMinor",
+   "blocks.headingSize",
+   "blocks.justified",
+   "blocks.kickerDemoted",
+   "extract.formFromCmap",
+   "order.rtlPage",
+   "regions.bodyFromLongLines",
+   "regions.bodyLead",
+   "regions.columnLeftMirrored",
+   "regions.columnRightMirrored",
+   "regions.spacedDoc",
+   "trust.blankSpace",
+   "trust.garbledFont"
+  ],
   "word-flyer--flyer-fa": [
    "blocks.brCentredPair",
    "blocks.breakBigGap",
@@ -9726,7 +9760,7 @@
     "errors": 0,
     "unexpected": 0,
     "relation": {},
-    "total": 0.5207458333333334,
+    "total": 0.5207624999999999,
     "delta": -0.4783,
     "files": {
      "chrome-github-bg--article": 0.1561,
@@ -9736,10 +9770,10 @@
      "chrome-template--template": 1,
      "chrome-web-rtl--web-rtl": 1,
      "wk-github--readme": 0.004,
-     "lohtml--article": 0.0201,
-     "kelkdocx-lo--report": 0.1739,
+     "lohtml--article": 0.0203,
+     "kelkdocx-lo--report": 0.1742,
      "pandoc-lo--article": 0.001,
-     "lowriter--word-tables": 0.1736,
+     "lowriter--word-tables": 0.1735,
      "calc--xl-sales": 0.2143,
      "impress--deck": 0.1667,
      "kelk--article": 1,
@@ -10801,7 +10835,7 @@
   }
  },
  "realHeldout": {
-  "at": "2026-11-17T03:12:47.850Z",
+  "at": "2026-11-17T07:58:10.907Z",
   "n": 17,
   "errors": 0,
   "docs": [
