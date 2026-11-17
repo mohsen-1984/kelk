@@ -38,8 +38,8 @@ Read only what the task needs, in this order:
 5. **Explain git and CI simply.** The owner uses GitHub's web pages, not the command line: say what to click,
    and what a check's result means, in plain words (see [Words](#words)).
 6. **No regressions.** A change to the PDF importer must pass the lab's gate (CI's *lab* check): no lab file
-   scores worse than before. A fix comes with its own lab file. An expected-Markdown change that lowers a score on
-   purpose is said so in the PR.
+   scores worse than before. A fix comes with its own lab file. The expected Markdown is not changed to make a score
+   rise or to excuse a drop (agreement 14).
 7. **Write like the repository**: the house style is plain, short sentences; English in code, comments and docs;
    the README in three languages kept in step (`fa`, `en`, `ar`).
 8. **Third-party fonts without a licence — the B fonts** (B Nazanin, B Mitra, B Titr, © Borna Rayaneh; the
@@ -63,6 +63,20 @@ Read only what the task needs, in this order:
 10. **The startup size budget** (`tools/size-budget.json`, CI's *size* check): never move or squeeze code just to fit
     it. Code goes where it belongs (loaded on demand when that is its right place); when a change needs room, ask
     the owner for an increase and note the reason in the file's `_about` (the owner's rule, 2026-11-09).
+11. **One release per session** (the owner's rule, 2026-11-17). A session works on one release. Its first round
+    only proposes how the release is split into pull requests — branch, scope, main files, lab files, what each
+    depends on — and writes no code. Then one pull request per round. The last one is the release PR: the version,
+    `CHANGELOG.md` and the release notes.
+12. **A change that makes another lab file worse is dropped, not tuned around** (2026-11-17). When a rule helps its
+    own lab file but lowers any other — a corpus file, a golden file, a fuzz or meta mean — the rule goes. It is not
+    narrowed, given an exception or re-tuned until the gate passes. Say in the PR what was dropped and which file it
+    hurt; the idea goes to `TODO.md`.
+13. **Every importer PR reports the lab** (2026-11-17), in its text: a table of the lab files whose score changed,
+    before and after; the means of the random-style (fuzz) sets, the golden files and the held-out files, before and
+    after; and one line saying how many files got worse — it must be 0. No full list of the files.
+14. **A lab expectation that looks wrong is flagged, not changed** (2026-11-17). When an expected Markdown (or a
+    golden file, or `expect.json`) seems wrong, say so in the PR or to the owner, with the reason, and leave it as
+    it is. The owner decides whether it changes.
 
 ## A change, step by step
 
@@ -78,8 +92,8 @@ goes in pull requests of its own.
    same; its base is still `main`.
 2. The change, one commit per item, each message saying what changed and why. Commit messages end with the
    assistant's attribution lines when an assistant made them.
-3. A pull request to `main`: what it does, the lab numbers if the importer changed, anything the owner should
-   check by eye.
+3. A pull request to `main`: what it does, the lab report if the importer changed (agreement 13), anything the
+   owner should check by eye.
 4. CI runs by itself (a few minutes; *lab* takes longest, and runs only when the importer or the lab changed).
    Read a failed check's **summary** first (the check's page → *Summary*), its full log only if needed.
 5. All green → tell the owner it is ready to merge. Red → fix on the same branch; CI runs again.
