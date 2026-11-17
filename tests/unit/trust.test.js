@@ -98,5 +98,71 @@ test('the note\'s language: the trusted text, then a Persian or Arabic /Lang, th
   assert.equal(lang(Object.assign({ _lang: 'ar-SA', options: { uiLang: 'fa' } }, bad), gibberish), 'ar', 'a declared Arabic');
   assert.equal(lang(Object.assign({ _lang: 'en-US', options: { uiLang: 'fa' } }, bad), gibberish), 'fa', 'a declared English is a default');
   assert.equal(lang(bad, gibberish), 'en');
-  assert.equal(lang({}, [page('سلام بر شما', 'a')]), 'ar', 'a few letters still tell when nothing else does');
+  assert.equal(lang({}, [page('\u0633\u0644\u0627\u0645 \u0628\u0631 \u0634\u0645\u0627', 'a')]), 'ar', 'a few letters still tell when nothing else does');
 });
+
+// ---- the font arbiter -------------------------------------------------------------------------------------------
+const P = PdfImporter.prototype;
+/** an importer with one font read: glyph id = code, each glyph with an outline, the face naming them as `face` says */
+function arbiter(face, read) {
+  const hs = {}, text = {};
+  Object.keys(face).forEach(function (g) { hs[g] = 'h' + g; if (face[g]) text[g] = Array.isArray(face[g]) ? face[g] : [face[g]]; });
+  const imp = Object.create(P);
+  imp._arb = { read: { f: read }, font: { f: { m: { family: 'Lab', face: 'Regular', text: text }, hs: hs, name: 'LabFont', gid: function (c) { return +c; } } }, mode: {} };
+  imp._arbiter = {}; imp._fire = function () {};
+  return imp;
+}
+const letters = 'ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهی';
+
+test('arbiter: a sound map keeps the file\'s names but for a glyph named as another kind of character', function () {
+  const face = {}, read = {};
+  Array.from(letters).forEach(function (c, i) { face[i + 1] = c; read[i + 1] = {}; read[i + 1][c] = 5; });
+  face[40] = '('; read[40] = { '\u0645': 3 };                     // a bracket the file names as a letter
+  face[41] = ','; read[41] = { '.': 2 };                     // a comma named as a stop
+  face[42] = '7'; read[42] = { '3': 2 };                     // a digit the file names: stays
+  face[43] = ['\u06CC', '\u064A']; read[43] = { '\u064A': 4 };            // one outline, two letters: the file's word stands
+  face[44] = '\u06D5'; read[44] = { '\u0647': 4 };                    // a letter for a letter: stays
+  const imp = arbiter(face, read);
+  assert.equal(imp._arbiterDecide('f'), 'few');
+  imp._arb.mode.f = 'few';
+  const gl = [40, 41, 42, 43, 44, 1].map(function (c) { return { font: 'f', cid: c, ch: Object.keys(read[c])[0], w: 5 }; });
+  imp._arbiterApply(gl, 1);
+  assert.deepEqual(gl.map(function (g) { return g.ch; }), ['(', ',', '3', '\u064A', '\u0647', '\u0627']);
+  assert.equal(imp._arbiter.f.changed, 2);
+  assert.equal(imp._arbiter.f.all, false);
+});
+
+test('arbiter: a map that is not the font\'s gives way to the face on every glyph it knows; a blank glyph is a space', function () {
+  const face = {}, read = {};
+  Array.from(letters).forEach(function (c, i) { face[i + 1] = c; read[i + 1] = {}; read[i + 1][String.fromCharCode(0xC0 + i)] = 5; });
+  const imp = arbiter(face, read);
+  assert.equal(imp._arbiterDecide('f'), 'all');
+  imp._arb.mode.f = 'all';
+  delete imp._arb.font.f.hs[90];                              // glyph 90: no outline
+  const gl = [{ font: 'f', cid: 2, ch: '\u00C1', w: 5, unmapped: true }, { font: 'f', cid: 90, ch: '\uFFFD', w: 3 }, { font: 'f', cid: 90, ch: '\uFFFD', w: 0 }, { font: 'f', cid: 3, ch: ' ', space: true, w: 4 }];
+  imp._arbiterApply(gl, 1);
+  assert.deepEqual(gl.map(function (g) { return g.ch; }), ['\u0628', ' ', '\u200C', '\u067E']);
+  assert.deepEqual(gl.map(function (g) { return !!g.space; }), [false, true, false, false]);
+  assert.equal(gl[0].unmapped, false);
+});
+
+test('arbiter: too few glyphs, or a face that knows too few of them, decide nothing', function () {
+  const few = arbiter({ 1: '\u0627', 2: '\u0628', 3: '\u067E' }, { 1: { 'x': 1 }, 2: { 'y': 1 }, 3: { 'z': 1 } });
+  assert.equal(few._arbiterDecide('f'), null);
+  const face = {}, read = {};
+  Array.from(letters).forEach(function (c, i) { face[i + 1] = i < 10 ? c : null; read[i + 1] = {}; read[i + 1][c] = 1; });
+  assert.equal(arbiter(face, read)._arbiterDecide('f'), null, 'known by a third of its outlines: not this face');
+});
+
+test('arbiter: the same character — folded, of the shared outline, or the mirror bracket', function () {
+  assert.ok(P._arbiterSame('\u064A', ['\u06CC']));
+  assert.ok(P._arbiterSame('\uFEFB', ['\u0644\u0627']));
+  assert.ok(P._arbiterSame('\u0664', ['4', '\u0664\u06F4']));
+  assert.ok(P._arbiterSame('(', [')']));
+  assert.ok(!P._arbiterSame('\u0645', ['(']));
+  assert.ok(!P._arbiterFew(' ', '\u064D'), 'a blank where the face has a mark stays');
+  assert.ok(P._arbiterFew(':', '\u0651'), 'a sign where the face has a mark is the mark');
+  assert.ok(!P._arbiterFew('\u200C', '\u0645'));
+  assert.ok(!P._arbiterFew('-', '\u2010') && !P._arbiterFew('\u2010', '-'), 'signs beyond ASCII stay');
+});
+

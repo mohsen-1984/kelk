@@ -5,7 +5,7 @@ in `PdfImporter._internal`, `fromArrayBuffer`, structure tree, Kelk's own source
 its methods to `PdfImporter.prototype` with `Object.assign`. Plain scripts, no build step, work from `file://`.
 
 Load order, after pdf.js and `MarkdownImporter.js`: `lib/PdfImporter.js`, then `thresholds`, `calibration`,
-`extract`, `lines`, `regions`, `ladder`, `letterstats`, `trust`, `order`, `blocks` (`PdfImporter.PARTS`; the app loads them on the first PDF import). The rules and why each is as it is: [`../PDFIMPORT.md`](../PDFIMPORT.md);
+`extract`, `lines`, `regions`, `ladder`, `letterstats`, `fontprint`, `fontprints`, `trust`, `order`, `blocks` (`PdfImporter.PARTS`; the app loads them on the first PDF import). The rules and why each is as it is: [`../PDFIMPORT.md`](../PDFIMPORT.md);
 the stage list is in the header of `lib/PdfImporter.js`.
 
 The tables list every method defined in a file, in pipeline order, with its callers and what it does. A step
@@ -192,6 +192,12 @@ list number at a line's end), `.tcBrackets` (brackets named logically, renamed a
 | `_hiddenMarks` | `fromArrayBuffer` | `'inPlace'`: a one-word paragraph between the blocks where each piece lies |
 | `_hiddenMarkdown` | `fromArrayBuffer` | The blocks in the Markdown: in the marks' places, the rest — or all — at the end |
 | `PdfImporter._trust.hiddenMd` (pure) | `_hiddenMarkdown` | The block's Markdown, one quote: the note, each piece under its page and reason as a `text` code block in the quote |
+| `_arbiterStart` | `fromArrayBuffer` | The font arbiter's memory, per import |
+| `_arbiterPage` | `_extractPage` | 1.8 a page's raw glyphs: its fonts' names added to what is known, the decided fonts' glyphs named by the face |
+| ↳ `_arbiterFont` | `_arbiterPage` | A font's program read once (of several under one name, the one whose advances are the font's widths) and matched to a face |
+| ↳ `_arbiterDecide` | `_arbiterPage`, `_fontArbiter` | A font's verdict from the pages read so far: the map is sound (`few`), not this font's (`all`), or too little yet |
+| ↳ `_arbiterApply` | `_arbiterPage`, `_fontArbiter` | The glyphs of a decided font take the face's characters (`_arbiterSame`, `_arbiterFew`: where they may) |
+| `_fontArbiter` | `fromArrayBuffer` | After the last page: the fonts no page could decide alone; the note `fontprintRead` |
 | `_noteLang` | `_hiddenItems` | The language of a note Kelk writes into the document: the trusted text, a Persian or Arabic `/Lang`, the interface (`options.uiLang`), English |
 
 `_hiddenText` (the marking) is `extract.js`'s, after `_watermark`.
@@ -272,9 +278,9 @@ list number at a line's end), `.tcBrackets` (brackets named logically, renamed a
 | ↳ `_inline` | `_toHtml` | 6. inline HTML of glyphs: bold, italic, code, links, escapes |
 | ↳ `_listHtml` | `_toHtml` | a list (nested by level) as <ul> / <ol> |
 
-## fontprint.js and fontprints.js — a glyph known by its outline (not loaded by the importer yet)
+## fontprint.js and fontprints.js — a glyph known by its outline
 
-Not one of `PdfImporter.PARTS`: Kelk 2.9's font arbiter will load both on first need. `fontprint.js` adds
+Two of `PdfImporter.PARTS`, loaded before `trust.js`: the font arbiter reads them. `fontprint.js` adds
 `PdfImporter._fontprint` (pure functions over a font program's bytes); `fontprints.js` is its data, generated
 (`tools/build-fontprints.js`, `tools/fontprints.html`). See *Fontprints* in [`../PDFIMPORT.md`](../PDFIMPORT.md).
 
@@ -284,5 +290,5 @@ Not one of `PdfImporter.PARTS`: Kelk 2.9's font arbiter will load both on first 
 | `names` | `face` | The family and face of the name table |
 | `face` | the build script, the tool page | A reference font → its table: fontprint, character, the others of the same glyph |
 | `pack`, `unpack` | the build script, `match` | The table as a string and back |
-| `match` | the tests (the font arbiter) | The face of the data that knows most of a file's font, and what it says of each glyph |
+| `match` | `_arbiterFont` | The face of the data that knows most of a file's font, and what it says of each glyph |
 | `source` | the build script, the tool page | `fontprints.js` as text — the one writer of that file |
