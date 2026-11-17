@@ -1428,7 +1428,8 @@ with boxes, badges and pieces of drawing. Lab: `chrome-booklet--booklet-cards-fa
   column), are one picture: its region cropped, its labels in the alt text in reading order joined by « · », one
   plain line when pictures are off. A line that is no label stops a merge where it would come in (text wins: a
   caption stays a paragraph). It needs three paths at least — a table's rules and a layout's fills are no drawing —
-  and a mark in a line's band is the line's (a bullet, a task box). Three labels or more at one start edge are a
+  and a mark in a line's band is the line's (a bullet, a task box), as is one between two pieces of a line's row (a
+  contents line's leader dots, drawn one by one: Kelk's own PDF). Three labels or more at one start edge are a
   list's items: no drawing (wkhtmltopdf's task list, its boxes drawn as paths). With no text, three fills or more of
   two colours that touch are one picture. The labels are not counted as text lost under a picture (`r.quality`).
 
