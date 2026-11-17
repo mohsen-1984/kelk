@@ -1433,6 +1433,54 @@ with boxes, badges and pieces of drawing. Lab: `chrome-booklet--booklet-cards-fa
   list's items: no drawing (wkhtmltopdf's task list, its boxes drawn as paths). With no text, three fills or more of
   two colours that touch are one picture. The labels are not counted as text lost under a picture (`r.quality`).
 
+- **A mail's print head** (`_pbPrintHead`, 3.0 lines): on the first page, two rules as wide as the column or wider, a
+  few ems apart, holding up to four lines with an e-mail address or a mail's field («To:», «From:», «Cc:», «Date:»,
+  «از:», «به:») are the head a browser or a mail client prints over a message. The lines between are read column by
+  column in their own direction, each column one paragraph with its lines kept apart; the block above (up to three
+  lines, the page's first) is the subject, bold text and no heading; the two rules, and their twins drawn at the same
+  height, are no `---`. The subject, larger than the message's headings, had become a heading and pushed the
+  message's own a level down (`chrome-mail--mail-fa` headings 20 → 88.9).
+
+- **A right-to-left label decides a line's direction** (`_blockDir`, 3.0 lines): a «label: value» line whose label —
+  one to three right-to-left words — is drawn at the line's right end, the colon at its left, is a right-to-left line,
+  however many Latin letters its value has (`blocks.dirByRtlLabel`). «تلفن: 05138001234» and `ایمیل دبیرخانه : club@example.org`
+  had been read value first (`word-contact--contact-fa`, `chrome-mail--mail-fa`).
+
+- **Numbered minor headings** (the document's blocks, 3.0 lines): when two bold lines of body size or more open with
+  a number («1. معرفی», «2. برنامه»), the document numbers its headings of that rank. An unnumbered one among them is
+  bold text, no heading (`blocks.minorUnnumberedDemoted`: a workshop's bold title under «2.»), and a lone one-line bold
+  item that goes on with their numbers — its number set in the list's regular face — is one of them
+  (`blocks.numberedHeadingFromItem`: «3. نام‌نویسی» had come out a list item). `word-lines--heads-fa` 91.1 → 100.
+
+- **A title reversed out of its band** (`_pbBoxBlocks`, `order.boxTitleBandReversed`, 3.0 lines): a fill as wide as
+  most of the column, darker than 0.4 in luminance, holding one short line whose letters are all lighter than 0.75, is a
+  section's title band — a heading — whatever lies under it (a title band otherwise needs a box, a table or a form
+  under it). Word's shaded heading, white on dark blue over plain paragraphs, had been read as a quote
+  (`word-hidden--hidden-fa` 86.7 → 100).
+
+- **Dash-marked labels** (`_textBlocks`, `blocks.dashLabelItem`, 3.0 lines): a one-line bold label opening with a
+  dash, typed with or without a space («-برنامه‌ها», «- پیشنهادها»), is a list item with its label bold — no heading
+  with «\-» before it. And under a plain item, an unmarked bold line that starts out at the item's marker, not at its
+  text, is a label of its own (`blocks.breakLabelAtMarker`): a report's bold sub-labels between its dash items had
+  been glued to the item before. `word-labels--labels-fa` 82.5 → 88.0. (Those sub-labels still come out as minor
+  headings; the rule that read a bold line at the list's own pitch as a label was dropped — it took a real
+  `#### Small print` for one in seven *features* files: `TODO.md`.)
+
+- **A bold line in a box** (`_lineBreaks`, `blocks.breakBoldInBox`, 3.0 lines): in a quote or a card, a line wholly
+  bold after one wholly plain starts a paragraph, at the body's size too. A side box's names over their lines: the
+  second name had been glued to the line before it (`chrome-mail--mail-fa`). Outside boxes a bold change at the
+  body's size still makes no break.
+
+- **A heading's subtitle** (the document's blocks, `blocks.subtitleDemoted`, 3.0 lines): a bold line of body size
+  right under a larger heading, nothing between, both centred on one middle away from the column's edges, is bold
+  text, no heading of its own (a mail's «کتاب‌خوانی در محله، برای همه» under its title). A section's first
+  sub-heading, set at the start side, stays a heading. `chrome-mail--mail-fa` headings 88.9 → 100.
+
+- **A centred line after a flush one** (`_lineBreaks`, `blocks.breakCentredOwn`, 3.0 lines): under a line flush with
+  the start edge (and short of the other), a line set in from both edges and centred is no wrap of it — a wrap starts
+  at that edge. An address centred on a line of its own after a paragraph (`: https://…`) had joined it, and was read
+  in the paragraph's direction (`word-contact--contact-fa` 98.6 → 100).
+
 ### Forms
 
 `_formRows` (order.js), before the ruled tables (a box with rules between its rows is no table of them): rows —

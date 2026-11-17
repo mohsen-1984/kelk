@@ -14,6 +14,19 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Fixed
 
+- **PDF import keeps a centred line after a paragraph apart from it** (an address on a line of its own).
+- **PDF import reads a centred subtitle under a centred title as bold text**, not a heading of its own.
+- **PDF import keeps a bold name in a side box apart** from the line before it.
+- **PDF import reads dash-marked bold labels as list items**, not headings with a dash before them, and keeps a bold
+  label between list items apart from the item before it.
+- **PDF import reads a white title on a dark band as a heading**, not a quote.
+- **PDF import reads numbered headings of the body's size as one set**: a bold title among them without a number is
+  bold text, and a numbered one whose number is not bold is a heading, not a list item.
+- **PDF import keeps «label: value» lines in order** when the value is Latin (a phone number, an e-mail address, a
+  site) after a Persian label: they came back value first.
+
+- **PDF import reads a printed mail's head**: the subject comes back as bold text, not a heading that pushed the mail's
+  own headings a level down; the sender, the addressee and the date come back in their order, without rules.
 - **PDF import reads bold in a variable font printed by Chromium at small sizes**: a booklet's bold subtitle, labels
   and lead words came back plain (Vazirmatn's digits and spaces are as wide at every weight, and hid the bold).
 

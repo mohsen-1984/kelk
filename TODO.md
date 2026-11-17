@@ -100,8 +100,8 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
   space; a number and a dash («1- …») is a paragraph. Markdown writes every ordered item «1.».
 - `---` in Markdown is a horizontal rule, never a page separator.
 
-**3.0 — designed pages, tables, lines, fonts Kelk does not know** (moved out of 2.9, 2026-11-16;
-2.9's lines and lost text joined it, 2026-11-17):
+**3.0 — designed pages, lines, tables** (moved out of 2.9, 2026-11-16; 2.9's lines joined it, 2026-11-17; the
+release's split decided 2026-11-17: the booklet, lines, tables, then the release PR):
 
 1. **A designed booklet** — *done* (`pdf/3.0-booklet`; `lib/PDFIMPORT.md`, «Designed pages (3.0)»): contents of
    badges as a numbered list, badges joined right to left, leaders, drop caps, callouts, a question as a heading,
@@ -111,8 +111,32 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
    - **by design** (2026-11-11): «## 1 title», no period added — the expected «## 1. title» stays a mismatch
    - heading levels: a page whose largest heading is an `h2` comes back `#` (Kelk ranks the sizes it sees)
    - the mail's print head (the subject, the sender and the date), its side box's names and its footer's «label :
-     value» lines — item 4
-2. **Tables from reports** (high risk) — *PR:* `pdf/3.0-tables`. **lab** (`make-tables30-rtl.py`):
+     value» lines — item 2
+2. **Lines** — *done* (`pdf/3.0-lines`; `lib/PDFIMPORT.md`, «Designed pages (3.0)»): a mail's print head, a
+   right-to-left label deciding a «label: value» line's direction, numbered minor headings, a title reversed out of a
+   dark band, dash-marked labels and labels between items, a bold line in a box, a heading's subtitle, a centred line
+   after a flush one. **lab:** `chrome-mail--mail-fa` 86.2 → 100 (headings 20 → 100: the pass condition met),
+   `word-contact--contact-fa` 97.5 → 100, `word-hidden--hidden-fa` 86.7 → 100, `word-lines--heads-fa` 90.9 → 99.8,
+   `word-labels--labels-fa` 82.5 → 88.0. What is left:
+   - `word-labels--labels-fa`: its bold sub-labels between items still come out as minor headings (below);
+   - `word-lines--heads-fa`: «Web (Web Writing)» still reads «(Web Writing) Web», and its «label: value» lines after a
+     full line run together, as do the mail's footer fields (both below);
+   - the mail's rule under its subtitle is not kept.
+   **Dropped** (2026-11-17, agreement 12): a bold line of body size right under a list item, no more space above it
+   than under it, read as a label (bold text) rather than a minor heading — right for `word-labels--labels-fa`'s
+   sub-labels, but it took a real `#### Small print` after a list for one in seven *features* files (Chromium,
+   wkhtmltopdf, OCR; 100 → 99.2). Those sub-labels still come out as headings; another sign is needed.
+   **Dropped** (2026-11-17, agreement 12): a bracket pair of Latin content touching a Latin run on its left read as
+   that run's — right for «Web (Web Writing)» (`word-lines--heads-fa`), wrong for the golden `rtl-basic`, whose
+   source «نام سامانه (Business Process) BPMS» is drawn the same way and came back «BPMS (Business Process)». The two
+   cannot be told apart by their glyphs; another sign is needed (the owner's call which reading wins when unsure).
+   **Dropped** (2026-11-17, agreements 12 and 14): a run of «label: value» lines — a line opening with a label in a
+   paragraph whose first line did too starts a line of its own. It kept `word-lines--heads-fa`'s «مدرس: …» and
+   «زمان: …» apart and the mail's footer fields, but changed the golden snapshot `symbol-fallback` (`pdf.md`),
+   where «وضعیت: …» and «Status: …» come back as one paragraph. **Flagged**: that snapshot looks wrong — the source
+   (`tests/test-corpus.js`) has them as two paragraphs. If the owner accepts a new snapshot, the rule can come back.
+
+3. **Tables from reports** (high risk) — *PR:* `pdf/3.0-tables`. **lab** (`make-tables30-rtl.py`):
    `word-report--ruled-header-fa` (79.8) — a header ruled column by column over a borderless body of one- and
    two-line cells centred vertically (the columns from the header's rules); `word-report--span-header-fa` (74.8) —
    a header spanning two rows, the first column lost whole: the table's double border lies a point from the page's
@@ -122,28 +146,13 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
    rows); `word-report--group-header-fa` (77.6) — a group title over two columns lost, kashidas kept in the header;
    `word-report--chart-fa` (80.0) — a chart drawn of rules and bars is one picture; the controls
    `word-report--nested-rows-fa` (98.7) and `word-report--frame-head-fa` (100).
-3. **Fonts Kelk does not know** — the approximate path, marked «recovered, approximate» in the report; it must work
-   everywhere, phones included: candidates for every glyph by its drawn shape against Kelk's bundled fonts, votes from
-   OCR for the frequent glyphs (when the OCR phase arrives), the judge accepting only a plausible text. A spike
-   (2026-11-16, scratch code): **shape** against other typefaces — the top candidate right for 77–91 % of a text
-   face's glyphs (86–98 % within the first three), 36 % for a display face, 100 % against the same typeface, 10–15 ms a
-   glyph; **OCR votes** (Arabic data only, a plain aligner) — 80 % of the letters right from one page, 87 % from five,
-   half the distinct glyphs too rare to learn, most wrong votes گ پ ژ چ; 56 % on a kashida-justified page; 0.9 s a
-   page natively. Neither alone gives exact text. A font installed on the reader's system (drawn on a canvas by its
-   name) is an extra when it happens to be there: nothing depends on it (such fonts are rarely installed, never on a
-   phone).
+4. **The release** — *PR:* `release/3.0`: version, `CHANGELOG.md`, the README in three languages, release notes
+   (`docs/RELEASING.md`).
 
-4. **Lines** (moved from 2.9, 2026-11-17) — *PR:* `pdf/3.0-lines`: `word-contact--contact-fa`, `word-labels--labels-fa`, and
-   `word-lines--heads-fa` (90.9): numbered bold titles in the body's size, the number a tab before the title (one a
-   heading, one a list item), a «label: value» line glued to the full line before it, a bold title ending «Web (Web
-   Writing)» read «(Web Writing) Web». A name glued to the line before it in a side box of short lines:
-   `chrome-mail--mail-fa` (below). And the white title on a dark band of `word-hidden--hidden-fa`, which reads as a
-   quote (expected a heading).
-5. **Lost text** (moved from 2.9, 2026-11-17) — *PR:* `pdf/3.0-lost-text`, its own: the finding `lostText`, report only.
-   The first try (in `pdf/2.9-trust`) counted a page's letters against its blocks' and was not sound (blocks do not
-   all carry their page; one glyph can hold several letters): it needs the layout to count what each step drops
-   (furniture, doubles, ornaments).
-6. **What the font arbiter left** (2.9):
+**3.1 — what the font arbiter left, lost text** (moved out of 3.0, 2026-11-17):
+
+1. **What the font arbiter left** (2.9) — two pull requests: `pdf/3.1-stream-length` (the stream's length, below; first),
+   then `pdf/3.1-wk-fonts` (wkhtmltopdf Persian and the blank glyph read as a ZWNJ):
    - **a stream's length read wrong** (`_rawStream`: «/Length 15 0 R» taken for a length of 1): the font programs of
      such a file were hidden from every repair that reads them (LibreOffice's files). Mended for the arbiter's own
      reading only: mended for all, `lohtml-rtl--fa-article`, `--fa-report` and two others read worse (list numbers
@@ -154,10 +163,29 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
      at with the stream's length (above).
    - a font with too little text to judge (under 150 letters) that no face knows: since 2.9, reported
      unreadable when its letters are mostly accented Latin in a document of Arabic script (a cover's title and year
-     named by glyph indices: `word-cover--glyph-index-fa`); its text stays unread — item 3 above;
+     named by glyph indices: `word-cover--glyph-index-fa`); its text stays unread — 3.2;
      its blank lines (the space named U+0003) are read as blank.
    - a blank glyph of no advance in a renumbered font is read as a ZWNJ; after a letter that never joins it is
      redundant («بر‌گ»), harmless to the eye: to drop where the letter before it does not join.
+
+2. **Lost text** (moved from 2.9, 2026-11-17) — *PR:* `pdf/3.1-lost-text`, its own: the finding `lostText`, report only.
+   The first try (in `pdf/2.9-trust`) counted a page's letters against its blocks' and was not sound (blocks do not
+   all carry their page; one glyph can hold several letters): it needs the layout to count what each step drops
+   (furniture, doubles, ornaments).
+
+**3.2 — fonts Kelk does not know** (moved out of 3.0, 2026-11-17; a release of its own):
+
+1. **Fonts Kelk does not know** — *PR:* `pdf/3.2-unknown-fonts`; a new lab file first (a font outside the fontprints,
+   renumbered) — the approximate path, marked «recovered, approximate» in the report; it must work
+   everywhere, phones included: candidates for every glyph by its drawn shape against Kelk's bundled fonts, votes from
+   OCR for the frequent glyphs (when the OCR phase arrives), the judge accepting only a plausible text. A spike
+   (2026-11-16, scratch code): **shape** against other typefaces — the top candidate right for 77–91 % of a text
+   face's glyphs (86–98 % within the first three), 36 % for a display face, 100 % against the same typeface, 10–15 ms a
+   glyph; **OCR votes** (Arabic data only, a plain aligner) — 80 % of the letters right from one page, 87 % from five,
+   half the distinct glyphs too rare to learn, most wrong votes گ پ ژ چ; 56 % on a kashida-justified page; 0.9 s a
+   page natively. Neither alone gives exact text. A font installed on the reader's system (drawn on a canvas by its
+   name) is an extra when it happens to be there: nothing depends on it (such fonts are rarely installed, never on a
+   phone).
 
 **Not placed in a release yet** (moved out of 2.8's scope, 2026-11-11):
 
@@ -186,7 +214,7 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
 - PDF import, right to left: RTL fuzz files score well below English ones (RTL ≈ 77–81 against LTR ≈ 92–93; tables
   and quotes weakest, then `zwnj` — see `CHANGELOG.md` 2.7 for what is done); Chrome's
   browser-default style loses quotes and code in fa / ar while the text is right
-- PDF import: wkhtmltopdf Persian — 2.9, item 4
+- PDF import: wkhtmltopdf Persian — 3.1, item 1
 - Release: GitHub Pages served from the app's set (`tools/build-release.sh`) rather than from the whole repository
   (no `.nojekyll`, no cache-busting today)
 
