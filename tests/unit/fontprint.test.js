@@ -68,6 +68,32 @@ test('fontprint: match — the face that knows most of a font\'s glyphs, and wha
   assert.equal(F.match({ 3: 'AAAAAAAA' }, tie, 'BCDFEE+BMitraBold').family, 'B Mitra');
 });
 
+test('fontprint: rough prints — a record with no character makes the glyph unknown; one character is known', function () {
+  assert.equal(F.pack([['AAAAAAAA', '', '']]), 'AAAAAAAA\t');
+  assert.deepEqual(F.unpack('AAAAAAAA\t'), { AAAAAAAA: ['', ''] });
+  const d = { faces: [{ family: 'One', face: 'Regular', prints: 'XXXXXXXXا', rough: 'AAAAAAAAب BBBBBBBB\t CCCCCCCCپ' }] };
+  // a glyph's probed prints: one character found (ب); one that finds a print of two characters (unknown); two characters (unknown)
+  const m = F.matchRough({ 3: ['AAAAAAAA', 'ZZZZZZZZ'], 4: ['BBBBBBBB', 'AAAAAAAA'], 5: ['AAAAAAAA', 'CCCCCCCC'] }, d);
+  assert.equal(m.rough, true);
+  assert.equal(m.known, 1);
+  assert.deepEqual(m.text, { 3: ['ب', ''] });
+});
+
+test('fontprint: a font whose outlines wkhtmltopdf rebuilt (Qt) is found by its rough prints, not its fontprints', async function () {
+  // the lab's wkhtmltopdf file: its Vazirmatn subset, every curve written again
+  const pdf = fs.readFileSync(path.join(root, 'tests', 'pdf-lab', 'pdf', 'rtl', 'wk-rtl--fa-article.pdf')).toString('latin1');
+  const desc = /\/FontName\s*\/[A-Z]{6}\+Vazirmatn-Regular[^>]*?\/FontFile2\s+(\d+)\s+0\s+R/.exec(pdf);
+  assert.ok(desc);
+  const obj = new RegExp('\\n' + desc[1] + ' 0 obj\\s*<<[\\s\\S]*?>>\\s*stream\\r?\\n').exec(pdf);
+  const start = obj.index + obj[0].length, end = pdf.indexOf('endstream', start);
+  const bytes = new Uint8Array(require('zlib').inflateSync(Buffer.from(pdf.slice(start, end), 'latin1'), { finishFlush: require('zlib').constants.Z_SYNC_FLUSH }));
+  const hs = F.hashes(bytes), exact = F.match(hs, data, 'Vazirmatn-Regular');
+  assert.ok(!exact || exact.known < 0.2 * Object.keys(hs).length, exact && exact.known + ' of ' + Object.keys(hs).length);
+  const rough = F.matchRough(F.roughs(bytes, true), data, 'Vazirmatn-Regular');
+  assert.equal(rough.family + ' ' + rough.face, 'Vazirmatn Regular');
+  assert.ok(rough.known >= 0.9 * Object.keys(hs).length, rough.known + ' of ' + Object.keys(hs).length);
+});
+
 test('fontprints.js: the file is what its writer writes, and no fontprint names two characters', function () {
   const file = fs.readFileSync(path.join(root, 'lib', 'pdfimport', 'fontprints.js'), 'utf8');
   assert.equal(F.source(F.expand(data)), file);
