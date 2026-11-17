@@ -24,7 +24,9 @@ async function font(name) {
 
 test('fontprint: a face of the font zip — its names, its fontprints, the characters its cmap and GSUB give', async function () {
   const bytes = await font('vazirmatn/Vazirmatn-Regular.ttf');
-  assert.deepEqual(F.names(bytes), { family: 'Vazirmatn', face: 'Regular' });
+  const nm = F.names(bytes);
+  assert.deepEqual([nm.family, nm.face], ['Vazirmatn', 'Regular']);
+  assert.ok(/^Version /.test(nm.version), nm.version);
   const hs = F.hashes(bytes), f = F.face(bytes);
   assert.ok(Object.keys(hs).length > 1000);
   assert.ok(Object.keys(hs).every((g) => /^[A-Za-z0-9_-]{8}$/.test(hs[g])));
@@ -68,14 +70,16 @@ test('fontprint: match — the face that knows most of a font\'s glyphs, and wha
 
 test('fontprints.js: the file is what its writer writes, and no fontprint names two characters', function () {
   const file = fs.readFileSync(path.join(root, 'lib', 'pdfimport', 'fontprints.js'), 'utf8');
-  assert.equal(F.source(data.faces), file);
+  assert.equal(F.source(F.expand(data)), file);
   assert.equal(data.v, F.V);
-  const where = {};
+  const where = {}, digit = (c) => c.replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 0x660)).replace(/[\u06F0-\u06F9]/g, (d) => String(d.charCodeAt(0) - 0x6F0));
   data.faces.forEach(function (f) {
     assert.ok(f.family && f.face && (f.src === 'kelk' || f.src === 'supplied'), JSON.stringify([f.family, f.face, f.src]));
-    const t = F.unpack(f.prints);
+    if (f.base) assert.ok(data.faces.some((b) => b.family + '|' + b.face === f.base && !b.base), f.family + ': its base is in the file, and not based itself');
+    const t = F.table(f, data.faces);
     Object.keys(t).forEach(function (h) {
-      const c = t[h][0].normalize('NFKC');
+      // (digits of one value are one character: one outline draws ۴ ٤ 4)
+      const c = digit(t[h][0].normalize('NFKC'));
       assert.ok(!where[h] || where[h] === c, h + ' names «' + where[h] + '» and «' + c + '»');
       where[h] = c;
     });
@@ -90,4 +94,23 @@ test('fontprints.js: the repository\'s OFL faces are in it, as the fonts give th
     assert.equal(kept.src, 'kelk');
     assert.equal(kept.prints, F.pack(f.prints));
   }
+});
+
+test('fontprints: a face that shares most outlines with another is written over it, and read back whole', function () {
+  const ten = 'AAAAAAAAب BBBBBBBBپ CCCCCCCCت DDDDDDDDث FFFFFFFFح GGGGGGGGخ HHHHHHHHد IIIIIIIIذ JJJJJJJJر KKKKKKKKز';
+  const a = { family: 'B Lab', face: 'Bold', src: 'kelk', glyphs: 10, prints: ten };
+  const b = { family: '2 Lab', face: 'Bold', src: 'supplied', glyphs: 11, prints: ten + ' EEEEEEEEج' };
+  const c = { family: 'Other', face: 'Bold', src: 'supplied', glyphs: 2, prints: 'AAAAAAAAب ZZZZZZZZچ' };
+  const text = F.source([b, c, a]);
+  const d = new Function('module', text + '; return module.exports;')({ exports: {} });
+  // («2 Lab» comes first in the file's order: the base; «B Lab» is written over it and can leave the file alone)
+  const two = d.faces.find((f) => f.family === '2 Lab'), bl = d.faces.find((f) => f.family === 'B Lab');
+  assert.ok(!two.base);
+  assert.equal(bl.base, '2 Lab|Bold');
+  assert.equal(bl.prints, '');
+  assert.ok(!d.faces.find((f) => f.family === 'Other').base, 'half its outlines shared: written whole');
+  assert.equal(Object.keys(F.table(bl, d.faces)).length, 11, 'the base\'s records: a face may be read with a few more than it has');
+  assert.equal(F.expand(d).find((f) => f.family === 'B Lab').prints.split(' ').length, 11);
+  assert.equal(F.source(F.expand(d)), text, 'read back whole and written again: the same file');
+  assert.equal(F.match({ 1: 'EEEEEEEE', 2: 'AAAAAAAA' }, d, 'ABCDEF+BLab-Bold').family, 'B Lab', 'a tie: the file\'s font name');
 });

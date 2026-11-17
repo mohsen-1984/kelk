@@ -64,6 +64,6 @@ test('fontprints: a print driver\'s renumbered fonts — nothing names their let
 test('fontprints: the six B faces are in the table', function () {
   ['B Mitra|Regular', 'B Mitra|Bold', 'B Nazanin|Regular', 'B Nazanin|Bold', 'B Nazanin Outline|Regular', 'B Titr|Bold'].forEach(function (k) {
     const f = data.faces.find((x) => x.family + '|' + x.face === k);
-    assert.ok(f && f.src === 'kelk' && f.prints.split(' ').length > 150, k);
+    assert.ok(f && f.src === 'kelk' && Object.keys(F.table(f, data.faces)).length > 150, k);
   });
 });
