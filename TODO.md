@@ -80,114 +80,30 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
   builders, the slides deck with PptxBuilder; the step is named while it loads. HtmlBuilder and the Word template stay
   at startup (the preview is built on them).
 
-**2.9 — can the text be trusted** (the next release; from six real samples the owner showed, 2026-11-15 — private:
-each problem below has a lab file of our own). Merged or ready: the lab (#73), fontprints (#74), trust (#75), the
-lab's coverage for 2.9 and 2.10 (#76), the hidden-text block and the preview's alerts (#77), the font arbiter (#78).
-**Left for 2.9, in order:** `pdf/2.9-lines` (item 5), `pdf/2.9-lost-text` (item 6), then the release (item 7).
+**Standing rules from 2.9** (the owner's decisions; done — `CHANGELOG.md` 2.9):
 
-*What the samples showed.* Page confidence counts structural signs only (U+FFFD, glued words, unclear gaps, guessed
-letters, the structure tree): nothing reads the letters, so a page whose every letter is named wrong scores 1
-(`driver-print--renumbered-fa`: confidence 1, 0.6 of 100). And the font repairs compare the file with itself (ToUnicode
-against cmap), each behind its own gate: when both are missing or wrong nothing is left.
+- Real samples the owner shows stay private: never a file, its name, its text or its content in the repository,
+  a commit, a pull request or this file. Each problem gets a lab file of our own, made by a script.
+- Fontprints, not a rule per font: a glyph is known by its outline's hash (`lib/pdfimport/fontprints.js`). Fonts the
+  owner supplies enter as hashes only. The B fonts' fontprints are in commits of their own, and no face is written
+  over a B face (a family taken out takes no other face's records).
+- The font arbiter: where a file's map is sound, only a glyph named as another kind of character takes the face's
+  (a bracket read «م», a comma read as a stop); where the map is not the font's, every glyph the face knows does. A
+  digit the file names stays; ي / ی and ك / ک stay the file's (no outline tells them apart).
+- The judge reports, it does not rewrite: `garbledText` names the fonts and pages; the Markdown stays.
+- Hidden text is shown, never dropped unsaid: one quote at the end (default), in place, or left out (Settings →
+  Hidden text in a PDF); its note in the document's language (the trusted text, a Persian or Arabic `/Lang`, the
+  interface). Never an OCR layer.
+- GitHub alerts come out in every export: a bold label in the quote's language; the preview and HTML draw them as
+  GitHub does.
+- A number with its period or closing bracket, or a bullet, typed against the item's word starts an item, as with a
+  space; a number and a dash («1- …») is a paragraph. Markdown writes every ordered item «1.».
+- `---` in Markdown is a horizontal rule, never a page separator.
 
-*The decisions (the owner's, 2026-11-16).*
+**3.0 — designed pages, tables, lines, fonts Kelk does not know** (moved out of 2.9, 2026-11-16;
+2.9's lines and lost text joined it, 2026-11-17):
 
-- **Fontprints, not a rule per font.** A subset keeps each glyph's outline as the font has it: a glyph is known by its
-  outline's hash against the fonts Kelk knows (the B fonts, Vazirmatn, Sahel, and the «2 …» family the owner supplied —
-  only hashes enter the repository, never those fonts). Measured on the samples: every embedded Persian font matched
-  its reference on 99–100 % of its glyphs. Per font, every reading of a glyph is collected (ToUnicode, the font's cmap,
-  glyph names, ActualText, the fontprint); where they agree the font is trusted; where they differ a known font's
-  fontprint wins, else the **judge** (below) keeps the reading under which the text is language; none → the font is
-  reported unreadable. A fontprint overrides only a reading the judge rejected, never a digit the file names (Kelk
-  writes the codepoint the file names), and never tells ي from ی or ك from ک. The repairs of today stay; they retire
-  one by one, in later releases, when the lab shows the same output without them.
-- **The judge**: per font, over the document — letter pairs never seen in our own Persian and Arabic text (kept apart),
-  one-letter words but «و», ASCII punctuation inside words, a letter's share out of range; for Latin, symbols inside
-  words and pairs never seen in English. Statistics generated from our corpus (`lib/pdfimport/letterstats.js`).
-  Finding `garbledText` (fonts, pages), a heavy weight in the page's confidence. Report only: the Markdown stays.
-- **Hidden text is shown, not dropped**: text off the page, white on white with nothing painted under it, under 1 pt,
-  or invisible (render mode 3 / 7, fully transparent) with no picture under it — never an OCR layer, which is the
-  page's content. It comes back in a block at the document's end (default), in place between blocks, or left out
-  (Settings → Import → Hidden text); finding `hiddenText` in all three. The block: one quote — a `> [!WARNING]` alert
-  in the document's language (fa, ar, en: the trusted text, then a Persian or Arabic `/Lang`, then the interface), then
-  each piece under «page N — reason» as a `text` code block inside the quote (`rtl_pdf2.py` `hidden_md` writes the
-  lab's). Text too small to read (`_tinyText`: under 2 pt on a page of reading-size text) is hidden text
-  too, not dropped unsaid.
-- **Alerts in every export**: only the slides read `> [!WARNING]` today; DOCX, PDF, HTML and DOC get the marker line
-  as a bold label in the document's language, in the quote. A document without alerts exports byte for byte as before.
-- **Lost text**: the page's glyphs against the glyphs its blocks used (furniture, hidden text and doubles aside):
-  finding `lostText`. Report only. (A table's whole first column was lost, the page's confidence 0.99.)
-- **A line of its own by its alignment**: a centred line under a paragraph whose last line stops short at the start
-  side is no wrap; and a centred line holding both scripts takes its block's direction, not its letter count
-  («label: value» with a long Latin value read value first).
-- **A line that opens with a bullet mark is never a heading** («- **برنامه‌ها**» is a bold item; numbered headings stay
-  headings); after a short line the next is no wrap when its first word would have fitted (a bold sub-label was glued
-  to the item before it).
-
-1. **The lab** — *PR:* `pdf/2.9-lab` (merged, #73: no importer change). **lab:** `word-bfonts--faces-fa` (100, the
-   control), `word-bfonts--tounicode-fa` (69.2), `word-bfonts--parens-fa` (98.7: «م‌وابسته», «4.518.260»),
-   `driver-print--renumbered-fa` (0.6), `driver-print--renumbered-en` (1.3), `word-hidden--hidden-fa` (37.5),
-   `word-contact--contact-fa` (97.5, links 75), `word-labels--labels-fa` (82.5); `expect.json`, what each file's
-   report must say (pending until item 3).
-2. **Fontprints** — *PR:* `pdf/2.9-fontprints` (no importer change): `lib/pdfimport/fontprint.js` (the hash of a
-   glyph's outline, a face's table, the match), `lib/pdfimport/fontprints.js` (29 faces, 11,591 fontprints, 141 KB:
-   Vazirmatn, Sahel, the B fonts from the font zip; the nine «2 …» faces supplied), `tools/build-fontprints.js`
-   (`npm run check:fresh` runs it) and `tools/fontprints.html` (the same from font files dropped on a page). Neither
-   file is loaded by the app yet: item 4 loads them on first need. Measured on the six samples' embedded Persian
-   fonts, with this code: 1,375 of 1,416 glyphs with an outline known (97 %; the rest `.notdef` boxes, private-use
-   glyphs and characters the table does not keep). Two families can share their outlines («2 Mitra» and «B Mitra»
-   bold are one table): the file's font name settles which is named. Limits: TrueType outlines only (no CFF, no
-   Type 3); a font rebuilt with other outlines, or another version of one, is known only where its outlines are
-   the same (one sample's B Nazanin differs from ours in one glyph).
-3. **Trust** — *PR:* `pdf/2.9-trust`: the judge as a detector (`lib/pdfimport/trust.js`, `letterstats.js`; the note
-   `garbledText`, the pages' confidence), the hidden-text block and its setting (Settings → Import → Hidden text), alerts
-   in the exports (`BuilderBase.alertLabels`), the crash of a garbled file of two pages fixed (**lab:**
-   `driver-print--renumbered-pages-fa`, its regression file). What the lab's files showed while it was made: a line
-   that runs over the page's edge (a heading wider than its page, a right-to-left page wkhtmltopdf shifts) is the
-   page's text, not hidden; a print proof's slug is left to the page furniture (a page with printer's marks outside
-   its box); an invisible copy of text the page shows is no hidden text.
-4. **The font arbiter** — *PR:* `pdf/2.9-font-arbiter` (`trust.js` `_arbiterPage`, `_fontArbiter`; the note
-   `fontprintRead`): per font with an embedded TrueType program a face of the fontprints knows — where the file's map
-   is sound, only a glyph named as another kind of character takes the face's (a bracket read «م», a comma read as a
-   stop: **numbers in the B fonts**, the item 2.8 left — the glyph between the thousands is the font's comma and the
-   file names it «.»); where the map is not the font's (a wrong ToUnicode, a print driver's renumbered codes), every
-   glyph the face knows takes the face's character, and a blank glyph is a space. **lab:** `word-bfonts--tounicode-fa`
-   69.2 → 100, `word-bfonts--parens-fa` 98.7 → 100, `driver-print--renumbered-fa` 48.4 → 97.7,
-   `driver-print--renumbered-pages-fa` 49.9 → 97.9; `driver-print--renumbered-en` (a font Kelk has no fontprints of)
-   stays reported garbled. What it found and left:
-   - **a stream's length read wrong** (`_rawStream`: «/Length 15 0 R» taken for a length of 1): the font programs of
-     such a file were hidden from every repair that reads them (LibreOffice's files). Mended for the arbiter's own
-     reading only: mended for all, `lohtml-rtl--fa-article`, `--fa-report` and two others read worse (list numbers
-     glued to their items, ZWNJs lost: the repairs act where they did not). To mend for all with those repairs
-     looked at — a pull request of its own.
-   - **wkhtmltopdf Persian** (`wk-rtl--fa-article`: `zwnj` 0, `yehKaf` 53–68, a broken ToUnicode; the narrow-space →
-     ZWNJ rule hurts those files): still reported garbled, not read — its fonts are not matched to a face. To look
-     at with the stream's length (above).
-   - a font with too little text to judge (under 150 letters) that no face knows: since `pdf/2.9-cover`, reported
-     unreadable when its letters are mostly accented Latin in a document of Arabic script (a cover's title and year
-     named by glyph indices: `word-cover--glyph-index-fa`); its text stays unread — 3.0's «fonts Kelk does not know»;
-     its blank lines (the space named U+0003) are read as blank.
-   - a blank glyph of no advance in a renumbered font is read as a ZWNJ; after a letter that never joins it is
-     redundant («بر‌گ»), harmless to the eye: to drop where the letter before it does not join.
-5. **Lines** — *PR:* `pdf/2.9-lines`: `word-contact--contact-fa`, `word-labels--labels-fa`, and
-   `word-lines--heads-fa` (90.9): numbered bold titles in the body's size, the number a tab before the title (one a
-   heading, one a list item), a «label: value» line glued to the full line before it, a bold title ending «Web (Web
-   Writing)» read «(Web Writing) Web». A name glued to the line before it in a side box of short lines:
-   `chrome-mail--mail-fa` (below). And the white title on a dark band of `word-hidden--hidden-fa`, which reads as a
-   quote (expected a heading).
-6. **Lost text** — *PR:* `pdf/2.9-lost-text`, its own, before the 2.9 release: the finding `lostText`, report only.
-   The first try (in `pdf/2.9-trust`) counted a page's letters against its blocks' and was not sound (blocks do not
-   all carry their page; one glyph can hold several letters): it needs the layout to count what each step drops
-   (furniture, doubles, ornaments).
-
-7. **The release** — after items 5 and 6 are merged: the release pull request by `docs/RELEASING.md` (the version,
-   the changelog's date, the README's three languages: the fonts Kelk reads by their shapes, hidden text, alerts),
-   then the owner's steps. To check by eye before it: the six samples in the app (the report's notes, the hidden-text
-   block, the confidence), and an export of a document with alerts to each format.
-
-**2.10 — designed pages, tables, fonts Kelk does not know** (moved out of 2.9, 2026-11-16):
-
-1. **A designed booklet** (moved from 2.7, then 2.8, then 2.9; high risk). *PR:* `pdf/2.10-booklet`, its own.
+1. **A designed booklet** (moved from 2.7, then 2.8, then 2.9; high risk). *PR:* `pdf/3.0-booklet`, its own.
    Designed documents from browsers: heading, box and figure rules shared by every Chromium file in the lab —
    **lab:** `chrome-booklet--booklet-cards-fa` (45.4). Cards, badges and coloured boxes:
    - a table of contents — a number badge, the title, dot leaders drawn as a dashed rule, no page number — comes
@@ -224,7 +140,7 @@ against cmap), each behind its own gate: when both are missing or wrong nothing 
    labels and its caption, a thin strip, statements beside number badges, pieces that touch) and
    `chrome-mail--mail-fa` (70.4: a printed web mail — tinted rows and link buttons read as quotes, a name glued to
    the line before it in a side box, a footer's «label : value» lines joined, the print's own head).
-2. **Tables from reports** (high risk) — *PR:* `pdf/2.10-tables`. **lab** (`make-tables210-rtl.py`):
+2. **Tables from reports** (high risk) — *PR:* `pdf/3.0-tables`. **lab** (`make-tables30-rtl.py`):
    `word-report--ruled-header-fa` (79.8) — a header ruled column by column over a borderless body of one- and
    two-line cells centred vertically (the columns from the header's rules); `word-report--span-header-fa` (74.8) —
    a header spanning two rows, the first column lost whole: the table's double border lies a point from the page's
@@ -244,6 +160,32 @@ against cmap), each behind its own gate: when both are missing or wrong nothing 
    page natively. Neither alone gives exact text. A font installed on the reader's system (drawn on a canvas by its
    name) is an extra when it happens to be there: nothing depends on it (such fonts are rarely installed, never on a
    phone).
+
+4. **Lines** (moved from 2.9, 2026-11-17) — *PR:* `pdf/3.0-lines`: `word-contact--contact-fa`, `word-labels--labels-fa`, and
+   `word-lines--heads-fa` (90.9): numbered bold titles in the body's size, the number a tab before the title (one a
+   heading, one a list item), a «label: value» line glued to the full line before it, a bold title ending «Web (Web
+   Writing)» read «(Web Writing) Web». A name glued to the line before it in a side box of short lines:
+   `chrome-mail--mail-fa` (below). And the white title on a dark band of `word-hidden--hidden-fa`, which reads as a
+   quote (expected a heading).
+5. **Lost text** (moved from 2.9, 2026-11-17) — *PR:* `pdf/3.0-lost-text`, its own: the finding `lostText`, report only.
+   The first try (in `pdf/2.9-trust`) counted a page's letters against its blocks' and was not sound (blocks do not
+   all carry their page; one glyph can hold several letters): it needs the layout to count what each step drops
+   (furniture, doubles, ornaments).
+6. **What the font arbiter left** (2.9):
+   - **a stream's length read wrong** (`_rawStream`: «/Length 15 0 R» taken for a length of 1): the font programs of
+     such a file were hidden from every repair that reads them (LibreOffice's files). Mended for the arbiter's own
+     reading only: mended for all, `lohtml-rtl--fa-article`, `--fa-report` and two others read worse (list numbers
+     glued to their items, ZWNJs lost: the repairs act where they did not). To mend for all with those repairs
+     looked at — a pull request of its own.
+   - **wkhtmltopdf Persian** (`wk-rtl--fa-article`: `zwnj` 0, `yehKaf` 53–68, a broken ToUnicode; the narrow-space →
+     ZWNJ rule hurts those files): still reported garbled, not read — its fonts are not matched to a face. To look
+     at with the stream's length (above).
+   - a font with too little text to judge (under 150 letters) that no face knows: since 2.9, reported
+     unreadable when its letters are mostly accented Latin in a document of Arabic script (a cover's title and year
+     named by glyph indices: `word-cover--glyph-index-fa`); its text stays unread — item 3 above;
+     its blank lines (the space named U+0003) are read as blank.
+   - a blank glyph of no advance in a renumbered font is read as a ZWNJ; after a letter that never joins it is
+     redundant («بر‌گ»), harmless to the eye: to drop where the letter before it does not join.
 
 **Not placed in a release yet** (moved out of 2.8's scope, 2026-11-11):
 

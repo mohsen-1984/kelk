@@ -1,4 +1,4 @@
-// Designed pages as Chromium prints them, for the designed-pages work of 2.10 (from real files' habits; our own text):
+// Designed pages as Chromium prints them, for the designed-pages work of 3.0 (from real files' habits; our own text):
 //   · chrome-mail--mail-fa: a web mail printed from the browser — the print's own head (the subject in bold on two
 //     lines, the sender and the date on one row), a centred title and subtitle, a side box of short lines (a bold name,
 //     then its line, twice: the second name came back glued to the line before it), links drawn as centred buttons
