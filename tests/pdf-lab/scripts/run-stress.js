@@ -3,7 +3,10 @@
 // Exit code 1 when one of the expectations below fails.
 // big:    total time, and the longest the main thread was held (PerformanceObserver 'longtask', and a timer
 //         heartbeat's longest gap) — a page that
-//         keeps the thread for seconds freezes Kelk's interface
+//         keeps the thread for seconds freezes Kelk's interface. Opening the file is counted apart (`open`: the long
+//         tasks before the first page is read): pdf.js reads the file's structure on the main thread under file://,
+//         in one piece and in proportion to its size — a second for the 22 MB the lab's files make together — and
+//         no step of the importer can break it; its limit is its own (3 s), so the lab can grow
 // faults: a page that throws in extraction, another in layout — the import must finish with the other pages, not
 //         reject: in auto mode the fallback ladder (lib/pdfimport/ladder.js) gives the first as pdf.js's text
 //         ('textContent') and the second simplified, with no 'pageFailed'; in 'full' mode both are 'pageFailed' as
@@ -22,15 +25,16 @@ const { lab, req, LAB } = require('./env.js');
     const bin = atob(b64), u = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
     const longs = [];
-    const po = new PerformanceObserver((l) => l.getEntries().forEach((e) => longs.push(e.duration)));
+    const po = new PerformanceObserver((l) => l.getEntries().forEach((e) => longs.push([e.startTime, e.duration])));
     po.observe({ type: 'longtask', buffered: false });
     // (and a heartbeat — the longest wait between two 50 ms timer ticks: Chromium 141's observer reported no long
     // task for a 52 s synchronous step that Chromium 156's reports; the heartbeat sees it in both)
-    let beat = performance.now(), gap = 0;
-    const hb = setInterval(() => { const n = performance.now(); gap = Math.max(gap, n - beat); beat = n; }, 50);
+    let beat = performance.now(), gap = 0, first = Infinity;                       // first: when the first page is read
+    const hb = setInterval(() => { const n = performance.now(); if (beat >= first) gap = Math.max(gap, n - beat); beat = n; }, 50);
     const P = PdfImporter.prototype, ex = P._extractPage, pb = P._pageBlocks;
+    P._extractPage = function () { if (first === Infinity) first = performance.now(); return ex.apply(this, arguments); };
     if (mode === 'faults' || mode === 'faults-full') {
-      P._extractPage = function (doc, num) { if (num === 2) throw new Error('injected: extraction of page 2'); return ex.apply(this, arguments); };
+      P._extractPage = function (doc, num) { if (first === Infinity) first = performance.now(); if (num === 2) throw new Error('injected: extraction of page 2'); return ex.apply(this, arguments); };
       P._pageBlocks = function (pl) { if (pl.p.num === 3) throw new Error('injected: layout of page 3'); return pb.apply(this, arguments); };
     }
     const ac = new AbortController();
@@ -44,7 +48,10 @@ const { lab, req, LAB } = require('./env.js');
     out.ms = Math.round(performance.now() - t0);
     await new Promise((r) => setTimeout(r, 50)); po.disconnect(); clearInterval(hb);
     P._extractPage = ex; P._pageBlocks = pb;
-    out.longest = Math.round(Math.max(0, ...longs)); out.longTasks = longs.length; out.heartbeatGap = Math.round(gap);
+    // (a task that starts before the first page is read is the file's opening)
+    out.longest = Math.round(Math.max(0, ...longs.filter((e) => e[0] + 1 >= first).map((e) => e[1])));
+    out.open = Math.round(Math.max(0, ...longs.filter((e) => e[0] + 1 < first).map((e) => e[1])));
+    out.longTasks = longs.length; out.heartbeatGap = Math.round(gap);
     return out;
   }, { b64: fs.readFileSync(file).toString('base64'), mode, ladder });
   const big = process.argv[2], small = process.argv[3] || big;
@@ -67,6 +74,7 @@ const { lab, req, LAB } = require('./env.js');
   const fails = [];
   if (!b.ok) fails.push('big: ' + b.error);
   if (b.longest > 1000) fails.push('big: the main thread held ' + b.longest + ' ms at once');
+  else if (b.open > 3000) fails.push('big: opening the file held the main thread ' + b.open + ' ms at once');
   else if (b.heartbeatGap > 1000) fails.push('big: the main thread held ' + b.heartbeatGap + ' ms at once (heartbeat; no long task reported)');
   // (pages 2 and 3 of the small file: its extraction fault read as pdf.js's text, its layout fault simplified)
   if (!f.ok) fails.push('faults: ' + f.error);
