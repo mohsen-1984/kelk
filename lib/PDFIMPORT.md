@@ -1506,6 +1506,11 @@ with boxes, badges and pieces of drawing. Lab: `chrome-booklet--booklet-cards-fa
   (`regBorderFrameShortPt`) — is the table's edge (`regions.borderFrameBeyondRules`), and the ruled table carries those
   rules on to it (`regions.tableRulesToFrame`). `word-report--span-header-fa` 74.8 → 100.
 
+- **Header cells centred in their row** (`_tableRowSplit`, `regions.tableRowSplitCentred`, 3.0 tables): a row whose
+  cells hold several lines on shared baselines is split into rows, one per baseline (a payslip's items). Not when a
+  cell has a line on none of the fullest cell's baselines: those cells are centred — a header's words, cells of one,
+  two and six lines — and a header had come back a row per line (`word-report--tall-header-fa` 77.1 → 100).
+
 ### Forms
 
 `_formRows` (order.js), before the ruled tables (a box with rules between its rows is no table of them): rows —
