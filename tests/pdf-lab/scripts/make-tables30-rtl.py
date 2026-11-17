@@ -1,4 +1,4 @@
-# A yearly report's tables and lines as Word prints them, for the tables work of 2.10 and the lines work of 2.9
+# A yearly report's tables and lines as Word prints them, for the tables and the lines work of 3.0
 # (rtl_pdf2.py; DejaVu Sans subsets; text of our own). From real reports' habits:
 #   · word-report--ruled-header-fa: a borderless table — only its header ruled, a short rule under each column's title —
 #     whose body cells hold one or two centred lines, centred in their row; a column left empty for signatures (it came
@@ -22,7 +22,7 @@
 #     in a Latin phrase in brackets after a Latin word; «label: value» lines the first of which fills its measure (the
 #     next label was glued to it); a line where a colon follows a Latin phrase
 # IMITATED: we cannot run Word here; the files follow what such files hold.
-#   python3 scripts/make-tables210-rtl.py   → pdf/producers/word-report--*.pdf, word-lines--heads-fa.pdf and their corpus files
+#   python3 scripts/make-tables30-rtl.py    → pdf/producers/word-report--*.pdf, word-lines--heads-fa.pdf and their corpus files
 import os, sys
 sys.dont_write_bytecode = True
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

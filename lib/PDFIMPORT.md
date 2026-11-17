@@ -58,6 +58,9 @@ Three decisions shape everything:
 | `lib/pdfimport/lines.js` | 3. lines, segments, logical order; 3.5 page furniture (§6, §6a) |
 | `lib/pdfimport/regions.js` | 4. the page driver (`_layout`), ruled tables, code boxes, figures (§7) |
 | `lib/pdfimport/ladder.js` | 4.9 each page's confidence and the fallback ladder (§7a) |
+| `lib/pdfimport/letterstats.js` | data: the letter pairs of our own text by language (`tools/build-letterstats.js`), for the judge |
+| `lib/pdfimport/fontprint.js`, `fontprints.js` | a glyph known by its outline's hash; the fontprints of the fonts Kelk knows (`tools/build-fontprints.js`) |
+| `lib/pdfimport/trust.js` | 1.8 the font arbiter (from `_extractPage`); after the layout the judge (`garbledText`) and hidden text (`hiddenText`) (§5, *Fontprints* onwards) |
 | `lib/pdfimport/order.js` | 4. reading order: XY-cut, rows of borderless tables (§8.1, §8.3) |
 | `lib/pdfimport/blocks.js` | 5. blocks, structure-tree votes, joined across pages; 6. HTML (§8.2–§8.6, §9) |
 | `lib/MarkdownImporter.js` | HTML → Markdown (turndown + GFM), shared with Word and paste import |
@@ -857,7 +860,7 @@ back in a marked block, and the report says so (**`hiddenText`**). `_hiddenText`
 
 The marked glyphs stay through the font repairs (they are read as the text is), then `_hiddenSplit` takes them out
 before the fonts are classified. After the layout each piece is read into lines by the page's own line builder and
-written out (`_hiddenItems`). `options.hiddenText` (Settings → Import → Hidden text): `'end'` — one block at the
+written out (`_hiddenItems`). `options.hiddenText` (Settings → Hidden text in a PDF): `'end'` — one block at the
 document's end (the default); `'inPlace'` — a block between the blocks where the piece lies (a one-word paragraph
 marks the place through the HTML → Markdown step), never inside a paragraph or a cell; `'drop'` — left out. The
 block is one quote, seen and deleted as one: a `> [!WARNING]` alert, then each piece under «page N — reason:» as a
