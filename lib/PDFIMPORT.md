@@ -1456,6 +1456,12 @@ with boxes, badges and pieces of drawing. Lab: `chrome-booklet--booklet-cards-fa
   own (`blocks.brFieldRun`), even after a line that fills its measure. A workshop's «مدرس: …» ran into its «زمان: …»
   (`word-lines--heads-fa`), a mail's footer fields into one line (`chrome-mail--mail-fa`).
 
+- **Numbered minor headings** (the document's blocks, 3.0 lines): when two bold lines of body size or more open with
+  a number («1. معرفی», «2. برنامه»), the document numbers its headings of that rank. An unnumbered one among them is
+  bold text, no heading (`blocks.minorUnnumberedDemoted`: a workshop's bold title under «2.»), and a lone one-line bold
+  item that goes on with their numbers — its number set in the list's regular face — is one of them
+  (`blocks.numberedHeadingFromItem`: «3. نام‌نویسی» had come out a list item). `word-lines--heads-fa` 91.1 → 100.
+
 ### Forms
 
 `_formRows` (order.js), before the ruled tables (a box with rules between its rows is no table of them): rows —

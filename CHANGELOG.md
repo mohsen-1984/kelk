@@ -14,6 +14,8 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Fixed
 
+- **PDF import reads numbered headings of the body's size as one set**: a bold title among them without a number is
+  bold text, and a numbered one whose number is not bold is a heading, not a list item.
 - **PDF import keeps a Latin phrase with brackets in order** in Persian text: «Web (Web Writing)» came back
   «(Web Writing) Web».
 - **PDF import keeps «label: value» lines apart**: a field after a line that fills the page's width, or a footer's
