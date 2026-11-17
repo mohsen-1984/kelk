@@ -5,6 +5,7 @@
   "files": {
     "word-bfonts--faces-fa": { "not": ["garbledText", "hiddenText", "lostText", "fontprintRead"] },
     "word-bfonts--tounicode-fa": { "has": ["fontprintRead"], "not": ["garbledText"] },
+    "word-cover--glyph-index-fa": { "has": ["garbledText"], "not": ["fontprintRead", "hiddenText"] },
     "word-bfonts--parens-fa": { "has": ["fontprintRead"], "not": ["hiddenText", "garbledText"] },
     "driver-print--renumbered-fa": { "has": ["fontprintRead", "hiddenText"], "not": ["garbledText"] },
     "driver-print--renumbered-pages-fa": { "has": ["fontprintRead", "hiddenText"], "not": ["garbledText"] },

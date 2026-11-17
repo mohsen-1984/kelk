@@ -166,3 +166,23 @@ test('arbiter: the same character — folded, of the shared outline, or the mirr
   assert.ok(!P._arbiterFew('-', '\u2010') && !P._arbiterFew('\u2010', '-'), 'signs beyond ASCII stay');
 });
 
+
+test('judge: a font too small to judge alone, its letters mostly accented Latin, in a Persian document', function () {
+  const j = T.judge([run(FA, 'body'), run('\u0152\u0153\u0154 \u0155\u0156\u0157 \u0158\u0159', 'title'), run('\u00DD\u00D9\u00DD\u00DA', 'year'), run('\u00C9ditions Gallimard', 'name')]);
+  assert.equal(j.body.garbled, false);
+  assert.deepEqual([j.title.garbled, j.title.why], [true, ['foreign']]);
+  assert.deepEqual([j.year.garbled, j.year.why], [true, ['foreign']]);
+  assert.equal(j.name.garbled, false, 'a French name: one accented letter among plain ones');
+  const en = T.judge([run(EN, 'body'), run('\u0152\u0153\u0154 \u0155\u0156\u0157 \u0158\u0159', 'title')]);
+  assert.equal(en.title.garbled, false, 'in a Latin document an accented word may be a language');
+});
+
+test('arbiter: a glyph that draws nothing, named by a control character, is a space', function () {
+  const imp = Object.create(P);
+  imp._arb = { read: {}, font: { f: { m: null, hs: { 5: 'h5' }, name: 'X', gid: function (c) { return +c; } } }, mode: {} };
+  imp._arbiter = {}; imp._fire = function () {};
+  const gl = [{ font: 'f', cid: 3, ch: '\u0003', w: 3 }, { font: 'f', cid: 5, ch: '\u0003', w: 3 }, { font: 'f', cid: 4, ch: '\u0003', w: 0 }, { font: 'g', cid: 3, ch: '\u0003', w: 3 }];
+  imp._arbiterBlank(gl, 1);
+  assert.deepEqual(gl.map(function (g) { return g.ch; }), [' ', '\u0003', '\u0003', '\u0003'], 'only a blank glyph with an advance, in a font whose program is read');
+  assert.equal(gl[0].space, true);
+});

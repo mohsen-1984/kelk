@@ -801,6 +801,11 @@ The lab (2026-11): a known face names every drawn glyph; a sound map agrees on 0
 less. What it does not do: a font Kelk has no fontprints of stays as the file names it (reported by the judge when it
 has text enough — `driver-print--renumbered-en`); a CFF or Type 3 font has no fontprint.
 
+**A blank glyph named by a control character** (`_arbiterBlank`), in any font whose program is found, known to a
+face or not: a space when it has an advance. A producer that names each glyph by its glyph index names the space
+U+0003 (the space is glyph 3 of a TrueType font); it came out «�», a line of them for each blank line of a cover
+page set in a bold font Word draws twice (**lab:** `word-cover--glyph-index-fa`).
+
 `_rawStream(ref, exact)`: the arbiter reads a font's program with the stream's length read as a whole number. The
 older reading takes «/Length 15 0 R», a reference, for a length of 1 and loses the stream — which hides such a
 file's font programs from the repairs that read them (LibreOffice's files). Mended for all, four lab files read
@@ -828,7 +833,14 @@ figures and signs is odd too. A garbled font gives the note **`garbledText`** (i
 lowers its pages' confidence: times (1 − s)³, s the share of the page's letters in garbled fonts, each weighed by how
 garbled its font is. **Report only**: the Markdown is as it was (the font arbiter, above, is what changes names,
 before the layout; the judge reads what it left). What it does not catch: a font wrong for a few letters only
-(brackets named «م»: under every limit — the arbiter's, when the font is known), a font with too little text.
+(brackets named «م»: under every limit — the arbiter's, when the font is known).
+
+**A font too small to judge alone** (under `trustMinLetters`) is judged by the document: in a document whose trusted
+text is Arabic script (150 letters and more, four times its Latin letters), a font whose letters are mostly
+accented Latin (U+00C0–U+024F: six in ten, four at least — `trustForeignMin`) is garbled (`foreign`, severity 1): a
+title or a year in a font named by glyph indices (the lab's «ŒœŔ ŕŖŗ», «ÝÙÝÚ»). A French name in a Persian text has a few
+accented letters among plain ones. Its text stays as the file names it until Kelk reads fonts it does not know
+(TODO.md, 3.0).
 
 **Hidden text.** Text the file holds and no reader sees is not dropped unsaid, and not left in the text: it comes
 back in a marked block, and the report says so (**`hiddenText`**). `_hiddenText` (after the walk) marks a glyph:

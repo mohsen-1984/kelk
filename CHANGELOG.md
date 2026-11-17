@@ -33,6 +33,9 @@ All notable changes to Kelk. Dates are those of the release tags.
 ### Fixed
 
 - **PDF import**: a file of two pages whose text could not be read crashed the import.
+- **PDF import**: blank lines of a cover page set in a bold font no longer come out as rows of «�» (a space the file
+  names by its glyph number); a short title or a year in a font Kelk does not know, whose letters come out as
+  accented Latin, is now reported as unreadable.
 
 ## [2.8] — 2026-11-12
 
