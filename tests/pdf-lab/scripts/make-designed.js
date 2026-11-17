@@ -112,7 +112,7 @@ ${PHONES}
 
 [${MAIL}](mailto:${MAIL})
 
-${FOOT.map(([l, v, u]) => `${l} : ${u ? `[${v}](${u})` : v}`).join('\\\n')}
+${FOOT.map(([l, v, u]) => `${l} : ${u ? `[${v}](${u})` : v}`).join('\n\n')}
 `;
 
 // ---- 2. a booklet's chapter: a figure with labels, a thin strip, number badges -----------------------------------
