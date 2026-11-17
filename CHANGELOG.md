@@ -6,6 +6,10 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Fixed
 
+- **PDF import reads wkhtmltopdf's Persian and Arabic fonts**: wkhtmltopdf rebuilds a font's outlines and names some
+  of its letters as Latin letters, digits and signs. Kelk now knows such a font by its glyphs' advances and contours
+  (rough prints, beside the fontprints) and takes those letters from the font itself: the lab's five wkhtmltopdf
+  files read 52.6–71.8 → 58.1–77.9.
 - **PDF import reads every stream whose length is a reference** («/Length 12 0 R», as LibreOffice writes them): it
   was taken for a length of 1 and the stream lost — a page's /ActualText went unread (a ligature's letters lost), and
   the repairs that read a font's program skipped such files.
