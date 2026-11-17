@@ -1499,6 +1499,13 @@ with boxes, badges and pieces of drawing. Lab: `chrome-booklet--booklet-cards-fa
 - **A dash standing alone at a line's end** (`_joinLines`, 3.0 tables): «رئیس هیئت امنا -» over «غیر موظف» keeps the
   space after the dash; only a dash glued to its word («e-» over «mail») joins the next line without one.
 
+- **A table's frame beyond its row rules** (`_pageBorders`, `_tables`, 3.0 tables): Word's double border ends the
+  rows' rules at the cells' edge and draws the frame's thin line a few points beyond. Out by the page's edge, that
+  line met no rule and went with the page's ring of tiles, and the table, its first column left without a side, lost
+  it. Now a vertical rule on which two row rules or more end short — at one x, at most 5 pt
+  (`regBorderFrameShortPt`) — is the table's edge (`regions.borderFrameBeyondRules`), and the ruled table carries those
+  rules on to it (`regions.tableRulesToFrame`). `word-report--span-header-fa` 74.8 → 100.
+
 ### Forms
 
 `_formRows` (order.js), before the ruled tables (a box with rules between its rows is no table of them): rows —

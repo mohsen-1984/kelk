@@ -14,6 +14,8 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Fixed
 
+- **PDF import keeps a table's first column inside a page's tiled border**: the column was lost when the
+  table's frame stood a few points beyond its row rules.
 - **PDF import keeps the space after a dash that ends a line**, when the dash stands alone (Persian text).
 - **PDF import reads a table whose header alone is ruled**, column by column over a borderless body, as one
   table, its cells of two lines kept whole.
