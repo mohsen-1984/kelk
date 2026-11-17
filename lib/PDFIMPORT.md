@@ -1433,6 +1433,14 @@ with boxes, badges and pieces of drawing. Lab: `chrome-booklet--booklet-cards-fa
   list's items: no drawing (wkhtmltopdf's task list, its boxes drawn as paths). With no text, three fills or more of
   two colours that touch are one picture. The labels are not counted as text lost under a picture (`r.quality`).
 
+- **A mail's print head** (`_pbPrintHead`, 3.0 lines): on the first page, two rules as wide as the column or wider, a
+  few ems apart, holding up to four lines with an e-mail address or a mail's field («To:», «From:», «Cc:», «Date:»,
+  «از:», «به:») are the head a browser or a mail client prints over a message. The lines between are read column by
+  column in their own direction, each column one paragraph with its lines kept apart; the block above (up to three
+  lines, the page's first) is the subject, bold text and no heading; the two rules, and their twins drawn at the same
+  height, are no `---`. The subject, larger than the message's headings, had become a heading and pushed the
+  message's own a level down (`chrome-mail--mail-fa` headings 20 → 88.9).
+
 ### Forms
 
 `_formRows` (order.js), before the ruled tables (a box with rules between its rows is no table of them): rows —
