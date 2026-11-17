@@ -14,7 +14,7 @@ const result = sayHello("علی");
 int main() { return 0; }
 ```
 
-```
+```plaintext
 plain text
 ```
 

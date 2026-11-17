@@ -1,5 +1,5 @@
 {
- "written": "2026-11-16T20:02:51.475Z",
+ "written": "2026-11-16T20:10:00.188Z",
  "note": "scripts/gate.js --update; the fuzz means hold only for their env",
  "corpus": {
   "acrobat-word--booklet-fa": {
@@ -1198,46 +1198,46 @@
    "markup": 0,
    "pic": 0,
    "mix": 0,
-   "recall": 0.2704,
-   "order": 0.2704,
+   "recall": 0.2741,
+   "order": 0.2741,
    "headings": 0,
    "code": 1,
    "quotes": 1,
-   "total": 0.5082
+   "total": 0.5096
   },
   "driver-print--renumbered-fa": {
    "error": null,
    "markup": 0,
    "pic": 0,
    "mix": 0,
-   "recall": 0.0486,
-   "order": 0.0445,
+   "recall": 0.2097,
+   "order": 0.2097,
    "headings": 0,
    "code": 1,
-   "quotes": 0,
-   "total": 0.2186,
-   "rtl": 0.375,
-   "zwnj": 0,
-   "yehKaf": 0,
+   "quotes": 1,
+   "total": 0.4839,
+   "rtl": 0.57,
+   "zwnj": 0.069,
+   "yehKaf": 0.2111,
    "digits": 1,
-   "brackets": 0.5
+   "brackets": 1
   },
   "driver-print--renumbered-pages-fa": {
    "error": null,
    "markup": 0,
    "pic": 0,
    "mix": 0,
-   "recall": 0.0736,
-   "order": 0.0698,
+   "recall": 0.2462,
+   "order": 0.2462,
    "headings": 0,
    "code": 1,
-   "quotes": 0,
-   "total": 0.2287,
-   "rtl": 0.375,
-   "zwnj": 0,
-   "yehKaf": 0,
+   "quotes": 1,
+   "total": 0.4985,
+   "rtl": 0.5722,
+   "zwnj": 0.069,
+   "yehKaf": 0.2198,
    "digits": 1,
-   "brackets": 0.5
+   "brackets": 1
   },
   "edge--real-readme-en": {
    "error": null,
@@ -10799,7 +10799,7 @@
   }
  },
  "realHeldout": {
-  "at": "2026-11-16T20:02:51.288Z",
+  "at": "2026-11-16T20:08:10.768Z",
   "n": 17,
   "errors": 0,
   "docs": [

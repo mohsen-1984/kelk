@@ -16,15 +16,15 @@
 
 > [!WARNING]
 > **متن پنهان (hidden text)**: این بخش متنی است که در فایل هست ولی هنگام نمایش دیده نمی‌شود. آن را بررسی کنید و در بیشتر موارد حذف کنید؛ چنین متنی می‌تواند برای ابزارهای هوش مصنوعی دستور پنهان (prompt injection) باشد.
-
-صفحهٔ 1 — بیرون از صفحه:
-
-```text
-id000000 lab print driver - unregistered copy
-```
-
-صفحهٔ 2 — بیرون از صفحه:
-
-```text
-id000000 lab print driver - unregistered copy
-```
+>
+> صفحهٔ 1 — بیرون از صفحه:
+>
+> ```text
+> id000000 lab print driver - unregistered copy
+> ```
+>
+> صفحهٔ 2 — بیرون از صفحه:
+>
+> ```text
+> id000000 lab print driver - unregistered copy
+> ```

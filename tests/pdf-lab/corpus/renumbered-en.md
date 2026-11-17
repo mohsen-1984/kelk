@@ -10,9 +10,9 @@ New members can sign up at the first meeting of every month. A library card is a
 
 > [!WARNING]
 > **Hidden text**: this part is text that exists in the file but is not shown when the file is viewed. Check it and in most cases delete it; such text can act as a hidden instruction for AI tools (prompt injection).
-
-Page 1 — off the page:
-
-```text
-id000000 lab print driver - unregistered copy
-```
+>
+> Page 1 — off the page:
+>
+> ```text
+> id000000 lab print driver - unregistered copy
+> ```

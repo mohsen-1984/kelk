@@ -201,7 +201,7 @@
           <w:tcPr><w:tcW w:type="dxa" w:w="10002"/><w:tcBorders><w:top w:val="single" w:color="D4D0C8" w:sz="6"/><w:left w:val="single" w:color="D4D0C8" w:sz="6"/><w:bottom w:val="single" w:color="D4D0C8" w:sz="6"/><w:right w:val="single" w:color="D4D0C8" w:sz="6"/></w:tcBorders><w:shd w:fill="E7F1EE" w:color="auto" w:val="clear"/><w:tcMar><w:top w:type="dxa" w:w="20"/><w:left w:type="dxa" w:w="90"/><w:bottom w:type="dxa" w:w="20"/><w:right w:type="dxa" w:w="90"/></w:tcMar></w:tcPr>
           <w:p>
             <w:pPr><w:pStyle w:val="CodeBlock"/><w:bidi w:val="false"/></w:pPr>
-            <w:r><w:rPr><w:color w:val="595959"/><w:sz w:val="16"/><w:szCs w:val="16"/></w:rPr><w:t xml:space="preserve">code</w:t></w:r>
+            <w:r><w:rPr><w:color w:val="595959"/><w:sz w:val="16"/><w:szCs w:val="16"/></w:rPr><w:t xml:space="preserve">plaintext</w:t></w:r>
           </w:p>
         </w:tc>
       </w:tr>
