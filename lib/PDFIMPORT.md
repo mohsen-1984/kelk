@@ -1481,6 +1481,15 @@ with boxes, badges and pieces of drawing. Lab: `chrome-booklet--booklet-cards-fa
   at that edge. An address centred on a line of its own after a paragraph (`: https://…`) had joined it, and was read
   in the paragraph's direction (`word-contact--contact-fa` 98.6 → 100).
 
+- **A run of «label: value» lines** (`_lineBreaks`, `blocks.breakFieldRun`, 3.0 tables; the owner's rule,
+  2026-11-17): a line that opens with a plain label — one to three words, no digit, a colon and its value — under
+  another such line starts a paragraph of its own, even after a line that fills its measure: «label: value» lines
+  come out as separate paragraphs everywhere (a workshop's «مدرس: …» and «زمان: …», a mail's footer, contact lines).
+  The pieces split off by this rule alone keep what their joined paragraph had: its direction, taken over all of them
+  (`blocks.dirByFieldPieces` — a paragraph of mixed Persian and English lines, split there, re-decided each piece's
+  and read its Persian lines reversed), and no heading (a lone bold field read as one). Golden snapshots
+  `symbol-fallback` and `emoji` now keep the source's paragraphs apart there (the owner accepted both, 2026-11-17).
+
 ### Forms
 
 `_formRows` (order.js), before the ruled tables (a box with rules between its rows is no table of them): rows —

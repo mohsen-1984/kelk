@@ -119,8 +119,8 @@ release's split decided 2026-11-17: the booklet, lines, tables, then the release
    `word-contact--contact-fa` 97.5 → 100, `word-hidden--hidden-fa` 86.7 → 100, `word-lines--heads-fa` 90.9 → 99.8,
    `word-labels--labels-fa` 82.5 → 88.0. What is left:
    - `word-labels--labels-fa`: its bold sub-labels between items still come out as minor headings (below);
-   - `word-lines--heads-fa`: «Web (Web Writing)» still reads «(Web Writing) Web», and its «label: value» lines after a
-     full line run together, as do the mail's footer fields (both below);
+   - `word-lines--heads-fa`: «Web (Web Writing)» still reads «(Web Writing) Web» (below); its «label: value» lines and
+     the mail's footer fields are separate paragraphs since 3.0's tables PR (the owner's rule, 2026-11-17);
    - the mail's rule under its subtitle is not kept.
    **Dropped** (2026-11-17, agreement 12): a bold line of body size right under a list item, no more space above it
    than under it, read as a label (bold text) rather than a minor heading — right for `word-labels--labels-fa`'s
@@ -129,12 +129,8 @@ release's split decided 2026-11-17: the booklet, lines, tables, then the release
    **Dropped** (2026-11-17, agreement 12): a bracket pair of Latin content touching a Latin run on its left read as
    that run's — right for «Web (Web Writing)» (`word-lines--heads-fa`), wrong for the golden `rtl-basic`, whose
    source «نام سامانه (Business Process) BPMS» is drawn the same way and came back «BPMS (Business Process)». The two
-   cannot be told apart by their glyphs; another sign is needed (the owner's call which reading wins when unsure).
-   **Dropped** (2026-11-17, agreements 12 and 14): a run of «label: value» lines — a line opening with a label in a
-   paragraph whose first line did too starts a line of its own. It kept `word-lines--heads-fa`'s «مدرس: …» and
-   «زمان: …» apart and the mail's footer fields, but changed the golden snapshot `symbol-fallback` (`pdf.md`),
-   where «وضعیت: …» and «Status: …» come back as one paragraph. **Flagged**: that snapshot looks wrong — the source
-   (`tests/test-corpus.js`) has them as two paragraphs. If the owner accepts a new snapshot, the rule can come back.
+   cannot be told apart by their glyphs. **The owner's decision** (2026-11-17): when unsure, the golden `rtl-basic`
+   reading wins; the rule stays out. Kept as an idea: a sign that tells the two apart.
 
 3. **Tables from reports** (high risk) — *PR:* `pdf/3.0-tables`. **lab** (`make-tables30-rtl.py`):
    `word-report--ruled-header-fa` (79.8) — a header ruled column by column over a borderless body of one- and
