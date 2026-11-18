@@ -184,18 +184,19 @@ const MERGED = '<table><tr><th>A</th><th>B</th><th>C</th></tr>' +
   '<tr><td colspan="2" rowspan="2">pq</td><td rowspan="2">c3</td></tr><tr></tr>' +
   '<tr><td>a</td><td>b</td><td>c</td></tr></table>';
 
-test('merged cells (HTML / Word path): repeated down their rows by default, written once across columns, no column shifted', function () {
-  const r = win.MarkdownImporter.create().fromHtml(MERGED);
+test('merged cells (HTML / Word path), mergedRows "repeat": repeated down their rows, written once across columns, no column shifted', function () {
+  const r = win.MarkdownImporter.create({ mergedRows: 'repeat' }).fromHtml(MERGED);
   assert.deepEqual(tableIntact(r.markdown).slice(2), [
     '| x | b1 | c1 |', '| x | b2 | c2 |', '| pq |  | c3 |', '| pq |  | c3 |', '| a | b | c |'
   ], r.markdown);
 });
 
-test('merged cells (HTML / Word path), mergedRows "empty": the value in its first row only', function () {
+test('merged cells (HTML / Word path), mergedRows "empty" (the default since 3.1): the value in its first row only', function () {
   const r = win.MarkdownImporter.create({ mergedRows: 'empty' }).fromHtml(MERGED);
   assert.deepEqual(tableIntact(r.markdown).slice(2), [
     '| x | b1 | c1 |', '|  | b2 | c2 |', '| pq |  | c3 |', '|  |  |  |', '| a | b | c |'
   ], r.markdown);
+  assert.equal(win.MarkdownImporter.create().fromHtml(MERGED).markdown, r.markdown);
 });
 
 test('HR (HTML path): a rule at a cell\'s edge leaves no line break; the cell\'s own line breaks stay', function () {

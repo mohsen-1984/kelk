@@ -19,7 +19,7 @@
         const o = K.store.getUi('importer');
         return MarkdownImporter.create({
             nestedTables: o.nestedTables,
-            mergedRows: o.mergedRows === 'empty' ? 'empty' : 'repeat',
+            mergedRows: o.mergedRows === 'repeat' ? 'repeat' : 'empty',
             images: o.images,
             // (numbers and letters written out in every import and rich paste — not in typed text or an opened .md)
             asciiNumbers: o.asciiNumbers !== false, persianLetters: o.persianLetters !== false,
@@ -223,10 +223,10 @@
                 const opts = {
                     images: set.images === 'drop' ? 'drop' : 'markdown',
                     asciiNumbers: set.asciiNumbers !== false, persianLetters: set.persianLetters !== false,
-                    mergedRows: set.mergedRows === 'empty' ? 'empty' : 'repeat',
+                    mergedRows: set.mergedRows === 'repeat' ? 'repeat' : 'empty',
                     hiddenText: set.hiddenText === 'inPlace' || set.hiddenText === 'drop' ? set.hiddenText : 'end',
                     uiLang: K.i18n.lang,
-                    markdownImporter: { nestedTables: set.nestedTables, mergedRows: set.mergedRows === 'empty' ? 'empty' : 'repeat', images: set.images, labels: labels() },
+                    markdownImporter: { nestedTables: set.nestedTables, mergedRows: set.mergedRows === 'repeat' ? 'repeat' : 'empty', images: set.images, labels: labels() },
                     wasmBase: 'vendor/pdfjs/wasm/',
                     loadScript: K.ui.loadScript,
                     signal: t.signal,

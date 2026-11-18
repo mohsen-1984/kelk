@@ -70,14 +70,15 @@ test('XLSX: Kelk\'s own workbook reads back without its spacer column', async fu
   assert.deepEqual(book, [{ name: 'S', rows: [['a', 'b'], ['1', '0012']], hidden: false }]);
 });
 
-test('XLSX: cells merged over rows repeat in each row (or not: mergedRows empty); across columns, written once', function () {
+test('XLSX: cells merged over rows in their first row only (the default since 3.1), or in each row (repeat); across columns, written once', function () {
   const ws = XLSX.utils.aoa_to_sheet([['Group', 'Item', 'Note'], ['A', '1', 'wide'], ['', '2', ''], ['B', '3', '']]);
   ws['!merges'] = [{ s: { r: 1, c: 0 }, e: { r: 2, c: 0 } }, { s: { r: 1, c: 2 }, e: { r: 1, c: 3 } }];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'M');
   const bytes = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
-  assert.deepEqual(SheetImporter.readXlsx(bytes, { XLSX })[0].rows,
+  assert.deepEqual(SheetImporter.readXlsx(bytes, { XLSX, mergedRows: 'repeat' })[0].rows,
     [['Group', 'Item', 'Note'], ['A', '1', 'wide'], ['A', '2', ''], ['B', '3', '']]);
+  assert.deepEqual(SheetImporter.readXlsx(bytes, { XLSX })[0].rows[2], ['', '2', '']);
   assert.deepEqual(SheetImporter.readXlsx(bytes, { XLSX, mergedRows: 'empty' })[0].rows[2], ['', '2', '']);
 });
 

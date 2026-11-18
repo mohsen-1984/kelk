@@ -13,6 +13,8 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Changed
 
+- **Cells merged over rows come in their first row only** by default (Settings → Import → *Cells merged over rows*;
+  «Repeat in each row» is still there): the same for Word, HTML, PDF and XLSX import.
 - **ASCII numbers and Persian letters in every import**: the two import settings (digits as ASCII; Arabic ي and ك
   as Persian ی and ک in a Persian text) now change the Markdown of every import and rich paste — Word, HTML, CSV and
   XLSX as well as PDF — so the preview and every export get the same text. Typed text and an opened .md file are

@@ -13,10 +13,10 @@ held-out protocol (`tests/pdf-lab/HELDOUT.md`).
 **Standing rules from 2.3** (the owner's decisions; done — `CHANGELOG.md` 2.3): any «جدول N» / «Table N» title next
 to a table is bold, whatever it looks like in the PDF (`_tableTitles`); Excel's merged title row is the sheet's title
 and stays a heading, unless it starts «جدول N» or «Table N». Merged cells: a value merged over rows is repeated down
-its rows and written once across its columns (`pq` in `table-rowspan-colspan`); a band over the header is a
+its rows (with `repeat`, below) and written once across its columns (`pq` in `table-rowspan-colspan`); a band over the header is a
 paragraph over the table; a band between rows is a row of its own, bold in its first cell (`_tableMerges`). The row
-behaviour is a setting, Settings → Import → *Cells merged over rows*: `repeat` (default) | `empty` (first row only,
-as 2.2 did); column spans are written once either way; the same for Word, HTML and PDF import
+behaviour is a setting, Settings → Import → *Cells merged over rows*: `empty` (first row only, as 2.2 did; the
+default again since 3.1, the owner's decision of 2026-11-18) | `repeat` (the default from 2.3 to 3.0); column spans are written once either way; the same for Word, HTML and PDF import
 (`importer.mergedRows`). A form's pairs are list items, row by row, everywhere (`_formRows`, `_tablePreamble`).
 
 **Standing rules from 2.4** (the owner's decisions; done — `CHANGELOG.md` 2.4): the export buttons follow the view

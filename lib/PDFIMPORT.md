@@ -1255,7 +1255,8 @@ edge (a right-to-left list item ending short of it split a tight list).
   cells. **A first row that is one cell across the whole table**, over rows that have cells of their own, is
   the table's title (Excel's merged title row): Markdown has no span — it is written before the table.
   **Other merged cells** (`_tableMerges`, Kelk 2.3; the owner's decisions): a cell merged over rows is
-  repeated in each of its rows (left to its first row, the rows under it read as missing values) — not where
+  left to its first row (`mergedRows: 'empty'`, the default since 3.1, the owner's decision of 2026-11-18), or with
+  `'repeat'` (the default from 2.3 to 3.0) repeated in each of its rows — not where
   the rows under it hold nothing else; a band over some columns above the header row, the header row's other
   cells merged down into it, is a column group: it stays in the header row, written once, and those cells are
   repeated in the row under it (3.0, the owner's decision of 2026-11-17 — until then the band went before the table
