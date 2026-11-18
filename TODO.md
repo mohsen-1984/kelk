@@ -116,16 +116,22 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
 
 **3.1 — what the font arbiter left, lost text** (moved out of 3.0, 2026-11-17):
 
-1. **What the font arbiter left** (2.9) — `pdf/3.1-wk-fonts` (wkhtmltopdf Persian and the blank glyph read as a
-   ZWNJ), after `pdf/3.1-stream-length` (a stream's length given as a reference, read right by every reader: done):
-   - **wkhtmltopdf Persian** (`wk-rtl--fa-article`: `zwnj` 0, `yehKaf` 53–68, a broken ToUnicode; the narrow-space →
-     ZWNJ rule hurts those files): still reported garbled, not read — its fonts are not matched to a face.
+1. **What the font arbiter left** (2.9) — `pdf/3.1-stream-length` (done) and `pdf/3.1-wk-fonts` (done: wkhtmltopdf's
+   Vazirmatn found by its rough prints, its ToUnicode's ASCII names for Arabic forms replaced). What is left:
+   - **wkhtmltopdf's ZWNJs** (`zwnj` 0 in `wk-rtl--fa-*`): a space laid over the letter before it, the next letter
+     ending where that letter starts, and the letters drawn joined across it (Qt shapes through the ZWNJ). Read as a
+     ZWNJ and kept, `wk-rtl--fa-article` 58 → 76, `--fa-brackets` 78 → 97, but the golden held-out mean fell 86.0 →
+     84.8: dropped (`pdf/3.1-wk-fonts`), another sign is needed.
+   - **wkhtmltopdf's lines run together** («شکستهاا‌تنافگاه…» in `wk-rtl--fa-article`): two lines' glyphs interleaved
+     — a layout matter, not the fonts.
    - a font with too little text to judge (under 150 letters) that no face knows: since 2.9, reported
      unreadable when its letters are mostly accented Latin in a document of Arabic script (a cover's title and year
      named by glyph indices: `word-cover--glyph-index-fa`); its text stays unread — 3.2;
      its blank lines (the space named U+0003) are read as blank.
    - a blank glyph of no advance in a renumbered font is read as a ZWNJ; after a letter that never joins it is
-     redundant («بر‌گ»), harmless to the eye: to drop where the letter before it does not join.
+     redundant («بر‌گ»), harmless to the eye: to drop where the letter before it does not join. No lab file shows it
+     (3.1: a renumbered B Nazanin Bold with ZWNJs after non-joining letters came back without them) — a lab file
+     first, from a real case.
 
 2. **Lost text** (moved from 2.9, 2026-11-17) — *PR:* `pdf/3.1-lost-text`, its own: the finding `lostText`, report only.
    The first try (in `pdf/2.9-trust`) counted a page's letters against its blocks' and was not sound (blocks do not
@@ -185,7 +191,7 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
 - PDF import, right to left: RTL fuzz files score well below English ones (RTL ≈ 77–81 against LTR ≈ 92–93; tables
   and quotes weakest, then `zwnj` — see `CHANGELOG.md` 2.7 for what is done); Chrome's
   browser-default style loses quotes and code in fa / ar while the text is right
-- PDF import: wkhtmltopdf Persian — 3.1, item 1
+- PDF import: wkhtmltopdf Persian, its ZWNJs and lines — 3.1, item 1
 - Release: GitHub Pages served from the app's set (`tools/build-release.sh`) rather than from the whole repository
   (no `.nojekyll`, no cache-busting today)
 

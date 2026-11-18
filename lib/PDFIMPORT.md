@@ -776,6 +776,15 @@ and the other letters or digits that name the same glyph. Hashes and characters 
 - **Kept**: Basic Latin and Latin-1, general punctuation, the Arabic blocks and their presentation forms.
 - **`match(hashes, data, name)`**: the face that knows most of a file's font. Two families can share their outlines
   (one design under two names): the file's font name settles the tie.
+- **Rough prints** (3.1, `roughs`, `matchRough`): a producer that rebuilds a font's outlines keeps no fontprint —
+  wkhtmltopdf, through Qt, writes every curve again (more points, composites laid flat, points a unit off): of its
+  Vazirmatn subsets a face knew 12 glyphs of 128. What survives is each glyph's advance, its number of contours and
+  where each contour lies: the rough print hashes those, in bins of 32 thousandths of the em, the contours' boxes
+  sorted; a file's glyph is printed for both bins where a value lies within 2 thousandths of an edge. A face's rough
+  prints are kept apart (`rough` in the data: the faces read since 3.1 — the repository's), and one two characters
+  share is kept with no character (a glyph that finds it is not known: Latin H, N and U.unic in Vazirmatn). Read only
+  when the fontprints know under `trustPrintKnown` of a font's glyphs: the wkhtmltopdf subsets are then known on
+  127 of 128 glyphs (**lab:** `wk-rtl--*`). The data grew from 478 to 592 KB.
 - **What a fontprint cannot tell**: two characters of one outline — ي and ی, ك and ک, 4 ٤ ۴ where a font draws them
   with one glyph (the table lists them as the glyph's others); a space or a ZWNJ (no outline); a glyph of a CFF or
   Type 3 font; a font rebuilt with other outlines.
@@ -797,7 +806,7 @@ subset per run of pages — the one whose advances are the font's widths):
 | The font | What happens |
 |---|---|
 | a face names under 0.8 of the glyphs it draws, or under 12 of them | nothing: the file's names stand (and the judge reports the font if its text is no language) |
-| known, and the file agrees with the face on 0.85 of them or more — **the map is sound** | only a glyph named as *another kind* of character takes the face's: a letter where the face has a sign (a bracket read «م», a comma read «ک»), a sign or a blank where the face has a letter («(» for «ل»), one ASCII sign for another (a stop for a comma). A letter for a letter stays the file's (a form's outline is often several letters': ه ە ھ), as do a digit the file names, a ZWNJ, a blank where the face has a mark, and the signs beyond ASCII |
+| known, and the file agrees with the face on 0.85 of them or more — **the map is sound** | only a glyph named as *another kind* of character takes the face's: a letter where the face has a sign (a bracket read «م», a comma read «ک»), a sign or a blank where the face has a letter («(» for «ل»), one ASCII sign for another (a stop for a comma). An ASCII letter or digit where the face has an Arabic letter is of another kind too (wkhtmltopdf's ToUnicode names some of Vazirmatn's forms «H», «c», «4», 3.1). A letter for a letter stays the file's (a form's outline is often several letters': ه ە ھ), as do a digit the file names, a ZWNJ, a blank where the face has a mark, and the signs beyond ASCII |
 | known, and they agree on less — **the map is not this font's** (codes renumbered by a print driver, a ToUnicode of another subset) | every glyph the face knows takes the face's character; a glyph with no outline is a space (with no advance, a ZWNJ) |
 
 The file and the face agree on a glyph when they give the same character after folding, when the file's is one of

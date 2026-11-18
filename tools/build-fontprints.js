@@ -19,7 +19,7 @@ const F = PdfImporter._fontprint, OUT = path.join(root, 'lib', 'pdfimport', 'fon
 const arg = (name) => { const i = process.argv.indexOf(name); return i > 0 ? process.argv[i + 1] : null; };
 const add = arg('--add'), skip = arg('--skip');
 
-const faceOf = (bytes, src) => { const f = F.face(new Uint8Array(bytes)); return { family: f.family, face: f.face || 'Regular', version: f.version, src, glyphs: f.glyphs, prints: F.pack(f.prints) }; };
+const faceOf = (bytes, src) => { const f = F.face(new Uint8Array(bytes)); return { family: f.family, face: f.face || 'Regular', version: f.version, src, glyphs: f.glyphs, prints: F.pack(f.prints), rough: F.pack(f.rough) }; };
 const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? walk(path.join(d, e.name)) : /\.ttf$/i.test(e.name) ? [path.join(d, e.name)] : []);
 
 (async () => {

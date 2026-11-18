@@ -105,7 +105,7 @@ to that file.</p>
                 const f = F.face(bytes);
                 if (!f.family) throw new Error('no family name in its name table');
                 if (!f.prints.length) throw new Error('no TrueType outlines (an OpenType / CFF font, a collection or not a font)');
-                const face = { family: f.family, face: f.face || 'Regular', src: 'supplied', glyphs: f.glyphs, prints: F.pack(f.prints), state: 'new' };
+                const face = { family: f.family, face: f.face || 'Regular', src: 'supplied', glyphs: f.glyphs, prints: F.pack(f.prints), rough: F.pack(f.rough), state: 'new' };
                 const old = faces.findIndex(function (x) { return key(x) === key(face); });
                 if (old >= 0) {
                     if (faces[old].prints === face.prints) { faces[old].state = 'in the file, the same'; continue; }

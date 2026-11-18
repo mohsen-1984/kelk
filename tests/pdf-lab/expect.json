@@ -14,7 +14,7 @@
     "word-print--word-rtl": { "has": ["hiddenText"], "not": ["garbledText"] },
     "word-contact--contact-fa": { "not": ["garbledText", "hiddenText", "lostText"] },
     "word-labels--labels-fa": { "not": ["garbledText", "hiddenText", "lostText"] },
-    "wk-rtl--fa-article": { "has": ["garbledText"] },
+    "wk-rtl--fa-article": { "not": ["garbledText"] },
     "chrome-github-bg--symbols": { "not": ["garbledText"] },
     "wk-github--symbols": { "not": ["garbledText"] }
   }
