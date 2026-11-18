@@ -146,6 +146,11 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
 
 **3.2 — fonts Kelk does not know** (moved out of 3.0, 2026-11-17; a release of its own):
 
+- **A file that must always report garbled text** (the owner's rule, 2026-11-18): the lab files that must report
+   `garbledText` today — `word-cover--glyph-index-fa` and `driver-print--renumbered-en` — are those the unknown-fonts
+   work is meant to fix. Once it fixes them, keep a permanent synthetic lab file that must always report garbled text
+   (a font no reading can recover), so the finding stays tested.
+
 1. **Fonts Kelk does not know** — *PR:* `pdf/3.2-unknown-fonts`; a new lab file first (a font outside the fontprints,
    renumbered) — the approximate path, marked «recovered, approximate» in the report; it must work
    everywhere, phones included: candidates for every glyph by its drawn shape against Kelk's bundled fonts, votes from
