@@ -1,5 +1,5 @@
 {
-  "_about": "What the import report must say of a lab file (scripts/report-expect.js; the gate checks it). Codes: garbledText (a font's text is not language: lib/pdfimport/trust.js, the judge), hiddenText (text no reader sees, given in the hidden-text block), fontprintRead (a font's characters read from its outlines: the font arbiter). lostText (glyphs of the page missing from the Markdown) is not written by the importer yet.",
+  "_about": "What the import report must say of a lab file (scripts/report-expect.js; the gate checks it). Codes: garbledText (a font's text is not language: lib/pdfimport/trust.js, the judge), hiddenText (text no reader sees, given in the hidden-text block), fontprintRead (a font's characters read from its outlines: the font arbiter). lostText (letters the layout dropped with no known reason: trust.js _lostOut, 3.1).",
   "never": ["garbledText"],
   "neverExcept": ["wk-rtl--"],
   "files": {
@@ -16,6 +16,7 @@
     "word-labels--labels-fa": { "not": ["garbledText", "hiddenText", "lostText"] },
     "wk-rtl--fa-article": { "not": ["garbledText"] },
     "chrome-github-bg--symbols": { "not": ["garbledText"] },
-    "wk-github--symbols": { "not": ["garbledText"] }
+    "wk-github--symbols": { "not": ["garbledText"] },
+    "chrome-cutrow--cut-row": { "has": ["lostText"], "_note": "a table row cut by the page break, dropped with no reason (3.1): the report must say so" }
   }
 }

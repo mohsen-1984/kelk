@@ -66,6 +66,7 @@
         fontprintRead: { key: 'pdf_fontprintRead' },
         garbledText: { key: 'pdf_garbledText', warn: true },
         hiddenText: { key: 'pdf_hiddenText', warn: true },
+        lostText: { key: 'pdf_lostText', warn: true },
         kelkSource: { key: 'pdf_kelkSource', quiet: true },
         kelkMath: { key: 'pdf_kelkMath', quiet: true },
         monoBody: { key: 'pdf_monoBody', quiet: true },
