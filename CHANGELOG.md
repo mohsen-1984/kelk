@@ -4,6 +4,13 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+### Added
+
+- **PDF import says when text was lost**: the layout counts each page's letters in and out; text it drops on
+  purpose (page furniture, pictures, a table's header row repeated on the next page) is not lost. Text gone with no
+  known reason gets a new report note, «Compare it with the PDF». It found one fault already: a table row cut by the
+  page break is dropped (to fix later).
+
 ### Fixed
 
 - **PDF import reads wkhtmltopdf's Persian and Arabic fonts**: wkhtmltopdf rebuilds a font's outlines and names some

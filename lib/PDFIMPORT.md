@@ -888,6 +888,26 @@ Persian or Arabic (English is every program's default and says little); the inte
 (`options.uiLang`, which the app passes); English. A page's own text is not asked: a Persian file whose fonts read
 as Latin gibberish got an English note.
 
+### Lost text: letters in, letters out (`trust.js`, 3.1)
+
+The layout counts the letters it is given and the letters its blocks hold, page by page (`_lostIn`, `_lostOut`): a
+letter is a letter or a digit after NFKC, a kashida is none. A glyph is known by its page and its place in the page's
+glyphs (`lid`, set by `lines.js`), so a glyph copied into several views is counted once, and a mark or a ligature
+folded into another glyph moves its letters with it. What a step takes out of the lines on purpose is counted with its
+reason (`_lostStep` after `_hiddenPictures`, `_furniture` and `_pageBorders`: `picture`, `furniture`, `border`;
+`_lostDrop('repeatedHeader')` where a table's header row repeated on the next page is dropped), and text a block
+keeps as strings is kept (`_lostKeep`: a code block's lines, a drawn figure's labels in its alt text). A glyph counted
+as dropped and also kept is kept.
+
+What is left is lost with no known reason: the note `lostText` («Compare it with the PDF», report only) on a page
+short of more than `lostTextMin` (20) letters and of more than `lostTextShare` (1 %) of its own. The drops on purpose
+are not lost text (the owner's rule, 2026-11-17); they may show as plain counts at most, never as a warning — none
+are shown yet (`_lostPages` holds them). The first try (2.9) compared a page's letters with its blocks' and was not
+sound: blocks do not all carry their page, and one glyph can hold several letters. On the lab (3.1) no corpus or
+golden file is reported; a random-style file and `chrome-cutrow--cut-row` are: a ruled table's row cut by Chrome's
+page break, its first lines at a page's foot under no closing rule, is dropped — a fault the finding brought out, to
+fix in a later release (**lab:** `chrome-cutrow--cut-row`).
+
 ## 6. Lines and segments
 
 ### Visual lines

@@ -133,12 +133,16 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
      (3.1: a renumbered B Nazanin Bold with ZWNJs after non-joining letters came back without them) — a lab file
      first, from a real case.
 
-2. **Lost text** (moved from 2.9, 2026-11-17) — *PR:* `pdf/3.1-lost-text`, its own: the finding `lostText`, report only.
-   The first try (in `pdf/2.9-trust`) counted a page's letters against its blocks' and was not sound (blocks do not
-   all carry their page; one glyph can hold several letters): it needs the layout to count what each step drops
-   (furniture, doubles, ornaments). The owner's rule (2026-11-17): what a step drops on purpose — page furniture,
-   doubles, ornaments — is not lost text; `lostText` fires only for text dropped with no known reason. The
-   drops on purpose may appear in the report as plain counts at most, never as a warning.
+2. **Lost text** (moved from 2.9, 2026-11-17) — `pdf/3.1-lost-text` (done): the finding `lostText`, report only. The
+   layout counts the letters it is given and the letters its blocks hold, page by page; what a step drops on purpose
+   (page furniture, pictures, page borders, a table's header row repeated on the next page) is counted with its
+   reason, and a code block's lines and a drawn figure's labels are kept as text. The owner's rule (2026-11-17): what
+   a step drops on purpose is not lost text; `lostText` fires only for text dropped with no known reason. The drops on
+   purpose may appear in the report as plain counts at most, never as a warning (none shown yet).
+   - **What it found** (the lab file `chrome-cutrow--cut-row`, `expect.json`): a ruled table's row cut by Chrome's
+     page break — its first lines at a page's foot under no closing rule — is dropped, both parts (a random-style
+     file showed it first). A fix to place in a release; once it is fixed, the expectation is turned around with
+     the owner's approval, as `wk-rtl--fa-article`'s was.
 
 **3.2 — fonts Kelk does not know** (moved out of 3.0, 2026-11-17; a release of its own):
 
