@@ -21,6 +21,8 @@
             nestedTables: o.nestedTables,
             mergedRows: o.mergedRows === 'empty' ? 'empty' : 'repeat',
             images: o.images,
+            // (numbers and letters written out in every import and rich paste — not in typed text or an opened .md)
+            asciiNumbers: o.asciiNumbers !== false, persianLetters: o.persianLetters !== false,
             labels: labels()
         });
     }

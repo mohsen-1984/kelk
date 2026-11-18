@@ -461,10 +461,11 @@
                 await k.ui.paint();                  // reading a workbook holds the page: its step first
                 const bytes = new Uint8Array(await d.file.arrayBuffer());
                 if (isXlsx(d)) {
-                    d.book = SheetImporter.readXlsx(bytes, { mergedRows: k.store.getUi('importer.mergedRows') });   // Settings → Import
+                    d.book = SheetImporter.readXlsx(bytes, { mergedRows: k.store.getUi('importer.mergedRows'), persianLetters: k.store.getUi('importer.persianLetters') !== false,
+                        asciiNumbers: k.store.getUi('importer.asciiNumbers') !== false });   // Settings → Import
                     if (fi) { try { d.fileInfo = await fi.fromOffice(bytes); } catch (e) { d.fileInfo = null; } }
                 } else {
-                    d.csv = SheetImporter.readCsv(bytes, { persianLetters: k.store.getUi('importer.persianLetters') !== false });
+                    d.csv = SheetImporter.readCsv(bytes, { persianLetters: k.store.getUi('importer.persianLetters') !== false, asciiNumbers: k.store.getUi('importer.asciiNumbers') !== false });
                     const z = SheetImporter.size(d.csv.rows);
                     d.info = d.csv.error ? t('xs_emptyFile') : t('xs_info', z.rows, z.cols, ENC[d.csv.encoding] || d.csv.encoding, sepName(d.csv.separator));
                 }
@@ -654,7 +655,7 @@
         const k = K();
         try {
             await k.libs.need('sheetimport');
-            const r = SheetImporter.readCsv(new TextEncoder().encode(text), { persianLetters: k.store.getUi('importer.persianLetters') !== false });
+            const r = SheetImporter.readCsv(new TextEncoder().encode(text), { persianLetters: k.store.getUi('importer.persianLetters') !== false, asciiNumbers: k.store.getUi('importer.asciiNumbers') !== false });
             const z = SheetImporter.size(r.rows), max = +k.config.maxSheetCells || 100000;
             if (z.cells > max) { k.ui.toast(t('xs_tooMany', z.cells.toLocaleString('en-US'), max.toLocaleString('en-US')), 'error', 9000); return; }
             let count = 0;

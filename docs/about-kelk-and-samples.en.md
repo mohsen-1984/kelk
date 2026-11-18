@@ -131,7 +131,7 @@ Kelk supports **GitHub Flavored Markdown** in full ([GFM spec](https://github.gi
 
 The MD button saves the text with its images (inside the file), and importing it again brings them back.
 
-> 💡 **How to:** two import settings in the app settings are for PDF text, both on: digits as Latin (ASCII), and Arabic ي and ك as Persian ی and ک in a Persian document. Turn them off to keep the file's own characters.
+> 💡 **How to:** two import settings in the app settings, both on, apply to every import and rich paste (PDF, Word, HTML, CSV, XLSX) — not to typed text or an opened .md file: digits as Latin (ASCII), and Arabic ي and ك as Persian ی and ک in a Persian document. Turn them off to keep the file's own characters.
 
 ### 3.1 Slides (PowerPoint)
 

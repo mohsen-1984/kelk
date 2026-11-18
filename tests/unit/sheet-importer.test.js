@@ -84,3 +84,16 @@ test('XLSX: cells merged over rows repeat in each row (or not: mergedRows empty)
 test('size: rows under the header, columns, cells', function () {
   assert.deepEqual(SheetImporter.size([['a', 'b'], ['1'], ['2', '3']]), { rows: 2, cols: 2, cells: 6 });
 });
+
+test('numbers and letters written out (Settings → Import): CSV and XLSX cells, as PDF import does', function () {
+  const csv = SheetImporter.readCsv(bytes('نام;مبلغ;سهم\nكتاب گران;۱۲٬۵۰۰;٢٥٪\n'), { Papa });
+  assert.deepEqual(csv.rows[1], ['کتاب گران', '12,500', '25%']);
+  const off = SheetImporter.readCsv(bytes('a;b\n۱۲٬۵۰۰;ي\n'), { Papa, asciiNumbers: false, persianLetters: false });
+  assert.deepEqual(off.rows[1], ['۱۲٬۵۰۰', 'ي']);
+  const ws = XLSX.utils.aoa_to_sheet([['گزارش', 'كد'], ['۳٫۵', 7]]), wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'S');
+  const book = SheetImporter.readXlsx(new Uint8Array(XLSX.write(wb, { type: 'array', bookType: 'xlsx' })), { XLSX });
+  assert.deepEqual(book[0].rows, [['گزارش', 'کد'], ['3.5', '7']]);
+  // (no Persian letter in an Arabic sheet: its ي and ك stay)
+  assert.deepEqual(SheetImporter.writeOut([['مدينة', 'كتاب']], {}), [['مدينة', 'كتاب']]);
+});
