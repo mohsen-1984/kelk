@@ -7,7 +7,7 @@
  *   .docx             MarkdownImporter.fromDocx (mammoth)
  *   .pdf              PdfImporter (it and PDF.js loaded on the first .pdf) → HTML → MarkdownImporter
  *   .csv, .xlsx       sheets: one heading and one table each (scripts/sheets.js, lib/SheetImporter.js — loaded on
- *                     the first one); an .xlsx on its own only, never from a zip
+ *                     the first one); an .xlsx on its own only, never from a zip; a .pdf never from a zip
  *   rich paste        MarkdownImporter.fromHtml (Word, web pages)
  * Cleaning, sanitizing and nested-table handling happen once, inside
  * MarkdownImporter (lib/), with the options of Settings → Import.
@@ -63,7 +63,8 @@
         if (!K.libs.loaded('jszip')) { step('libs', 0, 1); await K.libs.need('jszip'); }   // loaded on the first .zip
         step('file', 0, 1);
         const zip = await JSZip.loadAsync(await readBuffer(file));
-        const X = K.config.extensions, known = [].concat(X.markdown, X.html, X.docx, X.pdf, X.csv);
+        // (a PDF comes in on its own or beside other files, never from a zip — like an XLSX: each PDF has its own report)
+        const X = K.config.extensions, known = [].concat(X.markdown, X.html, X.docx, X.csv);
         const entries = Object.keys(zip.files).map(function (k) { return zip.files[k]; })
             .filter(function (e) { return !e.dir && !/(^|\/)(__MACOSX|\.)/.test(e.name); });
         for (let i = 0; i < entries.length; i++) {
@@ -73,7 +74,7 @@
             const x = ext(e.name), base = e.name.split('/').pop();
             const size = e._data && e._data.uncompressedSize;
             const image = /^\.(png|jpe?g|gif|webp|svg|bmp)$/.test(x);
-            if (!image && known.indexOf(x) < 0) { skipped.push({ name: base, path: e.name, size: size, reason: X.xlsx.indexOf(x) >= 0 ? 'xlsx' : 'type' }); continue; }
+            if (!image && known.indexOf(x) < 0) { skipped.push({ name: base, path: e.name, size: size, reason: X.xlsx.indexOf(x) >= 0 ? 'xlsx' : X.pdf.indexOf(x) >= 0 ? 'pdf' : 'type' }); continue; }
             if (size > maxMB * 1024 * 1024) { skipped.push({ name: base, path: e.name, size: size, reason: 'size' }); continue; }
             if (image) {
                 const type = x === '.svg' ? 'image/svg+xml' : 'image/' + x.slice(1).replace('jpg', 'jpeg');

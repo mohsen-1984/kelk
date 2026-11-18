@@ -417,7 +417,7 @@
         /**
          * Several documents (a zip, a multi-file drop) before they are imported: the order they come in, and
          * which of them. o: { title, docs: [{ name, path, size, info }], skipped: [{ name, path, size, reason:
-         * 'type' | 'size' | 'xlsx', note }], images: n, maxMB, choice }. Each document has the icon of its kind (md,
+         * 'type' | 'size' | 'xlsx' | 'pdf', note }], images: n, maxMB, choice }. Each document has the icon of its kind (md,
          * txt, html, docx, pdf, csv), a checkbox, a handle to drag (mouse or touch) and up/down buttons (Alt + ↑/↓ on
          * a focused row); info: a line under its name (a CSV's rows, columns, encoding, separator). The files that
          * cannot come in are listed apart, with the reason (note: the reason's own words).
@@ -478,7 +478,7 @@
                 (skipped || []).forEach(function (d) {
                     const li = el('li', 'order-row off');
                     li.appendChild(iconOf('none'));
-                    const note = d.reason === 'size' ? K.i18n.t('orderTooBig', o.maxMB) : d.note || (d.reason === 'xlsx' ? K.i18n.t('orderXlsx') : K.i18n.t('orderNoType'));
+                    const note = d.reason === 'size' ? K.i18n.t('orderTooBig', o.maxMB) : d.note || (d.reason === 'xlsx' ? K.i18n.t('orderXlsx') : d.reason === 'pdf' ? K.i18n.t('orderPdfZip') : K.i18n.t('orderNoType'));
                     label(d, 'none', note).forEach(function (x) { li.appendChild(x); });
                     skipList.appendChild(li);
                 });

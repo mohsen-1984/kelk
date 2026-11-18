@@ -11,6 +11,11 @@ All notable changes to Kelk. Dates are those of the release tags.
   known reason gets a new report note, «Compare it with the PDF». It found one fault already: a table row cut by the
   page break is dropped (to fix later).
 
+### Changed
+
+- **A PDF does not come in from a zip**, like an XLSX: import it on its own (each PDF has its own report). The import
+  window lists it apart, with the reason.
+
 ### Fixed
 
 - **PDF import reads wkhtmltopdf's Persian and Arabic fonts**: wkhtmltopdf rebuilds a font's outlines and names some
