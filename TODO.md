@@ -114,35 +114,14 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
 - A drawing with short labels is one picture, its labels in the alt text; a mail's print head is its subject in bold,
   then its sender and date.
 
-**3.1 — what the font arbiter left, lost text** (moved out of 3.0, 2026-11-17):
-
-1. **What the font arbiter left** (2.9) — `pdf/3.1-stream-length` (done) and `pdf/3.1-wk-fonts` (done: wkhtmltopdf's
-   Vazirmatn found by its rough prints, its ToUnicode's ASCII names for Arabic forms replaced). What is left:
-   - **wkhtmltopdf's ZWNJs** (`zwnj` 0 in `wk-rtl--fa-*`): a space laid over the letter before it, the next letter
-     ending where that letter starts, and the letters drawn joined across it (Qt shapes through the ZWNJ). Read as a
-     ZWNJ and kept, `wk-rtl--fa-article` 58 → 76, `--fa-brackets` 78 → 97, but the golden held-out mean fell 86.0 →
-     84.8: dropped (`pdf/3.1-wk-fonts`), another sign is needed.
-   - **wkhtmltopdf's lines run together** («شکستهاا‌تنافگاه…» in `wk-rtl--fa-article`): two lines' glyphs interleaved
-     — a layout matter, not the fonts.
-   - a font with too little text to judge (under 150 letters) that no face knows: since 2.9, reported
-     unreadable when its letters are mostly accented Latin in a document of Arabic script (a cover's title and year
-     named by glyph indices: `word-cover--glyph-index-fa`); its text stays unread — 3.2;
-     its blank lines (the space named U+0003) are read as blank.
-   - a blank glyph of no advance in a renumbered font is read as a ZWNJ; after a letter that never joins it is
-     redundant («بر‌گ»), harmless to the eye: to drop where the letter before it does not join. No lab file shows it
-     (3.1: a renumbered B Nazanin Bold with ZWNJs after non-joining letters came back without them) — a lab file
-     first, from a real case.
-
-2. **Lost text** (moved from 2.9, 2026-11-17) — `pdf/3.1-lost-text` (done): the finding `lostText`, report only. The
-   layout counts the letters it is given and the letters its blocks hold, page by page; what a step drops on purpose
-   (page furniture, pictures, page borders, a table's header row repeated on the next page) is counted with its
-   reason, and a code block's lines and a drawn figure's labels are kept as text. The owner's rule (2026-11-17): what
-   a step drops on purpose is not lost text; `lostText` fires only for text dropped with no known reason. The drops on
-   purpose may appear in the report as plain counts at most, never as a warning (none shown yet).
-   - **What it found** (the lab file `chrome-cutrow--cut-row`, `expect.json`): a ruled table's row cut by Chrome's
-     page break — its first lines at a page's foot under no closing rule — is dropped, both parts (a random-style
-     file showed it first). A fix to place in a release; once it is fixed, the expectation is turned around with
-     the owner's approval, as `wk-rtl--fa-article`'s was.
+**Standing rules from 3.1** (the owner's decisions; done — `CHANGELOG.md` 3.1): `lostText` fires only for text a
+step drops with no known reason — what a step drops on purpose (page furniture, pictures, page borders, a table's
+header row repeated on the next page) is not lost text, at most a plain count, never a warning. Cells merged over rows
+come in their first row only by default (`mergedRows: 'empty'`, page and libraries alike; `repeat` stays a choice).
+ASCII numbers and Persian letters apply to every import and rich paste, not to typed text, an opened .md file or
+code. A PDF, like an XLSX, does not come in from a zip. A lab expectation that a fix makes untrue (`wk-rtl--fa-article`
+no longer garbled) is turned around only with the owner's approval. The app zip holds the app, its three sample
+documents, README.md, LICENSE and the notices; the with-pdf-lab zip is the whole tree, CLAUDE.md with it.
 
 **3.2 — fonts Kelk does not know** (moved out of 3.0, 2026-11-17; a release of its own):
 
@@ -165,6 +144,21 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
 
 **Not placed in a release yet** (moved out of 2.8's scope, 2026-11-11):
 
+- **Left from 3.1** (2026-11-18):
+  - **A table row cut by the page break is dropped** (Chrome splits a ruled table's row whose cells wrap: its first
+    lines at a page's foot under no closing rule, the rest on the next page; both parts are lost). Found by
+    `lostText`; the lab file `chrome-cutrow--cut-row` must report it until the fix, then its expectation is turned
+    around with the owner's approval.
+  - **wkhtmltopdf's ZWNJs** (`zwnj` 0 in `wk-rtl--fa-*`): a space laid over the letter before it, the next letter
+    ending where that letter starts, the letters drawn joined across it (Qt shapes through the ZWNJ). Read as a ZWNJ
+    and kept, `wk-rtl--fa-article` 58 → 76 and `--fa-brackets` 78 → 97, but the golden held-out mean fell 86.0 →
+    84.8: dropped under agreement 12, another sign is needed.
+  - **wkhtmltopdf's lines run together** (`wk-rtl--fa-article`): two lines' glyphs interleaved — a layout matter.
+  - A blank glyph of no advance in a renumbered font read as a ZWNJ after a letter that never joins («بر‌گ»): no lab
+    file shows it (a renumbered B Nazanin Bold came back right) — a lab file first, from a real case.
+  - **Real Arabic PDFs and Arabic fonts** (the owner's request, 2026-11-18): check PDF import against several real
+    Arabic PDFs, made with Arabic fonts by several programs — a session of its own with the owner's samples (they
+    stay private: synthetic lab files for each problem found).
 - **Left from 3.0** (ideas dropped under agreement 12; another sign is needed for each):
   - a bold line right under a list item, at the list's pitch, as a label (bold text), not a minor heading
     (`word-labels--labels-fa`, 88.0) — it took a real `#### Small print` for one in seven *features* files;
@@ -200,7 +194,7 @@ window across the app (the preview's after 300 ms, not modal, taking no focus fr
 - PDF import, right to left: RTL fuzz files score well below English ones (RTL ≈ 77–81 against LTR ≈ 92–93; tables
   and quotes weakest, then `zwnj` — see `CHANGELOG.md` 2.7 for what is done); Chrome's
   browser-default style loses quotes and code in fa / ar while the text is right
-- PDF import: wkhtmltopdf Persian, its ZWNJs and lines — 3.1, item 1
+- PDF import: wkhtmltopdf Persian, its ZWNJs and lines — «Left from 3.1» above
 - Release: GitHub Pages served from the app's set (`tools/build-release.sh`) rather than from the whole repository
   (no `.nojekyll`, no cache-busting today)
 
