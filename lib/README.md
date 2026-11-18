@@ -264,7 +264,7 @@ const csvZip = await b.toCsvZip();               // one CSV per sheet; toCsvFile
 box.innerHTML = XlsxBuilder.previewHtml(b.plans(), { rows: 20 });   // + XlsxBuilder.previewCss(), once
 
 const csv = SheetImporter.readCsv(bytes);        // { rows, encoding, separator } — PapaParse
-const book = SheetImporter.readXlsx(bytes, { mergedRows: 'repeat' });   // [{ name, rows, hidden }] — SheetJS
+const book = SheetImporter.readXlsx(bytes, { mergedRows: 'empty' });   // [{ name, rows, hidden }] — SheetJS
 const md = SheetImporter.toMarkdown([{ name: 'Sales', rows: csv.rows }]);  // «## Sales» and a GFM table
 ```
 
@@ -304,8 +304,8 @@ writes one set of real Word styles. What Markdown does not hold — page layout,
 footer, comments, tracked changes — does not come back.
 
 Merged cells: Markdown has no spans, so a table's grid is filled out — a cell merged over columns is written once,
-the cells after it empty; a cell merged over rows is repeated in each of its rows (`mergedRows: 'repeat'`, the
-default) or left to its first row (`'empty'`). Settings → Import → *Cells merged over rows*; the PDF importer reads
+the cells after it empty; a cell merged over rows is left to its first row (`mergedRows: 'empty'`, the default since
+3.1) or repeated in each of its rows (`'repeat'`). Settings → Import → *Cells merged over rows*; the PDF importer reads
 the same setting (`PdfImporter.create({ mergedRows })`).
 
 ## Import: `PdfImporter`

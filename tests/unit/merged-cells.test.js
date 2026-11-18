@@ -39,21 +39,21 @@ function run(mergedRows) {
   return texts(grid);
 }
 
-test('repeat (the default): a cell merged over rows is in each of its rows; over columns, written once', function () {
-  assert.deepEqual(run(), [
+test('repeat: a cell merged over rows is in each of its rows; over columns, written once', function () {
+  assert.deepEqual(run('repeat'), [
     ['A', 'B', 'C'],
     ['x', 'b1', 'c1'],
     ['x', 'pq', ''],
     ['a3', 'pq', '']
   ]);
-  assert.deepEqual(run('repeat'), run());
 });
 
-test('empty: a cell merged over rows stays in its first row only; over columns, written once', function () {
+test('empty (the default since 3.1): a cell merged over rows stays in its first row only; over columns, written once', function () {
   assert.deepEqual(run('empty'), [
     ['A', 'B', 'C'],
     ['x', 'b1', 'c1'],
     ['', 'pq', ''],
     ['a3', '', '']
   ]);
+  assert.deepEqual(run(), run('empty'));
 });

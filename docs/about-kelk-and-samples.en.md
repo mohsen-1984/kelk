@@ -127,11 +127,11 @@ Kelk supports **GitHub Flavored Markdown** in full ([GFM spec](https://github.gi
 | **html**, and text pasted from Word or the web | the page's structure as Markdown; KaTeX, MathJax and Wikipedia formulas as LaTeX |
 | **pdf** | the document's text and structure (section 1.4); formulas of Kelk's own PDFs as LaTeX |
 | **csv**, **xlsx** | each sheet a heading and a table (section 3.2) |
-| **several files**, or a **zip** | one document, with the separator of the app settings between the files; first a window lists them with their kind, in name order: drag them into another order or leave some out — files that cannot be converted are listed apart. A zip's images are found too |
+| **several files**, or a **zip** | one document, with the separator of the app settings between the files; first a window lists them with their kind, in name order: drag them into another order or leave some out — files that cannot be converted are listed apart. A zip's images are found too; a PDF or an XLSX inside a zip is not imported (import it on its own) |
 
 The MD button saves the text with its images (inside the file), and importing it again brings them back.
 
-> 💡 **How to:** two import settings in the app settings are for PDF text, both on: digits as Latin (ASCII), and Arabic ي and ك as Persian ی and ک in a Persian document. Turn them off to keep the file's own characters.
+> 💡 **How to:** two import settings in the app settings, both on, apply to every import and rich paste (PDF, Word, HTML, CSV, XLSX) — not to typed text or an opened .md file: digits as Latin (ASCII), and Arabic ي and ك as Persian ی and ک in a Persian document. Turn them off to keep the file's own characters.
 
 ### 3.1 Slides (PowerPoint)
 

@@ -11,6 +11,17 @@ All notable changes to Kelk. Dates are those of the release tags.
   known reason gets a new report note, «Compare it with the PDF». It found one fault already: a table row cut by the
   page break is dropped (to fix later).
 
+### Changed
+
+- **Cells merged over rows come in their first row only** by default (Settings → Import → *Cells merged over rows*;
+  «Repeat in each row» is still there): the same for Word, HTML, PDF and XLSX import.
+- **ASCII numbers and Persian letters in every import**: the two import settings (digits as ASCII; Arabic ي and ك
+  as Persian ی and ک in a Persian text) now change the Markdown of every import and rich paste — Word, HTML, CSV and
+  XLSX as well as PDF — so the preview and every export get the same text. Typed text and an opened .md file are
+  left as they are, and so is code.
+- **A PDF does not come in from a zip**, like an XLSX: import it on its own (each PDF has its own report). The import
+  window lists it apart, with the reason.
+
 ### Fixed
 
 - **PDF import reads wkhtmltopdf's Persian and Arabic fonts**: wkhtmltopdf rebuilds a font's outlines and names some
