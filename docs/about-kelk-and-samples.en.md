@@ -61,6 +61,8 @@ The road runs both ways. Kelk turns a Word file (.docx), an HTML page, or text c
 
 > 💡 **How to:** drop a .docx, .html or .pdf file on the Markdown panel, or pick it with the Import button. Rich text pasted from Word or a web page becomes Markdown by itself; paste plain text with `Ctrl+Shift+V`. After a conversion the MD button at the bottom of the panel turns solid, to save the Markdown.
 
+> **Copyright:** Kelk only converts the file; it does not change who owns its content. Use what you import only as far as the rights holder and the law allow.
+
 ### 1.5 Cleaning up a Word document
 
 The same round trip is a simple way to **tidy a messy Word document**: import the .docx and export DOCX again. What comes back is one consistent document:
