@@ -65,7 +65,7 @@ On GitHub's web pages, click by click:
    *Release title*: `Kelk x.y` → paste the notes → leave *Set as a pre-release* unticked (the README links
    `releases/latest`) → **Publish release**.
 3. **Wait a minute or two**: the *release* workflow builds `kelk_x.y.zip` (the app) and
-   `kelk-with-pdf-lab_x.y.zip` (with `tests/pdf-lab`) from the tag and attaches them to the release
+   `kelk-with-pdf-lab_x.y.zip` (the whole tree, `tests/pdf-lab` and `CLAUDE.md` with it) from the tag and attaches them to the release
    (`tools/build-release.sh`; it fails if the tag is not `scripts/config.js`'s version). Refresh the release's
    page: they appear under *Assets*. If they don't: **Actions** → *release* → the failed run → read its summary.
 4. **Delete the merged branch**: on the merged PR's page → **Delete branch** (or **Code** → **Branches** → the
@@ -85,7 +85,7 @@ changed; then:
 Downloads:
 
 - kelk_x.y.zip — the app: unzip and open index.html
-- kelk-with-pdf-lab_x.y.zip — the same plus the PDF import lab (N test PDFs), for development
+- kelk-with-pdf-lab_x.y.zip — the whole repository, the PDF import lab (N test PDFs) with it, for development
 
 Full notes: CHANGELOG.md
 ```

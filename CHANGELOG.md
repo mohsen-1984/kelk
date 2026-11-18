@@ -2,7 +2,7 @@
 
 All notable changes to Kelk. Dates are those of the release tags.
 
-## [Unreleased]
+## [3.1] — 2026-11-18
 
 ### Added
 
@@ -10,6 +10,9 @@ All notable changes to Kelk. Dates are those of the release tags.
   purpose (page furniture, pictures, a table's header row repeated on the next page) is not lost. Text gone with no
   known reason gets a new report note, «Compare it with the PDF». It found one fault already: a table row cut by the
   page break is dropped (to fix later).
+- **The Guide names Excel and CSV** (import of .xlsx and .csv, the Excel view and its XLSX and CSV exports), and
+  it and the about-and-samples document carry a copyright note: Kelk converts a file, it does not change who owns
+  its content.
 
 ### Changed
 
@@ -21,6 +24,9 @@ All notable changes to Kelk. Dates are those of the release tags.
   left as they are, and so is code.
 - **A PDF does not come in from a zip**, like an XLSX: import it on its own (each PDF has its own report). The import
   window lists it apart, with the reason.
+- **The app's zip is smaller**: `kelk_3.1.zip` holds the app, its sample documents, the README, the license and the
+  notices — no tests, tools or other docs; `kelk-with-pdf-lab_3.1.zip` is the whole repository.
+- **PdfImporter is 1.1** (its own version; Kelk's libraries are 3.1).
 
 ### Fixed
 
@@ -31,6 +37,9 @@ All notable changes to Kelk. Dates are those of the release tags.
 - **PDF import reads every stream whose length is a reference** («/Length 12 0 R», as LibreOffice writes them): it
   was taken for a length of 1 and the stream lost — a page's /ActualText went unread (a ligature's letters lost), and
   the repairs that read a font's program skipped such files.
+- **The PDF lab**: 229 PDFs; no file scores worse than in 3.0, and nine read better — the five wkhtmltopdf files
+  among them. Corpus mean 95.7 → 95.8, golden 93.0 → 93.4, random-style sets 89.2 → 89.6 and 88.3 → 88.5, held-out
+  means unchanged.
 
 ## [3.0] — 2026-11-17
 
