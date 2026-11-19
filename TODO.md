@@ -130,8 +130,16 @@ documents, README.md, LICENSE and the notices; the with-pdf-lab zip is the whole
    work is meant to fix. Once it fixes them, keep a permanent synthetic lab file that must always report garbled text
    (a font no reading can recover), so the finding stays tested.
 
-1. **Fonts Kelk does not know** — *PR:* `pdf/3.2-unknown-fonts`; a new lab file first (a font outside the fontprints,
-   renumbered) — the approximate path, marked «recovered, approximate» in the report; it must work
+- **Decided** (the owner, 2026-11-19): pull requests `pdf/3.2-lab` (the lab files), `pdf/3.2-shapes` (shape data of
+   the fonts Kelk ships, the matcher; no change to the output), `pdf/3.2-approximate` (the reading, its report note),
+   then the release. A setting, Settings → Import → *Fonts Kelk does not know*: «Read approximately» (default) or
+   «Leave and report». Report only: nothing marks the recovered text in the Markdown. Once the always-garbled file is
+   in, `word-cover--glyph-index-fa` and `driver-print--renumbered-en` turn to «recovered, approximate». The reading's
+   pull request reports the character accuracy of the accepted text on the new lab files.
+
+1. **Fonts Kelk does not know** — the lab files (`make-unknown32.py`): `driver-print--unknown-serif-fa` and
+   `--unknown-serif-en` (FreeSerif, Liberation Serif: typefaces Kelk does not ship, renumbered) and
+   `driver-print--unreadable-fa` (abstract bars: the file that must always report garbled text). The approximate path, marked «recovered, approximate» in the report; it must work
    everywhere, phones included: candidates for every glyph by its drawn shape against Kelk's bundled fonts, votes from
    OCR for the frequent glyphs (when the OCR phase arrives), the judge accepting only a plausible text. A spike
    (2026-11-16, scratch code): **shape** against other typefaces — the top candidate right for 77–91 % of a text
