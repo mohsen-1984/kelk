@@ -64,6 +64,7 @@
         ocrLayer: { key: 'pdf_ocrLayer' },
         watermarkDropped: { key: 'pdf_watermarkDropped' },
         fontprintRead: { key: 'pdf_fontprintRead' },
+        fontApprox: { key: 'pdf_fontApprox', warn: true },
         garbledText: { key: 'pdf_garbledText', warn: true },
         hiddenText: { key: 'pdf_hiddenText', warn: true },
         lostText: { key: 'pdf_lostText', warn: true },

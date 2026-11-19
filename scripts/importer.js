@@ -225,6 +225,8 @@
                     asciiNumbers: set.asciiNumbers !== false, persianLetters: set.persianLetters !== false,
                     mergedRows: set.mergedRows === 'repeat' ? 'repeat' : 'empty',
                     hiddenText: set.hiddenText === 'inPlace' || set.hiddenText === 'drop' ? set.hiddenText : 'end',
+                    unknownFonts: set.unknownFonts === 'report' ? 'report' : 'approx',
+                    loadShapes: function () { return K.libs.need('pdfshapes'); },
                     uiLang: K.i18n.lang,
                     markdownImporter: { nestedTables: set.nestedTables, mergedRows: set.mergedRows === 'repeat' ? 'repeat' : 'empty', images: set.images, labels: labels() },
                     wasmBase: 'vendor/pdfjs/wasm/',
