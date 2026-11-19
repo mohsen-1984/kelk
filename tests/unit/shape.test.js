@@ -82,3 +82,22 @@ test('shape: each family against the others — the letters a typeface Kelk does
     assert.ok(t3 / n >= c[4], c[0] + ' first three: ' + (100 * t3 / n).toFixed(1) + ' %');
   });
 });
+
+test('shape: read — the script by the glyphs\' vote, each glyph its nearest character, the letter pairs deciding between near ones', function () {
+  // a font Kelk does not know played by B Mitra: its glyphs read against the other families' shapes
+  const own = faces.filter((f) => f.family === 'B Mitra' && f.face === 'Regular')[0], others = faces.filter((f) => f.family !== 'B Mitra');
+  const shapeOf = (t) => S.unpack(own.shapes.filter((r) => r[1] === t)[0][0]);
+  const word = ['ک', 'ت', 'ا', 'ب'], items = {};
+  word.forEach((t, i) => { items['g' + i] = { shape: shapeOf(t), uses: 5 }; });
+  assert.equal(S.script(items, others), 'arabic');
+  const pairs = new Set(['کت', 'تا', 'اب']);
+  const r = S.read(items, [['g0', 'g1', 'g2', 'g3'], ['g0', 'g1', 'g2', 'g3']], others, pairs, {});
+  assert.equal(r.script, 'arabic');
+  assert.equal(['g0', 'g1', 'g2', 'g3'].map((k) => fold(r.text[k])).join(''), 'کتاب');
+  assert.equal(r.unseen, 0);
+  assert.ok(r.dist > 0 && r.dist < 0.2, 'distance ' + r.dist);
+  // with no pairs the nearest shapes stand alone; a Latin font's glyphs vote Latin
+  const lat = faces.filter((f) => f.family === 'DejaVu Sans' && f.face === 'Book')[0], li = {};
+  ['k', 'e', 'l'].forEach((t, i) => { li['l' + i] = { shape: S.unpack(lat.shapes.filter((r) => r[1] === t)[0][0]), uses: 3 }; });
+  assert.equal(S.script(li, faces.filter((f) => f.family !== 'DejaVu Sans')), 'latin');
+});

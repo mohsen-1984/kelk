@@ -198,6 +198,7 @@ list number at a line's end), `.tcBrackets` (brackets named logically, renamed a
 | ↳ `_arbiterDecide` | `_arbiterPage`, `_fontArbiter` | A font's verdict from the pages read so far: the map is sound (`few`), not this font's (`all`), or too little yet |
 | ↳ `_arbiterApply` | `_arbiterPage`, `_fontArbiter` | The glyphs of a decided font take the face's characters (`_arbiterSame`, `_arbiterFew`: where they may) |
 | `_fontArbiter` | `fromArrayBuffer` | After the last page: the fonts no page could decide alone; the note `fontprintRead` |
+| `_fontApprox` | `fromArrayBuffer` | Then a font Kelk does not know, which the file does not name: read by its glyphs' shapes (shape.js, loaded then) when the reading reads as language; the note `fontApprox`, `this._approx` |
 | `_noteLang` | `_hiddenItems` | The language of a note Kelk writes into the document: the trusted text, a Persian or Arabic `/Lang`, the interface (`options.uiLang`), English |
 
 `_hiddenText` (the marking) is `extract.js`'s, after `_watermark`.
@@ -295,7 +296,8 @@ Two of `PdfImporter.PARTS`, loaded before `trust.js`: the font arbiter reads the
 
 ## shape.js and shapes.js — a glyph known by how it looks (3.2)
 
-Not parts of the importer yet: the approximate reading of 3.2 will load them. `shape.js` adds `PdfImporter._shape`
+Not among `PdfImporter.PARTS`: `_fontApprox` (trust.js) loads them on the first font Kelk does not know (`options.loadShapes`,
+else script tags beside `trust.js`, else `require`). `shape.js` adds `PdfImporter._shape`
 (pure functions over a font program's bytes, using `_fontprint.outlines`); `shapes.js` is its data, generated
 (`tools/build-shapes.js`). See *Glyph shapes* in [`../PDFIMPORT.md`](../PDFIMPORT.md).
 
@@ -304,5 +306,7 @@ Not parts of the importer yet: the approximate reading of 3.2 will load them. `s
 | `glyphs` | `face`, the tests, `shape-accuracy.js` | A TrueType program's glyphs → the shape of each (grid, box, dots) |
 | `face` | the build script | A reference font → its shapes and the characters its cmap and GSUB give |
 | `pack`, `unpack` | the build script, `rank` | A shape as 104 characters and back |
-| `distance`, `rank` | the tests, `shape-accuracy.js` | How far two shapes are; the nearest characters of a glyph |
+| `distance`, `rank` | `read`, the tests, `shape-accuracy.js` | How far two shapes are; the nearest characters of a glyph |
+| `script`, `read` | `_fontApprox`, `tools/calibrate-shapes.js` | A font's script; its glyphs read, the letter pairs choosing among the three nearest |
+| `fromPolygons` | `glyphs`, `tools/calibrate-shapes.js` | One glyph's shape from its polygons |
 | `source`, `expand` | the build script; the readers | `shapes.js` as text — the one writer of that file; the data read back |

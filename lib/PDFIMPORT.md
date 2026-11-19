@@ -818,8 +818,52 @@ Sans (Latin), made by `tools/build-shapes.js` (`npm run check:fresh` runs it). S
   vote gives): FreeSerif 95.8 % first, 98.1 % in the first three; Liberation Serif 76.8 % and 91.3 % — Kelk ships no
   serif Latin face, and r t, v Y, l I are its misses.
 
-Nothing in the importer reads the shapes yet: the approximate reading (TODO.md, 3.2) chooses among the first three
-with the letter pairs and the judge.
+### Reading a font Kelk does not know: the approximate reading (`trust.js` `_fontApprox`, 3.2)
+
+After the font arbiter's last word and before the repairs that read a font's own program (`_gsubRepair`), each font
+the arbiter left — its program found (TrueType), no face of the fontprints knowing most of its glyphs — is asked:
+
+1. **Does anything name it?** Not when its own program names under half of the glyphs it draws (no Unicode cmap: the
+   repairs could read it otherwise, exactly), and the judge finds its text no language (each line read in its
+   script's order: a line mostly of Arabic script from its end) or its font dictionary has neither a ToUnicode nor an
+   Encoding (a print driver's: nothing says which letter a code is, a title of seven letters too).
+2. **The shapes load** — only now, on the first such font: `shape.js` and `shapes.js` (300 KB), through
+   `options.loadShapes` (the app: `Kelk.libs.need('pdfshapes')`), else script tags beside `trust.js` (file:// too), else
+   `require` under Node. A document without such a font never loads them.
+3. **The reading** (`shape.js` `read`): the script by the vote of each glyph's nearest character (as often as drawn);
+   each glyph's three nearest characters in that script; the nearest first, then — glyph by glyph, the most drawn
+   first, three times over — the one that leaves the fewest letter pairs our languages do not write (`letterstats.js`:
+   Persian and Arabic together, or English), a step away from the nearest costing 20 a unit of distance a time drawn.
+   The words come from the page's lines (a gap of a third of the size is a space; a right-to-left line from its end).
+4. **Taken or left** (`trustApprox*`): the file's own names stand where they agree with the reading on half its letters
+   or more (a font named right reads back 83 % the same at the fewest). Otherwise the reading is taken with 20 letters
+   or more, at most 0.19 of its pairs unseen and a mean distance of 0.18 (Arabic script), 0.04 and 0.10 (Latin); a font
+   under 20 letters (a title) is taken with a font of its script that was, when its distance is within the limit. A
+   Persian reading (پ چ ژ گ in it) writes ی and ک.
+5. **Taken**: every glyph of the font takes its character, one with no outline is a space (a ZWNJ with no advance); the
+   note **`fontApprox`** («recovered, approximate») names the fonts and pages; a page's confidence is times 1 − half the
+   share of its letters so read (`ladApproxWeight`). Left: the text stays the file's, and the judge reports it
+   (`garbledText`). Settings → Import → *Fonts Kelk does not know*: «Read approximately» (default) or «Leave and
+   report» (`options.unknownFonts`: `'approx'` | `'report'`).
+
+**The limits were set on the fonts Kelk ships only** (`tools/calibrate-shapes.js`, never the lab's files): each family
+draws our `docs/` text and is read against the other families' shapes, with the letter pairs of the lab's expected
+Markdown (not `docs/`, whose text is read). Right readings, against the same pages in a font of another glyph's shapes
+(what a reading of the wrong map gives) and in a font of bars:
+
+| Script, letters | Right letters | Unseen pairs: right (max) · shuffled (min) | Distance: right (max) · bars (min) | Taken: right · shuffled · bars |
+|---|---|---|---|---|
+| Arabic, 150 | 95.1 % | 0.21 · 0.20 | 0.16 · 0.21 | 98 % · 0 % · 0 % |
+| Arabic, 600 | 95.3 % | 0.18 · 0.30 | 0.15 · 0.22 | 100 % · 0 % · 0 % |
+| Latin, 150 | 95.9 % | 0.03 · 0.03 | 0.08 · 0.14 | 100 % · 0 % · 0 % |
+| Latin, 600 | 95.3 % | 0.04 · 0.07 | 0.08 · 0.14 | 100 % · 0 % · 0 % |
+
+**The lab** (`tests/pdf-lab/scripts/char-accuracy.js`: the imported letters against the expected ones, as one minus
+the edit distance): `driver-print--unknown-serif-fa` (FreeSerif) 97.9 %, `driver-print--renumbered-en` (DejaVu Sans)
+100 %, both reported «recovered, approximate». Left and reported: `driver-print--unknown-serif-en` (Liberation Serif: a
+serif Latin face lies further from the fonts Kelk ships, all sans for Latin, than the distance limit — 0.16 against
+0.10), `driver-print--unreadable-fa` (bars: always), and `word-cover--glyph-index-fa`'s two short lines (seven letters,
+no other font of the page read).
 
 ### The font arbiter: who names a glyph (`trust.js`)
 
