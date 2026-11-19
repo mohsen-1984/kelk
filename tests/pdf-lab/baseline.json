@@ -1,5 +1,5 @@
 {
- "written": "2026-11-17T16:14:27.334Z",
+ "written": "2026-11-19T07:43:29.996Z",
  "note": "scripts/gate.js --update; the fuzz means hold only for their env",
  "corpus": {
   "acrobat-word--booklet-fa": {
@@ -3106,6 +3106,45 @@
    "yehKaf": 1,
    "digits": 1,
    "brackets": 1
+  },
+  "driver-print--unknown-serif-en": {
+   "error": null,
+   "markup": 0,
+   "pic": 0,
+   "mix": 0,
+   "recall": 0,
+   "order": 0,
+   "headings": 0,
+   "code": 1,
+   "total": 0.25
+  },
+  "driver-print--unknown-serif-fa": {
+   "error": null,
+   "markup": 0,
+   "pic": 0,
+   "mix": 0,
+   "recall": 0,
+   "order": 0,
+   "headings": 0,
+   "code": 1,
+   "total": 0.25,
+   "rtl": 0,
+   "zwnj": 0,
+   "yehKaf": 0
+  },
+  "driver-print--unreadable-fa": {
+   "error": null,
+   "markup": 0,
+   "pic": 0,
+   "mix": 0,
+   "recall": 0,
+   "order": 0,
+   "headings": 0,
+   "code": 1,
+   "total": 0.25,
+   "rtl": 0,
+   "zwnj": 0,
+   "yehKaf": 0
   }
  },
  "fuzz": {
@@ -9245,6 +9284,43 @@
    "regions.bodyLead",
    "regions.columnLeftMirrored",
    "regions.spacedDoc"
+  ],
+  "driver-print--unknown-serif-en": [
+   "blocks.breakBigGap",
+   "blocks.breakFromFar",
+   "blocks.breakStyle",
+   "blocks.headingSize",
+   "lines.bracketsLogical",
+   "regions.bodyFromLongLines",
+   "regions.bodyLead",
+   "regions.columnRightMirrored",
+   "trust.garbledFont"
+  ],
+  "driver-print--unknown-serif-fa": [
+   "blocks.breakBigGap",
+   "blocks.breakFromFar",
+   "blocks.breakIndent",
+   "blocks.breakStyle",
+   "blocks.headingSize",
+   "regions.bodyFromLongLines",
+   "regions.bodyLead",
+   "regions.columnLeftMirrored",
+   "regions.columnRightMirrored",
+   "regions.startFlushPartial",
+   "trust.garbledFont"
+  ],
+  "driver-print--unreadable-fa": [
+   "blocks.breakBigGap",
+   "blocks.breakFromFar",
+   "blocks.breakIndent",
+   "blocks.breakStyle",
+   "blocks.headingSize",
+   "regions.bodyFromLongLines",
+   "regions.bodyLead",
+   "regions.columnLeftMirrored",
+   "regions.columnRightMirrored",
+   "regions.startFlushPartial",
+   "trust.garbledFont"
   ]
  },
  "meta": {
@@ -11052,7 +11128,7 @@
   }
  },
  "realHeldout": {
-  "at": "2026-11-17T16:13:59.182Z",
+  "at": "2026-11-19T07:43:25.438Z",
   "n": 17,
   "errors": 0,
   "docs": [

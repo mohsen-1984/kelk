@@ -292,3 +292,17 @@ Two of `PdfImporter.PARTS`, loaded before `trust.js`: the font arbiter reads the
 | `pack`, `unpack` | the build script, `match` | The table as a string and back |
 | `match` | `_arbiterFont` | The face of the data that knows most of a file's font, and what it says of each glyph |
 | `source` | the build script, the tool page | `fontprints.js` as text — the one writer of that file |
+
+## shape.js and shapes.js — a glyph known by how it looks (3.2)
+
+Not parts of the importer yet: the approximate reading of 3.2 will load them. `shape.js` adds `PdfImporter._shape`
+(pure functions over a font program's bytes, using `_fontprint.outlines`); `shapes.js` is its data, generated
+(`tools/build-shapes.js`). See *Glyph shapes* in [`../PDFIMPORT.md`](../PDFIMPORT.md).
+
+| Function | Used by | Step |
+|---|---|---|
+| `glyphs` | `face`, the tests, `shape-accuracy.js` | A TrueType program's glyphs → the shape of each (grid, box, dots) |
+| `face` | the build script | A reference font → its shapes and the characters its cmap and GSUB give |
+| `pack`, `unpack` | the build script, `rank` | A shape as 104 characters and back |
+| `distance`, `rank` | the tests, `shape-accuracy.js` | How far two shapes are; the nearest characters of a glyph |
+| `source`, `expand` | the build script; the readers | `shapes.js` as text — the one writer of that file; the data read back |

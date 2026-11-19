@@ -793,6 +793,34 @@ Both files are parts of the importer (`PdfImporter.PARTS`): the font arbiter rea
 `tests/unit/fontprint*.test.js` hold them to the lab's files: a Word file whose ToUnicode is wrong and a print
 driver's renumbered fonts are both known glyph for glyph.
 
+### Glyph shapes: the nearest glyphs of the fonts Kelk ships (`shape.js`, 3.2)
+
+A fontprint finds a glyph only in the typeface it was made from. For a font Kelk does not know, `lib/pdfimport/shape.js`
+gives each glyph a **shape**, and ranks the characters whose glyphs in the fonts Kelk ships look most like it. The data,
+`lib/pdfimport/shapes.js`, holds the shapes of Vazirmatn, Sahel, the B fonts (regular and bold; B Titr bold) and DejaVu
+Sans (Latin), made by `tools/build-shapes.js` (`npm run check:fresh` runs it). Shapes and characters only: no font.
+
+- **The shape**: the glyph's contours (curves cut into four lines) drawn on a 12 × 12 grid stretched to the glyph's box
+  (neither side more than three times the other: a dash stays a bar), four samples a side per cell, then smoothed; its
+  box — width, height, bottom, top and advance — in the font's body (the median height of its glyphs, so typefaces of
+  other sizes compare); and its dots above and below the middle of its box (a part at most a quarter of the largest
+  part's box and under half a body a side). Packed in 104 characters: the grid in 4 bits a cell.
+- **The distance**: the mean difference of the grids, plus half the mean difference of the box (each term at most 1),
+  plus 0.03 a dot. The weights were chosen on the fonts Kelk ships only — each family ranked against the others — never
+  on the lab files.
+- **Kept**: ASCII, the Arabic and Persian letters, the digits, Arabic punctuation, «» – — and the lam-alef, after NFKC
+  (a joining form is its letter; each form keeps its own shape). Rarer letters and Latin-1 signs would only lead a guess
+  astray.
+- **`rank(shape, faces, k, only)`**: the k nearest characters, each once; `only`, a pattern for the script.
+- **How well** (2026-11-19). Each family against the others: Arabic script 95 % first, 99 % in the first three; Latin
+  82 % and 91 % (O and 0, l and I are one shape in a sans). The lab's fonts Kelk does not know
+  (`tests/pdf-lab/scripts/shape-accuracy.js`, letter by letter as the page draws them, within the script the glyphs'
+  vote gives): FreeSerif 95.8 % first, 98.1 % in the first three; Liberation Serif 76.8 % and 91.3 % — Kelk ships no
+  serif Latin face, and r t, v Y, l I are its misses.
+
+Nothing in the importer reads the shapes yet: the approximate reading (TODO.md, 3.2) chooses among the first three
+with the letter pairs and the judge.
+
 ### The font arbiter: who names a glyph (`trust.js`)
 
 A file names each glyph of a font — its ToUnicode, its cmap, its glyph names: pdf.js's reading. The font's own
