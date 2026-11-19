@@ -157,9 +157,10 @@ documents, README.md, LICENSE and the notices; the with-pdf-lab zip is the whole
 - **Left from 3.2** (2026-11-19):
   - **A serif Latin face** (`driver-print--unknown-serif-en`, Liberation Serif): its glyphs lie further from the fonts
     Kelk ships (Vazirmatn, Sahel and DejaVu Sans: all sans for Latin) than the reading's distance limit (0.16 against
-    0.10), so it stays reported. A serif Latin face among the shapes (one Kelk would ship, with its licence) would let
-    the limit be set on serif readings too.
-  - **Short fonts alone** (`word-cover--glyph-index-fa`): two lines of seven letters in a font Kelk does not know, no
+    0.10), so it stays reported. **Planned for a later release** (the owner's decision, 2026-11-19): the shapes of one
+    bundled serif Latin face, so the limit is set on serif readings too. Never Liberation Serif or FreeSerif — the lab's
+    test fonts: their shapes would leak the answers. DejaVu Serif is a candidate (DejaVu's licence, like DejaVu Sans).
+  - **Short fonts alone** (`word-cover--glyph-index-fa`, stays reported garbled: the owner's decision, 2026-11-19): two lines of seven letters in a font Kelk does not know, no
     other font of the page read — under 20 letters the pairs say nothing (on the fonts Kelk ships, a wrong reading of
     30 letters passes one time in eight). Another sign is needed (the OCR phase's votes).
   - FreeSerif's alef read «أ» in a few words («أن»): a hamza's small part weighs little (`W_DOTS`, set on the fonts
