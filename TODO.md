@@ -135,7 +135,9 @@ documents, README.md, LICENSE and the notices; the with-pdf-lab zip is the whole
    then the release. A setting, Settings → Import → *Fonts Kelk does not know*: «Read approximately» (default) or
    «Leave and report». Report only: nothing marks the recovered text in the Markdown. Once the always-garbled file is
    in, `word-cover--glyph-index-fa` and `driver-print--renumbered-en` turn to «recovered, approximate». The reading's
-   pull request reports the character accuracy of the accepted text on the new lab files.
+   pull request reports the character accuracy of the accepted text on the new lab files. The shape data loads only
+   when a PDF has such a font, never at startup, from file:// too; the reading's acceptance limits are set like the
+   shape weights, on the fonts Kelk ships only (`tools/calibrate-shapes.js`), never on the lab files (2026-11-19).
 
 1. **Fonts Kelk does not know** — the lab files (`make-unknown32.py`): `driver-print--unknown-serif-fa` and
    `--unknown-serif-en` (FreeSerif, Liberation Serif: typefaces Kelk does not ship, renumbered) and
@@ -152,6 +154,16 @@ documents, README.md, LICENSE and the notices; the with-pdf-lab zip is the whole
 
 **Not placed in a release yet** (moved out of 2.8's scope, 2026-11-11):
 
+- **Left from 3.2** (2026-11-19):
+  - **A serif Latin face** (`driver-print--unknown-serif-en`, Liberation Serif): its glyphs lie further from the fonts
+    Kelk ships (Vazirmatn, Sahel and DejaVu Sans: all sans for Latin) than the reading's distance limit (0.16 against
+    0.10), so it stays reported. A serif Latin face among the shapes (one Kelk would ship, with its licence) would let
+    the limit be set on serif readings too.
+  - **Short fonts alone** (`word-cover--glyph-index-fa`): two lines of seven letters in a font Kelk does not know, no
+    other font of the page read — under 20 letters the pairs say nothing (on the fonts Kelk ships, a wrong reading of
+    30 letters passes one time in eight). Another sign is needed (the OCR phase's votes).
+  - FreeSerif's alef read «أ» in a few words («أن»): a hamza's small part weighs little (`W_DOTS`, set on the fonts
+    Kelk ships); not tuned on the lab file.
 - **Left from 3.1** (2026-11-18):
   - **A table row cut by the page break is dropped** (Chrome splits a ruled table's row whose cells wrap: its first
     lines at a page's foot under no closing rule, the rest on the next page; both parts are lost). Found by
