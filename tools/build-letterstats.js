@@ -6,6 +6,8 @@
  * the READMEs and docs/*.md by their language suffix. Per language: every pair of adjacent letters inside a word, seen
  * twice or more — Arabic-script words for fa and ar (letters folded as the importer folds them: forms to letters,
  * ي ك to ی ک, marks and the tatweel dropped), Latin words (a–z, case folded) for en whatever the file's language.
+ * Left out: the lab's files in fonts Kelk does not know (MEASURED). Their text is what the approximate reading (3.2)
+ * must find and its accuracy is measured on: in the stats, the answer would help pick the letters and flatter the score.
  */
 'use strict';
 const fs = require('fs'), path = require('path');
@@ -14,8 +16,9 @@ const OUT = path.join(root, 'lib', 'pdfimport', 'letterstats.js');
 const AR = /[\u0621-\u063A\u0641-\u064A\u067E\u0686\u0698\u06A9\u06AF\u06CC]/;
 const fold = (s) => s.normalize('NFKC').replace(/[\u064B-\u065F\u0670\u0640]/g, '').replace(/[\u064A\u0649]/g, '\u06CC').replace(/\u0643/g, '\u06A9');
 
+const MEASURED = ['glyph-index-fa.md', 'renumbered-en.md', 'unknown-serif-fa.md', 'unknown-serif-en.md', 'unreadable-fa.md'];
 const files = [];
-const take = (dir, re, lang) => fs.readdirSync(path.join(root, dir)).filter((f) => re.test(f)).sort().forEach((f) => files.push([path.join(root, dir, f), lang(f)]));
+const take = (dir, re, lang) => fs.readdirSync(path.join(root, dir)).filter((f) => re.test(f) && !(dir === 'tests/pdf-lab/corpus' && MEASURED.indexOf(f) >= 0)).sort().forEach((f) => files.push([path.join(root, dir, f), lang(f)]));
 const byName = (f) => /[-.]fa\.md$/.test(f) ? 'fa' : /[-.]ar\.md$/.test(f) ? 'ar' : 'en';
 take('tests/pdf-lab/corpus', /\.md$/, byName);
 take('docs', /\.md$/, byName);
