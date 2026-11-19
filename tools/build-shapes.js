@@ -2,7 +2,8 @@
  * Build lib/pdfimport/shapes.js — the glyph shapes (lib/pdfimport/shape.js) of the fonts Kelk ships, so the PDF importer
  * can guess a glyph of a font it does not know by the glyphs it looks most like (Kelk 3.2).
  *   node tools/build-shapes.js        (`npm run check:fresh` runs it: the file must equal what its sources give)
- * Sources: the regular and bold faces of Vazirmatn and Sahel (assets/fonts/download/persian-fonts-ttf.zip), DejaVu Sans
+ * Sources: the regular and bold faces of Vazirmatn and Sahel, the B fonts (B Nazanin, B Mitra, B Titr; their notice:
+ * lib/pdf-base64-ttf-fonts/borna-rayaneh/NOTICE.txt) — assets/fonts/download/persian-fonts-ttf.zip — and DejaVu Sans
  * for Latin (lib/pdf-base64-ttf-fonts/pdf-font-dejavu-sans.js). Only shapes and characters are written, never a font.
  * The fonts the owner supplied that are not in the repository (the "2" series) are not among them: they enter as
  * fontprints only.
@@ -17,7 +18,10 @@ const JSZip = require(path.join(root, 'vendor', fs.readdirSync(path.join(root, '
 const S = PdfImporter._shape, OUT = path.join(root, 'lib', 'pdfimport', 'shapes.js');
 
 // the faces, in the order they are written (the zip's file names)
-const ZIPPED = ['vazirmatn/Vazirmatn-Regular.ttf', 'vazirmatn/Vazirmatn-Bold.ttf', 'sahel/Sahel.ttf', 'sahel/Sahel-Bold.ttf'];
+const ZIPPED = ['vazirmatn/Vazirmatn-Regular.ttf', 'vazirmatn/Vazirmatn-Bold.ttf', 'sahel/Sahel.ttf', 'sahel/Sahel-Bold.ttf',
+  // the B fonts, (c) Borna Rayaneh, no published license (lib/pdf-base64-ttf-fonts/borna-rayaneh/NOTICE.txt): their shapes
+  // only, as their fontprints — removed with them in one commit
+  'borna-rayaneh/BNAZANIN.TTF', 'borna-rayaneh/BNAZNNBD.TTF', 'borna-rayaneh/BMITRA.TTF', 'borna-rayaneh/BMITRABD.TTF', 'borna-rayaneh/BTITRBD.TTF'];
 
 /** a pdf-font-*.js file's styles as TrueType programs (the file sets PdfFonts.<family> = { styles: { <style>: { data } } }) */
 function pdfFont(file, styles) {
