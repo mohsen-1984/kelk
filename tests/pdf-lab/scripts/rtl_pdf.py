@@ -56,11 +56,18 @@ def shape(word):
 CODES = {c for v in FORMS.values() for c in v} | {ord(c) for c in FORMS} | {ord(c) for c in '0123456789 .:/-،؛…()'} | \
         {0x2013, 0x2611, 0xFEFB, 0xFEFC}
 
+FIXED_DATE = 3849984000                      # 2026-01-01 in the head table's seconds since 1904
+def fixed(t):
+    """a font saved with a fixed date, so a regenerated lab file is byte for byte the same (no timestamp noise in diffs)"""
+    t.recalcTimestamp = False; t['head'].created = t['head'].modified = FIXED_DATE
+    return t
+
 class Font:
     def __init__(self, path, ps):
         src = TTFont(path); cm = src.getBestCmap()
         opts = subset.Options(); opts.layout_features = []; opts.notdef_outline = True; opts.name_IDs = ['*']; opts.glyph_names = True
         sub = subset.Subsetter(opts); sub.populate(unicodes=sorted(c for c in CODES if c in cm)); sub.subset(src)
+        fixed(src)
         buf = io.BytesIO(); src.save(buf); self.bytes = buf.getvalue()
         self.ps, self.font = ps, TTFont(io.BytesIO(self.bytes))
         self.cmap, self.upem = self.font.getBestCmap(), self.font['head'].unitsPerEm

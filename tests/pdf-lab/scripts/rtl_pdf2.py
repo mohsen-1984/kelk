@@ -32,7 +32,7 @@ class Renum:
         assert self.code[g] < 256, 'more than 223 glyphs in one renumbered font'
         return self.code[g]
     def program(self):
-        t = TTFont(io.BytesIO(self.f.bytes)); order = t.getGlyphOrder()
+        t = rtl_pdf.fixed(TTFont(io.BytesIO(self.f.bytes))); order = t.getGlyphOrder()
         sub = CmapSubtable.newSubtable(6); sub.platformID, sub.platEncID, sub.language = 1, 0, 0
         sub.cmap = {code: order[g] for g, code in self.code.items()}
         cm = newTable('cmap'); cm.tableVersion = 0; cm.tables = [sub]; t['cmap'] = cm
