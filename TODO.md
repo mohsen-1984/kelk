@@ -172,11 +172,18 @@ zip grows by the core and the model (about 8 MB). OCR votes for decipherment sta
    headings are found; no line a few pixels high (a real scan's 1-pixel rows took Tesseract up to 100 s each). A real
    scan of about 300 pages, run outside the repository: nearly every page read, 0.83 of the words known on average, a
    tenth of the pages under 0.7 (lowConf), about 2.6 s a page.
-   Open: `corpus/scan-headings-fa.md` has level-2 headings and no level 1, the importer gives level 1 (asked of the
-   owner, PR 3); the whole real scan crashed the headless browser's tab in 3 of 6 runs before its layout ended, with or
+   `corpus/scan-headings-fa.md` now writes its headings at level 1, as the lab's 46 other one-level answer keys (the
+   owner, 2026-11-21). Open: the whole real scan crashed the headless browser's tab in 3 of 6 runs before its layout ended, with or
    without OCR and with 3.3's importer too, its JavaScript heap staying under 100 MB — to look into (memory outside
    the heap: pdf.js's JBIG2 decoder?).
-4. **Release** (`release/3.4`).
+4. **Release** (`release/3.4`). The release notes say: for a very large scanned file, read a page range at a time
+   (the report's «Read with OCR» range); the import runs in the browser's memory.
+
+**3.5 candidate — OCR lines as positioned text** (the owner, 2026-11-21): an OCR page's words enter the layout as
+glyphs (Tesseract's word boxes and baselines), so columns, running heads, lists, tables and every other rule run on it
+as on a page with a text layer; today it skips them (`lib/PDFIMPORT.md`, "What an OCR page goes through"). About a
+release of work: OCR before the layout, glyphs in a font of its own, the rules found as segments, the ladder.
+
 
 **A session of its own: real Arabic PDFs and Arabic fonts** (the owner's request, 2026-11-18) — «Left from 3.1» below.
 

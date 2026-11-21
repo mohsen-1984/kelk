@@ -1767,6 +1767,42 @@ their own, `report.ocr` `[{ page, conf, lines, notes }]` — `noLines`, `lowConf
 (`tests/pdf-lab/scripts/ocr-check.js`, five pages): 0.21 % of the letters and 1.0 % of the words wrong, about 1 s a
 page (3.4's first engine: 1.1 % and 3.2 %, the frame's remnant read as a line of letters).
 
+**What an OCR page goes through, against a page with a text layer (3.4).** Its blocks are made apart — the line
+finder, Tesseract, `postCorrect`, `_ladParas` — and join the document's blocks after the layout, so only the passes
+that run on the whole document see them:
+
+| Step | A page with a text layer | An OCR page (3.4) |
+|---|---|---|
+| Lines | glyphs to lines (`lines.js`): baselines, sizes, fonts, bold and italic, ZWNJ | ink rows (`ocr.js`), one box a line across the page; Tesseract's text in its own reading order |
+| Columns and reading order | `regions.js`, `order.js` | none: one column assumed — two columns side by side are read across, line by line |
+| Running heads, feet, page numbers | removed (§6) | kept, as paragraphs |
+| Headings | size, weight, family, numbering, the structure tree; levels by size | size only (the ink's middle, `_ladParas`); levels by size as any page (`_toHtml`) |
+| Paragraphs | gaps, indents, justification (`fullLast`) | gaps (`_ladParas`) |
+| Lists | markers, indents, nesting | none: a list's lines are paragraphs |
+| Tables | rules and gutters (`_tables`) | none: rules are taken out, cells read as lines |
+| Code, quotes, boxes, footnotes | detected | none |
+| Pictures inside the page | cropped figures | lost: the text replaces the page's picture |
+| Links, inline bold and italic | from the file | none |
+| Joined across pages | full last line, or a sentence that runs on | runs on only (no sentence mark at its end; no `fullLast`) |
+| Trust, fontprints, letter statistics | per font | none (no font): the confidence is the share of known words |
+| Write-out (numbers, Persian letters) | yes | yes |
+
+**OCR lines as positioned text** — so every rule runs the same (not built: about a release of work). Tesseract
+gives word boxes and a line's baseline (the core exposes `GetIterator()` → `ResultIterator`, `BoundingBox` at
+`RIL_WORD` / `RIL_TEXTLINE`, `Baseline`; `GetTSVText` too). What it would take:
+1. OCR moves before the layout: after `read`, the step `ocr` (the progress order holds), each OCR page's pixels read
+   then — with Tesseract's own page layout (psm 3 or 6) and its iterator for words, or ours for lines and its
+   iterator within each line (our line finder keeps the lines Tesseract's layout drops).
+2. A glyph per character as `extract.js` makes them: its word's box split by the characters, set out in drawing
+   order (right to left for Persian), `size` from the line's ink, `y` its baseline, in a font of its own (`ocr`: no
+   program, trusted, no fontprint, no letter statistics, no garbled check; bold from the stroke width later).
+3. The rules and frames `ocr.js` finds become the page's `hsegs` / `vsegs` (in points), so tables and boxes are found;
+   the rest of the page's picture becomes a figure only where no line lies.
+4. The ladder: the page now has glyphs, so its rung is decided as any page's — never `ocr` again —; its confidence
+   from the share of known words, its `ocrLayer` note replaced by the report's OCR list.
+5. The lab: the scans' expectations hold; columns, a list and a table on a scan to add (`make-scans.js`).
+Kept from 3.4: the engine, the line finder, `postCorrect`, the progress and the Cancel, the report.
+
 **The textContent rung reads pdf.js's items as glyphs**, not as strings sorted by position (which gave «۱۴۰۳» →
 «3041», «2024-05-12» → «12-05-2024», «(NAS)» → «)NAS(», a list item «مورد اول با Google Chrome» → «Google Chrome
 اب ورد اولم .1», its ZWNJs lost, running heads kept). pdf.js puts each item's characters, gathered in drawing order,
