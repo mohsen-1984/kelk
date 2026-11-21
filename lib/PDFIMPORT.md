@@ -1737,10 +1737,30 @@ structure tree disagrees with (`_treeVote`, from 3 votes; 0.15), gaps between a 
 
 | Mode | When | What the page gets |
 |---|---|---|
-| `ocr` | no text at all (a caption, a page number left after the furniture is text) over a picture covering half the page or more | its pictures (the scan) and the note `ocrNeeded`; conf 0 — the hook for an OCR runtime (later) |
+| `ocr` | no text at all (a caption, a page number left after the furniture is text) over a picture covering half the page or more | its pictures (the scan) and the note `ocrNeeded`; conf 0. With `options.ocr` `'read'` (3.4): read with OCR after the layout (below) |
 | `textContent` | its extraction or its lines failed; 20 % or more of its glyphs lost (`ladLostTextContent`) *and* pdf.js's text demonstrably fewer lost (`_ladTcBetter`: at most half their lost share, 80 % of their characters kept) | pdf.js's own text (`getTextContent()`), read as glyphs (below); note `pageTextOnly` |
 | `simplified` | 20 % or more of its glyphs lost otherwise (pdf.js's text is where their letters came from and loses the same: 74 U+FFFD either way on `t3-glued--lost25`); `suspectSpaces` and `lostGlyphs` together; conf under `pageConfSimplified` (0.45); its layout failed; `safe` mode | headings and paragraphs only: a table's rows, a list's items and a quote's blocks become paragraphs (`_ladFlatten`); after a failed layout, the lines by size and gap (`_ladSimpleBlocks`); note `pageSimplified` (not in safe mode) |
 | `full` | otherwise | the layout as it is |
+
+**OCR (3.4, `options.ocr` `'read'`).** The pages the ladder gives as their picture are read after the layout of
+every page (`_ladOcrPass`, called by `_layout` before the pages are joined), so the progress runs forward: the step
+`ocrLoad` while the engine starts (`_ladOcrLoad`: `options.loadOcr`, the app's `Kelk.libs.need('pdfocr')`; else
+script tags beside `ladder.js`, `require` under Node), then `ocr`, named by its page and line —
+`hooks.onStage('ocr', k + i / L, n, [page, i + 1, L])`. Each page is drawn at 300 dpi (`ladOcrDpi`, at most 16
+million pixels, `ladOcrMaxPx`), in gray; `lib/pdfimport/ocr.js` finds its lines (Otsu; frames and table rules — runs
+of ink a twelfth of the width, a 25th of the height — taken out; ink rows, the dots joined to their line) and
+Tesseract (tesseract.js-core 7.0.0's SIMD-LSTM build, the `fas` `best` model) reads each on its own as one raw line
+(psm 13); `postCorrect` fixes the commas it misreads and «ة» where only «ه» makes a known word (the words of
+`lm-fa.js`). The import's Cancel is checked before each line (`_yield`): it stops within one line. The lines become
+paragraphs and headings as the textContent rung's do (`_ladParas`: a line's size the page's usual line height when
+within a quarter of it — a box grows with its dots and tails); the page's blocks replace its picture. Its
+confidence is the share of its words the language model knows (as `tools/build-lm.js` counts them: Tesseract's own
+scores read high on lines that are wrong); the report lists the pages read in a category of
+their own, `report.ocr` `[{ page, conf, lines, notes }]` — `noLines`, `lowConf` (under 0.7, `ladOcrLowConf`),
+`failed` —, apart from the findings. A page that cannot be drawn (no canvas: Node) keeps its picture and
+`ocrNeeded`; a page Tesseract fails on, `ocrPageFailed`; an engine that does not start, `ocrFailed`. The lab's scans
+(`tests/pdf-lab/scripts/ocr-check.js`, five pages): 1.1 % of the letters and 3.2 % of the words wrong, about 1 s a
+page.
 
 **The textContent rung reads pdf.js's items as glyphs**, not as strings sorted by position (which gave «۱۴۰۳» →
 «3041», «2024-05-12» → «12-05-2024», «(NAS)» → «)NAS(», a list item «مورد اول با Google Chrome» → «Google Chrome

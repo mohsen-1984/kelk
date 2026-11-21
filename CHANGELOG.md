@@ -2,6 +2,18 @@
 
 All notable changes to Kelk. Dates are those of the release tags.
 
+## [Unreleased]
+
+### Added
+
+- **OCR of scanned Persian pages, the engine** (not yet offered in the app: its setting and button come next):
+  Tesseract (tesseract.js-core 7.0.0) and its Persian `best` model, loaded only when a page is read with OCR. Kelk
+  finds the lines itself and Tesseract reads each one. The PDF importer reads a page that is one picture when asked
+  (`ocr: 'read'`), in the import's own progress — named by page and line — and its Cancel, which stops within a line.
+  The import report lists the pages read with OCR in a section of their own, with a confidence (the share of their
+  words Kelk knows) and notes. On our lab's five scanned pages: 1.1 % of the letters and 3.2 % of the words wrong,
+  about a second a page.
+
 ## [3.3] — 2026-11-21
 
 ### Added

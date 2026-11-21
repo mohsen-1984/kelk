@@ -17,7 +17,9 @@
         // after the last page is read, the font repairs, the layout and the Markdown still take about two thirds of the time
         // (libs: pdf.js and the importer on the first PDF; file: the file read into memory; open: pdf.js opens the
         // document, its metadata and structure tree — not measured, small)
-        importProgress: { libs: 0.02, file: 0.01, open: 0.02, read: 0.31, fonts: 0.17, lines: 0.08, layout: 0.34, markdown: 0.05 },
+        // (ocrLoad, ocr: only in an import that reads its scanned pages with OCR — scripts/importer.js leaves them out
+        // otherwise —, on top of the rest: about a second or two a page, against a tenth for everything else, 3.4)
+        importProgress: { libs: 0.02, file: 0.01, open: 0.02, read: 0.31, fonts: 0.17, lines: 0.08, layout: 0.34, ocrLoad: 0.1, ocr: 2, markdown: 0.05 },
         // a PowerPoint export's progress bar (deck.js blob): each step's share, measured on decks of 200–430 slides
         // (libs: PptxGenJS on the first export, not measured)
         pptxProgress: { libs: 0.02, model: 0.05, build: 0.03, write: 0.5, slides: 0.22, zip: 0.2 },
@@ -194,6 +196,9 @@
             },
             // the glyph shapes of the fonts Kelk ships (300 KB): only when a PDF has a font Kelk does not know (trust.js)
             pdfshapes: { src: ['lib/pdfimport/shape.js', 'lib/pdfimport/shapes.js'], global: 'KelkPdfShapes' },
+            // OCR of a page that is one picture (3.4, 8 MB): Tesseract's core and Persian model, our line reader and the words
+            // of its post-correction — only when a PDF's pages are read with OCR (ladder.js _ladOcrLoad)
+            pdfocr: { src: ['lib/pdfimport/ocr.js', 'lib/pdfimport/lm-fa.js', 'vendor/tesseract/tesseract-core-simd-lstm_7.0.0.wasm.js', 'vendor/tesseract/fas-best.js'], global: 'TesseractCore' },
             jszip: { src: 'vendor/jszip.min_3.10.2.js', global: 'JSZip' },
             fontembed: { src: 'lib/FontEmbed.js', global: 'FontEmbed' },           // Settings → Fonts → Embed fonts
             slidecheck: { src: 'scripts/slidecheck.js', global: 'KelkSlideCheck' },      // on the first switch to slides

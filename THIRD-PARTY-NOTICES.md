@@ -25,6 +25,7 @@ unchanged unless noted; each keeps its own license.
 | MathJax (startup, core, TeX input + extensions, SVG output, ui/safe) | 4.1.3 | Apache-2.0 | `vendor/mathjax_4.1.3/` (`LICENSE` there) | https://github.com/mathjax/MathJax |
 | MathJax New Computer Modern font (SVG data) | 4.1.3 | Apache-2.0 | `vendor/mathjax_4.1.3/fonts/mathjax-newcm-font/` | https://cdn.jsdelivr.net/npm/@mathjax/mathjax-newcm-font@4.1.3/ |
 | MathJax mhchem font extension (SVG data) | 4.1.3 | Apache-2.0 | `vendor/mathjax_4.1.3/fonts/mathjax-mhchem-font-extension/` | https://cdn.jsdelivr.net/npm/@mathjax/mathjax-mhchem-font-extension@4.1.3/ |
+| tesseract.js-core: Tesseract OCR and Leptonica in WebAssembly (its SIMD-LSTM build, `tesseract-core-simd-lstm.wasm.js`, code unchanged), loaded only to read a scanned page | 7.0.0 | Apache-2.0 (Tesseract, tesseract.js-core); Leptonica: BSD-2-Clause | `vendor/tesseract/` (`LICENSE` there) | https://github.com/naptha/tesseract.js-core |
 
 The license text of each library is in its file header or at its source.
 
@@ -32,6 +33,7 @@ The license text of each library is in its file header or at its source.
 
 | Data | Source | License | Used for | File |
 |---|---|---|---|---|
+| Tesseract's Persian model `fas` (tessdata_best, in base64 by `tools/vendor-ocr-model.js`, bytes unchanged) | https://github.com/tesseract-ocr/tessdata_best | Apache-2.0 | OCR of scanned Persian pages (3.4), loaded only when needed | `vendor/tesseract/fas-best.js` |
 | Persian language model (letter and word counts) | Kelk's own text and the Leipzig Corpora Collection's Iranian Persian corpora `pes-ir_web-public_2019_100K` and `pes_wikipedia_2021_100K` (https://wortschatz.uni-leipzig.de/en/download/pes) | the corpora: CC BY (https://wortschatz.uni-leipzig.de/en/usage); the Wikipedia corpus's source text is CC BY-SA | OCR's post-correction (3.4), loaded only when needed | `tools/lm/lm.json`, `lib/pdfimport/lm-fa.js` |
 
 The model holds counts only — letter n-grams and the words seen at least ten times — no sentence of the corpora,
