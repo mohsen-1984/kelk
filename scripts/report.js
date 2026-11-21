@@ -8,7 +8,8 @@
  *                                                  the contract's failed: true — has the mode 'failed'),
  *         flags: [{ code, pages }], ocr: [{ page, conf, lines, notes: [] }], notes: [{ code, pages? }] }
  *     ocr: the pages read with OCR (3.4), a category of their own — apart from the findings (the fonts' among them)
- *     and from the pages not read in full, which leave them out; their notes are OCR_NOTES codes.
+ *     and from the pages not read in full, whose table leaves them out (they stay in pages: the contract's); their
+ *     notes are OCR_NOTES codes.
  *     r.report when the importer gives one (normalised: lists always there, a flag never repeated as a
  *     note); otherwise built from the older fields — r.pages (per-page mode / conf), r.quality.flags, r.notes,
  *     r.failedPages.
@@ -136,8 +137,7 @@
         if (r.report && typeof r.report === 'object') {
             const rep = r.report, s = rep.summary || {};
             const flags = flagList(rep.flags), ocr = ocrList(rep.ocr);
-            const byOcr = function (p) { return ocr.some(function (x) { return x.page === p.page; }); };
-            const pages = (Array.isArray(rep.pages) ? rep.pages : []).filter(function (p) { return p && (p.mode !== 'full' || p.failed) && !byOcr(p); }).map(function (p) {
+            const pages = (Array.isArray(rep.pages) ? rep.pages : []).filter(function (p) { return p && (p.mode !== 'full' || p.failed); }).map(function (p) {
                 return { page: p.page, mode: p.failed ? FAILED : String(p.mode || ''), conf: confOf(p.conf), why: (Array.isArray(p.why) ? p.why : []).map(String) };
             });
             const summary = { pages: +s.pages || 0, full: +s.full || 0, simplified: +s.simplified || 0, textContent: +s.textContent || 0, ocr: +s.ocr || 0, failed: +s.failed || 0, conf: confOf(s.conf) };
@@ -184,6 +184,8 @@
     /** the pages read with OCR as rows [page, confidence, notes] (the panel's table and the copy's) */
     const ocrRows = function (rep) { return ocrOf(rep).map(function (x) { return [x.page, pct(x.conf), x.notes.map(ocrNote).join(sep())]; }); };
     const OCR_HEAD = ['rep_colPage', 'rep_colConf', 'rep_colNotes'];
+    /** the pages not read in full as their table shows them: a page read with OCR is in the OCR table instead */
+    const notFull = function (rep) { return rep.pages.filter(function (p) { return !ocrOf(rep).some(function (x) { return x.page === p.page; }); }); };
     const list = function (ps) { return K.ui.pageList(ps, 12); };
 
     /** one finding (a flag or a note) → { text, warn } */
@@ -248,10 +250,10 @@
                 lines.push('', '**' + t('rep_findingsHead') + '**', '');
                 fs.forEach(function (f) { lines.push('- ' + f.text); });
             }
-            if (rep.pages.length) {
+            if (notFull(rep).length) {
                 lines.push('', '**' + t('rep_pagesHead') + '**', '');
                 Array.prototype.push.apply(lines, gfmTable(['rep_colPage', 'rep_colMode', 'rep_colConf', 'rep_colWhy'].map(function (k) { return t(k); }),
-                    rep.pages.map(function (p) { return [p.page, modeName(pageMode(p)), pct(p.conf), p.why.map(whyName).join(sep())]; })));
+                    notFull(rep).map(function (p) { return [p.page, modeName(pageMode(p)), pct(p.conf), p.why.map(whyName).join(sep())]; })));
             }
             if (ocrOf(rep).length) {
                 lines.push('', '**' + t('rep_ocrHead') + '**', '');
@@ -323,13 +325,13 @@
                     li.setAttribute('data-code', f.code);
                 });
             }
-            if (rep.pages.length) {
+            if (notFull(rep).length) {
                 const tbl = sec.appendChild(el('table', 'report-pages'));
                 tbl.appendChild(el('caption', null, t('rep_pagesHead')));
                 const hr = tbl.appendChild(el('thead')).appendChild(el('tr'));
                 ['rep_colPage', 'rep_colMode', 'rep_colConf', 'rep_colWhy'].forEach(function (k) { hr.appendChild(el('th', null, t(k))).scope = 'col'; });
                 const tb = tbl.appendChild(el('tbody'));
-                rep.pages.forEach(function (p) {
+                notFull(rep).forEach(function (p) {
                     const tr = tb.appendChild(el('tr'));
                     tr.setAttribute('data-mode', pageMode(p));
                     tr.appendChild(el('th', 'num', String(p.page))).scope = 'row';

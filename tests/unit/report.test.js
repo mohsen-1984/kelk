@@ -13,11 +13,8 @@ const { appWindow } = require('./helpers');
 const SAMPLE = require('../../tools/report-sample.js');
 
 const LIB = path.resolve(__dirname, '..', '..', 'lib');
-/** the sample's pages as the panel takes them: a page that failed has the mode 'failed'; the pages read with OCR in
- * their own list (SAMPLE.ocr), not here */
-const SAMPLE_PAGES = SAMPLE.pages.filter(function (p) {
-  return !SAMPLE.ocr.some(function (x) { return x.page === p.page; });
-}).map(function (p) {
+/** the sample's pages as the panel takes them: a page that failed has the mode 'failed' */
+const SAMPLE_PAGES = SAMPLE.pages.map(function (p) {
   return { page: p.page, mode: p.failed ? 'failed' : p.mode, conf: p.conf, why: p.why };
 });
 
@@ -115,6 +112,7 @@ test('fromResult: a result without r.report → the contract, from r.notes, r.qu
     summary: { pages: 4, full: 3, simplified: 0, textContent: 0, ocr: 0, failed: 1, conf: null },
     pages: [],
     flags: [{ code: 'suspectSpaces', pages: [2, 4] }],
+    ocr: [],
     // a flag is shown once (as a flag), a code once, pageFailed with its pages
     notes: [{ code: 'printNoLinks' }, { code: 'pageFailed', pages: [3] }]
   });
@@ -238,7 +236,9 @@ for (const lang of ['fa', 'en', 'ar']) {
     assert.equal(box.querySelector('[aria-live]'), null, 'no live region of its own');
     assert.equal(K.ui.report(clone(SAMPLE), { name: 'sample.pdf', onSafe: function () {} }), true);
     assert.equal(box.hidden, false);
-    assert.equal(box.querySelectorAll('.report-pages:not(.report-ocr) tbody tr').length, SAMPLE_PAGES.length);
+    // (the pages read with OCR are in their own table, not in the pages not read in full)
+    const byOcr = (p) => SAMPLE.ocr.some((x) => x.page === p.page);
+    assert.equal(box.querySelectorAll('.report-pages:not(.report-ocr) tbody tr').length, SAMPLE.pages.filter((p) => !byOcr(p)).length);
     // the pages read with OCR: a table of their own, each page with its confidence and its notes
     const ocrRows = box.querySelectorAll('.report-ocr tbody tr');
     assert.equal(ocrRows.length, SAMPLE.ocr.length);
