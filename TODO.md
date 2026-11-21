@@ -173,7 +173,7 @@ zip grows by the core and the model (about 8 MB). OCR votes for decipherment sta
    scan of about 300 pages, run outside the repository: nearly every page read, 0.83 of the words known on average, a
    tenth of the pages under 0.7 (lowConf), about 2.6 s a page.
    Open: `corpus/scan-headings-fa.md` has level-2 headings and no level 1, the importer gives level 1 (asked of the
-   owner, PR 3); the whole real scan crashed the headless browser's tab in 2 of 5 runs before its layout ended, with or
+   owner, PR 3); the whole real scan crashed the headless browser's tab in 3 of 6 runs before its layout ended, with or
    without OCR and with 3.3's importer too, its JavaScript heap staying under 100 MB — to look into (memory outside
    the heap: pdf.js's JBIG2 decoder?).
 4. **Release** (`release/3.4`).
