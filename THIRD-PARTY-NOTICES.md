@@ -36,6 +36,7 @@ The license text of each library is in its file header or at its source.
 | Sahel | 3.4.0 | SIL Open Font License 1.1 | web font; PDF font; .ttf to install for Word | `…/SAHEL-LICENSE-OFL.txt` (both folders), `sahel/OFL.txt` in the zip |
 | Vazir Code (Hack variant) | 1.1.2 | changes in the public domain; Hack glyphs MIT; Bitstream Vera license | web font; PDF font | `assets/fonts/vazir-code/VAZIR-CODE-LICENSE.txt`, `lib/pdf-base64-ttf-fonts/VAZIR-CODE-LICENSE.txt` |
 | DejaVu Sans, DejaVu Sans Mono | 2.37 | Bitstream Vera and Arev licenses (DejaVu changes in the public domain) | web fonts; PDF fonts | `assets/fonts/dejavu/DEJAVU-LICENSE.txt`, `lib/pdf-base64-ttf-fonts/DEJAVU-LICENSE.txt` |
+| DejaVu Serif (regular, bold) | 2.37 | Bitstream Vera and Arev licenses (DejaVu changes in the public domain) | build input only: the glyph shapes of its ASCII letters in `lib/pdfimport/shapes.js` (PDF import); the TTFs are in the repository, not in the app zip | `assets/fonts/dejavu/DEJAVU-LICENSE.txt` |
 | Noto Emoji | — | SIL Open Font License 1.1 | PDF font (monochrome) | `lib/pdf-base64-ttf-fonts/NOTO-EMOJI-LICENSE-OFL.txt` |
 | B Nazanin, B Mitra, B Titr | 2.01 | (c) Borna Rayaneh, no published license, see borna-rayaneh/NOTICE.txt | preview font (B Nazanin, B Mitra: the TTFs as they are); PDF font; .ttf to install for Word | `lib/pdf-base64-ttf-fonts/borna-rayaneh/NOTICE.txt`, `borna-rayaneh/NOTICE.txt` in the zip |
 

@@ -2,6 +2,42 @@
 
 All notable changes to Kelk. Dates are those of the release tags.
 
+## [3.3] — 2026-11-21
+
+### Added
+
+- **PDF import reads CFF fonts**: the compact Adobe fonts that Acrobat Distiller, InDesign and the Adobe PDF Library
+  embed (FontFile3 Type 1C and CID-keyed). Kelk now reads their outlines, so a CFF font Kelk does not know is read by
+  its letters' shapes, a known face by its rough prints, and a ZWNJ from the outlines — as TrueType fonts already were.
+  On our lab files: a CID-keyed Persian page 27.6 → 51.9, a renumbered one 20.0 → 68.9, Vazirmatn as CFF 25.0 → 61.9,
+  the ZWNJ case 93.9 → 100. On a real report embedded that way, the Persian words read went from about 1,400 to about
+  64,000. A CFF font no reading recovers is reported garbled, never passed off as text: where 3.2 let such text through
+  unreported, the report now names it — so such a file's confidence can come out lower than before. Such files also
+  import more slowly (about twice as long), since their fonts are read by their shapes.
+- **Serif Latin**: the shapes of DejaVu Serif's letters (a build input only; the app ships no new font) let Kelk read
+  an English page in a serif font it does not know — our Liberation Serif lab page 25.0 → 100. The reading's limits
+  stayed as they were, set on the fonts Kelk ships: wrong readings are still accepted 0 % of the time. The cost,
+  measured the same way: an English page in a font like Vazirmatn's Latin is now accepted less often (at 150 and 600
+  letters, 12 → 3 of 12 test pages) — such a page is reported garbled, never read wrong.
+
+### Fixed
+
+- **Word's ت**: Word's «Save as PDF» names every ت «"» (U+0022) in its fonts' ToUnicode; the font's own cmap names
+  them right, and now wins. A real quotation mark keeps its name.
+- **Stretched letters**: a Nastaliq font that names its stretched forms as tatweels and the letter («ـــی») now gives
+  the letter, without the tatweels.
+- **Persian letters**: in a Persian text, ە and ھ now become ه too (as ي ك ى already became ی ک ی), in every import
+  — PDF, Word/HTML, paste and sheets. Arabic keeps ى; a text with Urdu or Kurdish letters keeps its ە and ھ.
+- **The PDF lab**: 239 PDFs (seven new: four CFF cases, a CFF font no reading recovers, Word's ت, the tatweel
+  ToUnicode). On 3.2's 232 files none scores worse and one reads better (`driver-print--unknown-serif-en` 25.0 →
+  100.0); `word-save--teh-fa` 60.5 → 74.1, `word-save--tatweel-fa` 92.2 → 100. Corpus mean 94.8 (the new files are
+  hard on purpose); golden, random-style and held-out means unchanged.
+
+### Changed
+
+- **PdfImporter is 1.3** (its own version; Kelk's libraries are 3.3). The startup size budget rose by 0.5 KB, for
+  the Persian letters rule.
+
 ## [3.2] — 2026-11-21
 
 ### Added
