@@ -17,6 +17,7 @@ require(path.join(root, 'lib', 'pdfimport', 'shape.js'));
 const JSZip = require(path.join(root, 'vendor', fs.readdirSync(path.join(root, 'vendor')).find((f) => /^jszip\.min_.*\.js$/.test(f))));
 const S = PdfImporter._shape, OUT = path.join(root, 'lib', 'pdfimport', 'shapes.js');
 
+const SERIF = ['DejaVuSerif.ttf', 'DejaVuSerif-Bold.ttf'];
 // the faces, in the order they are written (the zip's file names)
 const ZIPPED = ['vazirmatn/Vazirmatn-Regular.ttf', 'vazirmatn/Vazirmatn-Bold.ttf', 'sahel/Sahel.ttf', 'sahel/Sahel-Bold.ttf',
   // the B fonts, (c) Borna Rayaneh, no published license (lib/pdf-base64-ttf-fonts/borna-rayaneh/NOTICE.txt): their shapes
@@ -39,6 +40,16 @@ function pdfFont(file, styles) {
     faces.push(S.face(await zip.files[name].async('uint8array')));
   }
   pdfFont(path.join(root, 'lib', 'pdf-base64-ttf-fonts', 'pdf-font-dejavu-sans.js'), ['normal', 'bold']).forEach((b) => faces.push(S.face(b)));
+  // DejaVu Serif (3.3): the one serif Latin face, its Latin shapes only — its TTFs are a build input beside the DejaVu
+  // licence (assets/fonts/dejavu/), not loaded by the app and left out of the app zip (tools/build-release.sh)
+  // (the glyphs the cmap gives an ASCII character itself: NFKC would fold its math, fullwidth and small letters in too)
+  SERIF.forEach((f) => {
+    const bytes = new Uint8Array(fs.readFileSync(path.join(root, 'assets', 'fonts', 'dejavu', f)));
+    const g2u = PdfImporter._internal.sfntLigatures(bytes).g2u, only = {};
+    Object.keys(g2u).forEach((g) => { if (/^[!-~]$/.test(g2u[g])) only[g] = 1; });
+    const sh = S.glyphs(bytes, only), nm = PdfImporter._fontprint.names(bytes);
+    faces.push({ family: nm.family, face: nm.face || 'Regular', shapes: Object.keys(sh).map(Number).sort((a, b) => a - b).map((g) => [S.pack(sh[g]), g2u[g]]) });
+  });
   const bad = faces.filter((f) => !f.family || !f.shapes.length);
   if (bad.length) { console.error('a font without a family name or without TrueType outlines'); process.exit(1); }
   fs.writeFileSync(OUT, S.source(faces));

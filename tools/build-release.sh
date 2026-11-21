@@ -22,6 +22,8 @@ git archive --format=zip --prefix=kelk/ -o "$full" "$rev"
 git archive --format=tar --prefix=kelk/ "$rev" | tar -x -C "$tmp"
 ( cd "$tmp/kelk"
   rm -rf .github .gitattributes .gitignore eslint.config.js package.json package-lock.json CLAUDE.md TODO.md tools tests
+  # (DejaVu Serif's TTFs are a build input of lib/pdfimport/shapes.js only, 3.3: the app never loads them)
+  rm -f assets/fonts/dejavu/DejaVuSerif.ttf assets/fonts/dejavu/DejaVuSerif-Bold.ttf
   find docs -mindepth 1 ! -name about-kelk-and-samples.js ! -name excel-samples.js ! -name slides-samples.js -exec rm -rf {} +
   for f in index.html README.md LICENSE docs/about-kelk-and-samples.js docs/excel-samples.js docs/slides-samples.js; do
     [ -f "$f" ] || { echo "the app's tree is missing $f" >&2; exit 1; }

@@ -574,8 +574,12 @@ The text is read as the file names it; two settings then write it out, both on b
   points for all four, so there is nothing more to map. A comma between words stays «،», a separator not
   between digits stays, code (inline or a block) is never touched.
 - **`persianLetters`** («Persian letters»): in a **Persian document** — three or more of the letters only
-  Persian writes (پ چ ژ گ), at least 0.3 % of its Arabic-script letters — Arabic ي ك ى become ی ک ی. An
-  Arabic document keeps its letters, and so does an Arabic quotation in a document that is not Persian.
+  Persian writes (پ چ ژ گ), at least 0.3 % of its Arabic-script letters — Arabic ي ك ى become ی ک ی, and ە ھ
+  become ه (3.3: a font read by its outlines gives a glyph its face's first character, and Vazirmatn's final and
+  medial heh are ە and ھ there). An Arabic document keeps its letters, and so does an Arabic quotation in a document
+  that is not Persian. A text with three or more letters of Urdu (ٹ ڈ ڑ ں ے) or Kurdish (ڕ ڵ ۆ ێ) — which write پ چ
+  ژ گ too — keeps its ە and ھ, letters of their own there. The same rule in every import (MarkdownImporter,
+  SheetImporter); `tests/unit/write-out.test.js` holds both sides.
 
 Why these defaults: some producers name the Persian letters by the Arabic ones whatever was typed (GDI /
 Microsoft Print to PDF's ToUnicode, some Word exports), and a document's numbers are easier to search, sort and
@@ -610,6 +614,13 @@ wins glyph by glyph where the glyph's advance agrees with it: the cmap's space w
 or more is a space; the cmap's mark with no advance is that mark; the cmap's lam-alef ligature (U+FEF5–FEFC) named
 by one of its letters is both letters. Composite fonts read by glyph id only (§5). Lab: `make-slides-rtl.py`.
 
+### A stretched form named with tatweels
+
+A Nastaliq font (IranNastaliq in Word) names each stretched form as tatweels and its letter («ـــی») in its ToUnicode;
+the tatweels stayed in the text («کهـــن») and the judge doubted the font. A ToUnicode value of tatweels and one Arabic
+letter, on either side, is the letter (`TATWEEL_NAME`, `_opGlyphs`, 3.3). A kashida glyph named «ـ» alone stays a
+kashida. Lab: `word-save--tatweel-fa` (92.1 → 100).
+
 ### A ToUnicode wrong for a few letters
 
 A Word letter stamped by iText kept B Mitra's ToUnicode, wrong for a dozen glyphs while right for the rest: medial
@@ -618,6 +629,11 @@ space — «عمه ات» for «عملیات», «ایج» for «این», «پ 
 of its Arabic letters (20 or more, four in five) and disagrees on a few, the few are the ToUnicode's mistakes and
 the cmap's letter wins (twins aside — ي ی, ك ک, ة ۀ, and Arial's heh, which its cmap names ھ), for a glyph with an
 advance (`arTrust` in `_gsubRepair`).
+
+**An ASCII sign for a letter** (3.3): Word's «Save as PDF» names every form of ت «"» in its ToUnicode («م"ن» for
+«متن») while its cmap names them right. The rule above now also takes a glyph the file names by an ASCII sign — a real
+«"» keeps its name, its cmap naming it «"» too. A font with too few letters for the rule (a bold title alone) keeps
+the ToUnicode's names. Lab: `word-save--teh-fa` (60.5 → 74.1; its body's words 71.1 → 98.2).
 
 **Wrong throughout** (Kelk 2.2, `_gsubFormPairs`): a Word subset of a Persian font through another PDF program names
 almost every Arabic glyph by a wrong letter or a mark («ثٝ» for «به») — the cmap disagrees on most letters, so the
@@ -834,8 +850,10 @@ ZWNJ by outline: a renumbered CFF font with no ToUnicode came back as ASCII («!
 
 A fontprint finds a glyph only in the typeface it was made from. For a font Kelk does not know, `lib/pdfimport/shape.js`
 gives each glyph a **shape**, and ranks the characters whose glyphs in the fonts Kelk ships look most like it. The data,
-`lib/pdfimport/shapes.js`, holds the shapes of Vazirmatn, Sahel, the B fonts (regular and bold; B Titr bold) and DejaVu
-Sans (Latin), made by `tools/build-shapes.js` (`npm run check:fresh` runs it). Shapes and characters only: no font.
+`lib/pdfimport/shapes.js`, holds the shapes of Vazirmatn, Sahel, the B fonts (regular and bold; B Titr bold), DejaVu
+Sans (Latin) and, since 3.3, DejaVu Serif (its ASCII glyphs only: the one serif Latin face, its TTFs a build input in
+`assets/fonts/dejavu/`, never loaded by the app and left out of its zip), made by `tools/build-shapes.js` (`npm run
+check:fresh` runs it). Shapes and characters only: no font.
 
 - **The shape**: the glyph's contours (curves cut into four lines) drawn on a 12 × 12 grid stretched to the glyph's box
   (neither side more than three times the other: a dash stays a bar), four samples a side per cell, then smoothed; its
@@ -853,7 +871,13 @@ Sans (Latin), made by `tools/build-shapes.js` (`npm run check:fresh` runs it). S
   82 % and 91 % (O and 0, l and I are one shape in a sans). The lab's fonts Kelk does not know
   (`tests/pdf-lab/scripts/shape-accuracy.js`, letter by letter as the page draws them, within the script the glyphs'
   vote gives): FreeSerif 95.8 % first, 98.1 % in the first three; Liberation Serif 76.8 % and 91.3 % — Kelk ships no
-  serif Latin face, and r t, v Y, l I are its misses.
+  serif Latin face, and r t, v Y, l I are its misses. With DejaVu Serif's shapes (3.3): Liberation Serif 100 % and
+  100 %, and `driver-print--unknown-serif-en` is read (25.0 → 100) under the limits as they were.
+- **The serif shapes' cost** (3.3, measured on the fonts Kelk ships, `tools/calibrate-shapes.js`): the Latin limits stay
+  (unseen 0.04, distance 0.10) — a serif reading lies at 0.15–0.17, where glyphs no font draws (the bars) lie too, and
+  a limit of 0.14 already took a tenth of those. The wrong readings (shuffled, bars) are still accepted 0 % of the time
+  in Latin; but a Vazirmatn page playing an unknown Latin font is taken less often — 9 → 5 of 12 at 30 letters, 12 → 3
+  at 150 and at 600 —: such a page is reported garbled, never read wrong. `TODO.md` holds an idea to win it back.
 
 ### Reading a font Kelk does not know: the approximate reading (`trust.js` `_fontApprox`, 3.2)
 
