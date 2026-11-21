@@ -145,7 +145,11 @@ lab files (`make-cff33.py`) are in; their text stays out of `letterstats.js` for
    prints) — both renumbered files come back as ASCII today and nothing is reported, a gap the reader closes (pending
    in `expect.json`); `prince-cff--cff-zwnj-fa`, the ZWNJ in a CFF program («Words and letters» below). pdf.js
    reports a glyph's width from a 2048-unit CFF program as if it were in 1000 units: the widths come from the font's
-   `/Widths` (or `/W`), never from the program.
+   `/Widths` (or `/W`), never from the program. **Done** (`pdf/3.3-cff`: `lib/pdfimport/cff.js`, `PDFIMPORT.md` §5
+   «CFF programs»); a CFF font no reading recovers is always reported garbled (`distiller-cff--cff-unreadable-fa`,
+   the owner's rule). Left, not placed: a CFF table inside an OpenType program (FontFile3 `/OpenType`); a plain CFF
+   font whose codes the PDF's `/Encoding /Differences` remaps; seac accents. The lab's TrueType programs are written
+   with a fixed date now (`rtl_pdf.fixed`): a regenerated file is byte for byte the same.
 2. **DejaVu Serif's shapes** — «Left from 3.2» below: one bundled serif Latin face (its TTFs committed beside the DejaVu
    licence as a build input only, out of the app zip; the owner's decision, 2026-11-21), then the Latin limits set
    again on the fonts Kelk ships (`tools/calibrate-shapes.js`); `driver-print--unknown-serif-en` is the file to read.
@@ -175,6 +179,14 @@ fonts Kelk does not know (`word-cover--glyph-index-fa`). Its own scope round fir
     30 letters passes one time in eight). Another sign is needed: the OCR phase's votes (proposed for 3.4).
   - FreeSerif's alef read «أ» in a few words («أن»): a hamza's small part weighs little (`W_DOTS`, set on the fonts
     Kelk ships); not tuned on the lab file.
+- **Vazirmatn's heh and yeh by its fontprints** (seen with 3.3's `distiller-cff--cff-known-fa`, and the same with a
+  renumbered TrueType Vazirmatn): the arbiter gives the face's first character for a glyph several letters share —
+  final heh «ە» (U+06D5), medial «ھ», final yeh «ى» by its rough prints — where a Persian text writes ه and ی. The
+  owner decides whether a Persian document folds them, as it does ي and ك.
+- **A shape's scale and split subsets** (3.3): a shape is measured against the median height of its program's
+  glyphs, so a font whose digits and marks sit in another subset (Distiller's) reads a little differently from the
+  same font whole — FreeSerif's alef read «أ» throughout `distiller-cff--cff-cid-fa`, in a few words of
+  `unknown-serif-fa`. Not tuned on the lab files.
 - **Many subsets of one font** (2026-11-21): one font embedded as dozens of subsets (a
   subset a page or a section), each with little text. A reading that has to learn a font from its own text (3.2's
   shapes, a later decipherment) does worse and takes longer on each alone; subsets that share outlines are one font

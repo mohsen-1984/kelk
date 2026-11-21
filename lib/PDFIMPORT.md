@@ -59,6 +59,7 @@ Three decisions shape everything:
 | `lib/pdfimport/regions.js` | 4. the page driver (`_layout`), ruled tables, code boxes, figures (§7) |
 | `lib/pdfimport/ladder.js` | 4.9 each page's confidence and the fallback ladder (§7a) |
 | `lib/pdfimport/letterstats.js` | data: the letter pairs of our own text by language (`tools/build-letterstats.js`), for the judge |
+| `lib/pdfimport/cff.js` | the outlines of a bare CFF program (FontFile3 `/Type1C`, `/CIDFontType0C`) for the readers that knew only TrueType's: forms and the ZWNJ by outline, fontprints, shapes (3.3, §5 «CFF programs») |
 | `lib/pdfimport/fontprint.js`, `fontprints.js` | a glyph known by its outline's hash; the fontprints of the fonts Kelk knows (`tools/build-fontprints.js`) |
 | `lib/pdfimport/trust.js` | 1.8 the font arbiter (from `_extractPage`); after the layout the judge (`garbledText`) and hidden text (`hiddenText`) (§5, *Fontprints* onwards) |
 | `lib/pdfimport/order.js` | 4. reading order: XY-cut, rows of borderless tables (§8.1, §8.3) |
@@ -786,12 +787,48 @@ and the other letters or digits that name the same glyph. Hashes and characters 
   when the fontprints know under `trustPrintKnown` of a font's glyphs: the wkhtmltopdf subsets are then known on
   127 of 128 glyphs (**lab:** `wk-rtl--*`). The data grew from 478 to 592 KB.
 - **What a fontprint cannot tell**: two characters of one outline — ي and ی, ك and ک, 4 ٤ ۴ where a font draws them
-  with one glyph (the table lists them as the glyph's others); a space or a ZWNJ (no outline); a glyph of a CFF or
-  Type 3 font; a font rebuilt with other outlines.
+  with one glyph (the table lists them as the glyph's others); a space or a ZWNJ (no outline); a glyph of a Type 3
+  font; a font rebuilt with other outlines; a CFF font's glyph (its fontprint hashes its own points, a curve's two
+  control points among them, so it never matches a TrueType face's — its rough print can: «CFF programs» below).
 
 Both files are parts of the importer (`PdfImporter.PARTS`): the font arbiter reads them (below).
 `tests/unit/fontprint*.test.js` hold them to the lab's files: a Word file whose ToUnicode is wrong and a print
 driver's renumbered fonts are both known glyph for glyph.
+
+### CFF programs (`cff.js`, 3.3)
+
+Acrobat Distiller, InDesign and the Adobe PDF Library embed fonts as CFF programs (FontFile3 `/Type1C`, or
+`/CIDFontType0C` for a CID-keyed font): Type 2 charstrings, cubic outlines in a small stack language with shared
+subroutines. Before 3.3 only TrueType outlines (`glyf`) were read, so such a font had no shapes, no fontprints and no
+ZWNJ by outline: a renumbered CFF font with no ToUnicode came back as ASCII («!"#$%&'()») and nothing was reported.
+
+- **The reader** (`cff.js`, `PdfImporter._cff`): the charstrings with every path operator, flex and hint masks; local
+  and global subroutines, biased, ten deep at most; a CID-keyed font's FDArray and FDSelect (each glyph's own Private
+  DICT); the charset; the built-in encoding (formats 0 and 1 and their supplements, the standard encoding by name);
+  units an em from the FontMatrix (1/1000, often 1/2048). It gives the readers the map `sfntLigatures` gives a
+  TrueType program (`ink`, `adv`, `edges`, `side`, `c2g`, `g2u` from standard glyph names and `uniXXXX`) and
+  `fontprint.js`'s outline reader (`read(key, flat)`: the contours, a curve's control points off it; flat, the curves
+  cut into eight lines each, what `shape.js` draws). Checked against fontTools on the lab's programs: every glyph's box
+  within 2 units.
+- **A glyph's key** is what a code names: the glyph id in a plain font (through its built-in encoding), the CID in a
+  CID-keyed one. Distiller's CIDs are the source font's glyph ids (157 … 456), not the program's: the charset maps
+  them, and keyed by CID the readers that take a composite font's code as its glyph id read them unchanged —
+  `extract.js` lists a `CIDFontType0` among the composite fonts with an Identity map (`R.cidMaps`).
+- **Widths**: pdf.js gives a CFF font's `/Widths` in its program's units (`adjustWidths`: 735 → 1505 at 1/2048);
+  `extract.js` scales them by the font's FontMatrix, as it does a Type 3 font's.
+- **A composite font's names**: its `/Encoding` is a CMap and names no character; only a ToUnicode does
+  (`_approxDictNames`, which also finds Distiller's «Name-Identity-H»). A CID-keyed title font with no ToUnicode was
+  taken as named, and left out of the approximate reading.
+- **Shapes**: one font's glyphs give the same shapes from its TrueType and its CFF program (mean distance 0.01 on
+  the lab's FreeSerif, the reading's limit 0.18). A shape is measured against the median height of the program's
+  glyphs, so a font whose digits and marks are in another subset (Distiller's) reads a little differently.
+- **Not read**: an accented glyph made by `endchar`'s four extra operands (seac), CFF2, a CFF table inside an OpenType
+  program (FontFile3 `/OpenType`), a plain font whose codes the PDF's own `/Encoding /Differences` remaps.
+- **Lab** (`make-cff33.py`): `distiller-cff--cff-cid-fa` 27.6 → 51.9 (read approximately; the judge still reports
+  its body, FreeSerif's alef read «أ»), `--cff-type1c-fa` 20.0 → 68.9 (2048 units an em, nested subroutines),
+  `--cff-known-fa` 25.0 → 61.9 (Vazirmatn known by its rough prints), `prince-cff--cff-zwnj-fa` 93.9 → 100 (the ZWNJ
+  by outline); `distiller-cff--cff-unreadable-fa` (abstract bars) is always reported garbled, and so is any CFF font
+  the readings leave: the judge finds its program now (`_trustUnnamed`).
 
 ### Glyph shapes: the nearest glyphs of the fonts Kelk ships (`shape.js`, 3.2)
 

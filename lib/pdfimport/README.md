@@ -5,7 +5,7 @@ in `PdfImporter._internal`, `fromArrayBuffer`, structure tree, Kelk's own source
 its methods to `PdfImporter.prototype` with `Object.assign`. Plain scripts, no build step, work from `file://`.
 
 Load order, after pdf.js and `MarkdownImporter.js`: `lib/PdfImporter.js`, then `thresholds`, `calibration`,
-`extract`, `lines`, `regions`, `ladder`, `letterstats`, `fontprint`, `fontprints`, `trust`, `order`, `blocks` (`PdfImporter.PARTS`; the app loads them on the first PDF import). The rules and why each is as it is: [`../PDFIMPORT.md`](../PDFIMPORT.md);
+`extract`, `lines`, `regions`, `ladder`, `letterstats`, `cff`, `fontprint`, `fontprints`, `trust`, `order`, `blocks` (`PdfImporter.PARTS`; the app loads them on the first PDF import). The rules and why each is as it is: [`../PDFIMPORT.md`](../PDFIMPORT.md);
 the stage list is in the header of `lib/PdfImporter.js`.
 
 The tables list every method defined in a file, in pipeline order, with its callers and what it does. A step
@@ -278,6 +278,18 @@ list number at a line's end), `.tcBrackets` (brackets named logically, renamed a
 | `_toHtml` | `fromArrayBuffer` | 6. blocks to semantic HTML for MarkdownImporter |
 | ↳ `_inline` | `_toHtml` | 6. inline HTML of glyphs: bold, italic, code, links, escapes |
 | ↳ `_listHtml` | `_toHtml` | a list (nested by level) as <ul> / <ol> |
+
+## cff.js — the outlines of a CFF program
+
+One of `PdfImporter.PARTS` (3.3), loaded before `fontprint.js`. It adds `PdfImporter._cff`, pure functions over a bare
+CFF program's bytes (FontFile3 `/Type1C`, `/CIDFontType0C`). See *CFF programs* in [`../PDFIMPORT.md`](../PDFIMPORT.md).
+
+| Function | Used by | Step |
+|---|---|---|
+| `is` | `sfntLigatures`, `fontprint.js` | Whether the bytes are a bare CFF program |
+| `font` | the three below, the tests | The program → its outlines, advances, encoding and glyph names by key (glyph id, or CID) |
+| `ligatures` | `sfntLigatures` | The map `sfntLigatures` gives a TrueType program, from a CFF one |
+| `outlines` | `fontprint.js` `outlines` | Its outline reader: `read(key, flat)`, `adv(key)` |
 
 ## fontprint.js and fontprints.js — a glyph known by its outline
 
