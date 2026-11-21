@@ -9,7 +9,7 @@ seconds, so it can be run after every change. The why of the importer is in
 ```text
 corpus/    the sources: Markdown documents and the office files (.docx, .xlsx, .csv, .pptx) — each with
            the Markdown it should come back as
-pdf/       the PDFs made from them: <producer>--<doc>.pdf (232 files), in six folders by what they test:
+pdf/       the PDFs made from them: <producer>--<doc>.pdf (239 files), in six folders by what they test:
              en/         the English corpus through every producer we run (60)
              rtl/        the right-to-left corpus through the same producers (39)
              office/     the office files — sheets, a deck, Word documents — through LibreOffice (13)
