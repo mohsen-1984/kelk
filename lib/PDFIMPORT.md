@@ -574,8 +574,12 @@ The text is read as the file names it; two settings then write it out, both on b
   points for all four, so there is nothing more to map. A comma between words stays «،», a separator not
   between digits stays, code (inline or a block) is never touched.
 - **`persianLetters`** («Persian letters»): in a **Persian document** — three or more of the letters only
-  Persian writes (پ چ ژ گ), at least 0.3 % of its Arabic-script letters — Arabic ي ك ى become ی ک ی. An
-  Arabic document keeps its letters, and so does an Arabic quotation in a document that is not Persian.
+  Persian writes (پ چ ژ گ), at least 0.3 % of its Arabic-script letters — Arabic ي ك ى become ی ک ی, and ە ھ
+  become ه (3.3: a font read by its outlines gives a glyph its face's first character, and Vazirmatn's final and
+  medial heh are ە and ھ there). An Arabic document keeps its letters, and so does an Arabic quotation in a document
+  that is not Persian. A text with three or more letters of Urdu (ٹ ڈ ڑ ں ے) or Kurdish (ڕ ڵ ۆ ێ) — which write پ چ
+  ژ گ too — keeps its ە and ھ, letters of their own there. The same rule in every import (MarkdownImporter,
+  SheetImporter); `tests/unit/write-out.test.js` holds both sides.
 
 Why these defaults: some producers name the Persian letters by the Arabic ones whatever was typed (GDI /
 Microsoft Print to PDF's ToUnicode, some Word exports), and a document's numbers are easier to search, sort and
