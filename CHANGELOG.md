@@ -2,6 +2,34 @@
 
 All notable changes to Kelk. Dates are those of the release tags.
 
+## [3.2] — 2026-11-21
+
+### Added
+
+- **PDF import reads fonts Kelk does not know** — approximately. When a file does not name a font's letters (a print
+  driver's renumbered font, for one) and Kelk has no fontprints of it, Kelk reads each letter from its shape, against
+  the glyphs of the fonts it ships, and lets the letter pairs of Persian, Arabic and English choose between near
+  shapes. The text is taken only when it reads as language; the report then says «recovered, approximate», with the
+  fonts and pages, and those pages' confidence is lowered. Check such text against the PDF.
+- **How well, honestly**: on our lab files, a Persian page in a typeface Kelk does not ship came back with **97.9 %**
+  of its letters right; an English page in DejaVu Sans, 100 %. **Not read yet**: serif Latin (a Liberation Serif page
+  stays reported, since Kelk ships no serif Latin face to compare with) and very short texts (a title of a few letters
+  in such a font, alone on its page). A font no reading can recover is still reported, never passed off as text.
+- **Settings → Import → *Fonts Kelk does not know***: «Read approximately» (default) or «Leave and report».
+
+### Changed
+
+- **The shapes load only when needed**: the glyph shapes of the fonts Kelk ships (300 KB) load the first time a PDF
+  has such a font — never at startup, and from `file://` too.
+- **PdfImporter is 1.2** (its own version; Kelk's libraries are 3.2).
+
+### Fixed
+
+- **The PDF lab**: 232 PDFs (three new: a Persian and an English page in fonts Kelk does not ship, and a page no
+  reading can recover). No file scores worse than in 3.1; two read better (`driver-print--renumbered-en` 51.0 → 100.0,
+  `driver-print--unknown-serif-fa` 25.0 → 71.1). Corpus mean 94.9 → 95.3; golden, random-style and held-out means
+  unchanged. The limits of the reading were set on the fonts Kelk ships only, never on the lab files.
+
 ## [3.1] — 2026-11-18
 
 ### Added

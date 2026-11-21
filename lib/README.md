@@ -117,7 +117,7 @@ A code block whose fence says `text` (or `txt`, `plaintext`) is labelled so (`Bi
 fallback label.
 
 File properties: `configure({ meta: { title, author, subject, keywords, creator } })` (or `setMeta`) — PDF Info,
-the .docx core properties, HTML `<meta name="author">`; the creator is "Kelk " + `BuilderBase.version` (3.1 now) unless set, the title the
+the .docx core properties, HTML `<meta name="author">`; the creator is "Kelk " + `BuilderBase.version` (3.2 now) unless set, the title the
 header's or the first H1 when left out.
 
 ## The builders
@@ -339,13 +339,18 @@ const r = await PdfImporter.create({ images: 'markdown' }).fromArrayBuffer(buffe
 r.markdown; r.notes;            // notes: 'noText' (a scan?), 'pageLimit', 'figureFailed', 'printNoLinks', 'ocrLayer', 'pageFailed',
                                 //   'lostGlyphs', 'suspectSpaces', 'textInPictures' (pages in r.quality.flags),
                                 //   'garbledText' (a font whose text is no language: its fonts and pages), 'hiddenText'
-                                //   (text no reader sees), 'fontprintRead' (a font's characters read from its outlines)
+                                //   (text no reader sees), 'fontprintRead' (a font's characters read from its outlines),
+                                //   'fontApprox' (a font Kelk does not know, read from its glyphs' shapes: approximate)
 r.failedPages;                  // pages that could not be read or laid out (the others were)
 // options.signal: an AbortSignal — the import stops at the next page with err.code 'aborted'
 // options.asciiNumbers (true): ۰–۹ / ٠–٩ → 0–9, and inside a number ٬ ، → ',' · ٫ → '.' · ٪ → '%' (code untouched)
 // options.persianLetters (true): in a Persian document, ي ك ى → ی ک ی (an Arabic document keeps its letters)
 // options.hiddenText ('end'): text no reader sees — off the page, white on white, too small, invisible — in one quote
 //   at the document's end; 'inPlace' between the blocks where it stood; 'drop' left out (reported in all three)
+// options.unknownFonts ('approx'): a font Kelk does not know, which the file does not name, read by the shapes of its
+//   glyphs when the reading reads as language ('fontApprox'); 'report' leaves it as the file names it ('garbledText')
+// options.loadShapes (null): async () that loads lib/pdfimport/shape.js and shapes.js (300 KB); by default script tags
+//   beside trust.js (file:// too) or require under Node — only when a PDF has such a font
 // options.uiLang (''): the interface's language, for a note Kelk writes when the document's own cannot be told
 r.info;                         // the file's own words, as written: { title, author, subject, keywords, creator, producer,
                                 //   creatorTool, xmpProducer, history, created, modified, pdfVersion, pages, pageSize,
@@ -365,8 +370,10 @@ them into logical order with its own bidi pass (bracket pairs, numbers, code spa
 shaped Arabic letters go back to plain letters, lost ZWNJs come back where the shapes, the glyph order or the
 outlines show them; a ToUnicode is checked against the font's own cmap glyph by glyph, and — for a font Kelk knows
 (`fontprints.js`: the common Persian fonts) — against the font's own outlines: a file that names a font's letters
-wrong (a wrong ToUnicode, a print driver's renumbered codes) is read from the shapes. Each font's text is then judged:
-a font whose text is no language is reported (`garbledText`), not rewritten. Text no reader sees comes back in a
+wrong (a wrong ToUnicode, a print driver's renumbered codes) is read from the shapes. A font Kelk does not know, which
+the file does not name, is read approximately from its glyphs' shapes against the fonts Kelk ships, when the reading
+reads as language (`fontApprox`). Each font's text is then judged: a font whose text is no language is reported
+(`garbledText`), not rewritten. Text no reader sees comes back in a
 marked block (`hiddenText`).
 Then: running headers/footers dropped, headings by size, paragraphs by spacing, lists by markers
 (bullets drawn or typed, numbers — also set off by a tab — task boxes; line breaks kept where a line ends short), tables from ruled grids and from borderless rows
