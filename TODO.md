@@ -150,15 +150,20 @@ lab files (`make-cff33.py`) are in; their text stays out of `letterstats.js` for
    the owner's rule). Left, not placed: a CFF table inside an OpenType program (FontFile3 `/OpenType`); a plain CFF
    font whose codes the PDF's `/Encoding /Differences` remaps; seac accents. The lab's TrueType programs are written
    with a fixed date now (`rtl_pdf.fixed`): a regenerated file is byte for byte the same.
-2. **DejaVu Serif's shapes** — «Left from 3.2» below: one bundled serif Latin face (its TTFs committed beside the DejaVu
+2. **Done** (`pdf/3.3-serif-teh`): `driver-print--unknown-serif-en` 25.0 → 100, the limits unchanged (`PDFIMPORT.md`,
+   «The serif shapes' cost»). **DejaVu Serif's shapes** — «Left from 3.2» below: one bundled serif Latin face (its TTFs committed beside the DejaVu
    licence as a build input only, out of the app zip; the owner's decision, 2026-11-21), then the Latin limits set
    again on the fonts Kelk ships (`tools/calibrate-shapes.js`); `driver-print--unknown-serif-en` is the file to read.
 3. **Word's «Save as PDF» ت** — Word names Persian ت `"` in its ToUnicode («م"ن» for متن; «Next phase: right to left»
    below): `word-save--teh-fa` (reported garbled today), then the fix from the font's own cmap; a real `"` beside it
-   must stay a quote.
+   must stay a quote. **Done** (60.5 → 74.1). Left: the bold title's font has too few letters for the cmap rule and
+   keeps «"اریخچه»; real quotes around a Latin word in a right-to-left line come back «Ketabnama""».
 4. **A ToUnicode of tatweels plus a letter** («ـــی»: how a Nastaliq font names its stretched forms) is the letter —
    today the tatweels stay in the text and the judge doubts the font. `word-save--tatweel-fa`; in the same pull
-   request as items 2 and 3, a commit of its own (the owner's decision, 2026-11-21).
+   request as items 2 and 3, a commit of its own (the owner's decision, 2026-11-21). **Done** (92.1 → 100).
+5. **ە ھ ى in a Persian text** (the owner's decision, 2026-11-21): the Persian letters rule folds ە and ھ to ه too, in
+   every import; Arabic keeps ى, a text with Urdu or Kurdish letters keeps ە and ھ (`tests/unit/write-out.test.js`).
+   **Done**.
 
 **3.4 — OCR on demand, proposed** (the owner, 2026-11-21): tesseract.js (Persian, Arabic, English), loaded only when
 asked for — scanned PDFs, text drawn as outlines, titles drawn as pictures or in calligraphy, and votes for the short
@@ -179,10 +184,10 @@ fonts Kelk does not know (`word-cover--glyph-index-fa`). Its own scope round fir
     30 letters passes one time in eight). Another sign is needed: the OCR phase's votes (proposed for 3.4).
   - FreeSerif's alef read «أ» in a few words («أن»): a hamza's small part weighs little (`W_DOTS`, set on the fonts
     Kelk ships); not tuned on the lab file.
-- **Vazirmatn's heh and yeh by its fontprints** (seen with 3.3's `distiller-cff--cff-known-fa`, and the same with a
-  renumbered TrueType Vazirmatn): the arbiter gives the face's first character for a glyph several letters share —
-  final heh «ە» (U+06D5), medial «ھ», final yeh «ى» by its rough prints — where a Persian text writes ه and ی. The
-  owner decides whether a Persian document folds them, as it does ي and ك.
+- **The serif shapes and the sans Latin readings** (3.3, measured on the fonts Kelk ships): with DejaVu Serif among the
+  references, a Vazirmatn page playing an unknown Latin font is accepted less often — 9 → 5 of 12 at 30 letters, 12 → 3
+  at 150 and 12 → 3 at 600 (reported garbled, never read wrong; wrong readings still accepted 0 %). An idea, not for
+  now (the owner, 2026-11-21): pick the closest reference family first, then rank within it, to win that back.
 - **A shape's scale and split subsets** (3.3): a shape is measured against the median height of its program's
   glyphs, so a font whose digits and marks sit in another subset (Distiller's) reads a little differently from the
   same font whole — FreeSerif's alef read «أ» throughout `distiller-cff--cff-cid-fa`, in a few words of
