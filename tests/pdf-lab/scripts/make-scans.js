@@ -52,7 +52,7 @@ function html(fonts, body, opts) {
 // ---- the scanner, in the page: skew, blur, noise, Otsu ------------------------------------------------------------------
 async function scan(page, png, o) {
   return page.evaluate(async ([b64, o]) => {
-    const img = new Image(); img.src = 'data:image/png;base64,' + b64; await img.decode();
+    const img = document.createElement('img'); img.src = 'data:image/png;base64,' + b64; await img.decode();
     const w = Math.round(img.width * o.scale), h = Math.round(img.height * o.scale);
     const c = document.createElement('canvas'); c.width = w; c.height = h;
     const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, w, h);
