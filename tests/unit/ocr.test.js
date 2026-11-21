@@ -56,6 +56,15 @@ test('the line finder: a frame and a table rule are taken out, the text between 
   assert.equal(pg.clean[45 * w + 105], 0, 'the text stays');
 });
 
+test('the line finder: a rule scanned askew (a row lower every 60 pixels) is taken out too', function () {
+  const w = 1200, h = 300, boxes = [];
+  for (let k = 0; k < 18; k++) boxes.push([50 + 60 * k, 200 + k, 110 + 60 * k, 201 + k]);
+  const px = draw(w, h, [].concat(boxes, line(40, 100, 1100)));
+  const pg = O.page(px, w, h);
+  assert.equal(pg.boxes.length, 1, 'the askew rule leaves no line of specks');
+  assert.equal(pg.clean[209 * w + 600], 255, 'the rule is white');
+});
+
 test('postCorrect: the comma Tesseract mistakes, ة where only ه makes a known word', function () {
   const vocab = new Set(['خانه', 'کتاب', 'هوا']);
   assert.equal(O.postCorrect('کتاب, خانه', vocab), 'کتاب، خانه');
