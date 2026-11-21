@@ -193,16 +193,21 @@
      * the import could not read in full (Kelk.importReport.fromResult — shown by Kelk.ui.report once the text is
      * in, not as toasts); bytes: a copy of the file for "Re-import in safe mode" (pdf.js may take the buffer it
      * reads), only with o.keepBytes (a PDF imported on its own: the one case with that button), else null.
-     * o.mode: PdfImporter's mode ('safe': headings and paragraphs only; default its own, 'auto').
+     * o.mode: PdfImporter's mode ('safe': headings and paragraphs only; default its own, 'auto'). o.ocr: 'read' — the
+     * pages that are one picture read with OCR (PdfImporter's options.ocr, 3.4; default its own, 'picture').
      */
     async function fromPdf(file, name, t, o) {
-        const mode = o && o.mode;
+        const mode = o && o.mode, ocr = o && o.ocr === 'read';
         // the bar runs through every step (config.importProgress), not only the pages: after the last page
         // is read the font repairs, the layout and the Markdown still take most of the time; each step is named
         // (the page under way for the counted ones)
-        const step = K.ui.steps(t, K.config.importProgress, {
+        // (OCR's steps only when it reads: their shares would leave a gap in the bar otherwise; ocr is named by its page
+        // and line, the importer's [page, line, lines])
+        const W = {};
+        Object.keys(K.config.importProgress).forEach(function (k) { if (ocr || !/^ocr/.test(k)) W[k] = K.config.importProgress[k]; });
+        const step = K.ui.steps(t, W, {
             libs: 'imp_pdfLibs', file: 'imp_file', open: 'imp_pdfOpen', read: 'taskPage', fonts: 'taskFonts',
-            lines: 'taskLines', layout: 'taskLayout', markdown: 'taskMarkdown'
+            lines: 'taskLines', layout: 'taskLayout', ocrLoad: 'imp_ocrStart', ocr: 'taskOcr', markdown: 'taskMarkdown'
         }, ['read', 'lines', 'layout']);
         if (!K.libs.loaded('pdfjs') || !K.libs.loaded('pdfimport')) {
             step('libs', 0, 1);
@@ -227,6 +232,7 @@
                     hiddenText: set.hiddenText === 'inPlace' || set.hiddenText === 'drop' ? set.hiddenText : 'end',
                     unknownFonts: set.unknownFonts === 'report' ? 'report' : 'approx',
                     loadShapes: function () { return K.libs.need('pdfshapes'); },
+                    loadOcr: function () { return K.libs.need('pdfocr'); },
                     uiLang: K.i18n.lang,
                     markdownImporter: { nestedTables: set.nestedTables, mergedRows: set.mergedRows === 'repeat' ? 'repeat' : 'empty', images: set.images, labels: labels() },
                     wasmBase: 'vendor/pdfjs/wasm/',
@@ -247,8 +253,9 @@
                         } catch (err) { return uri; }
                     }
                 };
-                const hooks = { onStage: step };          // 'open', 'read', 'fonts', 'lines', 'layout', 'markdown'
+                const hooks = { onStage: step };          // 'open', 'read', 'fonts', 'lines', 'layout', 'ocrLoad', 'ocr', 'markdown'
                 if (mode) opts.mode = hooks.mode = mode;
+                if (ocr) opts.ocr = 'read';
                 const r = await PdfImporter.create(opts).fromArrayBuffer(buf, hooks);
                 if (r.messages && r.messages.length) console.info('PdfImporter:', r.messages);
                 return { md: r.markdown, report: K.importReport.fromResult(r), bytes: bytes, info: fi ? fi.fromPdf(r) : null, kind: 'pdf' };
@@ -292,7 +299,7 @@
          * and a clean import closes an older one. One PDF on its own can be re-imported in safe mode from there:
          * its bytes are copied for that import only, kept while its panel is open, and let go when the panel
          * closes, when nothing was worth a panel, and when the next import starts. o.mode: the PDF importer's mode
-         * ('safe').
+         * ('safe'); o.ocr: 'read' — its scanned pages read with OCR.
          */
         fromFiles: async function (files, o) {
             files = Array.from(files || []).filter(Boolean);
