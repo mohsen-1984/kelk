@@ -133,15 +133,28 @@ only (`tools/calibrate-shapes.js`), never on the lab files; the lab files whose 
 text. A lab font's shapes never enter `shapes.js` (FreeSerif, Liberation Serif: the answers). The B fonts' shapes stay
 removable in one commit, as their fontprints.
 
-**3.3 — fonts, proposed** (the owner, 2026-11-21; scope agreed before coding, as each release):
+**3.3 — fonts** (the owner, 2026-11-21; split approved: lab → CFF reader → serif shapes, ت and tatweels → release). The
+lab files (`make-cff33.py`) are in; their text stays out of `letterstats.js` for good (`MEASURED`, the owner's decision):
 
 1. **A CFF outline reader** (`FontFile3`, Type 1C / CIDFontType0C): shapes, fontprints and the ZWNJ read from the
-   outlines work only for TrueType programs (`glyf`) today; Adobe and InDesign PDFs embed CFF. A lab file first (a CFF
-   font Kelk does not know, renumbered), then the reader, then the ZWNJ in a CFF program («Words and letters» below).
-2. **DejaVu Serif's shapes** — «Left from 3.2» below: one bundled serif Latin face, then the Latin limits set again on
-   the fonts Kelk ships (`tools/calibrate-shapes.js`); `driver-print--unknown-serif-en` is the file to read.
-3. **A lab file for Word's «Save as PDF» ت** — Word names Persian ت `"` in its ToUnicode («م"ن» for متن; «Next phase:
-   right to left» below): a synthetic file of our own first, then the fix from the font's own cmap.
+   outlines work only for TrueType programs (`glyf`) today; Adobe and InDesign PDFs embed CFF. Distiller's habits: the Persian text in CID-keyed CFF subsets (Identity-H, ROS Adobe-Identity-0, one Font DICT, no
+   subroutines, no glyph names, no ToUnicode) whose CIDs are the source font's glyph ids — the program's charset, not
+   Identity, maps a CID to its glyph; the space, digits and ASCII marks in separate `/Type1C` subsets with standard
+   glyph names; one font re-subset many times in one file. Lab files: `distiller-cff--cff-cid-fa` (reported garbled
+   today), `--cff-type1c-fa` (2048 units an em, nested subroutines) and `--cff-known-fa` (Vazirmatn as CFF: its rough
+   prints) — both renumbered files come back as ASCII today and nothing is reported, a gap the reader closes (pending
+   in `expect.json`); `prince-cff--cff-zwnj-fa`, the ZWNJ in a CFF program («Words and letters» below). pdf.js
+   reports a glyph's width from a 2048-unit CFF program as if it were in 1000 units: the widths come from the font's
+   `/Widths` (or `/W`), never from the program.
+2. **DejaVu Serif's shapes** — «Left from 3.2» below: one bundled serif Latin face (its TTFs committed beside the DejaVu
+   licence as a build input only, out of the app zip; the owner's decision, 2026-11-21), then the Latin limits set
+   again on the fonts Kelk ships (`tools/calibrate-shapes.js`); `driver-print--unknown-serif-en` is the file to read.
+3. **Word's «Save as PDF» ت** — Word names Persian ت `"` in its ToUnicode («م"ن» for متن; «Next phase: right to left»
+   below): `word-save--teh-fa` (reported garbled today), then the fix from the font's own cmap; a real `"` beside it
+   must stay a quote.
+4. **A ToUnicode of tatweels plus a letter** («ـــی»: how a Nastaliq font names its stretched forms) is the letter —
+   today the tatweels stay in the text and the judge doubts the font. `word-save--tatweel-fa`; in the same pull
+   request as items 2 and 3, a commit of its own (the owner's decision, 2026-11-21).
 
 **3.4 — OCR on demand, proposed** (the owner, 2026-11-21): tesseract.js (Persian, Arabic, English), loaded only when
 asked for — scanned PDFs, text drawn as outlines, titles drawn as pictures or in calligraphy, and votes for the short
@@ -162,6 +175,10 @@ fonts Kelk does not know (`word-cover--glyph-index-fa`). Its own scope round fir
     30 letters passes one time in eight). Another sign is needed: the OCR phase's votes (proposed for 3.4).
   - FreeSerif's alef read «أ» in a few words («أن»): a hamza's small part weighs little (`W_DOTS`, set on the fonts
     Kelk ships); not tuned on the lab file.
+- **Many subsets of one font** (2026-11-21): one font embedded as dozens of subsets (a
+  subset a page or a section), each with little text. A reading that has to learn a font from its own text (3.2's
+  shapes, a later decipherment) does worse and takes longer on each alone; subsets that share outlines are one font
+  and can be read together.
 - **Left from 3.1** (2026-11-18):
   - **A table row cut by the page break is dropped** (Chrome splits a ruled table's row whose cells wrap: its first
     lines at a page's foot under no closing rule, the rest on the next page; both parts are lost). Found by
@@ -222,7 +239,7 @@ fonts Kelk does not know (`word-cover--glyph-index-fa`). Its own scope round fir
 
 - PDF import: put the calibrated thresholds to use (1,007 registered, none switched to calibrated yet); fonts with no
   ToUnicode at all (3.2 reads a renumbered TrueType program by its shapes; CFF and Type 3 programs not yet — CFF
-  proposed for 3.3); Persian digits that share a glyph with Arabic-Indic ones come back Arabic-Indic; bordered form boxes
+  in 3.3); Persian digits that share a glyph with Arabic-Indic ones come back Arabic-Indic; bordered form boxes
   as tables
 - Text kept safe: images and text in IndexedDB instead of `localStorage` (≈ 5 MB), and recovery snapshots (Clear and a
   crash can be undone after a reload)
@@ -427,7 +444,7 @@ is fixed; **decided / limit:** kept as it is)
 **Next phase: right to left** (Persian, Arabic, Hebrew PDFs from other programs — fonts, ToUnicode repairs,
 mixed-direction lists and tables)
 
-- Word "Save as PDF" maps Persian ت to `"` in its ToUnicode («م"ن» for متن) — fix from the font's own cmap (a lab file first: proposed for 3.3)
+- Word "Save as PDF" maps Persian ت to `"` in its ToUnicode («م"ن» for متن) — fix from the font's own cmap (3.3; lab file `word-save--teh-fa`)
   (as done for Microsoft Print to PDF); a Persian Excel sheet (Microsoft Print to PDF) repeats a merged
   cell's text in its last row
 - A Hebrew Word PDF reads its brackets mirrored the wrong way ("15)ב()4(")

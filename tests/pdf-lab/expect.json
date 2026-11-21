@@ -20,6 +20,10 @@
     "wk-rtl--fa-article": { "not": ["garbledText"] },
     "chrome-github-bg--symbols": { "not": ["garbledText"] },
     "wk-github--symbols": { "not": ["garbledText"] },
+    "distiller-cff--cff-cid-fa": { "has": ["garbledText"], "not": ["fontprintRead", "hiddenText"], "_note": "a CID-keyed CFF font Kelk does not know, no ToUnicode: reported garbled until the CFF outline reader (3.3) reads its shapes; turned around then with the owner's approval" },
+    "distiller-cff--cff-type1c-fa": { "has": ["fontApprox"], "not": ["garbledText", "hiddenText"], "pending": "3.3: the CFF outline reader", "_note": "a renumbered plain CFF font Kelk does not know: today its codes come back as ASCII and nothing is reported (a gap the reader closes)" },
+    "distiller-cff--cff-known-fa": { "has": ["fontprintRead"], "not": ["garbledText", "hiddenText"], "pending": "3.3: the CFF outline reader", "_note": "Vazirmatn as a renumbered CFF font: known by its rough prints once the outlines are read; today its codes come back as ASCII and nothing is reported" },
+    "word-save--teh-fa": { "has": ["garbledText"], "not": ["hiddenText"], "_note": "Word's ToUnicode names every ت «\"»: the judge reports it until the fix from the font's own cmap (3.3); turned around then with the owner's approval" },
     "chrome-cutrow--cut-row": { "has": ["lostText"], "_note": "a table row cut by the page break, dropped with no reason (3.1): the report must say so" }
   }
 }

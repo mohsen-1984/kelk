@@ -8,6 +8,8 @@
  * ي ك to ی ک, marks and the tatweel dropped), Latin words (a–z, case folded) for en whatever the file's language.
  * Left out: the lab's files in fonts Kelk does not know (MEASURED). Their text is what the approximate reading (3.2)
  * must find and its accuracy is measured on: in the stats, the answer would help pick the letters and flatter the score.
+ * 3.3's font files (tests/pdf-lab/scripts/make-cff33.py: the CFF programs, Word's ت, the tatweel ToUnicode) are left out
+ * the same way, for good (the owner's decision, 2026-11-21).
  */
 'use strict';
 const fs = require('fs'), path = require('path');
@@ -16,7 +18,8 @@ const OUT = path.join(root, 'lib', 'pdfimport', 'letterstats.js');
 const AR = /[\u0621-\u063A\u0641-\u064A\u067E\u0686\u0698\u06A9\u06AF\u06CC]/;
 const fold = (s) => s.normalize('NFKC').replace(/[\u064B-\u065F\u0670\u0640]/g, '').replace(/[\u064A\u0649]/g, '\u06CC').replace(/\u0643/g, '\u06A9');
 
-const MEASURED = ['glyph-index-fa.md', 'renumbered-en.md', 'unknown-serif-fa.md', 'unknown-serif-en.md', 'unreadable-fa.md'];
+const MEASURED = ['glyph-index-fa.md', 'renumbered-en.md', 'unknown-serif-fa.md', 'unknown-serif-en.md', 'unreadable-fa.md',
+  'cff-cid-fa.md', 'cff-type1c-fa.md', 'cff-known-fa.md', 'cff-zwnj-fa.md', 'teh-fa.md', 'tatweel-fa.md'];
 const files = [];
 const take = (dir, re, lang) => fs.readdirSync(path.join(root, dir)).filter((f) => re.test(f) && !(dir === 'tests/pdf-lab/corpus' && MEASURED.indexOf(f) >= 0)).sort().forEach((f) => files.push([path.join(root, dir, f), lang(f)]));
 const byName = (f) => /[-.]fa\.md$/.test(f) ? 'fa' : /[-.]ar\.md$/.test(f) ? 'ar' : 'en';
