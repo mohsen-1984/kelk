@@ -614,6 +614,13 @@ wins glyph by glyph where the glyph's advance agrees with it: the cmap's space w
 or more is a space; the cmap's mark with no advance is that mark; the cmap's lam-alef ligature (U+FEF5–FEFC) named
 by one of its letters is both letters. Composite fonts read by glyph id only (§5). Lab: `make-slides-rtl.py`.
 
+### A stretched form named with tatweels
+
+A Nastaliq font (IranNastaliq in Word) names each stretched form as tatweels and its letter («ـــی») in its ToUnicode;
+the tatweels stayed in the text («کهـــن») and the judge doubted the font. A ToUnicode value of tatweels and one Arabic
+letter, on either side, is the letter (`TATWEEL_NAME`, `_opGlyphs`, 3.3). A kashida glyph named «ـ» alone stays a
+kashida. Lab: `word-save--tatweel-fa` (92.1 → 100).
+
 ### A ToUnicode wrong for a few letters
 
 A Word letter stamped by iText kept B Mitra's ToUnicode, wrong for a dozen glyphs while right for the rest: medial
