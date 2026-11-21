@@ -44,7 +44,7 @@ const PDF_GROUPS = [
   ['producers', /^(word\d*-|driver-|loref-|pptx-|prince-|itext-|acrobat-|pdflib-|distiller-)/],
   ['office', /^(calc--|impress--|lowriter--word-)/],
   ['pages', /^(chrome-(layout|layers|template|web-rtl|headtable|positioned|float-tagged|pictures|card|fa-links|form|letterhead|booklet|mail)--|wk-pictures--|lowriter--merged)/],
-  ['rtl', /^(chrome-rtl-|wk-rtl--|lohtml-rtl--)|--(fa|ar)-/],
+  ['rtl', /^(chrome-rtl-|wk-rtl--|lohtml-rtl--|scan-\d+--)|--(fa|ar)-/],
   ['en', /./]
 ];
 function pdfGroup(name) { return PDF_GROUPS.find(([, re]) => re.test(path.basename(name)))[0]; }

@@ -28,7 +28,8 @@ const ACCEPT = ai > 0 ? { arabic: [+process.argv[ai + 1], +process.argv[ai + 2]]
 const FAMILIES = [['Vazirmatn', 'vazirmatn/Vazirmatn-Regular.ttf'], ['Sahel', 'sahel/Sahel.ttf'], ['B Nazanin', 'borna-rayaneh/BNAZANIN.TTF'],
   ['B Mitra', 'borna-rayaneh/BMITRA.TTF'], ['B Titr', 'borna-rayaneh/BTITRBD.TTF'], ['DejaVu Sans', 'dejavu'], ['DejaVu Serif', 'dejavu-serif']];
 const MEASURED = ['glyph-index-fa.md', 'renumbered-en.md', 'unknown-serif-fa.md', 'unknown-serif-en.md', 'unreadable-fa.md',
-  'cff-cid-fa.md', 'cff-type1c-fa.md', 'cff-known-fa.md', 'cff-unreadable-fa.md', 'cff-zwnj-fa.md', 'teh-fa.md', 'tatweel-fa.md'];
+  'cff-cid-fa.md', 'cff-type1c-fa.md', 'cff-known-fa.md', 'cff-unreadable-fa.md', 'cff-zwnj-fa.md', 'teh-fa.md', 'tatweel-fa.md',
+  'scan-plain-fa.md', 'scan-framed-fa.md', 'scan-low-fa.md', 'scan-headings-fa.md'];
 const fold = (t) => t.normalize('NFKC').replace(/[ً-ٰٟـ]/g, '').replace(/[يى]/g, 'ی').replace(/ك/g, 'ک');
 
 /** the letter pairs of the lab's expected Markdown (as tools/build-letterstats.js counts them: seen twice or more) */
