@@ -181,11 +181,22 @@
     const pageMode = function (p) { return p.failed ? FAILED : p.mode; };
     const whyName = function (w) { return own(WHY_KEYS, w) ? t(WHY_KEYS[w]) : w; };
     const ocrNote = function (n) { return own(OCR_NOTES, n) ? t(OCR_NOTES[n]) : n; };
-    /** the pages read with OCR as rows [page, confidence, notes] (the panel's table and the copy's) */
-    const ocrRows = function (rep) { return ocrOf(rep).map(function (x) { return [x.page, pct(x.conf), x.notes.map(ocrNote).join(sep())]; }); };
-    const OCR_HEAD = ['rep_colPage', 'rep_colConf', 'rep_colNotes'];
-    /** the pages not read in full as their table shows them: a page read with OCR is in the OCR table instead */
-    const notFull = function (rep) { return rep.pages.filter(function (p) { return !ocrOf(rep).some(function (x) { return x.page === p.page; }); }); };
+    /**
+     * a report's page tables, for the panel and the copy alike: the pages not read in full (a page read with OCR is in
+     * the next one instead), the pages read with OCR — each { cls, head, cols: [[key, cell class]], rows: [{ mode, cells }] },
+     * the empty ones left out
+     */
+    function tables(rep) {
+        const byOcr = function (p) { return ocrOf(rep).some(function (x) { return x.page === p.page; }); };
+        return [
+            { cls: 'report-pages', head: 'rep_pagesHead', cols: [['rep_colPage', 'num'], ['rep_colMode', 'mode'], ['rep_colConf', 'num'], ['rep_colWhy', 'why']],
+                rows: rep.pages.filter(function (p) { return !byOcr(p); }).map(function (p) {
+                    return { mode: pageMode(p), cells: [p.page, modeName(pageMode(p)), pct(p.conf), p.why.map(whyName).join(sep())] };
+                }) },
+            { cls: 'report-pages report-ocr', head: 'rep_ocrHead', cols: [['rep_colPage', 'num'], ['rep_colConf', 'num'], ['rep_colNotes', 'why']],
+                rows: ocrOf(rep).map(function (x) { return { cells: [x.page, pct(x.conf), x.notes.map(ocrNote).join(sep())] }; }) }
+        ].filter(function (tb) { return tb.rows.length; });
+    }
     const list = function (ps) { return K.ui.pageList(ps, 12); };
 
     /** one finding (a flag or a note) → { text, warn } */
@@ -250,15 +261,10 @@
                 lines.push('', '**' + t('rep_findingsHead') + '**', '');
                 fs.forEach(function (f) { lines.push('- ' + f.text); });
             }
-            if (notFull(rep).length) {
-                lines.push('', '**' + t('rep_pagesHead') + '**', '');
-                Array.prototype.push.apply(lines, gfmTable(['rep_colPage', 'rep_colMode', 'rep_colConf', 'rep_colWhy'].map(function (k) { return t(k); }),
-                    notFull(rep).map(function (p) { return [p.page, modeName(pageMode(p)), pct(p.conf), p.why.map(whyName).join(sep())]; })));
-            }
-            if (ocrOf(rep).length) {
-                lines.push('', '**' + t('rep_ocrHead') + '**', '');
-                Array.prototype.push.apply(lines, gfmTable(OCR_HEAD.map(function (k) { return t(k); }), ocrRows(rep)));
-            }
+            tables(rep).forEach(function (tb) {
+                lines.push('', '**' + t(tb.head) + '**', '');
+                Array.prototype.push.apply(lines, gfmTable(tb.cols.map(function (c) { return t(c[0]); }), tb.rows.map(function (r) { return r.cells; })));
+            });
             if (infoOf(e)) lines.push('', '**' + t('fi_head') + '**', '', K.fileInfo.gfm(e.info).replace(/\n$/, ''));
         });
         return lines.join('\n').replace(/[⁦-⁩]/g, '').replace(/^ +$/gm, '').replace(/\n{3,}/g, '\n\n').trim() + '\n';
@@ -325,34 +331,21 @@
                     li.setAttribute('data-code', f.code);
                 });
             }
-            if (notFull(rep).length) {
-                const tbl = sec.appendChild(el('table', 'report-pages'));
-                tbl.appendChild(el('caption', null, t('rep_pagesHead')));
+            tables(rep).forEach(function (tb) {
+                const tbl = sec.appendChild(el('table', tb.cls));
+                tbl.appendChild(el('caption', null, t(tb.head)));
                 const hr = tbl.appendChild(el('thead')).appendChild(el('tr'));
-                ['rep_colPage', 'rep_colMode', 'rep_colConf', 'rep_colWhy'].forEach(function (k) { hr.appendChild(el('th', null, t(k))).scope = 'col'; });
-                const tb = tbl.appendChild(el('tbody'));
-                notFull(rep).forEach(function (p) {
-                    const tr = tb.appendChild(el('tr'));
-                    tr.setAttribute('data-mode', pageMode(p));
-                    tr.appendChild(el('th', 'num', String(p.page))).scope = 'row';
-                    tr.appendChild(el('td', 'mode', modeName(pageMode(p))));
-                    tr.appendChild(el('td', 'num', pct(p.conf)));
-                    tr.appendChild(el('td', 'why', p.why.map(whyName).join(sep())));
+                tb.cols.forEach(function (c) { hr.appendChild(el('th', null, t(c[0]))).scope = 'col'; });
+                const tbody = tbl.appendChild(el('tbody'));
+                tb.rows.forEach(function (r) {
+                    const tr = tbody.appendChild(el('tr'));
+                    if (r.mode) tr.setAttribute('data-mode', r.mode);
+                    r.cells.forEach(function (v, i) {
+                        const c = tr.appendChild(el(i ? 'td' : 'th', tb.cols[i][1], String(v)));
+                        if (!i) c.scope = 'row';
+                    });
                 });
-            }
-            if (ocrOf(rep).length) {
-                const tbl = sec.appendChild(el('table', 'report-pages report-ocr'));
-                tbl.appendChild(el('caption', null, t('rep_ocrHead')));
-                const hr = tbl.appendChild(el('thead')).appendChild(el('tr'));
-                OCR_HEAD.forEach(function (k) { hr.appendChild(el('th', null, t(k))).scope = 'col'; });
-                const tb = tbl.appendChild(el('tbody'));
-                ocrRows(rep).forEach(function (c) {
-                    const tr = tb.appendChild(el('tr'));
-                    tr.appendChild(el('th', 'num', String(c[0]))).scope = 'row';
-                    tr.appendChild(el('td', 'num', c[1]));
-                    tr.appendChild(el('td', 'why', c[2]));
-                });
-            }
+            });
             if (infoOf(e)) K.fileInfo.render(sec, e.info);
         });
         const safe = K.$('#report-safe'), hint = K.$('#report-safe-hint');
