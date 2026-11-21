@@ -44,6 +44,12 @@ test('the line finder: one box a line, its dots with it, top to bottom', functio
   assert.equal(O.page(new Uint8Array(w * h).fill(255), w, h).boxes.length, 0, 'a blank page has no line');
 });
 
+test('the line finder: no line a few pixels high, nor a picture a sixth of the page', function () {
+  const w = 800, h = 1200;
+  const px = draw(w, h, [].concat([[100, 300, 700, 302]], [[100, 600, 700, 900]], line(100, 100, 700)));
+  assert.equal(O.page(px, w, h).boxes.length, 1, 'only the text line: not the two-pixel row, not the picture');
+});
+
 test('the line finder: a frame and a table rule are taken out, the text between them stays', function () {
   const w = 800, h = 400;
   const frame = [[20, 10, 780, 14], [20, 386, 780, 390], [20, 10, 24, 390], [776, 10, 780, 390]];
