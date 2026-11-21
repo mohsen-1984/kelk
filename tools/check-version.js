@@ -9,8 +9,8 @@
  *   semver   2.0.0-rc1   package.json (npm needs major.minor.patch)
  *   release  2.0         lib/ file headers and engine versions, the download zip in README —
  *                        they name the release they belong to, so an rc does not change them
- * Deliberately not checked: PdfImporter's own version (1.1, fixed below: its own numbering — 1.0 from Kelk 2.0,
- * 1.1 from Kelk 3.1); "new in 2.0" in docs/about-kelk-and-samples.* and TODO.md (history, stays at 2.0);
+ * Deliberately not checked: PdfImporter's own version (1.2, fixed below: its own numbering — 1.0 from Kelk 2.0,
+ * 1.1 from Kelk 3.1, 1.2 from Kelk 3.2); "new in 2.0" in docs/about-kelk-and-samples.* and TODO.md (history, stays at 2.0);
  * CHANGELOG's older headings and body; o:Version 16.00 (Word) in msOfficeWordHtmlTemplate.js,
  * MIME-Version 1.0 in WordHtmlBuilder.js; sample data ("Version 1.2" in config.js, sample tables);
  * third-party versions (vendor/, fonts, THIRD-PARTY-NOTICES.md).
@@ -56,8 +56,8 @@ const CHECKS = [
     { file: 'tools/bidi-lab.html', re: /<title>BiDi Lab ([^ ]+) /g, form: 'release', why: 'page title' },
     { file: 'tools/bidi-lab.html', re: HEADER, form: 'release', why: 'inlined BidiCore / BidiView headers', count: 2 },
     { file: 'tools/bidi-lab.html', re: /var BidiView = \{ version: '([^']+)'/g, form: 'release', why: 'inlined BidiView.version' },
-    { file: 'lib/PdfImporter.js', re: HEADER, fixed: '1.1', why: 'PdfImporter\'s own version, not Kelk\'s (1.0 from Kelk 2.0, 1.1 from 3.1: the owner\'s decision, 2026-11-17)' },
-    { file: 'lib/PdfImporter.js', re: /PdfImporter\.VERSION = '([^']+)'/g, fixed: '1.1', why: 'PdfImporter.VERSION, as above' }
+    { file: 'lib/PdfImporter.js', re: HEADER, fixed: '1.2', why: 'PdfImporter\'s own version, not Kelk\'s (1.0 from Kelk 2.0, 1.1 from 3.1, 1.2 from 3.2: the owner\'s decision, 2026-11-17)' },
+    { file: 'lib/PdfImporter.js', re: /PdfImporter\.VERSION = '([^']+)'/g, fixed: '1.2', why: 'PdfImporter.VERSION, as above' }
 ];
 
 let bad = 0;
