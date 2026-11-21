@@ -161,10 +161,15 @@ zip grows by the core and the model (about 8 MB). OCR votes for decipherment sta
    `scan-150--scan-low-fa`, our own text, in no text the language model counted (pending `ocrRead` in
    `expect.json`); the language model and its builder `tools/build-lm.js` (the corpora never in the repository).
 2. **Engine** (`pdf/3.4-ocr-engine`): the core and the model vendored; `lib/pdfimport/ocr.js` (the spike's
-   `ocr-lines.js`: Otsu, frames and rules out, lines found, psm 13, `postCorrect`); unit tests.
-3. **Import** (`pdf/3.4-ocr-import`): the ladder's `ocr` rung reads a picture-only page; a report note with its pages
-   and a confidence from the share of known words; the setting, the report's button, named progress steps, Cancel and
-   a page range. A real scan run outside the repository: pages read, share of known words, time a page. A real scan
+   `ocr-lines.js`: Otsu, frames and rules out, lines found, psm 13, `postCorrect`); unit tests. With it, as the owner
+   asked (2026-11-21), the importer's side: `options.ocr` `'read'` (default `'picture'`, as before) reads the `ocr`
+   rung's pages after the layout, a line at a time, in the import's own progress steps (`ocrLoad`, `ocr` named by page
+   and line) and Cancel; the report's own OCR category (pages, the share of known words, notes); `o.ocr` of the app's
+   PDF import. Lab scans (`ocr-check.js`): CER 1.1 %, WER 3.2 %, about 1 s a page.
+3. **Import** (`pdf/3.4-ocr-import`): the setting, the report's «Read with OCR» button (a re-import with `o.ocr`, as
+   safe mode's), a page range, the `ocrRead` expectations made real. Seen on the lab scans, to measure before any
+   change: a printed frame's remnant read as a line of single letters (Tesseract's confidence about 0.1, where text
+   lines read 0.35 and up); «هٔ» read as «ةٌ» or «ة» (the hamza as dots), `postCorrect` then writing «ه». A real scan run outside the repository: pages read, share of known words, time a page. A real scan
    is often one 1-bit JBIG2 image a page at 300 dpi, the text in a printed frame, its first pages in colour (an
    indexed cover, a JPEG page at 200 dpi); the lab files are Flate and JPEG (no JBIG2 encoder here).
 4. **Release** (`release/3.4`).
