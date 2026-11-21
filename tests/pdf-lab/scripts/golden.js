@@ -96,7 +96,7 @@ async function main() {
         const bin = atob(b64), u = new Uint8Array(bin.length);
         for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
         try {
-          const r = await PdfImporter.create({ images: 'markdown', onImage: (src, o) => 'img-' + o.page + '-' + o.index, asciiNumbers: false, persianLetters: false }).fromArrayBuffer(u.buffer);
+          const r = await PdfImporter.create({ images: 'markdown', onImage: (src, o) => 'img-' + o.page + '-' + o.index, asciiNumbers: false, persianLetters: false, ocr: 'read' }).fromArrayBuffer(u.buffer);
           return { markdown: r.markdown };
         } catch (e) { return { error: e.stack || String(e) }; }
       }, b64);
