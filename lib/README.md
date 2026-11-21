@@ -327,6 +327,7 @@ load them in this order (no build step; `PdfImporter.missingParts()` names any t
 <script src="lib/pdfimport/regions.js"></script>   <!-- 4. regions: tables, code boxes, figures -->
 <script src="lib/pdfimport/ladder.js"></script>    <!-- 4.9 confidence, the fallback ladder -->
 <script src="lib/pdfimport/letterstats.js"></script> <!-- data: letter pairs of our own text, by language -->
+<script src="lib/pdfimport/cff.js"></script> <!-- the outlines of a CFF font program -->
 <script src="lib/pdfimport/fontprint.js"></script> <!-- a glyph known by its outline's hash -->
 <script src="lib/pdfimport/fontprints.js"></script> <!-- data: the fontprints of the fonts Kelk knows (478 KB) -->
 <script src="lib/pdfimport/trust.js"></script>     <!-- the font arbiter, the judge, hidden text -->
