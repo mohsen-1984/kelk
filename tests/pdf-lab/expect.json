@@ -11,7 +11,7 @@
     "driver-print--renumbered-pages-fa": { "has": ["fontprintRead", "hiddenText"], "not": ["garbledText"] },
     "driver-print--renumbered-en": { "has": ["fontApprox", "hiddenText"], "not": ["garbledText"], "confBelow": 0.75, "_note": "DejaVu Sans renumbered: read by the shapes of its glyphs (3.2), recovered, approximate (garbled until 3.1; the owner's decision, 2026-11-19)" },
     "driver-print--unknown-serif-fa": { "has": ["fontApprox"], "not": ["garbledText", "fontprintRead", "hiddenText"], "confBelow": 0.75, "_note": "FreeSerif, a typeface Kelk does not ship, renumbered: read by the shapes of its glyphs (3.2), recovered, approximate" },
-    "driver-print--unknown-serif-en": { "has": ["garbledText"], "not": ["fontApprox", "fontprintRead", "hiddenText"], "_note": "Liberation Serif: its glyphs are further from the fonts Kelk ships (all sans for Latin) than the reading's limit, set on those fonts, allows — reported, not read (3.2)" },
+    "driver-print--unknown-serif-en": { "has": ["fontApprox"], "not": ["garbledText", "fontprintRead", "hiddenText"], "confBelow": 0.75, "_note": "Liberation Serif, renumbered: read by its shapes since DejaVu Serif's Latin shapes are among the references (3.3; reported garbled in 3.2, turned around with the owner's approval, 2026-11-21) — the limits unchanged"},
     "driver-print--unreadable-fa": { "has": ["garbledText"], "not": ["fontApprox", "fontprintRead", "hiddenText"], "confBelow": 0.5, "_note": "glyphs drawn as abstract bars: no reading can recover it, so it must always be reported garbled (the owner's rule, 2026-11-18)" },
     "word-hidden--hidden-fa": { "has": ["hiddenText"], "not": ["garbledText"] },
     "word-print--word-rtl": { "has": ["hiddenText"], "not": ["garbledText"] },

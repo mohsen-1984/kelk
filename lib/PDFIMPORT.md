@@ -850,8 +850,10 @@ ZWNJ by outline: a renumbered CFF font with no ToUnicode came back as ASCII («!
 
 A fontprint finds a glyph only in the typeface it was made from. For a font Kelk does not know, `lib/pdfimport/shape.js`
 gives each glyph a **shape**, and ranks the characters whose glyphs in the fonts Kelk ships look most like it. The data,
-`lib/pdfimport/shapes.js`, holds the shapes of Vazirmatn, Sahel, the B fonts (regular and bold; B Titr bold) and DejaVu
-Sans (Latin), made by `tools/build-shapes.js` (`npm run check:fresh` runs it). Shapes and characters only: no font.
+`lib/pdfimport/shapes.js`, holds the shapes of Vazirmatn, Sahel, the B fonts (regular and bold; B Titr bold), DejaVu
+Sans (Latin) and, since 3.3, DejaVu Serif (its ASCII glyphs only: the one serif Latin face, its TTFs a build input in
+`assets/fonts/dejavu/`, never loaded by the app and left out of its zip), made by `tools/build-shapes.js` (`npm run
+check:fresh` runs it). Shapes and characters only: no font.
 
 - **The shape**: the glyph's contours (curves cut into four lines) drawn on a 12 × 12 grid stretched to the glyph's box
   (neither side more than three times the other: a dash stays a bar), four samples a side per cell, then smoothed; its
@@ -869,7 +871,13 @@ Sans (Latin), made by `tools/build-shapes.js` (`npm run check:fresh` runs it). S
   82 % and 91 % (O and 0, l and I are one shape in a sans). The lab's fonts Kelk does not know
   (`tests/pdf-lab/scripts/shape-accuracy.js`, letter by letter as the page draws them, within the script the glyphs'
   vote gives): FreeSerif 95.8 % first, 98.1 % in the first three; Liberation Serif 76.8 % and 91.3 % — Kelk ships no
-  serif Latin face, and r t, v Y, l I are its misses.
+  serif Latin face, and r t, v Y, l I are its misses. With DejaVu Serif's shapes (3.3): Liberation Serif 100 % and
+  100 %, and `driver-print--unknown-serif-en` is read (25.0 → 100) under the limits as they were.
+- **The serif shapes' cost** (3.3, measured on the fonts Kelk ships, `tools/calibrate-shapes.js`): the Latin limits stay
+  (unseen 0.04, distance 0.10) — a serif reading lies at 0.15–0.17, where glyphs no font draws (the bars) lie too, and
+  a limit of 0.14 already took a tenth of those. The wrong readings (shuffled, bars) are still accepted 0 % of the time
+  in Latin; but a Vazirmatn page playing an unknown Latin font is taken less often — 9 → 5 of 12 at 30 letters, 12 → 3
+  at 150 and at 600 —: such a page is reported garbled, never read wrong. `TODO.md` holds an idea to win it back.
 
 ### Reading a font Kelk does not know: the approximate reading (`trust.js` `_fontApprox`, 3.2)
 

@@ -26,8 +26,9 @@ const ACCEPT = ai > 0 ? { arabic: [+process.argv[ai + 1], +process.argv[ai + 2]]
 
 // the families that play the unknown font: [family in shapes.js, its font file in the zip or DejaVu's PdfBuilder file]
 const FAMILIES = [['Vazirmatn', 'vazirmatn/Vazirmatn-Regular.ttf'], ['Sahel', 'sahel/Sahel.ttf'], ['B Nazanin', 'borna-rayaneh/BNAZANIN.TTF'],
-  ['B Mitra', 'borna-rayaneh/BMITRA.TTF'], ['B Titr', 'borna-rayaneh/BTITRBD.TTF'], ['DejaVu Sans', 'dejavu']];
-const MEASURED = ['glyph-index-fa.md', 'renumbered-en.md', 'unknown-serif-fa.md', 'unknown-serif-en.md', 'unreadable-fa.md'];
+  ['B Mitra', 'borna-rayaneh/BMITRA.TTF'], ['B Titr', 'borna-rayaneh/BTITRBD.TTF'], ['DejaVu Sans', 'dejavu'], ['DejaVu Serif', 'dejavu-serif']];
+const MEASURED = ['glyph-index-fa.md', 'renumbered-en.md', 'unknown-serif-fa.md', 'unknown-serif-en.md', 'unreadable-fa.md',
+  'cff-cid-fa.md', 'cff-type1c-fa.md', 'cff-known-fa.md', 'cff-unreadable-fa.md', 'cff-zwnj-fa.md', 'teh-fa.md', 'tatweel-fa.md'];
 const fold = (t) => t.normalize('NFKC').replace(/[ً-ٰٟـ]/g, '').replace(/[يى]/g, 'ی').replace(/ك/g, 'ک');
 
 /** the letter pairs of the lab's expected Markdown (as tools/build-letterstats.js counts them: seen twice or more) */
@@ -107,7 +108,8 @@ const measures = (r, truth, words) => {
   new Function('PdfFonts', 'window', 'globalThis', fs.readFileSync(path.join(root, 'lib', 'pdf-base64-ttf-fonts', 'pdf-font-dejavu-sans.js'), 'utf8'))(PdfFonts, { PdfFonts }, { PdfFonts });
   const P = pairs(), T = texts(), rows = [];
   for (const [family, file] of FAMILIES) {
-    const bytes = file === 'dejavu' ? new Uint8Array(Buffer.from(Object.values(PdfFonts)[0].styles.normal.data, 'base64')) : await zip.files[file].async('uint8array');
+    const bytes = file === 'dejavu' ? new Uint8Array(Buffer.from(Object.values(PdfFonts)[0].styles.normal.data, 'base64'))
+      : file === 'dejavu-serif' ? new Uint8Array(fs.readFileSync(path.join(root, 'assets', 'fonts', 'dejavu', 'DejaVuSerif.ttf'))) : await zip.files[file].async('uint8array');
     const map = cmap(bytes), sh = S.glyphs(bytes), others = faces.filter((f) => f.family !== family);
     const truth = {};
     Object.keys(map).forEach((c) => { const g = map[c]; if (!truth[g]) truth[g] = String.fromCodePoint(+c).normalize('NFKC'); });
