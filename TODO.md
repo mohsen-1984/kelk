@@ -123,46 +123,43 @@ code. A PDF, like an XLSX, does not come in from a zip. A lab expectation that a
 no longer garbled) is turned around only with the owner's approval. The app zip holds the app, its three sample
 documents, README.md, LICENSE and the notices; the with-pdf-lab zip is the whole tree, CLAUDE.md with it.
 
-**3.2 — fonts Kelk does not know** (moved out of 3.0, 2026-11-17; a release of its own):
+**Standing rules from 3.2** (the owner's decisions; done — `CHANGELOG.md` 3.2): a font Kelk does not know, which the
+file does not name, is read by the shapes of its glyphs against the fonts Kelk ships, only when the reading reads as
+language, and reported «recovered, approximate» (`fontApprox`) — never marked in the Markdown; Settings → Import →
+*Fonts Kelk does not know*, «Read approximately» by default. The shape data (300 KB) loads only when a PDF has such a
+font, never at startup, from file:// too. The reading's limits and the shapes' weights are set on the fonts Kelk ships
+only (`tools/calibrate-shapes.js`), never on the lab files; the lab files whose text a reading must find stay out of
+`letterstats.js` (`MEASURED` in `tools/build-letterstats.js`). `driver-print--unreadable-fa` must always report garbled
+text. A lab font's shapes never enter `shapes.js` (FreeSerif, Liberation Serif: the answers). The B fonts' shapes stay
+removable in one commit, as their fontprints.
 
-- **A file that must always report garbled text** (the owner's rule, 2026-11-18): the lab files that must report
-   `garbledText` today — `word-cover--glyph-index-fa` and `driver-print--renumbered-en` — are those the unknown-fonts
-   work is meant to fix. Once it fixes them, keep a permanent synthetic lab file that must always report garbled text
-   (a font no reading can recover), so the finding stays tested.
+**3.3 — fonts, proposed** (the owner, 2026-11-21; scope agreed before coding, as each release):
 
-- **Decided** (the owner, 2026-11-19): pull requests `pdf/3.2-lab` (the lab files), `pdf/3.2-shapes` (shape data of
-   the fonts Kelk ships, the matcher; no change to the output), `pdf/3.2-approximate` (the reading, its report note),
-   then the release. A setting, Settings → Import → *Fonts Kelk does not know*: «Read approximately» (default) or
-   «Leave and report». Report only: nothing marks the recovered text in the Markdown. Once the always-garbled file is
-   in, `word-cover--glyph-index-fa` and `driver-print--renumbered-en` turn to «recovered, approximate». The reading's
-   pull request reports the character accuracy of the accepted text on the new lab files. The shape data loads only
-   when a PDF has such a font, never at startup, from file:// too; the reading's acceptance limits are set like the
-   shape weights, on the fonts Kelk ships only (`tools/calibrate-shapes.js`), never on the lab files (2026-11-19).
+1. **A CFF outline reader** (`FontFile3`, Type 1C / CIDFontType0C): shapes, fontprints and the ZWNJ read from the
+   outlines work only for TrueType programs (`glyf`) today; Adobe and InDesign PDFs embed CFF. A lab file first (a CFF
+   font Kelk does not know, renumbered), then the reader, then the ZWNJ in a CFF program («Words and letters» below).
+2. **DejaVu Serif's shapes** — «Left from 3.2» below: one bundled serif Latin face, then the Latin limits set again on
+   the fonts Kelk ships (`tools/calibrate-shapes.js`); `driver-print--unknown-serif-en` is the file to read.
+3. **A lab file for Word's «Save as PDF» ت** — Word names Persian ت `"` in its ToUnicode («م"ن» for متن; «Next phase:
+   right to left» below): a synthetic file of our own first, then the fix from the font's own cmap.
 
-1. **Fonts Kelk does not know** — the lab files (`make-unknown32.py`): `driver-print--unknown-serif-fa` and
-   `--unknown-serif-en` (FreeSerif, Liberation Serif: typefaces Kelk does not ship, renumbered) and
-   `driver-print--unreadable-fa` (abstract bars: the file that must always report garbled text). The approximate path, marked «recovered, approximate» in the report; it must work
-   everywhere, phones included: candidates for every glyph by its drawn shape against Kelk's bundled fonts, votes from
-   OCR for the frequent glyphs (when the OCR phase arrives), the judge accepting only a plausible text. A spike
-   (2026-11-16, scratch code): **shape** against other typefaces — the top candidate right for 77–91 % of a text
-   face's glyphs (86–98 % within the first three), 36 % for a display face, 100 % against the same typeface, 10–15 ms a
-   glyph; **OCR votes** (Arabic data only, a plain aligner) — 80 % of the letters right from one page, 87 % from five,
-   half the distinct glyphs too rare to learn, most wrong votes گ پ ژ چ; 56 % on a kashida-justified page; 0.9 s a
-   page natively. Neither alone gives exact text. A font installed on the reader's system (drawn on a canvas by its
-   name) is an extra when it happens to be there: nothing depends on it (such fonts are rarely installed, never on a
-   phone).
+**3.4 — OCR on demand, proposed** (the owner, 2026-11-21): tesseract.js (Persian, Arabic, English), loaded only when
+asked for — scanned PDFs, text drawn as outlines, titles drawn as pictures or in calligraphy, and votes for the short
+fonts Kelk does not know (`word-cover--glyph-index-fa`). Its own scope round first.
+
+**A session of its own: real Arabic PDFs and Arabic fonts** (the owner's request, 2026-11-18) — «Left from 3.1» below.
 
 **Not placed in a release yet** (moved out of 2.8's scope, 2026-11-11):
 
 - **Left from 3.2** (2026-11-19):
   - **A serif Latin face** (`driver-print--unknown-serif-en`, Liberation Serif): its glyphs lie further from the fonts
     Kelk ships (Vazirmatn, Sahel and DejaVu Sans: all sans for Latin) than the reading's distance limit (0.16 against
-    0.10), so it stays reported. **Planned for a later release** (the owner's decision, 2026-11-19): the shapes of one
-    bundled serif Latin face, so the limit is set on serif readings too. Never Liberation Serif or FreeSerif — the lab's
+    0.10), so it stays reported. **Proposed for 3.3** (the owner's decisions, 2026-11-19 and 2026-11-21): the shapes of
+    one bundled serif Latin face, so the limit is set on serif readings too. Never Liberation Serif or FreeSerif — the lab's
     test fonts: their shapes would leak the answers. DejaVu Serif is a candidate (DejaVu's licence, like DejaVu Sans).
   - **Short fonts alone** (`word-cover--glyph-index-fa`, stays reported garbled: the owner's decision, 2026-11-19): two lines of seven letters in a font Kelk does not know, no
     other font of the page read — under 20 letters the pairs say nothing (on the fonts Kelk ships, a wrong reading of
-    30 letters passes one time in eight). Another sign is needed (the OCR phase's votes).
+    30 letters passes one time in eight). Another sign is needed: the OCR phase's votes (proposed for 3.4).
   - FreeSerif's alef read «أ» in a few words («أن»): a hamza's small part weighs little (`W_DOTS`, set on the fonts
     Kelk ships); not tuned on the lab file.
 - **Left from 3.1** (2026-11-18):
@@ -177,7 +174,9 @@ documents, README.md, LICENSE and the notices; the with-pdf-lab zip is the whole
   - **wkhtmltopdf's lines run together** (`wk-rtl--fa-article`): two lines' glyphs interleaved — a layout matter.
   - A blank glyph of no advance in a renumbered font read as a ZWNJ after a letter that never joins («بر‌گ»): no lab
     file shows it (a renumbered B Nazanin Bold came back right) — a lab file first, from a real case.
-  - **Real Arabic PDFs and Arabic fonts** (the owner's request, 2026-11-18): check PDF import against several real
+    3.2's approximate reading reads a glyph with no outline and no advance the same way (`_fontApprox`): the same lab
+    file would test both.
+  - **Real Arabic PDFs and Arabic fonts** (the owner's request, 2026-11-18; a session of its own, 2026-11-21): check PDF import against several real
     Arabic PDFs, made with Arabic fonts by several programs — a session of its own with the owner's samples (they
     stay private: synthetic lab files for each problem found).
 - **Left from 3.0** (ideas dropped under agreement 12; another sign is needed for each):
@@ -222,7 +221,8 @@ documents, README.md, LICENSE and the notices; the with-pdf-lab zip is the whole
 **Medium**
 
 - PDF import: put the calibrated thresholds to use (1,007 registered, none switched to calibrated yet); fonts with no
-  ToUnicode at all; Persian digits that share a glyph with Arabic-Indic ones come back Arabic-Indic; bordered form boxes
+  ToUnicode at all (3.2 reads a renumbered TrueType program by its shapes; CFF and Type 3 programs not yet — CFF
+  proposed for 3.3); Persian digits that share a glyph with Arabic-Indic ones come back Arabic-Indic; bordered form boxes
   as tables
 - Text kept safe: images and text in IndexedDB instead of `localStorage` (≈ 5 MB), and recovery snapshots (Clear and a
   crash can be undone after a reload)
@@ -237,7 +237,7 @@ documents, README.md, LICENSE and the notices; the with-pdf-lab zip is the whole
 **Optional, later**
 
 - A layout model as an optional download (http(s) only, never from `file://`), as a second opinion on headings and tables
-- OCR for scanned PDFs (tesseract.js, Persian / Arabic / English), on demand
+- OCR for scanned PDFs (tesseract.js, Persian / Arabic / English), on demand — proposed for 3.4 (top of this file)
 
 ## Backlog
 
@@ -354,7 +354,7 @@ showed is rebuilt in the lab with our own text, and the lab is what the rules ar
 - `/ActualText` is read from page content streams stored as plain or Flate objects; inside object streams,
   other filters or encrypted files it is not (the guesses for list numbers and minus signs remain)
 - Text drawn as outlines (Microsoft Print to PDF can do this): no text layer — needs the OCR phase
-- Scanned PDFs: optional OCR (tesseract.js, Persian traineddata) as a separate phase
+- Scanned PDFs: optional OCR (tesseract.js, Persian traineddata) as a separate phase — proposed for 3.4
 - PDFs that already carry an OCR layer (lab `ocr-tesseract--article` 90.8, `--features` 99.1, `--report` 91.5): what is left is mostly the
   OCR's own misreadings (a struck word is misread under its strike). From the scan, still not read: italic (a
   slant), inline code (a monospace word in prose), a thematic break (a rule), an empty task list (an empty box
@@ -427,7 +427,7 @@ is fixed; **decided / limit:** kept as it is)
 **Next phase: right to left** (Persian, Arabic, Hebrew PDFs from other programs — fonts, ToUnicode repairs,
 mixed-direction lists and tables)
 
-- Word "Save as PDF" maps Persian ت to `"` in its ToUnicode («م"ن» for متن) — fix from the font's own cmap
+- Word "Save as PDF" maps Persian ت to `"` in its ToUnicode («م"ن» for متن) — fix from the font's own cmap (a lab file first: proposed for 3.3)
   (as done for Microsoft Print to PDF); a Persian Excel sheet (Microsoft Print to PDF) repeats a merged
   cell's text in its last row
 - A Hebrew Word PDF reads its brackets mirrored the wrong way ("15)ב()4(")
@@ -449,8 +449,8 @@ mixed-direction lists and tables)
 - A heading only 1.2 × the body (18 / 15 px, bold) is read as a paragraph (`chrome-positioned`)
 - Chrome, browser-default style: tables and quotes lost in Persian and Arabic (the styled pages 83–100)
 - A slide's paragraph whose last line ends short is split before it (`slides-fa`)
-- wkhtmltopdf with Vazirmatn: a broken ToUnicode (letters named «4», «@»; pdftotext loses them too) — the
-  font's own cmap could name them, as for Word's «ت → "»; ZWNJ lost; runs interleaved in a line
+- wkhtmltopdf with Vazirmatn: a broken ToUnicode (letters named «4», «@»; pdftotext loses them too) — done in 3.1
+  (the font known by its advances and contours). Left: ZWNJ lost; runs interleaved in a line («Left from 3.1» above)
 - Kelk's own: `fa-features` 85 (its quotes)
 
 **From the metamorphic net and the coverage matrix** (round 2 of the 2.0 work; `run-meta.js`, `features.js`)
