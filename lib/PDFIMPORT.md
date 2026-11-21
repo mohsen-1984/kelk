@@ -623,6 +623,11 @@ of its Arabic letters (20 or more, four in five) and disagrees on a few, the few
 the cmap's letter wins (twins aside — ي ی, ك ک, ة ۀ, and Arial's heh, which its cmap names ھ), for a glyph with an
 advance (`arTrust` in `_gsubRepair`).
 
+**An ASCII sign for a letter** (3.3): Word's «Save as PDF» names every form of ت «"» in its ToUnicode («م"ن» for
+«متن») while its cmap names them right. The rule above now also takes a glyph the file names by an ASCII sign — a real
+«"» keeps its name, its cmap naming it «"» too. A font with too few letters for the rule (a bold title alone) keeps
+the ToUnicode's names. Lab: `word-save--teh-fa` (60.5 → 74.1; its body's words 71.1 → 98.2).
+
 **Wrong throughout** (Kelk 2.2, `_gsubFormPairs`): a Word subset of a Persian font through another PDF program names
 almost every Arabic glyph by a wrong letter or a mark («ثٝ» for «به») — the cmap disagrees on most letters, so the
 rule above cannot tell which side is right, and the Latin text in the same font keeps the ToUnicode from being thrown
