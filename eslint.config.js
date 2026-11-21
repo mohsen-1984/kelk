@@ -117,6 +117,7 @@ module.exports = [
       'docs/slides-samples.js',
       'docs/excel-samples.js',
       'tests/pdf-lab/corpus.js',
+      'lib/pdfimport/lm-fa.js', // the language model's counts (tools/build-lm.js)
       // PDF-lab outputs (LAB_OUT defaults to tests/pdf-lab/out) and private material (.gitignore).
       'tests/pdf-lab/out/**',
       'tests/pdf-lab/real/**',
