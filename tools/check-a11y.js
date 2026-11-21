@@ -177,7 +177,7 @@ async function check(browser, url, lang, theme, allow) {
                 const d = a.scope && !panel ? document.getElementById(a.scope) : null;
                 if (d) d.showModal();
                 if (panel) {
-                    window.Kelk.ui.report(a.sample, { name: 'sample.pdf', onSafe: function () {} });
+                    window.Kelk.ui.report(a.sample, { name: 'sample.pdf', onSafe: function () {}, onOcr: function () {} });
                     window.__reportState = {
                         open: !panel.hidden,
                         focused: document.activeElement === panel,

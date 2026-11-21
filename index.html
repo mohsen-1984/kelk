@@ -126,9 +126,12 @@
                     </div>
                     <div class="report-body" id="import-report-body" role="group" aria-labelledby="import-report-title" tabindex="0"></div>
                     <div class="report-actions">
+                        <label class="field report-ocr-pages" id="report-ocr-field" hidden><span data-i18n="rep_ocrPages"></span><input id="report-ocr-pages" type="text" dir="ltr" inputmode="numeric" autocomplete="off" aria-describedby="report-ocr-hint"></label>
+                        <button class="btn soft" id="report-ocr" type="button" aria-describedby="report-ocr-hint" hidden><i data-lucide="scan-text"></i><span data-i18n="rep_ocrRead"></span></button>
                         <button class="btn soft" id="report-safe" type="button" aria-describedby="report-safe-hint" hidden><i data-lucide="rotate-ccw"></i><span data-i18n="rep_safe"></span></button>
                         <button class="btn" id="report-copy" type="button"><i data-lucide="copy"></i><span data-i18n="rep_copy"></span></button>
                         <p class="report-safe-hint" id="report-safe-hint" data-i18n="rep_safeHint" hidden></p>
+                        <p class="report-safe-hint" id="report-ocr-hint" data-i18n="rep_ocrHint" hidden></p>
                     </div>
                 </section>
                 <div class="editor-wrap">
@@ -663,8 +666,13 @@
                 <select data-ui="importer.hiddenText"><option value="end" data-i18n="hiddenEnd"></option><option value="inPlace" data-i18n="hiddenInPlace"></option><option value="drop" data-i18n="hiddenDrop"></option></select></label>
         </div>
         <div class="field"><span class="hint" data-i18n="mergedRowsHint"></span></div>
-        <label class="field"><span data-i18n="unknownFonts"></span>
-            <select data-ui="importer.unknownFonts"><option value="approx" data-i18n="unknownApprox"></option><option value="report" data-i18n="unknownReport"></option></select></label>
+        <div class="row2">
+            <label class="field"><span data-i18n="unknownFonts"></span>
+                <select data-ui="importer.unknownFonts"><option value="approx" data-i18n="unknownApprox"></option><option value="report" data-i18n="unknownReport"></option></select></label>
+            <label class="field"><span data-i18n="scannedPages"></span>
+                <select data-ui="importer.scannedPages"><option value="ask" data-i18n="scannedAsk"></option><option value="read" data-i18n="scannedRead"></option><option value="leave" data-i18n="scannedLeave"></option></select></label>
+        </div>
+        <div class="field"><span class="hint" data-i18n="scannedPagesHint"></span></div>
         <label class="check"><input type="checkbox" data-ui="importer.asciiNumbers"><span data-i18n="asciiNumbers"></span></label>
         <label class="check"><input type="checkbox" data-ui="importer.persianLetters"><span data-i18n="persianLetters"></span></label>
         <div class="row2">

@@ -23,7 +23,7 @@
  *   An entry ({ name, report }) may carry info and kind: the file's information (scripts/fileinfo.js, loaded by the
  *     import), shown under the report in a closed <details> and copied with it; kind 'docx', 'xlsx', 'html' … names
  *     the panel «Import report» instead of «PDF import report».
- *   Kelk.ui.report(rep | [{ name, report }] | null, { name, onSafe })
+ *   Kelk.ui.report(rep | [{ name, report }] | null, { name, onSafe, onOcr })
  *     shows #import-report for every PDF import, the same way whatever the file: a clean one too (its summary, the
  *     calm color), one with something to tell in the warning color (worth). Open for config.reportOpenMs, then
  *     collapsed to its head (summary and a toggle: open again, collapse again); 0 keeps it open. Its × closes it
@@ -31,7 +31,9 @@
  *     another import) hides it, an undo back to that document shows it again (collapsed). null: hidden. The focus moves into the panel and
  *     goes back where it was when it closes (its ×, Escape, or a clean import that closes it). onSafe: the
  *     "Re-import in safe mode" button's action, its explanation shown under it (no button without it, nor for a
- *     report that already ran in safe mode). Kelk.ui.report.release(): a new import starts — onSafe (and the
+ *     report that already ran in safe mode). onOcr(pages): "Read with OCR" (3.4), shown with a page range — the pages
+ *     the report says need OCR, which the reader may narrow («1-3, 7»; an invalid range is refused with a toast) —
+ *     when a report has such pages. Kelk.ui.report.release(): a new import starts — onSafe, onOcr (and the
  *     file bytes it holds) goes. No live region of its
  *     own: the focus move announces the panel once (its name), the import's own toast says it loaded.
  *   Kelk.ui.report.custom(view)
@@ -229,6 +231,32 @@
     const titleKey = function (entries) { return entries.some(function (e) { return e.kind && e.kind !== 'pdf'; }) ? 'rep_titleImport' : 'rep_title'; };
     const infoOf = function (e) { return e.info && K.fileInfo && K.fileInfo.any(e.info) ? e.info : null; };
 
+    /** the pages a report's entries say need OCR (the note ocrNeeded) */
+    const scans = function (entries) {
+        const ps = [];
+        entries.forEach(function (e) { (e.report ? e.report.notes : []).forEach(function (n) { if (n.code === 'ocrNeeded') Array.prototype.push.apply(ps, n.pages || []); }); });
+        return pageNums(ps);
+    };
+    /** pages → a range to type in («1-3, 7»: ASCII, whatever the language) and back, only pages of `allowed` (null: none valid) */
+    function rangeText(ps) {
+        const out = [];
+        for (let i = 0; i < ps.length; i++) { let j = i; while (j + 1 < ps.length && ps[j + 1] === ps[j] + 1) j++; out.push(j > i ? ps[i] + '-' + ps[j] : String(ps[i])); i = j; }
+        return out.join(', ');
+    }
+    function rangePages(s, allowed) {
+        const DIG = '۰۱۲۳۴۵۶۷۸۹', AR = '٠١٢٣٤٥٦٧٨٩', got = [];
+        s = String(s || '').replace(/[۰-۹٠-٩]/g, function (d) { return String(DIG.indexOf(d) >= 0 ? DIG.indexOf(d) : AR.indexOf(d)); }).replace(/[–—]/g, '-').replace(/\s*-\s*/g, '-');
+        const parts = s.split(/[,،;\s]+/).filter(Boolean);
+        for (const p of parts) {
+            const m = /^(\d+)(?:-(\d+))?$/.exec(p);
+            if (!m) return null;
+            const a = +m[1], b = m[2] ? +m[2] : a;
+            if (b < a) return null;
+            allowed.forEach(function (n) { if (n >= a && n <= b) got.push(n); });
+        }
+        return got.length ? pageNums(got) : null;
+    }
+
     function entriesOf(rep, o) {
         if (Array.isArray(rep)) return rep.filter(function (e) { return e && e.report; });
         return rep ? [{ name: (o && o.name) || '', report: rep }] : [];
@@ -270,7 +298,7 @@
         return lines.join('\n').replace(/[⁦-⁩]/g, '').replace(/^ +$/gm, '').replace(/\n{3,}/g, '\n\n').trim() + '\n';
     }
 
-    K.importReport = { fromResult: fromResult, worth: worth, text: text, gfmTable: gfmTable, none: none, FLAGS: FLAGS, NOTES: NOTES, MODES: MODES, MODE_KEYS: MODE_KEYS, WHY: WHY_KEYS, OCR_NOTES: OCR_NOTES };
+    K.importReport = { rangePages: rangePages, rangeText: rangeText, fromResult: fromResult, worth: worth, text: text, gfmTable: gfmTable, none: none, FLAGS: FLAGS, NOTES: NOTES, MODES: MODES, MODE_KEYS: MODE_KEYS, WHY: WHY_KEYS, OCR_NOTES: OCR_NOTES };
 
     // ---- the panel ---------------------------------------------------------------------------------------------
     const state = { entries: [], o: {}, back: null, doc: null, timer: 0, view: null };
@@ -303,7 +331,7 @@
         const box = K.$('#import-report'), body = K.$('#import-report-body'), v = state.view;
         body.textContent = '';
         v.body(body);
-        ['#report-safe', '#report-safe-hint'].forEach(function (s) { const x = K.$(s); if (x) x.hidden = true; });
+        ['#report-safe', '#report-safe-hint', '#report-ocr', '#report-ocr-field', '#report-ocr-hint'].forEach(function (s) { const x = K.$(s); if (x) x.hidden = true; });
         const name = K.$('#import-report-name'); if (name) name.textContent = '';
         const brief = K.$('#import-report-brief'); if (brief) brief.textContent = v.brief();
         box.classList.remove('clean');
@@ -348,6 +376,9 @@
             });
             if (infoOf(e)) K.fileInfo.render(sec, e.info);
         });
+        // (Read with OCR: when a page needs it and the import said how — its range kept as the reader typed it)
+        const noOcr = !state.o.onOcr || !scans(state.entries).length;
+        ['#report-ocr', '#report-ocr-field', '#report-ocr-hint'].forEach(function (q) { const x = K.$(q); if (x) x.hidden = noOcr; });
         const safe = K.$('#report-safe'), hint = K.$('#report-safe-hint');
         // (a clean import has nothing safe mode would do better: no button)
         const noSafe = !state.o.onSafe || state.entries.every(function (e) { return e.report.mode === 'safe' || !worth(e.report); });
@@ -427,6 +458,8 @@
         if (!entries.length) { close(); return false; }
         const was = !box.hidden;
         state.entries = entries; state.o = o || {}; state.doc = docNow(); state.view = null;
+        const range = K.$('#report-ocr-pages');
+        if (range) range.value = rangeText(scans(entries));
         if (!was || !box.contains(document.activeElement)) {
             const a = document.activeElement;
             state.back = a && a !== document.body && !box.contains(a) ? a : state.back;
@@ -457,10 +490,10 @@
      * replaced), and the button with it; the report on screen stays until the new one comes.
      */
     report.release = function () {
-        if (!state.o.onSafe) return;
-        state.o = Object.assign({}, state.o, { onSafe: null });
-        const safe = K.$('#report-safe'), box = K.$('#import-report');
-        if (safe && box && document.activeElement === safe) box.focus();
+        if (!state.o.onSafe && !state.o.onOcr) return;
+        state.o = Object.assign({}, state.o, { onSafe: null, onOcr: null });
+        const box = K.$('#import-report');
+        if (box && ['report-safe', 'report-ocr', 'report-ocr-pages'].indexOf(document.activeElement && document.activeElement.id) >= 0) box.focus();
         render();
     };
     /** the language changed: the panel's words again */
@@ -494,6 +527,14 @@
             close();
             if (run) run();
         });
+        const readOcr = function () {
+            const run = state.o.onOcr, pages = rangePages(K.$('#report-ocr-pages').value, scans(state.entries));
+            if (!pages) { K.ui.toast(t('rep_ocrPagesBad', rangeText(scans(state.entries))), 'error'); K.$('#report-ocr-pages').focus(); return; }
+            close();
+            if (run) run(pages);
+        };
+        K.$('#report-ocr').addEventListener('click', readOcr);
+        K.$('#report-ocr-pages').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); readOcr(); } });
         box.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); }
         });

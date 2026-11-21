@@ -194,10 +194,13 @@
      * in, not as toasts); bytes: a copy of the file for "Re-import in safe mode" (pdf.js may take the buffer it
      * reads), only with o.keepBytes (a PDF imported on its own: the one case with that button), else null.
      * o.mode: PdfImporter's mode ('safe': headings and paragraphs only; default its own, 'auto'). o.ocr: 'read' — the
-     * pages that are one picture read with OCR (PdfImporter's options.ocr, 3.4; default its own, 'picture').
+     * pages that are one picture read with OCR (PdfImporter's options.ocr, 3.4), o.ocrPages the pages to read (the
+     * report's range); without o.ocr, Settings → Import → Scanned pages decides ('read'; 'ask' and 'leave' keep them
+     * pictures — 'ask' offers «Read with OCR» in the report).
      */
     async function fromPdf(file, name, t, o) {
-        const mode = o && o.mode, ocr = o && o.ocr === 'read';
+        const set = K.store.getUi('importer'), base = name.replace(/\.[^.]+$/, '');
+        const mode = o && o.mode, ocr = o && o.ocr === 'read' || !(o && o.ocr) && set.scannedPages === 'read';
         // the bar runs through every step (config.importProgress), not only the pages: after the last page
         // is read the font repairs, the layout and the Markdown still take most of the time; each step is named
         // (the page under way for the counted ones)
@@ -218,7 +221,6 @@
         let fi = null;
         if (!K.libs.loaded('fileinfo')) step('libs', 0, 1);
         try { fi = await K.libs.need('fileinfo'); } catch (e) { fi = null; }
-        const set = K.store.getUi('importer'), base = name.replace(/\.[^.]+$/, '');
         step('file', 0, 1);
         const buf = await readBuffer(file), bytes = o && o.keepBytes ? new Uint8Array(buf.slice(0)) : null;
         // the import's messages come once, at its end (K.ui.batch), and its pictures are stored once
@@ -256,6 +258,7 @@
                 const hooks = { onStage: step };          // 'open', 'read', 'fonts', 'lines', 'layout', 'ocrLoad', 'ocr', 'markdown'
                 if (mode) opts.mode = hooks.mode = mode;
                 if (ocr) opts.ocr = 'read';
+                if (ocr && o && Array.isArray(o.ocrPages)) opts.ocrPages = o.ocrPages.slice();
                 const r = await PdfImporter.create(opts).fromArrayBuffer(buf, hooks);
                 if (r.messages && r.messages.length) console.info('PdfImporter:', r.messages);
                 return { md: r.markdown, report: K.importReport.fromResult(r), bytes: bytes, info: fi ? fi.fromPdf(r) : null, kind: 'pdf' };
@@ -263,11 +266,18 @@
         });
     }
 
-    /** "Re-import in safe mode" of a PDF imported on its own: the action, the only holder of the file's bytes */
-    function safeAction(bytes, name) {
-        return function () {
+    /**
+     * A PDF imported on its own, read again from its report: "Re-import in safe mode" (safe) and "Read with OCR"
+     * (ocr(pages): its mode kept) — the actions, the only holders of the file's bytes, used once by either
+     */
+    function again(bytes, name, mode) {
+        const run = function (o) {
             const b = bytes; bytes = null;
-            return b ? K.importer.fromFiles([new File([b], name, { type: 'application/pdf' })], { mode: 'safe' }) : undefined;
+            return b ? K.importer.fromFiles([new File([b], name, { type: 'application/pdf' })], o) : undefined;
+        };
+        return {
+            safe: function () { return run({ mode: 'safe' }); },
+            ocr: function (pages) { return run(Object.assign(mode ? { mode: mode } : {}, { ocr: 'read', ocrPages: pages })); }
         };
     }
 
@@ -390,13 +400,15 @@
             // a PDF's report, and any file's information (an empty report beside it): nothing to show, no panel
             const reports = parts.filter(function (p) { return p.report || (p.info && K.fileInfo && K.fileInfo.any(p.info)); });
             const one = parts.length === 1 && reports.length === 1 ? parts[0] : null;
-            // the bytes: held by the safe-mode action only (the panel's), not by parts, the task's promise or this
-            // function's scope (safeAction: a closure of its own — one here would share the scope with the task's)
-            const onSafe = one && one.bytes ? safeAction(one.bytes, one.name) : null;
+            // the bytes: held by the panel's actions only, not by parts, the task's promise or this function's scope
+            // (again: a closure of its own — one here would share the scope with the task's); Read with OCR unless
+            // Settings → Import → Scanned pages says to leave them
+            const act = one && one.bytes ? again(one.bytes, one.name, o && o.mode) : null;
             parts.forEach(function (p) { p.bytes = null; });
             K.ui.report(reports.map(function (p) { return { name: p.name, report: p.report || K.importReport.none(), info: p.info, kind: p.kind }; }), {
                 name: one ? one.name : '',
-                onSafe: onSafe
+                onSafe: act ? act.safe : null,
+                onOcr: act && K.store.getUi('importer.scannedPages') !== 'leave' ? act.ocr : null
             });
             // in the Excel view, the tables that came in (no PDF report to show)
             if (!reports.length && K.slides.view() === 'excel') K.libs.need('sheets').then(function (sh) { sh.summary(); }, function () {});

@@ -49,7 +49,7 @@
             sampleLang: null,           // the about/sample document on screen (its language), if any
             view: 'document',           // the preview: document | slides | excel (Kelk.slides.view)
             sourceName: null,           // the imported (or sample) file's name: the exports' default name, kept across reloads
-            importer: { richPaste: true, nestedTables: 'extract', mergedRows: 'empty', hiddenText: 'end', unknownFonts: 'approx', images: 'markdown', asciiNumbers: true, persianLetters: true,
+            importer: { richPaste: true, nestedTables: 'extract', mergedRows: 'empty', hiddenText: 'end', unknownFonts: 'approx', scannedPages: 'ask', images: 'markdown', asciiNumbers: true, persianLetters: true,
                         maxMB: '20', separator: 'name' }   // largest file to import (MB); between files: name | rule | none
         },
 

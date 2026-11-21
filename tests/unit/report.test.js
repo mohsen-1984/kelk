@@ -503,3 +503,73 @@ test('the report follows its document (Clear hides it, Undo brings it back colla
   assert.deepEqual(errors, []);
   w.close();
 });
+
+test('Read with OCR: the range, the pages it asks for, the setting (Ask, Read with OCR, Leave as pictures)', async function () {
+  const { window: w, errors } = await appWindow(OPENED);
+  const K = w.Kelk,
+    d = w.document,
+    R = K.importReport;
+  // the range: typed as «1-3, 7» (Persian or Arabic digits, dashes, spaces), only the pages that need OCR
+  assert.equal(R.rangeText([1, 2, 3, 7, 9, 10]), '1-3, 7, 9-10');
+  assert.deepEqual(Array.from(R.rangePages('1-3, 7', [1, 2, 3, 5, 7])), [1, 2, 3, 7]);
+  assert.deepEqual(Array.from(R.rangePages('۲ – ۳،٥', [1, 2, 3, 5])), [2, 3, 5]);
+  assert.equal(R.rangePages('4', [1, 2]), null, 'no page that needs OCR');
+  assert.equal(R.rangePages('3-1', [1, 2, 3]), null);
+  assert.equal(R.rangePages('a', [1]), null);
+  const scan = function (opts) {
+    const read = opts.ocr === 'read';
+    return {
+      markdown: read ? 'متن\n' : '![](p1)\n',
+      notes: [],
+      messages: [],
+      report: {
+        mode: 'auto',
+        summary: { pages: 3, full: 1, ocr: 2 },
+        pages: [{ page: 2, mode: 'ocr', conf: read ? 0.9 : 0, why: ['noText'] }, { page: 3, mode: 'ocr', conf: 0, why: ['noText'] }],
+        flags: [],
+        ocr: read ? [{ page: 2, conf: 0.9, lines: 20, notes: [] }] : [],
+        notes: read ? [{ code: 'ocrNeeded', pages: [3] }] : [{ code: 'ocrNeeded', pages: [2, 3] }]
+      }
+    };
+  };
+  // Ask (the default): pictures, and the report offers OCR for pages 2 and 3
+  let calls = fakePdf(w, scan);
+  await K.importer.fromFile(pdfFile(w));
+  assert.equal(calls[0].opts.ocr, undefined, 'Ask: the pages stay pictures');
+  assert.equal(typeof calls[0].opts.loadOcr, 'function');
+  const btn = d.getElementById('report-ocr'),
+    range = d.getElementById('report-ocr-pages');
+  assert.equal(btn.hidden, false);
+  assert.equal(d.getElementById('report-ocr-field').hidden, false);
+  assert.equal(range.value, '2-3');
+  range.value = '9';
+  btn.click();
+  assert.equal(calls.length, 1, 'an invalid range reads nothing');
+  assert.ok(toasts(w).some((x) => x.includes('2-3')), 'and says which pages can be read');
+  range.value = '2';
+  btn.click();
+  for (let i = 0; i < 50 && calls.length < 2; i++) await new Promise((r) => setTimeout(r, 10));
+  assert.equal(calls.length, 2);
+  assert.equal(calls[1].opts.ocr, 'read');
+  assert.deepEqual(Array.from(calls[1].opts.ocrPages), [2]);
+  assert.deepEqual(calls[1].bytes, calls[0].bytes, 'the same file bytes');
+  for (let i = 0; i < 50 && K.editor.value() !== 'متن\n'; i++) await new Promise((r) => setTimeout(r, 10));
+  assert.equal(K.editor.value(), 'متن\n');
+  assert.equal(d.querySelectorAll('.report-ocr tbody tr').length, 1, 'the page read, in its own table');
+  assert.equal(btn.hidden, false, 'page 3 can still be read');
+  assert.equal(range.value, '3');
+  // Read with OCR: every such page read at once; Leave as pictures: no button
+  K.store.setUi('importer', Object.assign({}, K.store.getUi('importer'), { scannedPages: 'read' }));
+  calls = fakePdf(w, scan);
+  await K.importer.fromFile(pdfFile(w));
+  assert.equal(calls[0].opts.ocr, 'read');
+  assert.equal(calls[0].opts.ocrPages, undefined, 'every page');
+  K.store.setUi('importer', Object.assign({}, K.store.getUi('importer'), { scannedPages: 'leave' }));
+  calls = fakePdf(w, scan);
+  await K.importer.fromFile(pdfFile(w));
+  assert.equal(calls[0].opts.ocr, undefined);
+  assert.equal(btn.hidden, true, 'Leave as pictures: no button');
+  assert.ok(d.querySelector('[data-code="ocrNeeded"]'), 'the note still says so');
+  assert.deepEqual(errors, []);
+  w.close();
+});
