@@ -14,6 +14,8 @@
 #   · prince-cff--cff-zwnj-fa: shapes-fa's case (make-shapes-rtl.py) in plain CFF subsets of DejaVu Sans — codes
 #     shuffled, no glyph names, a /ToUnicode naming base letters, no ZWNJ drawn, 1000 units an em; the bold face only
 #     for two lines with ZWNJ words, too rare to learn its forms by use;
+#   · distiller-cff--cff-unreadable-fa: a Persian page in a renumbered plain CFF subset whose glyphs are abstract bars
+#     (make-unknown32.py's unreadable-fa in CFF): no reading can recover it, so it must always be reported garbled;
 #   · word-save--teh-fa: Word's «Save as PDF» habit with ت — the font's ToUnicode names every form of ت «"» (U+0022)
 #     while the program's cmap names them right; a Latin word in real quotes in the same font;
 #   · word-save--tatweel-fa: a calligraphic font's ToUnicode that names some final forms as tatweels plus the letter
@@ -129,16 +131,26 @@ def cff_program(name, glyphs, cids=None, codes=None, units=1000, subrs=False, bb
     assert len(body) == o['private']
     return body + private + (index(lsub_b) if lsub else b'')
 
+def bars(gid, adv, units):
+    """a glyph drawn as one to three bars made from its glyph id (make-unknown32.py's abstract glyphs): shapes no font has"""
+    h = (gid * 2654435761) & 0xFFFFFFFF; prog = []; x = y = 0
+    for k in range(1 + h % 3):
+        b = (h >> (5 * k)) & 31
+        x0 = round(adv * (0.1 + 0.25 * (b % 3))); x1 = x0 + round(adv * 0.18) + 10
+        y0 = round(units * (-0.1 + 0.15 * (b % 4))); y1 = y0 + round(units * (0.2 + 0.1 * (b % 5)))
+        prog += [x0 - x, y0 - y, 'rmoveto', y1 - y0, x1 - x0, y0 - y1, 'vlineto']; x, y = x1, y0
+    return prog
+
 # ---- a face drawn through a CFF program ----------------------------------------------------------------------------------
 class CffFace:
     """a source TrueType face whose used glyphs become a CFF program. kind: 'cid' (codes = the source's glyph ids, as
     CIDs) or 'plain' (one-byte codes). coding (plain): 'renum' (33… in order of first use, the space 32), 'ascii' (the
     character's own code) or 'shuffle' (1… shuffled, after prepare()). names: 'std' (the source's standard glyph names)
     or 'none' (names that say nothing). tounicode: write a /ToUnicode of the names drawn (base letters)."""
-    def __init__(self, src, ps, kind='plain', coding='renum', names='none', units=None, subrs=False, tounicode=False, seed=1):
+    def __init__(self, src, ps, kind='plain', coding='renum', names='none', units=None, subrs=False, tounicode=False, seed=1, bars=False):
         self.t = TTFont(src); self.cmap = self.t.getBestCmap(); self.gs = self.t.getGlyphSet(); self.upem = self.t['head'].unitsPerEm
         self.ps, self.kind, self.coding, self.names, self.subrs, self.tu = ps, kind, coding, names, subrs, tounicode
-        self.units = units or self.upem; self.used, self.code, self.text, self.seed = [], {}, {}, seed
+        self.units = units or self.upem; self.used, self.code, self.text, self.seed, self.bars = [], {}, {}, seed, bars
     def adv(self, c, size): return self.t['hmtx'][self.cmap[c]][0] * size / self.upem
     def _use(self, g):
         if g in self.code: return
@@ -166,6 +178,7 @@ class CffFace:
         for i, g in enumerate(['.notdef'] + self.used):
             pen = T2CharStringPen(None, self.gs); self.gs[g].draw(TransformPen(pen, (s, 0, 0, s, 0, 0)))
             path = [t for t in pen.getCharString().program if t != 'endchar']
+            if self.bars and path: path = bars(self.t.getGlyphID(g), round(self.t['hmtx'][g][0] * s), self.units)
             nm = g if self.names == 'std' and g in STD else '.notdef' if i == 0 else 'x%d' % (100 + i)
             glyphs.append((nm, path, round(self.t['hmtx'][g][0] * s)))
         if self.kind == 'cid':
@@ -293,6 +306,18 @@ D = Doc3(F)
 page(D, FA3[0], FA3[1], lambda c: 'T', lambda c: 'F')
 D.write(out('distiller-cff--cff-known-fa.pdf'), DISTILLER, 'cff-known-fa')
 corpus('cff-known-fa.md', md(*FA3))
+
+# ---- 3b. a CFF font no reading can recover --------------------------------------------------------------------------------
+FA3B = ('کارگاه سفالگری', [
+    'کارگاه سفالگری فرهنگسرا هر دوشنبه و چهارشنبه از ساعت پنج تا هشت عصر باز است. هنرجویان در این کارگاه ساختن کاسه و '
+    'گلدان را با چرخ سفالگری یاد می‌گیرند و کارهای خود را در کوره کارگاه می‌پزند.',
+    'استاد کارگاه سال‌ها در روستاهای سفالگر کار کرده است و روش‌های کهن رنگ‌آمیزی را به هنرجویان می‌آموزد. در پایان هر دوره '
+    'نمایشگاهی کوچک از کارهای هنرجویان در تالار فرهنگسرا برپا می‌شود.'])
+F = {'T': CffFace(SERIF_B, 'GLABAH+DemoBarsBold', bars=True), 'F': CffFace(SERIF, 'GLABAI+DemoBars', bars=True)}
+D = Doc3(F)
+page(D, FA3B[0], FA3B[1], lambda c: 'T', lambda c: 'F')
+D.write(out('distiller-cff--cff-unreadable-fa.pdf'), DISTILLER, 'cff-unreadable-fa')
+corpus('cff-unreadable-fa.md', md(*FA3B))
 
 # ---- 4. ZWNJ by outline, in CFF ------------------------------------------------------------------------------------------
 SUBJECT = 'موضوع: برنامه‌های تازه کلاس‌ها'
