@@ -13,8 +13,11 @@ const { appWindow } = require('./helpers');
 const SAMPLE = require('../../tools/report-sample.js');
 
 const LIB = path.resolve(__dirname, '..', '..', 'lib');
-/** the sample's pages as the panel takes them: a page that failed has the mode 'failed' */
-const SAMPLE_PAGES = SAMPLE.pages.map(function (p) {
+/** the sample's pages as the panel takes them: a page that failed has the mode 'failed'; the pages read with OCR in
+ * their own list (SAMPLE.ocr), not here */
+const SAMPLE_PAGES = SAMPLE.pages.filter(function (p) {
+  return !SAMPLE.ocr.some(function (x) { return x.page === p.page; });
+}).map(function (p) {
   return { page: p.page, mode: p.failed ? 'failed' : p.mode, conf: p.conf, why: p.why };
 });
 
@@ -139,6 +142,10 @@ test('fromResult: r.report is taken (normalised); clean imports and a Kelk sourc
   assert.deepEqual(clone(rep.pages), SAMPLE_PAGES, 'a page that failed is not shown as simplified');
   assert.deepEqual(clone(rep.flags), SAMPLE.flags);
   assert.deepEqual(clone(rep.notes), SAMPLE.notes, 'the report wins over the older fields');
+  assert.deepEqual(clone(rep.ocr), SAMPLE.ocr, 'the pages read with OCR: a list of their own');
+  // OCR alone is worth a panel; a report from before 3.4 has an empty list
+  assert.equal(R.worth(R.fromResult({ report: { summary: { pages: 1, ocr: 1 }, pages: [{ page: 1, mode: 'ocr', conf: 0.9, why: ['noText'] }], ocr: [{ page: 1, conf: 0.9, lines: 3, notes: [] }], notes: [] } })), true);
+  assert.deepEqual(clone(R.fromResult({ report: { pages: [], notes: [] } }).ocr), []);
   // a report with gaps: lists always there, a 'full' page and a flag repeated as a note left out
   const thin = R.fromResult({
     report: {
@@ -187,6 +194,9 @@ test('the sample report holds every mode, why, flag and note code the panel know
   R.MODES.forEach((m) => assert.ok(Object.prototype.hasOwnProperty.call(R.MODE_KEYS, m), 'a label for mode ' + m));
   const why = new Set([].concat(...SAMPLE.pages.map((p) => p.why)));
   Object.keys(R.WHY).forEach((k) => assert.ok(why.has(k), 'why ' + k));
+  const ocrNotes = new Set([].concat(...SAMPLE.ocr.map((x) => x.notes)));
+  Object.keys(R.OCR_NOTES).forEach((k) => assert.ok(ocrNotes.has(k), 'OCR note ' + k));
+  ['noLines', 'lowConf', 'failed'].forEach((k) => assert.ok(Object.prototype.hasOwnProperty.call(R.OCR_NOTES, k), 'the contract’s OCR note ' + k + ' is translated'));
   ['lowConf', 'suspectSpaces', 'lostGlyphs', 'layoutFailed', 'extractFailed', 'noText', 'safeMode'].forEach((k) =>
     assert.ok(Object.prototype.hasOwnProperty.call(R.WHY, k), 'the contract’s why ' + k + ' is translated')
   );
@@ -207,6 +217,9 @@ test('the sample report holds every mode, why, flag and note code the panel know
   Object.keys(R.NOTES).forEach((k) =>
     ['fa', 'en', 'ar'].forEach((l) => assert.ok(strings[l][R.NOTES[k].key], l + ' ' + R.NOTES[k].key))
   );
+  Object.keys(R.OCR_NOTES).forEach((k) =>
+    ['fa', 'en', 'ar'].forEach((l) => assert.ok(strings[l][R.OCR_NOTES[k]], l + ' ' + R.OCR_NOTES[k]))
+  );
   w.close();
 });
 
@@ -225,7 +238,16 @@ for (const lang of ['fa', 'en', 'ar']) {
     assert.equal(box.querySelector('[aria-live]'), null, 'no live region of its own');
     assert.equal(K.ui.report(clone(SAMPLE), { name: 'sample.pdf', onSafe: function () {} }), true);
     assert.equal(box.hidden, false);
-    assert.equal(box.querySelectorAll('.report-pages tbody tr').length, SAMPLE.pages.length);
+    assert.equal(box.querySelectorAll('.report-pages:not(.report-ocr) tbody tr').length, SAMPLE_PAGES.length);
+    // the pages read with OCR: a table of their own, each page with its confidence and its notes
+    const ocrRows = box.querySelectorAll('.report-ocr tbody tr');
+    assert.equal(ocrRows.length, SAMPLE.ocr.length);
+    assert.equal(box.querySelector('.report-ocr caption').textContent, K.i18n.t('rep_ocrHead'));
+    SAMPLE.ocr.forEach(function (x, i) {
+      assert.equal(ocrRows[i].querySelector('th').textContent, String(x.page));
+      x.notes.forEach(function (n) { assert.ok(ocrRows[i].textContent.includes(K.i18n.t(K.importReport.OCR_NOTES[n])), 'OCR note ' + n); });
+    });
+    assert.ok(K.ui.report.text().includes('**' + K.i18n.t('rep_ocrHead') + '**'), 'the OCR table in Copy report');
     const lost = box.querySelector('.report-pages tbody tr[data-mode="failed"]');
     assert.ok(lost, 'the failed page has a row of its own mode');
     assert.equal(lost.querySelector('.mode').textContent, K.i18n.t('rep_mode_failed'));

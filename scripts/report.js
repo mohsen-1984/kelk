@@ -6,7 +6,9 @@
  *       { mode, summary: { pages, full, simplified, textContent, ocr, failed, conf },
  *         pages: [{ page, mode, conf, why: [] }]   (pages not read 'full' only; a page that could not be read —
  *                                                  the contract's failed: true — has the mode 'failed'),
- *         flags: [{ code, pages }], notes: [{ code, pages? }] }
+ *         flags: [{ code, pages }], ocr: [{ page, conf, lines, notes: [] }], notes: [{ code, pages? }] }
+ *     ocr: the pages read with OCR (3.4), a category of their own — apart from the findings (the fonts' among them)
+ *     and from the pages not read in full, which leave them out; their notes are OCR_NOTES codes.
  *     r.report when the importer gives one (normalised: lists always there, a flag never repeated as a
  *     note); otherwise built from the older fields — r.pages (per-page mode / conf), r.quality.flags, r.notes,
  *     r.failedPages.
@@ -44,6 +46,8 @@
     'use strict';
 
     const own = function (o, k) { return o != null && Object.prototype.hasOwnProperty.call(o, k); };
+    /** a report's OCR list (a report made before 3.4 has none) */
+    const ocrOf = function (rep) { return Array.isArray(rep.ocr) ? rep.ocr : []; };
     const MODES = ['full', 'simplified', 'textContent', 'ocr'];
     /** the panel's own mode of a page that could not be read (the contract: failed: true, mode 'simplified') */
     const FAILED = 'failed';
@@ -60,6 +64,8 @@
         figureFailed: { key: 'pdf_figureFailed', warn: true },
         pageFailed: { key: 'pdf_pageFailed', warn: true },
         ocrNeeded: { key: 'pdf_ocrNeeded', warn: true },
+        ocrFailed: { key: 'pdf_ocrFailed', warn: true },
+        ocrPageFailed: { key: 'pdf_ocrPageFailed', warn: true },
         printNoLinks: { key: 'pdf_printNoLinks' },
         ocrLayer: { key: 'pdf_ocrLayer' },
         watermarkDropped: { key: 'pdf_watermarkDropped' },
@@ -80,6 +86,8 @@
         layoutFailed: 'rep_why_layoutFailed', extractFailed: 'rep_why_extractFailed', noText: 'rep_why_noText',
         safeMode: 'rep_why_safeMode'
     };
+    /** a page read with OCR: its notes (ladder.js _ladOcrPass) */
+    const OCR_NOTES = { noLines: 'rep_ocr_noLines', lowConf: 'rep_ocr_lowConf', failed: 'rep_ocr_failed' };
 
     const pageNums = function (ps) {
         return Array.from(new Set((Array.isArray(ps) ? ps : []).filter(function (p) { return typeof p === 'number' && isFinite(p); })))
@@ -110,17 +118,30 @@
         return out;
     }
 
+    /** the pages read with OCR → [{ page, conf, lines, notes }], each page once, in order */
+    function ocrList(xs) {
+        const seen = {};
+        return (Array.isArray(xs) ? xs : []).filter(function (x) {
+            if (!x || typeof x.page !== 'number' || own(seen, x.page)) return false;
+            seen[x.page] = true;
+            return true;
+        })
+            .map(function (x) { return { page: x.page, conf: confOf(x.conf), lines: +x.lines || 0, notes: (Array.isArray(x.notes) ? x.notes : []).map(String) }; })
+            .sort(function (a, b) { return a.page - b.page; });
+    }
+
     function fromResult(r) {
         r = r || {};
         const failed = pageNums(r.failedPages);
         if (r.report && typeof r.report === 'object') {
             const rep = r.report, s = rep.summary || {};
-            const flags = flagList(rep.flags);
-            const pages = (Array.isArray(rep.pages) ? rep.pages : []).filter(function (p) { return p && (p.mode !== 'full' || p.failed); }).map(function (p) {
+            const flags = flagList(rep.flags), ocr = ocrList(rep.ocr);
+            const byOcr = function (p) { return ocr.some(function (x) { return x.page === p.page; }); };
+            const pages = (Array.isArray(rep.pages) ? rep.pages : []).filter(function (p) { return p && (p.mode !== 'full' || p.failed) && !byOcr(p); }).map(function (p) {
                 return { page: p.page, mode: p.failed ? FAILED : String(p.mode || ''), conf: confOf(p.conf), why: (Array.isArray(p.why) ? p.why : []).map(String) };
             });
             const summary = { pages: +s.pages || 0, full: +s.full || 0, simplified: +s.simplified || 0, textContent: +s.textContent || 0, ocr: +s.ocr || 0, failed: +s.failed || 0, conf: confOf(s.conf) };
-            return { mode: rep.mode || 'auto', summary: summary, pages: pages, flags: flags, notes: noteList(rep.notes, flags, failed) };
+            return { mode: rep.mode || 'auto', summary: summary, pages: pages, flags: flags, ocr: ocr, notes: noteList(rep.notes, flags, failed) };
         }
         // from before the fallback ladder: the fields the importer has always given
         const flags = flagList(r.quality && r.quality.flags);
@@ -140,13 +161,13 @@
             summary.pages = pageNums(read.concat(failed)).length;
             summary.full = Math.max(0, summary.pages - failed.length);
         }
-        return { mode: 'full', summary: summary, pages: pages, flags: flags, notes: noteList(r.notes, flags, failed) };
+        return { mode: 'full', summary: summary, pages: pages, flags: flags, ocr: [], notes: noteList(r.notes, flags, failed) };
     }
 
     /** a note that opens the panel: a known one that is not quiet, or a code without words yet (shown as it is) */
     const loud = function (n) { return !own(NOTES, n.code) || !NOTES[n.code].quiet; };
     function worth(rep) {
-        return !!rep && (rep.pages.length > 0 || rep.flags.length > 0 || rep.notes.some(loud));
+        return !!rep && (rep.pages.length > 0 || rep.flags.length > 0 || ocrOf(rep).length > 0 || rep.notes.some(loud));
     }
 
     // ---- the words ---------------------------------------------------------------------------------------------
@@ -159,6 +180,10 @@
     /** a page's mode as shown: the contract's failed page (mode 'simplified', failed: true) is 'failed' */
     const pageMode = function (p) { return p.failed ? FAILED : p.mode; };
     const whyName = function (w) { return own(WHY_KEYS, w) ? t(WHY_KEYS[w]) : w; };
+    const ocrNote = function (n) { return own(OCR_NOTES, n) ? t(OCR_NOTES[n]) : n; };
+    /** the pages read with OCR as rows [page, confidence, notes] (the panel's table and the copy's) */
+    const ocrRows = function (rep) { return ocrOf(rep).map(function (x) { return [x.page, pct(x.conf), x.notes.map(ocrNote).join(sep())]; }); };
+    const OCR_HEAD = ['rep_colPage', 'rep_colConf', 'rep_colNotes'];
     const list = function (ps) { return K.ui.pageList(ps, 12); };
 
     /** one finding (a flag or a note) → { text, warn } */
@@ -186,7 +211,7 @@
     }
 
     function none() {
-        return { mode: null, summary: { pages: 0, full: 0, simplified: 0, textContent: 0, ocr: 0, failed: 0, conf: null }, pages: [], flags: [], notes: [] };
+        return { mode: null, summary: { pages: 0, full: 0, simplified: 0, textContent: 0, ocr: 0, failed: 0, conf: null }, pages: [], flags: [], ocr: [], notes: [] };
     }
     const titleKey = function (entries) { return entries.some(function (e) { return e.kind && e.kind !== 'pdf'; }) ? 'rep_titleImport' : 'rep_title'; };
     const infoOf = function (e) { return e.info && K.fileInfo && K.fileInfo.any(e.info) ? e.info : null; };
@@ -228,12 +253,16 @@
                 Array.prototype.push.apply(lines, gfmTable(['rep_colPage', 'rep_colMode', 'rep_colConf', 'rep_colWhy'].map(function (k) { return t(k); }),
                     rep.pages.map(function (p) { return [p.page, modeName(pageMode(p)), pct(p.conf), p.why.map(whyName).join(sep())]; })));
             }
+            if (ocrOf(rep).length) {
+                lines.push('', '**' + t('rep_ocrHead') + '**', '');
+                Array.prototype.push.apply(lines, gfmTable(OCR_HEAD.map(function (k) { return t(k); }), ocrRows(rep)));
+            }
             if (infoOf(e)) lines.push('', '**' + t('fi_head') + '**', '', K.fileInfo.gfm(e.info).replace(/\n$/, ''));
         });
         return lines.join('\n').replace(/[⁦-⁩]/g, '').replace(/^ +$/gm, '').replace(/\n{3,}/g, '\n\n').trim() + '\n';
     }
 
-    K.importReport = { fromResult: fromResult, worth: worth, text: text, gfmTable: gfmTable, none: none, FLAGS: FLAGS, NOTES: NOTES, MODES: MODES, MODE_KEYS: MODE_KEYS, WHY: WHY_KEYS };
+    K.importReport = { fromResult: fromResult, worth: worth, text: text, gfmTable: gfmTable, none: none, FLAGS: FLAGS, NOTES: NOTES, MODES: MODES, MODE_KEYS: MODE_KEYS, WHY: WHY_KEYS, OCR_NOTES: OCR_NOTES };
 
     // ---- the panel ---------------------------------------------------------------------------------------------
     const state = { entries: [], o: {}, back: null, doc: null, timer: 0, view: null };
@@ -307,6 +336,19 @@
                     tr.appendChild(el('td', 'mode', modeName(pageMode(p))));
                     tr.appendChild(el('td', 'num', pct(p.conf)));
                     tr.appendChild(el('td', 'why', p.why.map(whyName).join(sep())));
+                });
+            }
+            if (ocrOf(rep).length) {
+                const tbl = sec.appendChild(el('table', 'report-pages report-ocr'));
+                tbl.appendChild(el('caption', null, t('rep_ocrHead')));
+                const hr = tbl.appendChild(el('thead')).appendChild(el('tr'));
+                OCR_HEAD.forEach(function (k) { hr.appendChild(el('th', null, t(k))).scope = 'col'; });
+                const tb = tbl.appendChild(el('tbody'));
+                ocrRows(rep).forEach(function (c) {
+                    const tr = tb.appendChild(el('tr'));
+                    tr.appendChild(el('th', 'num', String(c[0]))).scope = 'row';
+                    tr.appendChild(el('td', 'num', c[1]));
+                    tr.appendChild(el('td', 'why', c[2]));
                 });
             }
             if (infoOf(e)) K.fileInfo.render(sec, e.info);
