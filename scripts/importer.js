@@ -219,8 +219,10 @@
         }
         // the file's information for the report (scripts/fileinfo.js): with the libraries, on the first import
         let fi = null;
-        if (!K.libs.loaded('fileinfo')) step('libs', 0, 1);
+        if (!K.libs.loaded('fileinfo') || !K.libs.loaded('ocrreport')) step('libs', 0, 1);
         try { fi = await K.libs.need('fileinfo'); } catch (e) { fi = null; }
+        // (OCR's words, its section of the report and its button: scripts/ocrreport.js, with the importer — before its steps)
+        try { await K.libs.need('ocrreport'); } catch (e) { /* the report shows its other parts */ }
         step('file', 0, 1);
         const buf = await readBuffer(file), bytes = o && o.keepBytes ? new Uint8Array(buf.slice(0)) : null;
         // the import's messages come once, at its end (K.ui.batch), and its pictures are stored once

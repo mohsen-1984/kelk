@@ -215,8 +215,8 @@ test('a PDF import loads pdf.js, then the importer, before PdfImporter.create', 
     return Promise.resolve();
   };
   await K.importer.fromFile(new w.File(['%PDF-1.7'], 'doc.pdf', { type: 'application/pdf' }));
-  // (fileinfo: the import report's file information, 2.7 — loaded with the importer)
-  assert.deepEqual(calls, ['need pdfjs', 'need pdfimport', 'need fileinfo', 'create']);
+  // (fileinfo: the import report's file information, 2.7, and ocrreport: its OCR section, 3.4 — loaded with the importer)
+  assert.deepEqual(calls, ['need pdfjs', 'need pdfimport', 'need fileinfo', 'need ocrreport', 'create']);
   assert.equal(K.editor.value(), '# From the PDF\n');
   assert.deepEqual(errors, []);
   w.close();

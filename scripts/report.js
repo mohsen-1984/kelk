@@ -9,7 +9,7 @@
  *         flags: [{ code, pages }], ocr: [{ page, conf, lines, notes: [] }], notes: [{ code, pages? }] }
  *     ocr: the pages read with OCR (3.4), a category of their own — apart from the findings (the fonts' among them)
  *     and from the pages not read in full, whose table leaves them out (they stay in pages: the contract's); their
- *     notes are OCR_NOTES codes.
+ *     notes are KelkOcrReport.NOTES codes.
  *     r.report when the importer gives one (normalised: lists always there, a flag never repeated as a
  *     note); otherwise built from the older fields — r.pages (per-page mode / conf), r.quality.flags, r.notes,
  *     r.failedPages.
@@ -31,9 +31,8 @@
  *     another import) hides it, an undo back to that document shows it again (collapsed). null: hidden. The focus moves into the panel and
  *     goes back where it was when it closes (its ×, Escape, or a clean import that closes it). onSafe: the
  *     "Re-import in safe mode" button's action, its explanation shown under it (no button without it, nor for a
- *     report that already ran in safe mode). onOcr(pages): "Read with OCR" (3.4), shown with a page range — the pages
- *     the report says need OCR, which the reader may narrow («1-3, 7»; an invalid range is refused with a toast) —
- *     when a report has such pages. Kelk.ui.report.release(): a new import starts — onSafe, onOcr (and the
+ *     report that already ran in safe mode). onOcr(pages): "Read with OCR" (3.4) with a page range, when a report says
+ *     pages need OCR (scripts/ocrreport.js, loaded with the PDF importer: the button, the range, the OCR table, their words). Kelk.ui.report.release(): a new import starts — onSafe, onOcr (and the
  *     file bytes it holds) goes. No live region of its
  *     own: the focus move announces the panel once (its name), the import's own toast says it loaded.
  *   Kelk.ui.report.custom(view)
@@ -89,8 +88,6 @@
         layoutFailed: 'rep_why_layoutFailed', extractFailed: 'rep_why_extractFailed', noText: 'rep_why_noText',
         safeMode: 'rep_why_safeMode'
     };
-    /** a page read with OCR: its notes (ladder.js _ladOcrPass) */
-    const OCR_NOTES = { noLines: 'rep_ocr_noLines', lowConf: 'rep_ocr_lowConf', failed: 'rep_ocr_failed' };
 
     const pageNums = function (ps) {
         return Array.from(new Set((Array.isArray(ps) ? ps : []).filter(function (p) { return typeof p === 'number' && isFinite(p); })))
@@ -182,11 +179,10 @@
     /** a page's mode as shown: the contract's failed page (mode 'simplified', failed: true) is 'failed' */
     const pageMode = function (p) { return p.failed ? FAILED : p.mode; };
     const whyName = function (w) { return own(WHY_KEYS, w) ? t(WHY_KEYS[w]) : w; };
-    const ocrNote = function (n) { return own(OCR_NOTES, n) ? t(OCR_NOTES[n]) : n; };
     /**
      * a report's page tables, for the panel and the copy alike: the pages not read in full (a page read with OCR is in
-     * the next one instead), the pages read with OCR — each { cls, head, cols: [[key, cell class]], rows: [{ mode, cells }] },
-     * the empty ones left out
+     * the next one instead), the pages read with OCR (scripts/ocrreport.js, loaded with the PDF importer) — each
+     * { cls, head, cols: [[key, cell class]], rows: [{ mode, cells }] }, the empty ones left out
      */
     function tables(rep) {
         const byOcr = function (p) { return ocrOf(rep).some(function (x) { return x.page === p.page; }); };
@@ -195,9 +191,8 @@
                 rows: rep.pages.filter(function (p) { return !byOcr(p); }).map(function (p) {
                     return { mode: pageMode(p), cells: [p.page, modeName(pageMode(p)), pct(p.conf), p.why.map(whyName).join(sep())] };
                 }) },
-            { cls: 'report-pages report-ocr', head: 'rep_ocrHead', cols: [['rep_colPage', 'num'], ['rep_colConf', 'num'], ['rep_colNotes', 'why']],
-                rows: ocrOf(rep).map(function (x) { return { cells: [x.page, pct(x.conf), x.notes.map(ocrNote).join(sep())] }; }) }
-        ].filter(function (tb) { return tb.rows.length; });
+            K.ocrReport && K.ocrReport.table(rep, pct, sep)
+        ].filter(function (tb) { return tb && tb.rows.length; });
     }
     const list = function (ps) { return K.ui.pageList(ps, 12); };
 
@@ -230,32 +225,6 @@
     }
     const titleKey = function (entries) { return entries.some(function (e) { return e.kind && e.kind !== 'pdf'; }) ? 'rep_titleImport' : 'rep_title'; };
     const infoOf = function (e) { return e.info && K.fileInfo && K.fileInfo.any(e.info) ? e.info : null; };
-
-    /** the pages a report's entries say need OCR (the note ocrNeeded) */
-    const scans = function (entries) {
-        const ps = [];
-        entries.forEach(function (e) { (e.report ? e.report.notes : []).forEach(function (n) { if (n.code === 'ocrNeeded') Array.prototype.push.apply(ps, n.pages || []); }); });
-        return pageNums(ps);
-    };
-    /** pages → a range to type in («1-3, 7»: ASCII, whatever the language) and back, only pages of `allowed` (null: none valid) */
-    function rangeText(ps) {
-        const out = [];
-        for (let i = 0; i < ps.length; i++) { let j = i; while (j + 1 < ps.length && ps[j + 1] === ps[j] + 1) j++; out.push(j > i ? ps[i] + '-' + ps[j] : String(ps[i])); i = j; }
-        return out.join(', ');
-    }
-    function rangePages(s, allowed) {
-        const DIG = '۰۱۲۳۴۵۶۷۸۹', AR = '٠١٢٣٤٥٦٧٨٩', got = [];
-        s = String(s || '').replace(/[۰-۹٠-٩]/g, function (d) { return String(DIG.indexOf(d) >= 0 ? DIG.indexOf(d) : AR.indexOf(d)); }).replace(/[–—]/g, '-').replace(/\s*-\s*/g, '-');
-        const parts = s.split(/[,،;\s]+/).filter(Boolean);
-        for (const p of parts) {
-            const m = /^(\d+)(?:-(\d+))?$/.exec(p);
-            if (!m) return null;
-            const a = +m[1], b = m[2] ? +m[2] : a;
-            if (b < a) return null;
-            allowed.forEach(function (n) { if (n >= a && n <= b) got.push(n); });
-        }
-        return got.length ? pageNums(got) : null;
-    }
 
     function entriesOf(rep, o) {
         if (Array.isArray(rep)) return rep.filter(function (e) { return e && e.report; });
@@ -298,7 +267,7 @@
         return lines.join('\n').replace(/[⁦-⁩]/g, '').replace(/^ +$/gm, '').replace(/\n{3,}/g, '\n\n').trim() + '\n';
     }
 
-    K.importReport = { rangePages: rangePages, rangeText: rangeText, fromResult: fromResult, worth: worth, text: text, gfmTable: gfmTable, none: none, FLAGS: FLAGS, NOTES: NOTES, MODES: MODES, MODE_KEYS: MODE_KEYS, WHY: WHY_KEYS, OCR_NOTES: OCR_NOTES };
+    K.importReport = { fromResult: fromResult, worth: worth, text: text, gfmTable: gfmTable, none: none, FLAGS: FLAGS, NOTES: NOTES, MODES: MODES, MODE_KEYS: MODE_KEYS, WHY: WHY_KEYS };
 
     // ---- the panel ---------------------------------------------------------------------------------------------
     const state = { entries: [], o: {}, back: null, doc: null, timer: 0, view: null };
@@ -331,7 +300,8 @@
         const box = K.$('#import-report'), body = K.$('#import-report-body'), v = state.view;
         body.textContent = '';
         v.body(body);
-        ['#report-safe', '#report-safe-hint', '#report-ocr', '#report-ocr-field', '#report-ocr-hint'].forEach(function (s) { const x = K.$(s); if (x) x.hidden = true; });
+        ['#report-safe', '#report-safe-hint'].forEach(function (s) { const x = K.$(s); if (x) x.hidden = true; });
+        if (K.ocrReport) K.ocrReport.show([], null);
         const name = K.$('#import-report-name'); if (name) name.textContent = '';
         const brief = K.$('#import-report-brief'); if (brief) brief.textContent = v.brief();
         box.classList.remove('clean');
@@ -376,9 +346,8 @@
             });
             if (infoOf(e)) K.fileInfo.render(sec, e.info);
         });
-        // (Read with OCR: when a page needs it and the import said how — its range kept as the reader typed it)
-        const noOcr = !state.o.onOcr || !scans(state.entries).length;
-        ['#report-ocr', '#report-ocr-field', '#report-ocr-hint'].forEach(function (q) { const x = K.$(q); if (x) x.hidden = noOcr; });
+        // (Read with OCR and its page range: scripts/ocrreport.js)
+        if (K.ocrReport) K.ocrReport.show(state.entries, state.o.onOcr, close);
         const safe = K.$('#report-safe'), hint = K.$('#report-safe-hint');
         // (a clean import has nothing safe mode would do better: no button)
         const noSafe = !state.o.onSafe || state.entries.every(function (e) { return e.report.mode === 'safe' || !worth(e.report); });
@@ -458,8 +427,6 @@
         if (!entries.length) { close(); return false; }
         const was = !box.hidden;
         state.entries = entries; state.o = o || {}; state.doc = docNow(); state.view = null;
-        const range = K.$('#report-ocr-pages');
-        if (range) range.value = rangeText(scans(entries));
         if (!was || !box.contains(document.activeElement)) {
             const a = document.activeElement;
             state.back = a && a !== document.body && !box.contains(a) ? a : state.back;
@@ -527,14 +494,6 @@
             close();
             if (run) run();
         });
-        const readOcr = function () {
-            const run = state.o.onOcr, pages = rangePages(K.$('#report-ocr-pages').value, scans(state.entries));
-            if (!pages) { K.ui.toast(t('rep_ocrPagesBad', rangeText(scans(state.entries))), 'error'); K.$('#report-ocr-pages').focus(); return; }
-            close();
-            if (run) run(pages);
-        };
-        K.$('#report-ocr').addEventListener('click', readOcr);
-        K.$('#report-ocr-pages').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); readOcr(); } });
         box.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); }
         });

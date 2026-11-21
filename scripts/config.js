@@ -211,6 +211,8 @@
             pdfBuilder: { src: 'lib/PdfBuilder.js', global: 'PdfBuilder' },
             docBuilder: { src: 'lib/WordHtmlBuilder.js', global: 'WordHtmlBuilder' },
             fileinfo: { src: 'scripts/fileinfo.js', global: 'KelkFileInfo' },          // the import report's file information
+            // OCR in the import report (3.4): its section, «Read with OCR» and its page range, their words — with the PDF importer
+            ocrreport: { src: 'scripts/ocrreport.js', global: 'KelkOcrReport' },
             // the Excel view (its preview, the no-tables report, the exports): on the first switch to Excel
             sheets: { src: ['lib/XlsxBuilder.js', 'scripts/sheets.js'], global: 'KelkSheets' },
             xlsx: { src: ['vendor/jszip.min_3.10.2.js', 'vendor/xlsx.full.min_0.20.3.js'], global: 'XLSX' },     // an XLSX export or import

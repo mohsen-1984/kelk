@@ -66,10 +66,18 @@ const clone = function (o) {
   return JSON.parse(JSON.stringify(o));
 };
 
+/** scripts/ocrreport.js in the page, as Kelk.libs.need('ocrreport') loads it with the PDF importer (3.4) */
+const OCR_UI = fs.readFileSync(path.resolve(__dirname, '..', '..', 'scripts', 'ocrreport.js'), 'utf8');
+function ocrUi(w) {
+  if (!w.Kelk.ocrReport) w.eval(OCR_UI);
+  return w.Kelk.ocrReport;
+}
+
 /** A PdfImporter stand-in: create(opts) and fromArrayBuffer(buf, hooks) recorded, `result` returned. */
 function fakePdf(w, result) {
   const calls = [];
   w.Kelk.libs.need = function (name) {
+    if (name === 'ocrreport') ocrUi(w);
     if (name === 'pdfimport') {
       w.PdfImporter = {
         create: function (opts) {
@@ -184,7 +192,7 @@ test('fromResult: r.report is taken (normalised); clean imports and a Kelk sourc
 
 test('the sample report holds every mode, why, flag and note code the panel knows', async function () {
   const { window: w } = await appWindow(OPENED);
-  const R = w.Kelk.importReport;
+  const R = w.Kelk.importReport, OCR = ocrUi(w);
   const modes = new Set(SAMPLE_PAGES.map((p) => p.mode));
   Object.keys(R.MODE_KEYS)
     .filter((m) => m !== 'full')
@@ -193,8 +201,8 @@ test('the sample report holds every mode, why, flag and note code the panel know
   const why = new Set([].concat(...SAMPLE.pages.map((p) => p.why)));
   Object.keys(R.WHY).forEach((k) => assert.ok(why.has(k), 'why ' + k));
   const ocrNotes = new Set([].concat(...SAMPLE.ocr.map((x) => x.notes)));
-  Object.keys(R.OCR_NOTES).forEach((k) => assert.ok(ocrNotes.has(k), 'OCR note ' + k));
-  ['noLines', 'lowConf', 'failed'].forEach((k) => assert.ok(Object.prototype.hasOwnProperty.call(R.OCR_NOTES, k), 'the contract’s OCR note ' + k + ' is translated'));
+  Object.keys(OCR.NOTES).forEach((k) => assert.ok(ocrNotes.has(k), 'OCR note ' + k));
+  ['noLines', 'lowConf', 'failed'].forEach((k) => assert.ok(Object.prototype.hasOwnProperty.call(OCR.NOTES, k), 'the contract’s OCR note ' + k + ' is translated'));
   ['lowConf', 'suspectSpaces', 'lostGlyphs', 'layoutFailed', 'extractFailed', 'noText', 'safeMode'].forEach((k) =>
     assert.ok(Object.prototype.hasOwnProperty.call(R.WHY, k), 'the contract’s why ' + k + ' is translated')
   );
@@ -215,8 +223,8 @@ test('the sample report holds every mode, why, flag and note code the panel know
   Object.keys(R.NOTES).forEach((k) =>
     ['fa', 'en', 'ar'].forEach((l) => assert.ok(strings[l][R.NOTES[k].key], l + ' ' + R.NOTES[k].key))
   );
-  Object.keys(R.OCR_NOTES).forEach((k) =>
-    ['fa', 'en', 'ar'].forEach((l) => assert.ok(strings[l][R.OCR_NOTES[k]], l + ' ' + R.OCR_NOTES[k]))
+  Object.keys(OCR.NOTES).forEach((k) =>
+    ['fa', 'en', 'ar'].forEach((l) => assert.ok(strings[l][OCR.NOTES[k]], l + ' ' + OCR.NOTES[k]))
   );
   w.close();
 });
@@ -234,6 +242,7 @@ for (const lang of ['fa', 'en', 'ar']) {
     assert.equal(box.getAttribute('role'), 'region');
     assert.ok(d.getElementById(box.getAttribute('aria-labelledby')).textContent.trim(), 'an accessible name');
     assert.equal(box.querySelector('[aria-live]'), null, 'no live region of its own');
+    ocrUi(w);                                       // (with the PDF importer: the report's OCR section)
     assert.equal(K.ui.report(clone(SAMPLE), { name: 'sample.pdf', onSafe: function () {} }), true);
     assert.equal(box.hidden, false);
     // (the pages read with OCR are in their own table, not in the pages not read in full)
@@ -245,7 +254,7 @@ for (const lang of ['fa', 'en', 'ar']) {
     assert.equal(box.querySelector('.report-ocr caption').textContent, K.i18n.t('rep_ocrHead'));
     SAMPLE.ocr.forEach(function (x, i) {
       assert.equal(ocrRows[i].querySelector('th').textContent, String(x.page));
-      x.notes.forEach(function (n) { assert.ok(ocrRows[i].textContent.includes(K.i18n.t(K.importReport.OCR_NOTES[n])), 'OCR note ' + n); });
+      x.notes.forEach(function (n) { assert.ok(ocrRows[i].textContent.includes(K.i18n.t(K.ocrReport.NOTES[n])), 'OCR note ' + n); });
     });
     assert.ok(K.ui.report.text().includes('**' + K.i18n.t('rep_ocrHead') + '**'), 'the OCR table in Copy report');
     const lost = box.querySelector('.report-pages tbody tr[data-mode="failed"]');
@@ -508,7 +517,7 @@ test('Read with OCR: the range, the pages it asks for, the setting (Ask, Read wi
   const { window: w, errors } = await appWindow(OPENED);
   const K = w.Kelk,
     d = w.document,
-    R = K.importReport;
+    R = ocrUi(w);
   // the range: typed as «1-3, 7» (Persian or Arabic digits, dashes, spaces), only the pages that need OCR
   assert.equal(R.rangeText([1, 2, 3, 7, 9, 10]), '1-3, 7, 9-10');
   assert.deepEqual(Array.from(R.rangePages('1-3, 7', [1, 2, 3, 5, 7])), [1, 2, 3, 7]);
