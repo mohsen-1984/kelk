@@ -9,7 +9,8 @@ All notable changes to Kelk. Dates are those of the release tags.
 - **PDF import reads CFF fonts**: the compact Adobe fonts that Acrobat Distiller, InDesign and the Adobe PDF Library
   embed (FontFile3 Type 1C and CID-keyed). Kelk now reads their outlines, so a CFF font Kelk does not know is read by
   its letters' shapes, a known face by its rough prints, and a ZWNJ from the outlines — as TrueType fonts already were.
-  On our lab files: a CID-keyed Persian page 27.6 → 51.9, a renumbered one 20.0 → 68.9, Vazirmatn as CFF 25.0 → 61.9,
+  On our lab files: a CID-keyed Persian page 27.6 → 51.9 (its body is still reported garbled: the shape reading takes
+  that font's alef for «أ»), a renumbered one 20.0 → 68.9, Vazirmatn as CFF 25.0 → 61.9,
   the ZWNJ case 93.9 → 100. On a real report embedded that way, the Persian words read went from about 1,400 to about
   64,000. A CFF font no reading recovers is reported garbled, never passed off as text: where 3.2 let such text through
   unreported, the report now names it — so such a file's confidence can come out lower than before. Such files also
@@ -22,10 +23,11 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ### Fixed
 
-- **Word's ت**: Word's «Save as PDF» names every ت «"» (U+0022) in its fonts' ToUnicode; the font's own cmap names
-  them right, and now wins. A real quotation mark keeps its name.
+- **Word's ت**: Word's «Save as PDF» names every ت «"» (U+0022) in its fonts' ToUnicode: the font's own cmap now wins
+  in body text (our lab page's words 71 → 98 %). A real quotation mark keeps its name. Not yet: a short title in such a
+  font, and real quotation marks around a Latin word in a Persian line.
 - **Stretched letters**: a Nastaliq font that names its stretched forms as tatweels and the letter («ـــی») now gives
-  the letter, without the tatweels.
+  the letter, without the tatweels. The font itself can still be reported garbled; that is being looked into.
 - **Persian letters**: in a Persian text, ە and ھ now become ه too (as ي ك ى already became ی ک ی), in every import
   — PDF, Word/HTML, paste and sheets. Arabic keeps ى; a text with Urdu or Kurdish letters keeps its ە and ھ.
 - **The PDF lab**: 239 PDFs (seven new: four CFF cases, a CFF font no reading recovers, Word's ت, the tatweel

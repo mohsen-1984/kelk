@@ -147,9 +147,27 @@ TrueType programs with a fixed date (`rtl_pdf.fixed`).
 reference family nearest the unknown font, then rank within it, to win back the sans Latin acceptance the serif
 shapes cost («The serif shapes and the sans Latin readings» below).
 
-**3.4 — OCR on demand, proposed** (the owner, 2026-11-21): tesseract.js (Persian, Arabic, English), loaded only when
-asked for — scanned PDFs, text drawn as outlines, titles drawn as pictures or in calligraphy, and votes for the short
-fonts Kelk does not know (`word-cover--glyph-index-fa`). Its own scope round first.
+**3.4 — OCR on demand** (the owner, 2026-11-21; split approved: lab → engine → import → release). Decisions:
+Tesseract (tesseract.js-core 7.0.0, its SIMD-LSTM build — never the relaxed-SIMD one, which aborts with the `best`
+models — called directly, not through tesseract.js's worker, which `file://` cannot load), not PaddleOCR; the `fas`
+`best` model only, a script loaded only when OCR runs, from `file://` too, never at startup; our own line finding,
+each line read alone (psm 13), then post-correction with the language model's word list (`tools/lm/lm.json`, its
+`file://` copy `lib/pdfimport/lm-fa.js`, also never at startup); Persian only, and only pages that are one picture;
+Settings → Import → *Scanned pages*: «Ask» (the default: the report offers «Read with OCR»), «Read with OCR», «Leave as
+pictures»; OCR runs on the main thread, so it has a Cancel button and a page range and yields between lines; the app
+zip grows by the core and the model (about 8 MB). OCR votes for decipherment stay for 3.5.
+
+1. **Lab** (`pdf/3.4-lab`): `make-scans.js` — `scan-300--scan-plain-fa`, `--scan-framed-fa`, `--scan-headings-fa`,
+   `scan-150--scan-low-fa`, our own text, in no text the language model counted (pending `ocrRead` in
+   `expect.json`); the language model and its builder `tools/build-lm.js` (the corpora never in the repository).
+2. **Engine** (`pdf/3.4-ocr-engine`): the core and the model vendored; `lib/pdfimport/ocr.js` (the spike's
+   `ocr-lines.js`: Otsu, frames and rules out, lines found, psm 13, `postCorrect`); unit tests.
+3. **Import** (`pdf/3.4-ocr-import`): the ladder's `ocr` rung reads a picture-only page; a report note with its pages
+   and a confidence from the share of known words; the setting, the report's button, named progress steps, Cancel and
+   a page range. A real scan run outside the repository: pages read, share of known words, time a page. A real scan
+   is often one 1-bit JBIG2 image a page at 300 dpi, the text in a printed frame, its first pages in colour (an
+   indexed cover, a JPEG page at 200 dpi); the lab files are Flate and JPEG (no JBIG2 encoder here).
+4. **Release** (`release/3.4`).
 
 **A session of its own: real Arabic PDFs and Arabic fonts** (the owner's request, 2026-11-18) — «Left from 3.1» below.
 

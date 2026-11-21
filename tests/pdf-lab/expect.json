@@ -25,6 +25,10 @@
     "distiller-cff--cff-known-fa": { "has": ["fontprintRead"], "not": ["garbledText", "hiddenText"], "_note": "Vazirmatn as a renumbered CFF font: known by its rough prints since the CFF outline reader (3.3); before, its codes came back as ASCII and nothing was reported" },
     "distiller-cff--cff-unreadable-fa": { "has": ["garbledText"], "not": ["fontApprox", "fontprintRead", "hiddenText"], "confBelow": 0.5, "_note": "a CFF font of abstract bars: no reading can recover it, so it must always be reported garbled (the owner's rule for CFF fonts, 2026-11-21)" },
     "word-save--teh-fa": { "not": ["garbledText", "hiddenText"], "_note": "Word's ToUnicode names every ت «\"»: the font's own cmap names them right since 3.3 (reported garbled before; turned around with the owner's approval, 2026-11-21)"},
+    "scan-150--scan-low-fa": { "has": ["ocrRead"], "not": ["garbledText", "fontApprox", "hiddenText"], "pending": "3.4: OCR on demand", "_note": "a scanned page of our text, no text layer (make-scans.js): today a picture, reported ocrNeeded; OCR reads it in 3.4 (the lab runs with OCR on)" },
+    "scan-300--scan-framed-fa": { "has": ["ocrRead"], "not": ["garbledText", "fontApprox", "hiddenText"], "pending": "3.4: OCR on demand", "_note": "a scanned page of our text, no text layer (make-scans.js): today a picture, reported ocrNeeded; OCR reads it in 3.4 (the lab runs with OCR on)" },
+    "scan-300--scan-headings-fa": { "has": ["ocrRead"], "not": ["garbledText", "fontApprox", "hiddenText"], "pending": "3.4: OCR on demand", "_note": "a scanned page of our text, no text layer (make-scans.js): today a picture, reported ocrNeeded; OCR reads it in 3.4 (the lab runs with OCR on)" },
+    "scan-300--scan-plain-fa": { "has": ["ocrRead"], "not": ["garbledText", "fontApprox", "hiddenText"], "pending": "3.4: OCR on demand", "_note": "a scanned page of our text, no text layer (make-scans.js): today a picture, reported ocrNeeded; OCR reads it in 3.4 (the lab runs with OCR on)" },
     "chrome-cutrow--cut-row": { "has": ["lostText"], "_note": "a table row cut by the page break, dropped with no reason (3.1): the report must say so" }
   }
 }
