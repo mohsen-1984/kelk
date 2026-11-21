@@ -71,7 +71,10 @@ test('postCorrect: the comma Tesseract mistakes, ة where only ه makes a known 
   assert.equal(O.postCorrect('کتابء خانه', vocab), 'کتاب، خانه', 'a hamza ending a word after a joining letter');
   assert.equal(O.postCorrect('کتاب» خانه', vocab), 'کتاب، خانه', '» without «');
   assert.equal(O.postCorrect('«کتاب» خانه', vocab), '«کتاب» خانه', 'quotes kept');
-  assert.equal(O.postCorrect('خانة کتاب', vocab), 'خانه کتاب');
+  assert.equal(O.postCorrect('خانة کتاب', vocab), 'خانهٔ کتاب', '«هٔ» read «ة»');
+  ['خانةٌ', 'خانهٌ', 'خانٌ'].forEach((w) => assert.equal(O.postCorrect(w + ' کتاب', vocab), 'خانهٔ کتاب', '«هٔ» read «' + w + '»'));
+  assert.equal(O.postCorrect('کتابٌ', vocab), 'کتابٌ', 'no known word with «ه»: as it is');
+  assert.equal(O.postCorrect('میزة', vocab), 'میزة', 'an unknown word keeps its ة');
   assert.equal(O.postCorrect('صلاة', vocab), 'صلاة', 'an unknown word keeps its ة');
   assert.equal(O.postCorrect('هواء', vocab), 'هوا،', 'a hamza after alef that makes no word');
   assert.equal(O.postCorrect('a, b', vocab), 'a, b', 'Latin untouched');
