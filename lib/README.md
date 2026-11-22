@@ -117,7 +117,7 @@ A code block whose fence says `text` (or `txt`, `plaintext`) is labelled so (`Bi
 fallback label.
 
 File properties: `configure({ meta: { title, author, subject, keywords, creator } })` (or `setMeta`) — PDF Info,
-the .docx core properties, HTML `<meta name="author">`; the creator is "Kelk " + `BuilderBase.version` (3.3 now) unless set, the title the
+the .docx core properties, HTML `<meta name="author">`; the creator is "Kelk " + `BuilderBase.version` (3.4 now) unless set, the title the
 header's or the first H1 when left out.
 
 ## The builders
@@ -343,7 +343,7 @@ r.markdown; r.notes;            // notes: 'noText' (a scan?), 'pageLimit', 'figu
                                 //   (text no reader sees), 'fontprintRead' (a font's characters read from its outlines),
                                 //   'fontApprox' (a font Kelk does not know, read from its glyphs' shapes: approximate)
 r.failedPages;                  // pages that could not be read or laid out (the others were)
-// options.signal: an AbortSignal — the import stops at the next page with err.code 'aborted'
+// options.signal: an AbortSignal — the import stops at the next page (or the next line OCR reads) with err.code 'aborted'
 // options.asciiNumbers (true): ۰–۹ / ٠–٩ → 0–9, and inside a number ٬ ، → ',' · ٫ → '.' · ٪ → '%' (code untouched)
 // options.persianLetters (true): in a Persian document, ي ك ى → ی ک ی (an Arabic document keeps its letters)
 // options.hiddenText ('end'): text no reader sees — off the page, white on white, too small, invisible — in one quote
@@ -352,6 +352,13 @@ r.failedPages;                  // pages that could not be read or laid out (the
 //   glyphs when the reading reads as language ('fontApprox'); 'report' leaves it as the file names it ('garbledText')
 // options.loadShapes (null): async () that loads lib/pdfimport/shape.js and shapes.js (300 KB); by default script tags
 //   beside trust.js (file:// too) or require under Node — only when a PDF has such a font
+// options.ocr ('picture'): a page that is only a picture (a scan) — 'picture' keeps it, noted 'ocrNeeded'; 'read' reads
+//   its Persian text with OCR (Tesseract, line by line: PDFIMPORT.md, OCR); options.ocrPages (null): the pages to read
+// options.loadOcr (null): async () that loads lib/pdfimport/ocr.js, lm-fa.js and vendor/tesseract/ (9 MB); by default
+//   script tags beside ladder.js or require under Node — only when a page is read with OCR
+// hooks.onStage(stage, done, total, args): also 'ocrLoad' and 'ocr' (args [page, line, lines]) when pages are read
+r.report.ocr;                   // the pages read with OCR: [{ page, conf (the share of known words), lines, notes }] —
+                                //   notes: 'noLines', 'lowConf', 'columns', 'failed'
 // options.uiLang (''): the interface's language, for a note Kelk writes when the document's own cannot be told
 r.info;                         // the file's own words, as written: { title, author, subject, keywords, creator, producer,
                                 //   creatorTool, xmpProducer, history, created, modified, pdfVersion, pages, pageSize,
