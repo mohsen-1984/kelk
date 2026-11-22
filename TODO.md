@@ -147,37 +147,25 @@ TrueType programs with a fixed date (`rtl_pdf.fixed`).
 reference family nearest the unknown font, then rank within it, to win back the sans Latin acceptance the serif
 shapes cost («The serif shapes and the sans Latin readings» below).
 
-**3.4 — OCR on demand** (the owner, 2026-11-21; split approved: lab → engine → import → release). Decisions:
-Tesseract (tesseract.js-core 7.0.0, its SIMD-LSTM build — never the relaxed-SIMD one, which aborts with the `best`
-models — called directly, not through tesseract.js's worker, which `file://` cannot load), not PaddleOCR; the `fas`
-`best` model only, a script loaded only when OCR runs, from `file://` too, never at startup; our own line finding,
-each line read alone (psm 13), then post-correction with the language model's word list (`tools/lm/lm.json`, its
-`file://` copy `lib/pdfimport/lm-fa.js`, also never at startup); Persian only, and only pages that are one picture;
-Settings → Import → *Scanned pages*: «Ask» (the default: the report offers «Read with OCR»), «Read with OCR», «Leave as
-pictures»; OCR runs on the main thread, so it has a Cancel button and a page range and yields between lines; the app
-zip grows by the core and the model (about 8 MB). OCR votes for decipherment stay for 3.5.
+**Standing rules from 3.4** (the owner's decisions; done — `CHANGELOG.md` 3.4): OCR is Tesseract through
+tesseract.js-core 7.0.0's SIMD-LSTM build (never the relaxed-SIMD one, which aborts with the `best` models), called
+directly (tesseract.js's worker cannot load from `file://`), with the `fas` `best` model only; the core, the model,
+`lm-fa.js` and the report's OCR section (`scripts/ocrreport.js`) load on demand, never at startup. Our own line
+finding, each line read alone (psm 13), then `postCorrect` with the language model's words; Persian only, pages that
+are one picture only. Settings → *Scanned pages*: «Ask» by default. OCR runs on the main thread: its steps are named
+by page and line, Cancel stops within a line, the report's «Read with OCR» has a page range. The lab runs with OCR on;
+the scans' text is ours and stays out of `lm.json`, `letterstats.js` and `calibrate-shapes.js`. A lab answer key with
+one heading level writes it as `#`.
 
-1. **Lab** (`pdf/3.4-lab`): `make-scans.js` — `scan-300--scan-plain-fa`, `--scan-framed-fa`, `--scan-headings-fa`,
-   `scan-150--scan-low-fa`, our own text, in no text the language model counted (pending `ocrRead` in
-   `expect.json`); the language model and its builder `tools/build-lm.js` (the corpora never in the repository).
-2. **Engine** (`pdf/3.4-ocr-engine`): the core and the model vendored; `lib/pdfimport/ocr.js` (the spike's
-   `ocr-lines.js`: Otsu, frames and rules out, lines found, psm 13, `postCorrect`); unit tests. With it, as the owner
-   asked (2026-11-21), the importer's side: `options.ocr` `'read'` (default `'picture'`, as before) reads the `ocr`
-   rung's pages after the layout, a line at a time, in the import's own progress steps (`ocrLoad`, `ocr` named by page
-   and line) and Cancel; the report's own OCR category (pages, the share of known words, notes); `o.ocr` of the app's
-   PDF import. Lab scans (`ocr-check.js`): CER 1.1 %, WER 3.2 %, about 1 s a page.
-3. **Import** (`pdf/3.4-ocr-import`): Settings → Import → *Scanned pages* (Ask, Read with OCR, Leave as pictures);
-   the report's «Read with OCR» with a page range (a re-import of the same bytes, `ocrPages`); the lab with OCR on and
-   `ocrRead` real; the askew frame and «هٔ» fixes (lab scans: CER 0.21 %, WER 1.0 %); line sizes from the ink, so
-   headings are found; no line a few pixels high (a real scan's 1-pixel rows took Tesseract up to 100 s each). A real
-   scan of about 300 pages, run outside the repository: nearly every page read, 0.83 of the words known on average, a
-   tenth of the pages under 0.7 (lowConf), about 2.6 s a page.
-   `corpus/scan-headings-fa.md` now writes its headings at level 1, as the lab's 46 other one-level answer keys (the
-   owner, 2026-11-21). Open: the whole real scan crashed the headless browser's tab in 3 of 6 runs before its layout ended, with or
-   without OCR and with 3.3's importer too, its JavaScript heap staying under 100 MB — to look into (memory outside
-   the heap: pdf.js's JBIG2 decoder?).
-4. **Release** (`release/3.4`). The release notes say: for a very large scanned file, read a page range at a time
-   (the report's «Read with OCR» range); the import runs in the browser's memory.
+Open from 3.4:
+- **The whole real scan of about 300 pages crashed the headless browser's tab** in 3 of 6 runs before its layout
+  ended, with or without OCR and with 3.3's importer too, its JavaScript heap staying under 100 MB — to look into
+  (memory outside the heap: pdf.js's JBIG2 decoder?). Runs of up to 250 pages never crashed. The release notes say: for
+  a very large scanned file, read a page range at a time.
+- **OCR pages skip the page layout** (one column; no running heads, lists, tables, boxes or pictures inside the page):
+  `lib/PDFIMPORT.md`, "What an OCR page goes through". A page that seems to have two columns is only noted
+  (`columns`, lab `scan-300--scan-columns-fa`).
+- **OCR votes for decipherment** (unknown fonts read with OCR's help) — 3.5.
 
 **3.5 candidate — OCR lines as positioned text** (the owner, 2026-11-21): an OCR page's words enter the layout as
 glyphs (Tesseract's word boxes and baselines), so columns, running heads, lists, tables and every other rule run on it
@@ -192,7 +180,7 @@ release of work: OCR before the layout, glyphs in a font of its own, the rules f
 - **Left from 3.2** (2026-11-19):
   - **Short fonts alone** (`word-cover--glyph-index-fa`, stays reported garbled: the owner's decision, 2026-11-19): two lines of seven letters in a font Kelk does not know, no
     other font of the page read — under 20 letters the pairs say nothing (on the fonts Kelk ships, a wrong reading of
-    30 letters passes one time in eight). Another sign is needed: the OCR phase's votes (proposed for 3.4).
+    30 letters passes one time in eight). Another sign is needed: the OCR phase's votes (3.5).
   - FreeSerif's alef read «أ» in a few words («أن»): a hamza's small part weighs little (`W_DOTS`, set on the fonts
     Kelk ships); not tuned on the lab file.
 - **Left from 3.3** (2026-11-21):
@@ -294,7 +282,7 @@ release of work: OCR before the layout, glyphs in a font of its own, the rules f
 **Optional, later**
 
 - A layout model as an optional download (http(s) only, never from `file://`), as a second opinion on headings and tables
-- OCR for scanned PDFs (tesseract.js, Persian / Arabic / English), on demand — proposed for 3.4 (top of this file)
+- OCR for scanned PDFs: Persian done in 3.4; Arabic and English models (each about 10 MB with `best`) — not placed
 
 ## Backlog
 
@@ -411,7 +399,7 @@ showed is rebuilt in the lab with our own text, and the lab is what the rules ar
 - `/ActualText` is read from page content streams stored as plain or Flate objects; inside object streams,
   other filters or encrypted files it is not (the guesses for list numbers and minus signs remain)
 - Text drawn as outlines (Microsoft Print to PDF can do this): no text layer — needs the OCR phase
-- Scanned PDFs: optional OCR (tesseract.js, Persian traineddata) as a separate phase — proposed for 3.4
+- Scanned PDFs: Persian OCR on demand — done in 3.4 (its limits: «Open from 3.4» at the top)
 - PDFs that already carry an OCR layer (lab `ocr-tesseract--article` 90.8, `--features` 99.1, `--report` 91.5): what is left is mostly the
   OCR's own misreadings (a struck word is misread under its strike). From the scan, still not read: italic (a
   slant), inline code (a monospace word in prose), a thematic break (a rule), an empty task list (an empty box

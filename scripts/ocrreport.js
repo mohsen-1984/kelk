@@ -28,6 +28,7 @@
             rep_ocrHead: 'صفحه‌هایی که با تشخیص نویسه (OCR) خوانده شدند',
             rep_ocr_noLines: 'خطی از متن پیدا نشد',
             rep_ocr_lowConf: 'اطمینان کم: متن را با تصویر صفحه مقایسه کنید',
+            rep_ocr_columns: 'شاید چند ستونی باشد: ترتیب خواندن ممکن است نادرست باشد',
             rep_ocr_failed: 'خوانده نشد؛ تصویر صفحه ماند',
             rep_ocrRead: 'خواندن با تشخیص نویسه (OCR)',
             rep_ocrPages: 'صفحه‌ها',
@@ -43,6 +44,7 @@
             rep_ocrHead: 'Pages read with character recognition (OCR)',
             rep_ocr_noLines: 'no line of text found',
             rep_ocr_lowConf: 'low confidence: compare the text with the page',
+            rep_ocr_columns: 'may have columns: the reading order may be wrong',
             rep_ocr_failed: 'not read; the page\'s picture was kept',
             rep_ocrRead: 'Read with OCR',
             rep_ocrPages: 'Pages',
@@ -58,6 +60,7 @@
             rep_ocrHead: 'صفحات قُرئت بالتعرّف الضوئي على الحروف (OCR)',
             rep_ocr_noLines: 'لم يُعثر على سطر نص',
             rep_ocr_lowConf: 'ثقة منخفضة: قارن النص بصورة الصفحة',
+            rep_ocr_columns: 'قد تكون متعددة الأعمدة: قد يكون ترتيب القراءة خاطئًا',
             rep_ocr_failed: 'لم تُقرأ؛ بقيت صورة الصفحة',
             rep_ocrRead: 'القراءة بالتعرّف الضوئي (OCR)',
             rep_ocrPages: 'الصفحات',
@@ -67,7 +70,7 @@
             imp_ocrStart: 'تهيئة التعرّف الضوئي على الحروف (OCR)…'
         }
     };
-    const NOTES = { noLines: 'rep_ocr_noLines', lowConf: 'rep_ocr_lowConf', failed: 'rep_ocr_failed' };
+    const NOTES = { noLines: 'rep_ocr_noLines', lowConf: 'rep_ocr_lowConf', columns: 'rep_ocr_columns', failed: 'rep_ocr_failed' };
 
     const K = root.Kelk;
     const t = function () { return K.i18n.t.apply(K.i18n, arguments); };

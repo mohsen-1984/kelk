@@ -5,6 +5,8 @@
 //   · scan-300--scan-framed-fa     one page, B Mitra, the text block in a printed frame of rules, 300 dpi, 1-bit
 //   · scan-150--scan-low-fa        one page, Vazirmatn, 150 dpi grey JPEG (quality 0.35), not binarised
 //   · scan-300--scan-headings-fa   one page, B Titr headings over B Nazanin paragraphs, 300 dpi, 1-bit
+//   · scan-300--scan-columns-fa    one page in two columns, B Nazanin, 300 dpi, 1-bit (3.4: OCR reads it as one column —
+//                                  the report notes it, ocrColumns; the answer key is the right order, column by column)
 // A book page of 5.5 × 8.5 in (396 × 612 pt), as an older scanned book. IMITATED: a real scan is often JBIG2 or
 // CCITT, which we cannot write here; pdf.js decodes every one of them, so the page's pixels are what OCR reads.
 // The text is ours, written for these files (2026-11-21), so it is in no corpus the language model counted
@@ -36,6 +38,11 @@ const HEADINGS = [['کشاورزی در دشت', 'دشت پهناوری که د�
   ['آب و قنات', 'قنات‌های این دشت صدها سال پیش کنده شده‌اند و هنوز برخی از آن‌ها آب می‌دهند. نگهداری قنات کاری دشوار است و تنها چند خانواده هنر لایروبی آن را می‌دانند. در سال‌های اخیر گروهی از جوانان روستا این کار را از آنان آموخته‌اند.'],
   ['بازار محصول', 'پس از برداشت، بیشتر محصول به بازار شهر برده می‌شود و بخشی از آن در انبارهای روستا برای زمستان نگه داشته می‌شود.']];
 
+const COLUMNS = ['ایستگاه قطار شهر در سال‌های نخست قرن ساخته شد و ساختمان سنگی آن هنوز بر جای مانده است. سالن انتظار سقفی بلند و پنجره‌هایی رنگی دارد که نور صبح را روی نیمکت‌های چوبی می‌اندازد. مسافران پیش از سوار شدن در قهوه‌خانهٔ کوچک کنار سکو چای می‌نوشند.',
+  'هر روز دو قطار مسافری از این ایستگاه می‌گذرد، یکی به سوی پایتخت و دیگری به سوی بندر. قطار باری شب‌ها می‌آید و بار غله و میوه را به انبارهای جنوب می‌برد. کارکنان ایستگاه بیشترشان از مردم همین شهرند و برخی از آنان سی سال است که در اینجا کار می‌کنند.',
+  'سال گذشته موزهٔ کوچکی در یکی از اتاق‌های ایستگاه گشایش یافت. در این موزه بلیت‌های قدیمی، فانوس‌های سوزنبانان و عکس‌هایی از نخستین قطارها نگهداری می‌شود. دانش‌آموزان مدرسه‌های شهر هر ماه برای دیدن آن می‌آیند و راهنمای موزه داستان ساختن راه‌آهن را برایشان می‌گوید.',
+  'شهرداری می‌خواهد میدان جلوی ایستگاه را به باغی کوچک بدل کند. در طرح تازه درختان چنار کاشته می‌شوند و راهی سنگفرش از خیابان تا در ورودی کشیده می‌شود تا مسافران بی‌آنکه از میان خودروها بگذرند به ایستگاه برسند.'];
+
 // ---- a page's HTML ------------------------------------------------------------------------------------------------------
 function html(fonts, body, opts) {
   const ff = Object.entries(fonts).map(([n, f]) => `@font-face{font-family:${n};src:url(${env.fileUrl(f)})}`).join('');
@@ -43,7 +50,7 @@ function html(fonts, body, opts) {
   return `<!doctype html><html dir="rtl" lang="fa"><head><meta charset="utf-8"><style>${ff}
     html,body{margin:0;background:#fff}
     .page{box-sizing:border-box;width:${W_PT}pt;height:${H_PT}pt;padding:54pt 50pt 60pt 50pt}
-    .block{${frame}height:100%;box-sizing:border-box}
+    .block{${frame}height:100%;box-sizing:border-box${opts.cols ? ';column-count:' + opts.cols + ';column-gap:26pt' : ''}}
     p{font-family:${opts.body};font-size:${opts.size || 12}pt;line-height:1.75;text-align:justify;margin:0 0 9pt 0;color:#000}
     h1{font-family:${opts.head || opts.body};font-size:15pt;font-weight:normal;margin:6pt 0 6pt 0;color:#000}
     </style></head><body><div class="page"><div class="block">${body}</div></div></body></html>`;
@@ -125,12 +132,14 @@ function writePdf(file, pages, title) {
   await make('scan-300--scan-plain-fa', PLAIN.map((ps) => ({ body: ps.map(P).join(''), opts: { body: 'Nazanin' }, scan: S300 })), 'scan-plain-fa');
   await make('scan-300--scan-framed-fa', [{ body: FRAMED.map(P).join(''), opts: { body: 'Mitra', frame: true }, scan: Object.assign({}, S300, { angle: -0.5 }) }], 'scan-framed-fa');
   await make('scan-150--scan-low-fa', [{ body: LOW.map(P).join(''), opts: { body: 'Vazir', size: 11 }, scan: { scale: 0.5, angle: 0.2, blur: 0.6, noise: 8, jpeg: 0.35 } }], 'scan-low-fa');
+  await make('scan-300--scan-columns-fa', [{ body: COLUMNS.map(P).join(''), opts: { body: 'Nazanin', size: 11, cols: 2 }, scan: Object.assign({}, S300, { angle: 0.3 }) }], 'scan-columns-fa');
   await make('scan-300--scan-headings-fa', [{ body: HEADINGS.map(([hd, p]) => `<h1>${hd}</h1>` + P(p)).join(''), opts: { body: 'Nazanin', head: 'Titr' }, scan: Object.assign({}, S300, { angle: 0.6 }) }], 'scan-headings-fa');
   await b.close();
   const md = (ps) => ps.join('\n\n') + '\n';
   const corpus = (n, t) => { fs.writeFileSync(path.join(env.LAB, 'corpus', n), t); console.log('corpus/' + n); };
   corpus('scan-plain-fa.md', md([].concat(...PLAIN)));
   corpus('scan-framed-fa.md', md(FRAMED));
+  corpus('scan-columns-fa.md', md(COLUMNS));
   corpus('scan-low-fa.md', md(LOW));
   corpus('scan-headings-fa.md', HEADINGS.map(([hd, p]) => '# ' + hd + '\n\n' + p).join('\n\n') + '\n');
   fs.rmSync(tmp, { recursive: true, force: true });
