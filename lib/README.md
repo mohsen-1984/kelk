@@ -117,7 +117,7 @@ A code block whose fence says `text` (or `txt`, `plaintext`) is labelled so (`Bi
 fallback label.
 
 File properties: `configure({ meta: { title, author, subject, keywords, creator } })` (or `setMeta`) — PDF Info,
-the .docx core properties, HTML `<meta name="author">`; the creator is "Kelk " + `BuilderBase.version` (3.4 now) unless set, the title the
+the .docx core properties, HTML `<meta name="author">`; the creator is "Kelk " + `BuilderBase.version` (3.5 now) unless set, the title the
 header's or the first H1 when left out.
 
 ## The builders
@@ -348,10 +348,15 @@ r.failedPages;                  // pages that could not be read or laid out (the
 // options.persianLetters (true): in a Persian document, ي ك ى → ی ک ی (an Arabic document keeps its letters)
 // options.hiddenText ('end'): text no reader sees — off the page, white on white, too small, invisible — in one quote
 //   at the document's end; 'inPlace' between the blocks where it stood; 'drop' left out (reported in all three)
-// options.unknownFonts ('approx'): a font Kelk does not know, which the file does not name, read by the shapes of its
-//   glyphs when the reading reads as language ('fontApprox'); 'report' leaves it as the file names it ('garbledText')
+// options.unknownFonts ('approx'): a font Kelk does not know, which the file does not name, read approximately when the
+//   reading reads as language ('fontApprox'): an Arabic-script font as a cipher first (3.5), else by the shapes of its
+//   glyphs; 'report' leaves it as the file names it ('garbledText'). With options.ocr 'read', OCR's votes help a short
+//   font, one read with doubt, or digits nothing counts; else the note 'fontOcr' names such fonts. 'toUnicodeDoubt': a
+//   file names a glyph as two letters where its shape reads one of them (reported, never rewritten)
 // options.loadShapes (null): async () that loads lib/pdfimport/shape.js and shapes.js (300 KB); by default script tags
 //   beside trust.js (file:// too) or require under Node — only when a PDF has such a font
+// options.loadDecipher (null): async () that loads lib/pdfimport/glyphfeat.js, featmodel.js, decipher.js and lm-fa.js
+//   (about 640 KB, 560 KB of it lm-fa.js, shared with OCR); by default as loadShapes — only when a PDF has such a font
 // options.ocr ('picture'): a page that is only a picture (a scan) — 'picture' keeps it, noted 'ocrNeeded'; 'read' reads
 //   its Persian text with OCR (Tesseract, line by line: PDFIMPORT.md, OCR); options.ocrPages (null): the pages to read
 // options.loadOcr (null): async () that loads lib/pdfimport/ocr.js, lm-fa.js and vendor/tesseract/ (9 MB); by default

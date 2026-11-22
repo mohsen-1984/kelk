@@ -934,7 +934,7 @@ cipher before 3.2's shapes: each glyph a symbol, the plain text Persian.
 1. **Which fonts**: a font whose glyph uses join forward on 0.3 or more (`decJoin`; `glyphfeat.js`: its outline reaches
    the left edge on the baseline). Latin, Cyrillic: never (3.2's shapes alone). Subsets of one font (three outlines in
    common, a fifth of the smaller) are pooled and read once (`decipher.js` `pool`), the biggest first.
-2. **The parts load** only now (`glyphfeat.js`, `featmodel.js`, `decipher.js`, `lm-fa.js`: 620 KB) through
+2. **The parts load** only now (`glyphfeat.js`, `featmodel.js`, `decipher.js`, `lm-fa.js`: about 640 KB, 560 KB of it `lm-fa.js`, which 3.4's OCR loads too) through
    `options.loadDecipher` (the app: `Kelk.libs.need('pdfdecipher')`), else script tags beside `trust.js`, else `require`.
 3. **The evidence**: the outline's features against `featmodel.js` (P(feature | letter, joins forward), counted on the
    fonts Kelk ships only: every Vazirmatn and Sahel, B Nazanin, B Nazanin Bold, B Mitra — `tools/build-featmodel.js`);
@@ -976,14 +976,16 @@ cipher before 3.2's shapes: each glyph a symbol, the plain text Persian.
 9. **Progress and Cancel**: the step is named a font at a time («Reading fonts Kelk does not know: font N of M»); the
    search lets the page breathe every 256 steps, and OCR's lines one by one, where Cancel stops it.
 
-**The lab** (`char-accuracy.js`, before → after): `decipher-body-fa` 96.8 → 100 %, `decipher-cid-fa` 87.2 → 99.7 %,
-`decipher-subsets-fa` 98.2 → 99.2 %, `decipher-digits-fa` 95.2 → 99.0 %, `decipher-short-fa` 96.3 → 99.4 %,
-`decipher-ocr-terms-fa` 98.1 → 99.6 %, `decipher-ocr-digits-fa` 96.0 → 98.9 %, `decipher-titr-small-fa` 97.5 → 99.2 %,
-`cff-cid-fa` 85.2 → 100 %, `cff-type1c-fa` 96.6 → 99.3 %, `unknown-serif-fa` 97.9 → 99.8 %; unchanged: the hollow face
+**The lab** (`char-accuracy.js`, 3.4 → 3.5, with OCR on as the lab runs): `decipher-body-fa` 96.8 → 100 %,
+`decipher-cid-fa` 87.2 → 100 %, `decipher-subsets-fa` 98.2 → 100 %, `decipher-digits-fa` 95.4 → 100 % (its 47 digits
+66 → 100 %), `decipher-short-fa` 96.3 → 100 %, `decipher-ocr-terms-fa` 98.1 → 99.8 %, `decipher-ocr-digits-fa` 96.0 →
+99.7 %, `decipher-titr-small-fa` 97.5 → 99.2 % (its body's year still wrong: an 8 read «ئ»), `decipher-titr-alone-fa`
+97.3 → 100 %, `cff-cid-fa` 85.2 → 100 %, `cff-type1c-fa` 96.6 → 100 %, `unknown-serif-fa` 97.9 → 100 %; unchanged: the hollow face
 (`low`: 3.2's shapes), the marks file (the language chose the shapes), the Russian page and the two unreadable files
 (garbled), `decipher-titr-large-fa` (rough prints read it first). **The side-by-side check**
 (`tests/pdf-lab/scripts/decipher-side.js`: the fonts fontprints read, deciphered as if unknown, glyph by glyph) reports
-faces unknown to the model, B Mitra Bold (the same family as a calibration face) and the calibration faces apart.
+faces unknown to the model, B Mitra Bold (the same family as a calibration face) and the calibration faces apart (3.5: on the four faces unknown to the model, 99.6 % of 1,239 letters, 57 % of 28 digits, 73 % of 37 marks — the
+digits and marks with no anchor or OCR; B Mitra Bold 100 % of 541 letters).
 
 ### The font arbiter: who names a glyph (`trust.js`)
 
