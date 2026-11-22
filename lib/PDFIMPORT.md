@@ -950,8 +950,11 @@ cipher before 3.2's shapes: each glyph a symbol, the plain text Persian.
 5. **The verdict**, from the reading's own signals: the mean log-probability per glyph use (−4.5 and up) and the runs'
    agreement (0.9 and up) — `read`; −7 and 0.6 — `low`; else `garbled`. A hollow face (most glyph uses with a counter)
    is never `read`. Only `read` is taken; `low` and `garbled` go to 3.2's shapes.
-6. **Taken**: the file's names stand where they agree with the reading on half its letters or more, as in step 4
-   above. Taken, the note is 3.2's `fontApprox` («recovered, approximate»); nothing in the Markdown marks it.
+6. **Both read, the language chooses**: 3.2's shapes read the font too, and where both read it the reading whose
+   words fit Persian better per letter (`decipher.js` `fit`) is taken — a font close to one Kelk ships reads better by
+   its shapes, the others by the decipherment. The file's names stand where they agree with the reading on half its
+   letters or more, as in step 4 above. Taken, the note is 3.2's `fontApprox` («recovered, approximate»); nothing in the
+   Markdown marks it.
 7. **Progress and Cancel**: the step is named a font at a time («Reading fonts Kelk does not know: font N of M»); the
    search lets the page breathe every 256 steps, where Cancel stops it.
 
@@ -959,8 +962,8 @@ cipher before 3.2's shapes: each glyph a symbol, the plain text Persian.
 `decipher-subsets-fa` 98.2 → 99.2 %, `decipher-digits-fa` 95.2 → 99.0 %, `decipher-short-fa` 96.3 → 99.4 %,
 `decipher-ocr-terms-fa` 98.1 → 99.6 %, `decipher-ocr-digits-fa` 96.0 → 98.9 %, `decipher-titr-small-fa` 97.5 → 99.2 %,
 `cff-cid-fa` 85.2 → 100 %, `cff-type1c-fa` 96.6 → 99.3 %, `unknown-serif-fa` 97.9 → 99.8 %; unchanged: the hollow face
-(`low`: 3.2's shapes), the Russian page and the two unreadable files (garbled), `decipher-titr-large-fa` (rough prints
-read it first).
+(`low`: 3.2's shapes), the marks file (the language chose the shapes), the Russian page and the two unreadable files
+(garbled), `decipher-titr-large-fa` (rough prints read it first).
 
 ### The font arbiter: who names a glyph (`trust.js`)
 

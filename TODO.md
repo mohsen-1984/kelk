@@ -152,6 +152,9 @@ wrong) is read as a cipher: each glyph a symbol, the plain text Persian. The evi
 - **The order**: fontprints first; then the decipherment, for Arabic-script fonts only (a forward-joining share of 0.3 or
   more); then 3.2's shapes as the fallback. The reading is shown as approximate in the import report only (`fontApprox`),
   as 3.2's — never marked in the Markdown — under the same setting (Settings → Import → *Fonts Kelk does not know*).
+  Done in the decipherment's pull request, with one change for the owner to approve: where the decipherment and 3.2's
+  shapes both read a font, the reading whose words fit Persian better per letter is taken (a real font close to one Kelk
+  ships read worse deciphered than by its shapes: its contextual alternates cost letters).
 - **The verdict** comes from the reading's own signals (how well the letters fit, how far the searches agree): `read` is
   taken; `low` is not — that font goes to 3.2's shapes, and when they do not read it either it is reported garbled, with a
   note that OCR may help (the note comes with OCR's votes, the next pull request); `garbled` is not taken.

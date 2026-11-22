@@ -201,7 +201,7 @@ list number at a line's end), `.tcBrackets` (brackets named logically, renamed a
 | `_fontArbiter` | `fromArrayBuffer` | After the last page: the fonts no page could decide alone; the note `fontprintRead` |
 | `_fontApprox` | `fromArrayBuffer` | Then a font Kelk does not know, which the file does not name: read by its glyphs' shapes (shape.js, loaded then) when the reading reads as language; the note `fontApprox`, `this._approx` |
 | ↳ `_decipherFonts` | `_fontApprox` | 3.5: the fonts of Arabic script read as a cipher (decipher.js, loaded then by `_loadDecipher`), their subsets pooled; `read` taken (`_decUsage`, `_decLexicon`, `_decNamedRight`) |
-| ↳ `_approxShapes` | `_fontApprox` | 3.2's reading by shapes, for the fonts the decipherment did not take |
+| ↳ `_approxShapes` | `_fontApprox` | 3.2's reading by shapes; where both read a font, the language chooses (`decipher.js` `fit`) |
 | `_noteLang` | `_hiddenItems` | The language of a note Kelk writes into the document: the trusted text, a Persian or Arabic `/Lang`, the interface (`options.uiLang`), English |
 
 `_hiddenText` (the marking) is `extract.js`'s, after `_watermark`.
@@ -351,4 +351,4 @@ when a PDF has such a font. Adds `PdfImporter._decipher` (pure, async where it s
 | `prepare` | `_decipherFonts` | A font's glyphs (features, form, marks' shapes, a hollow face) and its words |
 | `run` | `_decipherFonts` | The search, the verdict, the marks |
 | `pool` | `_decipherFonts` | Subsets of one font, by shared outlines |
-| `joinShare`, `fit` | `_decipherFonts` | Arabic script or not; how well a reading fits Persian |
+| `joinShare`, `fit` | `_decipherFonts`, `_fontApprox` | Arabic script or not; how well a reading fits Persian |
