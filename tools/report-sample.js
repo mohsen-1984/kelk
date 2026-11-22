@@ -50,6 +50,8 @@ module.exports = {
         { code: 'monoBody' },
         { code: 'fontprintRead' },
         { code: 'fontApprox', pages: [8] },
+        { code: 'fontOcr', pages: [5] },
+        { code: 'toUnicodeDoubt', pages: [8] },
         { code: 'garbledText', pages: [5] },
         { code: 'hiddenText', pages: [2, 6] },
         { code: 'lostText', pages: [4] },
