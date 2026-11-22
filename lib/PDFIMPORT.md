@@ -945,8 +945,11 @@ cipher before 3.2's shapes: each glyph a symbol, the plain text Persian.
    on more than 2 % of the uses); a font under 1,000 uses is read with the lexicon and without, the lexicon's reading
    kept unless the other earns a better verdict. Marks are settled by their drawn shape afterwards: a bracket by the
    way it bows, a colon and ؛ by their parts, a full stop or a comma by height, a raised flat bar a hyphen, a kashida
-   used in runs of itself a rule. Digits: the top profile among the digit glyphs (the document's counting is 3.5's
-   next step).
+   used in runs of itself a rule. **Digits** come from the document's own counting (`decipher.js` `anchors`, the
+   spike's): page numbers — a page's top or bottom line holding only the font's digits, counting up page by page (5
+   votes a digit) —, numbered lists — the glyphs at the start of a line counting up line by line, a bracket, dash or
+   dot beside them kept the same and given the likeliest mark (2) —, years — four-digit numbers mostly 13xx or 14xx
+   (3). The rest by the top profile among the digits left; those nothing counts are the uncertain digits.
 5. **The verdict**, from the reading's own signals: the mean log-probability per glyph use (−4.5 and up) and the runs'
    agreement (0.9 and up) — `read`; −7 and 0.6 — `low`; else `garbled`. A hollow face (most glyph uses with a counter)
    is never `read`. Only `read` is taken; `low` and `garbled` go to 3.2's shapes.
@@ -955,8 +958,17 @@ cipher before 3.2's shapes: each glyph a symbol, the plain text Persian.
    its shapes, the others by the decipherment. The file's names stand where they agree with the reading on half its
    letters or more, as in step 4 above. Taken, the note is 3.2's `fontApprox` («recovered, approximate»); nothing in the
    Markdown marks it.
-7. **Progress and Cancel**: the step is named a font at a time («Reading fonts Kelk does not know: font N of M»); the
-   search lets the page breathe every 256 steps, where Cancel stops it.
+7. **OCR's votes** (`trust.js` `_decVotes`, 3.4's engine): for a font read `low`, a font under 1,000 glyph uses
+   (`decOcrUses`) and a font with uncertain digits, with Settings → Scanned pages «Read with OCR» (`options.ocr`
+   `'read'`). Each line's run of the font's glyphs is cut from the page drawn at 300 dpi and read by Tesseract as one
+   line (at most 60 a font, `decOcrRuns`); its words line up with the glyphs word by word when their counts match (a
+   number left to right, the rest backwards), else the whole run when its letters count the same; each glyph gets a
+   vote. In the search a voted letter gains up to 6 nats, a digit up to 12, and an anchor three votes (70 %)
+   contradict is dropped with the anchor that took that digit. The font is then read again with the votes. Without
+   «Read with OCR», a font read `low` or with uncertain digits is named in the note **`fontOcr`**, and the report's
+   «Read with OCR» button reads the document again with OCR (no page range when no page is a scan).
+8. **Progress and Cancel**: the step is named a font at a time («Reading fonts Kelk does not know: font N of M»); the
+   search lets the page breathe every 256 steps, and OCR's lines one by one, where Cancel stops it.
 
 **The lab** (`char-accuracy.js`, before → after): `decipher-body-fa` 96.8 → 100 %, `decipher-cid-fa` 87.2 → 99.7 %,
 `decipher-subsets-fa` 98.2 → 99.2 %, `decipher-digits-fa` 95.2 → 99.0 %, `decipher-short-fa` 96.3 → 99.4 %,

@@ -87,3 +87,19 @@ test('decipher: a renumbered face read from its glyph ids alone, its verdict fro
   assert.equal(r.verdict, 'read');
   assert.ok(ticks > 0, 'the search lets the page breathe (and Cancel in)');
 });
+
+test('decipher: digits from the document\'s own counting — page numbers count up page by page', function () {
+  const DG = D.DIGITS, map = new Map(), symbols = new Map();
+  // glyphs 100…109 are the digits 0…9; the outline's guess is right for 1 and 2 only, the others swapped about
+  const guess = [0, 1, 2, 5, 6, 3, 4, 8, 7, 9];
+  for (let d = 0; d < 10; d++) { map.set(100 + d, DG[guess[d]]); symbols.set(100 + d, { mark: { markLike: false } }); }
+  [200, 201, 202].forEach((c) => { map.set(c, 'ب'); symbols.set(c, { mark: { markLike: false } }); });
+  const lines = [];
+  for (let p = 1; p <= 6; p++) {                                   // (pages from 0: page p - 1 is numbered p)
+    lines.push({ page: p - 1, y: 700, seq: [{ mine: true, code: 200 }, { mine: true, code: 201 }, { gap: true }, { mine: true, code: 202 }] });
+    lines.push({ page: p - 1, y: 40, seq: [{ mine: true, code: 100 + p }] });
+  }
+  const a = D.anchors(lines, map, symbols);
+  assert.ok(a, 'anchored');
+  for (let p = 1; p <= 6; p++) assert.equal(a.get(100 + p), DG[p], 'page ' + p);
+});

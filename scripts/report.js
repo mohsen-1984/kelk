@@ -74,6 +74,7 @@
         fontprintRead: { key: 'pdf_fontprintRead' },
         fontApprox: { key: 'pdf_fontApprox', warn: true },
         garbledText: { key: 'pdf_garbledText', warn: true },
+        fontOcr: { key: 'pdf_fontOcr', warn: true },
         hiddenText: { key: 'pdf_hiddenText', warn: true },
         lostText: { key: 'pdf_lostText', warn: true },
         kelkSource: { key: 'pdf_kelkSource', quiet: true },

@@ -177,6 +177,11 @@ wrong) is read as a cipher: each glyph a symbol, the plain text Persian. The evi
 - **Expectations**: `driver-print--unreadable-fa` and `distiller-cff--cff-unreadable-fa` stay garbled;
   `word-cover--glyph-index-fa` (garbled, the owner's decision of 2026-11-19) is shown with the OCR votes' result, and its
   expectation changes only with the owner's approval — as does any other expectation the decipherment turns around.
+- **Found in the digits and OCR pull request**: `word-cover--glyph-index-fa` stays garbled — its unknown font's two short
+  lines (11 glyphs) join forward on 0.25 of their uses, under the 0.3 that marks Arabic script, so they are never
+  deciphered and get no votes (a lower bar for very short fonts would be its own item). `decipher-titr-large-fa`: the
+  rough prints read its letters 99.0 % right (lam and a final ح as marks), the decipherment 100 % — the order
+  (rough prints first) is kept; a later item may let the decipherment check a font rough prints read on few glyphs.
 - **The lab files** (`make-decipher35.py`): `decipher-body-fa`, `decipher-cid-fa`, `decipher-subsets-fa`,
   `decipher-digits-fa`, `decipher-marks-fa`, `decipher-short-fa`, `decipher-hollow-fa`, `decipher-cyrillic-ru`,
   `decipher-cross-fa`, `decipher-ocr-terms-fa`, `decipher-ocr-digits-fa` — in DejaVu Sans and FreeSerif, typefaces Kelk
