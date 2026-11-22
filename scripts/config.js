@@ -19,7 +19,8 @@
         // document, its metadata and structure tree — not measured, small)
         // (ocrLoad, ocr: only in an import that reads its scanned pages with OCR — scripts/importer.js leaves them out
         // otherwise —, on top of the rest: about a second or two a page, against a tenth for everything else, 3.4)
-        importProgress: { libs: 0.02, file: 0.01, open: 0.02, read: 0.31, fonts: 0.17, lines: 0.08, layout: 0.34, ocrLoad: 0.1, ocr: 2, markdown: 0.05 },
+        // (decipher: named inside the fonts' share — font N of M —, no share of its own: few files have such a font, 3.5)
+        importProgress: { libs: 0.02, file: 0.01, open: 0.02, read: 0.31, fonts: 0.17, decipher: 0, lines: 0.08, layout: 0.34, ocrLoad: 0.1, ocr: 2, markdown: 0.05 },
         // a PowerPoint export's progress bar (deck.js blob): each step's share, measured on decks of 200–430 slides
         // (libs: PptxGenJS on the first export, not measured)
         pptxProgress: { libs: 0.02, model: 0.05, build: 0.03, write: 0.5, slides: 0.22, zip: 0.2 },
@@ -196,6 +197,8 @@
             },
             // the glyph shapes of the fonts Kelk ships (300 KB): only when a PDF has a font Kelk does not know (trust.js)
             pdfshapes: { src: ['lib/pdfimport/shape.js', 'lib/pdfimport/shapes.js'], global: 'KelkPdfShapes' },
+            // the decipherment of a font Kelk does not know (3.5): its outline features, their model and the language model
+            pdfdecipher: { src: ['lib/pdfimport/glyphfeat.js', 'lib/pdfimport/featmodel.js', 'lib/pdfimport/decipher.js', 'lib/pdfimport/lm-fa.js'], global: 'KelkPdfFeatModel' },
             // OCR of a page that is one picture (3.4, 8 MB): Tesseract's core and Persian model, our line reader and the words
             // of its post-correction — only when a PDF's pages are read with OCR (ladder.js _ladOcrLoad)
             pdfocr: { src: ['lib/pdfimport/ocr.js', 'lib/pdfimport/lm-fa.js', 'vendor/tesseract/tesseract-core-simd-lstm_7.0.0.wasm.js', 'vendor/tesseract/fas-best.js'], global: 'TesseractCore' },

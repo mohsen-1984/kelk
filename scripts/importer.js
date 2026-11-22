@@ -209,7 +209,7 @@
         const W = {};
         Object.keys(K.config.importProgress).forEach(function (k) { if (ocr || !/^ocr/.test(k)) W[k] = K.config.importProgress[k]; });
         const step = K.ui.steps(t, W, {
-            libs: 'imp_pdfLibs', file: 'imp_file', open: 'imp_pdfOpen', read: 'taskPage', fonts: 'taskFonts',
+            libs: 'imp_pdfLibs', file: 'imp_file', open: 'imp_pdfOpen', read: 'taskPage', fonts: 'taskFonts', decipher: 'taskDecipher',
             lines: 'taskLines', layout: 'taskLayout', ocrLoad: 'imp_ocrStart', ocr: 'taskOcr', markdown: 'taskMarkdown'
         }, ['read', 'lines', 'layout']);
         if (!K.libs.loaded('pdfjs') || !K.libs.loaded('pdfimport')) {
@@ -236,6 +236,7 @@
                     hiddenText: set.hiddenText === 'inPlace' || set.hiddenText === 'drop' ? set.hiddenText : 'end',
                     unknownFonts: set.unknownFonts === 'report' ? 'report' : 'approx',
                     loadShapes: function () { return K.libs.need('pdfshapes'); },
+                    loadDecipher: function () { return K.libs.need('pdfdecipher'); },
                     loadOcr: function () { return K.libs.need('pdfocr'); },
                     uiLang: K.i18n.lang,
                     markdownImporter: { nestedTables: set.nestedTables, mergedRows: set.mergedRows === 'repeat' ? 'repeat' : 'empty', images: set.images, labels: labels() },

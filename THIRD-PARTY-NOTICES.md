@@ -34,7 +34,7 @@ The license text of each library is in its file header or at its source.
 | Data | Source | License | Used for | File |
 |---|---|---|---|---|
 | Tesseract's Persian model `fas` (tessdata_best, in base64 by `tools/vendor-ocr-model.js`, bytes unchanged) | https://github.com/tesseract-ocr/tessdata_best | Apache-2.0 | OCR of scanned Persian pages (3.4), loaded only when needed | `vendor/tesseract/fas-best.js` |
-| Persian language model (letter and word counts) | Kelk's own text and the Leipzig Corpora Collection's Iranian Persian corpora `pes-ir_web-public_2019_100K` and `pes_wikipedia_2021_100K` (https://wortschatz.uni-leipzig.de/en/download/pes) | the corpora: CC BY (https://wortschatz.uni-leipzig.de/en/usage); the Wikipedia corpus's source text is CC BY-SA | OCR's post-correction (3.4), loaded only when needed | `tools/lm/lm.json`, `lib/pdfimport/lm-fa.js` |
+| Persian language model (letter and word counts) | Kelk's own text and the Leipzig Corpora Collection's Iranian Persian corpora `pes-ir_web-public_2019_100K` and `pes_wikipedia_2021_100K` (https://wortschatz.uni-leipzig.de/en/download/pes) | the corpora: CC BY (https://wortschatz.uni-leipzig.de/en/usage); the Wikipedia corpus's source text is CC BY-SA | OCR's post-correction (3.4) and the decipherment of fonts Kelk does not know (3.5), loaded only when needed | `tools/lm/lm.json`, `lib/pdfimport/lm-fa.js` |
 
 The model holds counts only — letter n-grams and the words seen at least ten times — no sentence of the corpora,
 which are not in the repository; `tools/build-lm.js` rebuilds it from them. As the collection asks: D. Goldhahn,

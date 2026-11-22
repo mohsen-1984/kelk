@@ -926,6 +926,42 @@ serif Latin face lies further from the fonts Kelk ships, all sans for Latin, tha
 0.10), `driver-print--unreadable-fa` (bars: always), and `word-cover--glyph-index-fa`'s two short lines (seven letters,
 no other font of the page read).
 
+### Reading a font Kelk does not know as a cipher: the decipherment (`decipher.js`, `trust.js` `_decipherFonts`, 3.5)
+
+Among the fonts `_fontApprox` asks about (step 1 above: nothing names them), those of Arabic script are read as a
+cipher before 3.2's shapes: each glyph a symbol, the plain text Persian.
+
+1. **Which fonts**: a font whose glyph uses join forward on 0.3 or more (`decJoin`; `glyphfeat.js`: its outline reaches
+   the left edge on the baseline). Latin, Cyrillic: never (3.2's shapes alone). Subsets of one font (three outlines in
+   common, a fifth of the smaller) are pooled and read once (`decipher.js` `pool`), the biggest first.
+2. **The parts load** only now (`glyphfeat.js`, `featmodel.js`, `decipher.js`, `lm-fa.js`: 620 KB) through
+   `options.loadDecipher` (the app: `Kelk.libs.need('pdfdecipher')`), else script tags beside `trust.js`, else `require`.
+3. **The evidence**: the outline's features against `featmodel.js` (P(feature | letter, joins forward), counted on the
+   fonts Kelk ships only: every Vazirmatn and Sahel, B Nazanin, B Nazanin Bold, B Mitra — `tools/build-featmodel.js`);
+   the words (a gap of 0.22 × the size, `decGap`, or a glyph with no outline breaks one); which glyph follows one that
+   joins forward; one font draws each (letter, form) once; the language model (`lm-fa.js`, `tools/build-lm.js`); the
+   document's own words (the lexicon: the fonts the file names right, then each font read).
+4. **The search**: simulated annealing over each glyph's nine likeliest letters, two runs (a third when they disagree
+   on more than 2 % of the uses); a font under 1,000 uses is read with the lexicon and without, the lexicon's reading
+   kept unless the other earns a better verdict. Marks are settled by their drawn shape afterwards: a bracket by the
+   way it bows, a colon and ؛ by their parts, a full stop or a comma by height, a raised flat bar a hyphen, a kashida
+   used in runs of itself a rule. Digits: the top profile among the digit glyphs (the document's counting is 3.5's
+   next step).
+5. **The verdict**, from the reading's own signals: the mean log-probability per glyph use (−4.5 and up) and the runs'
+   agreement (0.9 and up) — `read`; −7 and 0.6 — `low`; else `garbled`. A hollow face (most glyph uses with a counter)
+   is never `read`. Only `read` is taken; `low` and `garbled` go to 3.2's shapes.
+6. **Taken**: the file's names stand where they agree with the reading on half its letters or more, as in step 4
+   above. Taken, the note is 3.2's `fontApprox` («recovered, approximate»); nothing in the Markdown marks it.
+7. **Progress and Cancel**: the step is named a font at a time («Reading fonts Kelk does not know: font N of M»); the
+   search lets the page breathe every 256 steps, where Cancel stops it.
+
+**The lab** (`char-accuracy.js`, before → after): `decipher-body-fa` 96.8 → 100 %, `decipher-cid-fa` 87.2 → 99.7 %,
+`decipher-subsets-fa` 98.2 → 99.2 %, `decipher-digits-fa` 95.2 → 99.0 %, `decipher-short-fa` 96.3 → 99.4 %,
+`decipher-ocr-terms-fa` 98.1 → 99.6 %, `decipher-ocr-digits-fa` 96.0 → 98.9 %, `decipher-titr-small-fa` 97.5 → 99.2 %,
+`cff-cid-fa` 85.2 → 100 %, `cff-type1c-fa` 96.6 → 99.3 %, `unknown-serif-fa` 97.9 → 99.8 %; unchanged: the hollow face
+(`low`: 3.2's shapes), the Russian page and the two unreadable files (garbled), `decipher-titr-large-fa` (rough prints
+read it first).
+
 ### The font arbiter: who names a glyph (`trust.js`)
 
 A file names each glyph of a font — its ToUnicode, its cmap, its glyph names: pdf.js's reading. The font's own

@@ -154,7 +154,7 @@ wrong) is read as a cipher: each glyph a symbol, the plain text Persian. The evi
   as 3.2's — never marked in the Markdown — under the same setting (Settings → Import → *Fonts Kelk does not know*).
 - **The verdict** comes from the reading's own signals (how well the letters fit, how far the searches agree): `read` is
   taken; `low` is not — that font goes to 3.2's shapes, and when they do not read it either it is reported garbled, with a
-  note that OCR may help; `garbled` is not taken.
+  note that OCR may help (the note comes with OCR's votes, the next pull request); `garbled` is not taken.
 - **The feature model** is counted on the fonts Kelk ships only (`tools/build-featmodel.js`: every weight of Vazirmatn and
   Sahel, B Nazanin, B Nazanin Bold, B Mitra), never on a lab file; the B fonts are a group of their own in
   `featmodel.js`, removed with them. B Mitra Bold is the same family as a calibration face: wherever accuracy is
