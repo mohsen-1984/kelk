@@ -26,6 +26,7 @@
         fa: {
             pdf_ocrFailed: 'تشخیص نویسه (OCR) آغاز نشد؛ صفحه‌های اسکن‌شده به شکل تصویر ماندند.',
             pdf_fontOcr: 'برخی قلم‌های ناشناخته از روی شکل حروفشان با اطمینان خوانده نشدند؛ تشخیص نویسه (OCR) می‌تواند آن‌ها را بخواند (صفحهٔ {0}). «خواندن با OCR» را بزنید.',
+            pdf_toUnicodeDoubt: 'نام برخی نویسه‌های یک قلم در فایل با شکل آن‌ها نمی‌خواند (صفحهٔ {0}). متن همان است که فایل نام می‌برد؛ آن را با PDF مقایسه کنید.',
             pdf_ocrPageFailed: 'برخی صفحه‌ها با تشخیص نویسه (OCR) خوانده نشدند و به شکل تصویر ماندند (صفحهٔ {0}).',
             rep_colNotes: 'یادداشت',
             rep_ocrHead: 'صفحه‌هایی که با تشخیص نویسه (OCR) خوانده شدند',
@@ -43,6 +44,7 @@
         en: {
             pdf_ocrFailed: 'Character recognition (OCR) could not start; the scanned pages were kept as pictures.',
             pdf_fontOcr: 'Some fonts Kelk does not know could not be read for sure from the shapes of their letters; OCR can read them (page {0}). Use «Read with OCR».',
+            pdf_toUnicodeDoubt: 'The file names some characters of a font otherwise than their shapes read (page {0}). The text is what the file names; compare it with the PDF.',
             pdf_ocrPageFailed: 'Some pages could not be read with character recognition (OCR) and were kept as pictures (page {0}).',
             rep_colNotes: 'Notes',
             rep_ocrHead: 'Pages read with character recognition (OCR)',
@@ -60,6 +62,7 @@
         ar: {
             pdf_ocrFailed: 'تعذّر بدء التعرّف الضوئي على الحروف (OCR)؛ بقيت الصفحات الممسوحة ضوئيًا صورًا.',
             pdf_fontOcr: 'تعذّرت قراءة بعض الخطوط المجهولة بثقة من أشكال حروفها؛ يمكن للتعرّف الضوئي (OCR) قراءتها (الصفحة {0}). استخدم «القراءة بالتعرّف الضوئي».',
+            pdf_toUnicodeDoubt: 'يسمّي الملف بعض حروف خطٍّ بغير ما تقرؤه أشكالها (الصفحة {0}). النص هو ما يسمّيه الملف؛ قارنه بملف PDF.',
             pdf_ocrPageFailed: 'تعذّرت قراءة بعض الصفحات بالتعرّف الضوئي على الحروف (OCR) فبقيت صورًا (الصفحة {0}).',
             rep_colNotes: 'ملاحظات',
             rep_ocrHead: 'صفحات قُرئت بالتعرّف الضوئي على الحروف (OCR)',

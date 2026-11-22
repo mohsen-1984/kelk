@@ -203,6 +203,7 @@ list number at a line's end), `.tcBrackets` (brackets named logically, renamed a
 | ↳ `_decipherFonts` | `_fontApprox` | 3.5: the fonts of Arabic script read as a cipher (decipher.js, loaded then by `_loadDecipher`), their subsets pooled; `read` taken (`_decUsage`, `_decLexicon`, `_decNamedRight`) |
 | ↳ `_decLines`, `_decPages` | `_decipherFonts` | A group's lines for the digit anchors; the pages it is drawn on |
 | ↳ `_decVotes`, `_decOcrEngine` | `_decipherFonts` | OCR's votes: each line's run of the font cut from the page, read by Tesseract, lined up with the glyphs (3.4's engine) |
+| ↳ `_decCrossCheck` | `_fontApprox` | A ToUnicode the judge accepts that names glyphs as two letters: deciphered and compared; the note `toUnicodeDoubt` |
 | ↳ `_approxShapes` | `_fontApprox` | 3.2's reading by shapes; where both read a font, the language chooses (`decipher.js` `fit`) |
 | ↳ `_decipherSide` | `_fontApprox` | The lab's side-by-side check only (`options.decipherKnown`): the fonts fontprints read, deciphered and compared |
 | `_noteLang` | `_hiddenItems` | The language of a note Kelk writes into the document: the trusted text, a Persian or Arabic `/Lang`, the interface (`options.uiLang`), English |

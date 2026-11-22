@@ -967,7 +967,12 @@ cipher before 3.2's shapes: each glyph a symbol, the plain text Persian.
    contradict is dropped with the anchor that took that digit. The font is then read again with the votes. Without
    «Read with OCR», a font read `low` or with uncertain digits is named in the note **`fontOcr`**, and the report's
    «Read with OCR» button reads the document again with OCR (no page range when no page is a scan).
-8. **Progress and Cancel**: the step is named a font at a time («Reading fonts Kelk does not know: font N of M»); the
+8. **The ToUnicode cross-check** (`_decCrossCheck`): a font the judge accepts whose file names some glyphs as two
+   letters or more (lam-alef aside) on 0.5 % of its uses (`decMultiShare`) is deciphered too; where the reading is
+   `read` and reads such a glyph as one of the letters the file names it (an extra letter in the name: «ها» for a glyph
+   drawn «ه»), the note **`toUnicodeDoubt`** names the font and its glyphs («ها→ه»); a ligature the reading cannot name
+   is no doubt. The text stays the file's: it is reported, never rewritten.
+9. **Progress and Cancel**: the step is named a font at a time («Reading fonts Kelk does not know: font N of M»); the
    search lets the page breathe every 256 steps, and OCR's lines one by one, where Cancel stops it.
 
 **The lab** (`char-accuracy.js`, before → after): `decipher-body-fa` 96.8 → 100 %, `decipher-cid-fa` 87.2 → 99.7 %,
