@@ -188,6 +188,9 @@ Open from 3.5:
 
 - **Speed**: the unknown-font step takes several seconds on 15 pages (the 3 s target is not met): a short font is read
   twice (with and without the lexicon), each reading two or three runs of the search; OCR's votes add more.
+- **The stress check's margin**: the merged document's longest hold is 0.5 s on most runners but came to 1.04 s once
+  (a slow runner, the release PR's push run; its pull-request run 0.52 s). The rest is 3.2's steps over every page in one
+  task (`_approxLines`, `_approxGarbled`): a yield between pages there would give the margin back.
 - **Very short fonts that barely join**: `word-cover--glyph-index-fa`'s unknown font (11 glyphs) joins forward on 0.25 of
   its uses, under the 0.3 that marks Arabic script, so it is never deciphered (a lower bar for very short fonts).
 - **Hollow (outline) faces** are capped at `low`: reported, not read (`decipher-hollow-fa`).
