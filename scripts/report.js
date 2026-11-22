@@ -9,7 +9,7 @@
  *         flags: [{ code, pages }], ocr: [{ page, conf, lines, notes: [] }], notes: [{ code, pages? }] }
  *     ocr: the pages read with OCR (3.4), a category of their own — apart from the findings (the fonts' among them)
  *     and from the pages not read in full, whose table leaves them out (they stay in pages: the contract's); their
- *     notes are OCR_NOTES codes.
+ *     notes are KelkOcrReport.NOTES codes.
  *     r.report when the importer gives one (normalised: lists always there, a flag never repeated as a
  *     note); otherwise built from the older fields — r.pages (per-page mode / conf), r.quality.flags, r.notes,
  *     r.failedPages.
@@ -23,7 +23,7 @@
  *   An entry ({ name, report }) may carry info and kind: the file's information (scripts/fileinfo.js, loaded by the
  *     import), shown under the report in a closed <details> and copied with it; kind 'docx', 'xlsx', 'html' … names
  *     the panel «Import report» instead of «PDF import report».
- *   Kelk.ui.report(rep | [{ name, report }] | null, { name, onSafe })
+ *   Kelk.ui.report(rep | [{ name, report }] | null, { name, onSafe, onOcr })
  *     shows #import-report for every PDF import, the same way whatever the file: a clean one too (its summary, the
  *     calm color), one with something to tell in the warning color (worth). Open for config.reportOpenMs, then
  *     collapsed to its head (summary and a toggle: open again, collapse again); 0 keeps it open. Its × closes it
@@ -31,7 +31,8 @@
  *     another import) hides it, an undo back to that document shows it again (collapsed). null: hidden. The focus moves into the panel and
  *     goes back where it was when it closes (its ×, Escape, or a clean import that closes it). onSafe: the
  *     "Re-import in safe mode" button's action, its explanation shown under it (no button without it, nor for a
- *     report that already ran in safe mode). Kelk.ui.report.release(): a new import starts — onSafe (and the
+ *     report that already ran in safe mode). onOcr(pages): "Read with OCR" (3.4) with a page range, when a report says
+ *     pages need OCR (scripts/ocrreport.js, loaded with the PDF importer: the button, the range, the OCR table, their words). Kelk.ui.report.release(): a new import starts — onSafe, onOcr (and the
  *     file bytes it holds) goes. No live region of its
  *     own: the focus move announces the panel once (its name), the import's own toast says it loaded.
  *   Kelk.ui.report.custom(view)
@@ -87,8 +88,6 @@
         layoutFailed: 'rep_why_layoutFailed', extractFailed: 'rep_why_extractFailed', noText: 'rep_why_noText',
         safeMode: 'rep_why_safeMode'
     };
-    /** a page read with OCR: its notes (ladder.js _ladOcrPass) */
-    const OCR_NOTES = { noLines: 'rep_ocr_noLines', lowConf: 'rep_ocr_lowConf', failed: 'rep_ocr_failed' };
 
     const pageNums = function (ps) {
         return Array.from(new Set((Array.isArray(ps) ? ps : []).filter(function (p) { return typeof p === 'number' && isFinite(p); })))
@@ -180,12 +179,21 @@
     /** a page's mode as shown: the contract's failed page (mode 'simplified', failed: true) is 'failed' */
     const pageMode = function (p) { return p.failed ? FAILED : p.mode; };
     const whyName = function (w) { return own(WHY_KEYS, w) ? t(WHY_KEYS[w]) : w; };
-    const ocrNote = function (n) { return own(OCR_NOTES, n) ? t(OCR_NOTES[n]) : n; };
-    /** the pages read with OCR as rows [page, confidence, notes] (the panel's table and the copy's) */
-    const ocrRows = function (rep) { return ocrOf(rep).map(function (x) { return [x.page, pct(x.conf), x.notes.map(ocrNote).join(sep())]; }); };
-    const OCR_HEAD = ['rep_colPage', 'rep_colConf', 'rep_colNotes'];
-    /** the pages not read in full as their table shows them: a page read with OCR is in the OCR table instead */
-    const notFull = function (rep) { return rep.pages.filter(function (p) { return !ocrOf(rep).some(function (x) { return x.page === p.page; }); }); };
+    /**
+     * a report's page tables, for the panel and the copy alike: the pages not read in full (a page read with OCR is in
+     * the next one instead), the pages read with OCR (scripts/ocrreport.js, loaded with the PDF importer) — each
+     * { cls, head, cols: [[key, cell class]], rows: [{ mode, cells }] }, the empty ones left out
+     */
+    function tables(rep) {
+        const byOcr = function (p) { return ocrOf(rep).some(function (x) { return x.page === p.page; }); };
+        return [
+            { cls: 'report-pages', head: 'rep_pagesHead', cols: [['rep_colPage', 'num'], ['rep_colMode', 'mode'], ['rep_colConf', 'num'], ['rep_colWhy', 'why']],
+                rows: rep.pages.filter(function (p) { return !byOcr(p); }).map(function (p) {
+                    return { mode: pageMode(p), cells: [p.page, modeName(pageMode(p)), pct(p.conf), p.why.map(whyName).join(sep())] };
+                }) },
+            K.ocrReport && K.ocrReport.table(rep, pct, sep)
+        ].filter(function (tb) { return tb && tb.rows.length; });
+    }
     const list = function (ps) { return K.ui.pageList(ps, 12); };
 
     /** one finding (a flag or a note) → { text, warn } */
@@ -250,21 +258,16 @@
                 lines.push('', '**' + t('rep_findingsHead') + '**', '');
                 fs.forEach(function (f) { lines.push('- ' + f.text); });
             }
-            if (notFull(rep).length) {
-                lines.push('', '**' + t('rep_pagesHead') + '**', '');
-                Array.prototype.push.apply(lines, gfmTable(['rep_colPage', 'rep_colMode', 'rep_colConf', 'rep_colWhy'].map(function (k) { return t(k); }),
-                    notFull(rep).map(function (p) { return [p.page, modeName(pageMode(p)), pct(p.conf), p.why.map(whyName).join(sep())]; })));
-            }
-            if (ocrOf(rep).length) {
-                lines.push('', '**' + t('rep_ocrHead') + '**', '');
-                Array.prototype.push.apply(lines, gfmTable(OCR_HEAD.map(function (k) { return t(k); }), ocrRows(rep)));
-            }
+            tables(rep).forEach(function (tb) {
+                lines.push('', '**' + t(tb.head) + '**', '');
+                Array.prototype.push.apply(lines, gfmTable(tb.cols.map(function (c) { return t(c[0]); }), tb.rows.map(function (r) { return r.cells; })));
+            });
             if (infoOf(e)) lines.push('', '**' + t('fi_head') + '**', '', K.fileInfo.gfm(e.info).replace(/\n$/, ''));
         });
         return lines.join('\n').replace(/[⁦-⁩]/g, '').replace(/^ +$/gm, '').replace(/\n{3,}/g, '\n\n').trim() + '\n';
     }
 
-    K.importReport = { fromResult: fromResult, worth: worth, text: text, gfmTable: gfmTable, none: none, FLAGS: FLAGS, NOTES: NOTES, MODES: MODES, MODE_KEYS: MODE_KEYS, WHY: WHY_KEYS, OCR_NOTES: OCR_NOTES };
+    K.importReport = { fromResult: fromResult, worth: worth, text: text, gfmTable: gfmTable, none: none, FLAGS: FLAGS, NOTES: NOTES, MODES: MODES, MODE_KEYS: MODE_KEYS, WHY: WHY_KEYS };
 
     // ---- the panel ---------------------------------------------------------------------------------------------
     const state = { entries: [], o: {}, back: null, doc: null, timer: 0, view: null };
@@ -298,6 +301,7 @@
         body.textContent = '';
         v.body(body);
         ['#report-safe', '#report-safe-hint'].forEach(function (s) { const x = K.$(s); if (x) x.hidden = true; });
+        if (K.ocrReport) K.ocrReport.show([], null);
         const name = K.$('#import-report-name'); if (name) name.textContent = '';
         const brief = K.$('#import-report-brief'); if (brief) brief.textContent = v.brief();
         box.classList.remove('clean');
@@ -325,36 +329,25 @@
                     li.setAttribute('data-code', f.code);
                 });
             }
-            if (notFull(rep).length) {
-                const tbl = sec.appendChild(el('table', 'report-pages'));
-                tbl.appendChild(el('caption', null, t('rep_pagesHead')));
+            tables(rep).forEach(function (tb) {
+                const tbl = sec.appendChild(el('table', tb.cls));
+                tbl.appendChild(el('caption', null, t(tb.head)));
                 const hr = tbl.appendChild(el('thead')).appendChild(el('tr'));
-                ['rep_colPage', 'rep_colMode', 'rep_colConf', 'rep_colWhy'].forEach(function (k) { hr.appendChild(el('th', null, t(k))).scope = 'col'; });
-                const tb = tbl.appendChild(el('tbody'));
-                notFull(rep).forEach(function (p) {
-                    const tr = tb.appendChild(el('tr'));
-                    tr.setAttribute('data-mode', pageMode(p));
-                    tr.appendChild(el('th', 'num', String(p.page))).scope = 'row';
-                    tr.appendChild(el('td', 'mode', modeName(pageMode(p))));
-                    tr.appendChild(el('td', 'num', pct(p.conf)));
-                    tr.appendChild(el('td', 'why', p.why.map(whyName).join(sep())));
+                tb.cols.forEach(function (c) { hr.appendChild(el('th', null, t(c[0]))).scope = 'col'; });
+                const tbody = tbl.appendChild(el('tbody'));
+                tb.rows.forEach(function (r) {
+                    const tr = tbody.appendChild(el('tr'));
+                    if (r.mode) tr.setAttribute('data-mode', r.mode);
+                    r.cells.forEach(function (v, i) {
+                        const c = tr.appendChild(el(i ? 'td' : 'th', tb.cols[i][1], String(v)));
+                        if (!i) c.scope = 'row';
+                    });
                 });
-            }
-            if (ocrOf(rep).length) {
-                const tbl = sec.appendChild(el('table', 'report-pages report-ocr'));
-                tbl.appendChild(el('caption', null, t('rep_ocrHead')));
-                const hr = tbl.appendChild(el('thead')).appendChild(el('tr'));
-                OCR_HEAD.forEach(function (k) { hr.appendChild(el('th', null, t(k))).scope = 'col'; });
-                const tb = tbl.appendChild(el('tbody'));
-                ocrRows(rep).forEach(function (c) {
-                    const tr = tb.appendChild(el('tr'));
-                    tr.appendChild(el('th', 'num', String(c[0]))).scope = 'row';
-                    tr.appendChild(el('td', 'num', c[1]));
-                    tr.appendChild(el('td', 'why', c[2]));
-                });
-            }
+            });
             if (infoOf(e)) K.fileInfo.render(sec, e.info);
         });
+        // (Read with OCR and its page range: scripts/ocrreport.js)
+        if (K.ocrReport) K.ocrReport.show(state.entries, state.o.onOcr, close);
         const safe = K.$('#report-safe'), hint = K.$('#report-safe-hint');
         // (a clean import has nothing safe mode would do better: no button)
         const noSafe = !state.o.onSafe || state.entries.every(function (e) { return e.report.mode === 'safe' || !worth(e.report); });
@@ -464,10 +457,10 @@
      * replaced), and the button with it; the report on screen stays until the new one comes.
      */
     report.release = function () {
-        if (!state.o.onSafe) return;
-        state.o = Object.assign({}, state.o, { onSafe: null });
-        const safe = K.$('#report-safe'), box = K.$('#import-report');
-        if (safe && box && document.activeElement === safe) box.focus();
+        if (!state.o.onSafe && !state.o.onOcr) return;
+        state.o = Object.assign({}, state.o, { onSafe: null, onOcr: null });
+        const box = K.$('#import-report');
+        if (box && ['report-safe', 'report-ocr', 'report-ocr-pages'].indexOf(document.activeElement && document.activeElement.id) >= 0) box.focus();
         render();
     };
     /** the language changed: the panel's words again */

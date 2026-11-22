@@ -166,13 +166,24 @@ zip grows by the core and the model (about 8 MB). OCR votes for decipherment sta
    rung's pages after the layout, a line at a time, in the import's own progress steps (`ocrLoad`, `ocr` named by page
    and line) and Cancel; the report's own OCR category (pages, the share of known words, notes); `o.ocr` of the app's
    PDF import. Lab scans (`ocr-check.js`): CER 1.1 %, WER 3.2 %, about 1 s a page.
-3. **Import** (`pdf/3.4-ocr-import`): the setting, the report's «Read with OCR» button (a re-import with `o.ocr`, as
-   safe mode's), a page range, the `ocrRead` expectations made real. Seen on the lab scans, to measure before any
-   change: a printed frame's remnant read as a line of single letters (Tesseract's confidence about 0.1, where text
-   lines read 0.35 and up); «هٔ» read as «ةٌ» or «ة» (the hamza as dots), `postCorrect` then writing «ه». A real scan run outside the repository: pages read, share of known words, time a page. A real scan
-   is often one 1-bit JBIG2 image a page at 300 dpi, the text in a printed frame, its first pages in colour (an
-   indexed cover, a JPEG page at 200 dpi); the lab files are Flate and JPEG (no JBIG2 encoder here).
-4. **Release** (`release/3.4`).
+3. **Import** (`pdf/3.4-ocr-import`): Settings → Import → *Scanned pages* (Ask, Read with OCR, Leave as pictures);
+   the report's «Read with OCR» with a page range (a re-import of the same bytes, `ocrPages`); the lab with OCR on and
+   `ocrRead` real; the askew frame and «هٔ» fixes (lab scans: CER 0.21 %, WER 1.0 %); line sizes from the ink, so
+   headings are found; no line a few pixels high (a real scan's 1-pixel rows took Tesseract up to 100 s each). A real
+   scan of about 300 pages, run outside the repository: nearly every page read, 0.83 of the words known on average, a
+   tenth of the pages under 0.7 (lowConf), about 2.6 s a page.
+   `corpus/scan-headings-fa.md` now writes its headings at level 1, as the lab's 46 other one-level answer keys (the
+   owner, 2026-11-21). Open: the whole real scan crashed the headless browser's tab in 3 of 6 runs before its layout ended, with or
+   without OCR and with 3.3's importer too, its JavaScript heap staying under 100 MB — to look into (memory outside
+   the heap: pdf.js's JBIG2 decoder?).
+4. **Release** (`release/3.4`). The release notes say: for a very large scanned file, read a page range at a time
+   (the report's «Read with OCR» range); the import runs in the browser's memory.
+
+**3.5 candidate — OCR lines as positioned text** (the owner, 2026-11-21): an OCR page's words enter the layout as
+glyphs (Tesseract's word boxes and baselines), so columns, running heads, lists, tables and every other rule run on it
+as on a page with a text layer; today it skips them (`lib/PDFIMPORT.md`, "What an OCR page goes through"). About a
+release of work: OCR before the layout, glyphs in a font of its own, the rules found as segments, the ladder.
+
 
 **A session of its own: real Arabic PDFs and Arabic fonts** (the owner's request, 2026-11-18) — «Left from 3.1» below.
 

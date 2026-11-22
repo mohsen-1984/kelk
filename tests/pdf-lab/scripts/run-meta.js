@@ -80,7 +80,7 @@ const sameWords = (a, b) => a.size === b.size && [...a].every(([w, n]) => b.get(
   const imp = async (file) => page.evaluate(async (b64) => {
     const bin = atob(b64), u = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
-    try { const r = await PdfImporter.create({ images: 'drop', asciiNumbers: false, persianLetters: false }).fromArrayBuffer(u.buffer); return { markdown: r.markdown }; }
+    try { const r = await PdfImporter.create({ images: 'drop', asciiNumbers: false, persianLetters: false, ocr: 'read' }).fromArrayBuffer(u.buffer); return { markdown: r.markdown }; }
     catch (e) { return { error: String(e && e.message || e) }; }
   }, fs.readFileSync(file).toString('base64'));
   const src = (doc) => fs.readFileSync(path.join(LAB, 'corpus', doc + '.md'), 'utf8');

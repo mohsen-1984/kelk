@@ -44,6 +44,12 @@ test('the line finder: one box a line, its dots with it, top to bottom', functio
   assert.equal(O.page(new Uint8Array(w * h).fill(255), w, h).boxes.length, 0, 'a blank page has no line');
 });
 
+test('the line finder: no line a few pixels high, nor a picture a sixth of the page', function () {
+  const w = 800, h = 1200;
+  const px = draw(w, h, [].concat([[100, 300, 700, 302]], [[100, 600, 700, 900]], line(100, 100, 700)));
+  assert.equal(O.page(px, w, h).boxes.length, 1, 'only the text line: not the two-pixel row, not the picture');
+});
+
 test('the line finder: a frame and a table rule are taken out, the text between them stays', function () {
   const w = 800, h = 400;
   const frame = [[20, 10, 780, 14], [20, 386, 780, 390], [20, 10, 24, 390], [776, 10, 780, 390]];
@@ -56,13 +62,25 @@ test('the line finder: a frame and a table rule are taken out, the text between 
   assert.equal(pg.clean[45 * w + 105], 0, 'the text stays');
 });
 
+test('the line finder: a rule scanned askew (a row lower every 60 pixels) is taken out too', function () {
+  const w = 1200, h = 300, boxes = [];
+  for (let k = 0; k < 18; k++) boxes.push([50 + 60 * k, 200 + k, 110 + 60 * k, 201 + k]);
+  const px = draw(w, h, [].concat(boxes, line(40, 100, 1100)));
+  const pg = O.page(px, w, h);
+  assert.equal(pg.boxes.length, 1, 'the askew rule leaves no line of specks');
+  assert.equal(pg.clean[209 * w + 600], 255, 'the rule is white');
+});
+
 test('postCorrect: the comma Tesseract mistakes, ة where only ه makes a known word', function () {
   const vocab = new Set(['خانه', 'کتاب', 'هوا']);
   assert.equal(O.postCorrect('کتاب, خانه', vocab), 'کتاب، خانه');
   assert.equal(O.postCorrect('کتابء خانه', vocab), 'کتاب، خانه', 'a hamza ending a word after a joining letter');
   assert.equal(O.postCorrect('کتاب» خانه', vocab), 'کتاب، خانه', '» without «');
   assert.equal(O.postCorrect('«کتاب» خانه', vocab), '«کتاب» خانه', 'quotes kept');
-  assert.equal(O.postCorrect('خانة کتاب', vocab), 'خانه کتاب');
+  assert.equal(O.postCorrect('خانة کتاب', vocab), 'خانهٔ کتاب', '«هٔ» read «ة»');
+  ['خانةٌ', 'خانهٌ', 'خانٌ'].forEach((w) => assert.equal(O.postCorrect(w + ' کتاب', vocab), 'خانهٔ کتاب', '«هٔ» read «' + w + '»'));
+  assert.equal(O.postCorrect('کتابٌ', vocab), 'کتابٌ', 'no known word with «ه»: as it is');
+  assert.equal(O.postCorrect('میزة', vocab), 'میزة', 'an unknown word keeps its ة');
   assert.equal(O.postCorrect('صلاة', vocab), 'صلاة', 'an unknown word keeps its ة');
   assert.equal(O.postCorrect('هواء', vocab), 'هوا،', 'a hamza after alef that makes no word');
   assert.equal(O.postCorrect('a, b', vocab), 'a, b', 'Latin untouched');

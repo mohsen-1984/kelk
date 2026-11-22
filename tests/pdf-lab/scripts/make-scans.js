@@ -45,7 +45,7 @@ function html(fonts, body, opts) {
     .page{box-sizing:border-box;width:${W_PT}pt;height:${H_PT}pt;padding:54pt 50pt 60pt 50pt}
     .block{${frame}height:100%;box-sizing:border-box}
     p{font-family:${opts.body};font-size:${opts.size || 12}pt;line-height:1.75;text-align:justify;margin:0 0 9pt 0;color:#000}
-    h2{font-family:${opts.head || opts.body};font-size:15pt;font-weight:normal;margin:6pt 0 6pt 0;color:#000}
+    h1{font-family:${opts.head || opts.body};font-size:15pt;font-weight:normal;margin:6pt 0 6pt 0;color:#000}
     </style></head><body><div class="page"><div class="block">${body}</div></div></body></html>`;
 }
 
@@ -125,13 +125,13 @@ function writePdf(file, pages, title) {
   await make('scan-300--scan-plain-fa', PLAIN.map((ps) => ({ body: ps.map(P).join(''), opts: { body: 'Nazanin' }, scan: S300 })), 'scan-plain-fa');
   await make('scan-300--scan-framed-fa', [{ body: FRAMED.map(P).join(''), opts: { body: 'Mitra', frame: true }, scan: Object.assign({}, S300, { angle: -0.5 }) }], 'scan-framed-fa');
   await make('scan-150--scan-low-fa', [{ body: LOW.map(P).join(''), opts: { body: 'Vazir', size: 11 }, scan: { scale: 0.5, angle: 0.2, blur: 0.6, noise: 8, jpeg: 0.35 } }], 'scan-low-fa');
-  await make('scan-300--scan-headings-fa', [{ body: HEADINGS.map(([hd, p]) => `<h2>${hd}</h2>` + P(p)).join(''), opts: { body: 'Nazanin', head: 'Titr' }, scan: Object.assign({}, S300, { angle: 0.6 }) }], 'scan-headings-fa');
+  await make('scan-300--scan-headings-fa', [{ body: HEADINGS.map(([hd, p]) => `<h1>${hd}</h1>` + P(p)).join(''), opts: { body: 'Nazanin', head: 'Titr' }, scan: Object.assign({}, S300, { angle: 0.6 }) }], 'scan-headings-fa');
   await b.close();
   const md = (ps) => ps.join('\n\n') + '\n';
   const corpus = (n, t) => { fs.writeFileSync(path.join(env.LAB, 'corpus', n), t); console.log('corpus/' + n); };
   corpus('scan-plain-fa.md', md([].concat(...PLAIN)));
   corpus('scan-framed-fa.md', md(FRAMED));
   corpus('scan-low-fa.md', md(LOW));
-  corpus('scan-headings-fa.md', HEADINGS.map(([hd, p]) => '## ' + hd + '\n\n' + p).join('\n\n') + '\n');
+  corpus('scan-headings-fa.md', HEADINGS.map(([hd, p]) => '# ' + hd + '\n\n' + p).join('\n\n') + '\n');
   fs.rmSync(tmp, { recursive: true, force: true });
 })();

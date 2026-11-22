@@ -169,6 +169,8 @@ async function check(browser, url, lang, theme, allow) {
         });
     });
     const violations = [];
+    // (the report's OCR section and «Read with OCR» load with the PDF importer, scripts/ocrreport.js)
+    await page.evaluate(function () { return window.Kelk.libs.need('ocrreport'); });
     for (const scope of [null].concat(dialogs, [REPORT])) {
         const found = await page.evaluate(
             function (a) {
@@ -177,7 +179,7 @@ async function check(browser, url, lang, theme, allow) {
                 const d = a.scope && !panel ? document.getElementById(a.scope) : null;
                 if (d) d.showModal();
                 if (panel) {
-                    window.Kelk.ui.report(a.sample, { name: 'sample.pdf', onSafe: function () {} });
+                    window.Kelk.ui.report(a.sample, { name: 'sample.pdf', onSafe: function () {}, onOcr: function () {} });
                     window.__reportState = {
                         open: !panel.hidden,
                         focused: document.activeElement === panel,

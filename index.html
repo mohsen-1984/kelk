@@ -663,8 +663,13 @@
                 <select data-ui="importer.hiddenText"><option value="end" data-i18n="hiddenEnd"></option><option value="inPlace" data-i18n="hiddenInPlace"></option><option value="drop" data-i18n="hiddenDrop"></option></select></label>
         </div>
         <div class="field"><span class="hint" data-i18n="mergedRowsHint"></span></div>
-        <label class="field"><span data-i18n="unknownFonts"></span>
-            <select data-ui="importer.unknownFonts"><option value="approx" data-i18n="unknownApprox"></option><option value="report" data-i18n="unknownReport"></option></select></label>
+        <div class="row2">
+            <label class="field"><span data-i18n="unknownFonts"></span>
+                <select data-ui="importer.unknownFonts"><option value="approx" data-i18n="unknownApprox"></option><option value="report" data-i18n="unknownReport"></option></select></label>
+            <label class="field"><span data-i18n="scannedPages"></span>
+                <select data-ui="importer.scannedPages"><option value="ask" data-i18n="scannedAsk"></option><option value="read" data-i18n="scannedRead"></option><option value="leave" data-i18n="scannedLeave"></option></select></label>
+        </div>
+        <div class="field"><span class="hint" data-i18n="scannedPagesHint"></span></div>
         <label class="check"><input type="checkbox" data-ui="importer.asciiNumbers"><span data-i18n="asciiNumbers"></span></label>
         <label class="check"><input type="checkbox" data-ui="importer.persianLetters"><span data-i18n="persianLetters"></span></label>
         <div class="row2">
@@ -806,6 +811,14 @@
                                                                             (build/pdf.mjs, build/pdf.worker.mjs, web/wasm/
                                                                              → vendor/pdfjs/ as classic scripts,
                                                                              tools/build-pdfjs.js; loaded on first PDF import)
+       https://github.com/naptha/tesseract.js-core/blob/v7.0.0/tesseract-core-simd-lstm.wasm.js
+                                                                            (tesseract.js-core 7.0.0, its SIMD-LSTM build, unchanged
+                                                                             → vendor/tesseract/tesseract-core-simd-lstm_7.0.0.wasm.js)
+       https://github.com/tesseract-ocr/tessdata_best/blob/e12c65a915945e4c28e237a9b52bc4a8f39a0cec/fas.traineddata
+                                                                            (tessdata_best's Persian model, as a classic script by
+                                                                             tools/vendor-ocr-model.js → vendor/tesseract/fas-best.js;
+                                                                             both loaded on the first page read with OCR, never at
+                                                                             startup: Kelk.libs.need('pdfocr'), vendor/tesseract/README.md)
        https://cdn.jsdelivr.net/npm/jszip@3.10.2/dist/jszip.min.js          (loaded on the first .zip import or .pptx export)
        https://cdn.jsdelivr.net/npm/pptxgenjs@4.0.1/dist/pptxgen.min.js     (without its source-map line; loaded on the first .pptx export)
        https://cdn.jsdelivr.net/npm/lucide@1.48.0/dist/umd/lucide.min.js    (the full set: also :name: icons on slides, loaded on the first)

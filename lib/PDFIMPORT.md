@@ -1746,21 +1746,62 @@ structure tree disagrees with (`_treeVote`, from 3 votes; 0.15), gaps between a 
 every page (`_ladOcrPass`, called by `_layout` before the pages are joined), so the progress runs forward: the step
 `ocrLoad` while the engine starts (`_ladOcrLoad`: `options.loadOcr`, the app's `Kelk.libs.need('pdfocr')`; else
 script tags beside `ladder.js`, `require` under Node), then `ocr`, named by its page and line —
-`hooks.onStage('ocr', k + i / L, n, [page, i + 1, L])`. Each page is drawn at 300 dpi (`ladOcrDpi`, at most 16
+`hooks.onStage('ocr', k + i / L, n, [page, i + 1, L])`. `options.ocrPages` (an array) reads only those pages; the
+others keep their picture and `ocrNeeded` (the app's report offers «Read with OCR» with a page range). Each page is drawn at 300 dpi (`ladOcrDpi`, at most 16
 million pixels, `ladOcrMaxPx`), in gray; `lib/pdfimport/ocr.js` finds its lines (Otsu; frames and table rules — runs
-of ink a twelfth of the width, a 25th of the height — taken out; ink rows, the dots joined to their line) and
+of ink a twelfth of the width, a 25th of the height, measured over three rows (columns) so a rule scanned askew is
+one run — taken out; ink rows, the dots joined to their line) and
 Tesseract (tesseract.js-core 7.0.0's SIMD-LSTM build, the `fas` `best` model) reads each on its own as one raw line
-(psm 13); `postCorrect` fixes the commas it misreads and «ة» where only «ه» makes a known word (the words of
-`lm-fa.js`). The import's Cancel is checked before each line (`_yield`): it stops within one line. The lines become
-paragraphs and headings as the textContent rung's do (`_ladParas`: a line's size the page's usual line height when
-within a quarter of it — a box grows with its dots and tails); the page's blocks replace its picture. Its
+(psm 13); `postCorrect` fixes the commas it misreads, «هٔ» read as «ة», «ةٌ», «هٌ» or a bare «ٌ» (the hamza seen as dots
+or tanwin: 9 of 9 such endings on the lab's scans were «هٔ») where the word with «ه» is known, and «ة» where only
+«ه» makes a known word (the words of `lm-fa.js`). The import's Cancel is checked before each line (`_yield`): it stops within one line. The lines become
+paragraphs and headings as the textContent rung's do (`_ladParas`: a line's size from the height of the middle 80 % of its ink, sizes
+less than 12 % apart one size, `ladOcrSizeGap`; the body's set to the page's usual line height, a heading's that
+times its ratio); the page's blocks replace its picture. Its
 confidence is the share of its words the language model knows (as `tools/build-lm.js` counts them: Tesseract's own
 scores read high on lines that are wrong); the report lists the pages read in a category of
 their own, `report.ocr` `[{ page, conf, lines, notes }]` — `noLines`, `lowConf` (under 0.7, `ladOcrLowConf`),
 `failed` —, apart from the findings. A page that cannot be drawn (no canvas: Node) keeps its picture and
-`ocrNeeded`; a page Tesseract fails on, `ocrPageFailed`; an engine that does not start, `ocrFailed`. The lab's scans
-(`tests/pdf-lab/scripts/ocr-check.js`, five pages): 1.1 % of the letters and 3.2 % of the words wrong, about 1 s a
-page.
+`ocrNeeded`; a page Tesseract fails on, `ocrPageFailed`; an engine that does not start, `ocrFailed`. The lab runs with OCR on
+(`run-import.js`, `golden.js`, the fuzz and meta runs: `ocr: 'read'`; `expect.json`'s `ocrRead`). Its scans
+(`tests/pdf-lab/scripts/ocr-check.js`, five pages): 0.21 % of the letters and 1.0 % of the words wrong, about 1 s a
+page (3.4's first engine: 1.1 % and 3.2 %, the frame's remnant read as a line of letters).
+
+**What an OCR page goes through, against a page with a text layer (3.4).** Its blocks are made apart — the line
+finder, Tesseract, `postCorrect`, `_ladParas` — and join the document's blocks after the layout, so only the passes
+that run on the whole document see them:
+
+| Step | A page with a text layer | An OCR page (3.4) |
+|---|---|---|
+| Lines | glyphs to lines (`lines.js`): baselines, sizes, fonts, bold and italic, ZWNJ | ink rows (`ocr.js`), one box a line across the page; Tesseract's text in its own reading order |
+| Columns and reading order | `regions.js`, `order.js` | none: one column assumed — two columns side by side are read across, line by line |
+| Running heads, feet, page numbers | removed (§6) | kept, as paragraphs |
+| Headings | size, weight, family, numbering, the structure tree; levels by size | size only (the ink's middle, `_ladParas`); levels by size as any page (`_toHtml`) |
+| Paragraphs | gaps, indents, justification (`fullLast`) | gaps (`_ladParas`) |
+| Lists | markers, indents, nesting | none: a list's lines are paragraphs |
+| Tables | rules and gutters (`_tables`) | none: rules are taken out, cells read as lines |
+| Code, quotes, boxes, footnotes | detected | none |
+| Pictures inside the page | cropped figures | lost: the text replaces the page's picture |
+| Links, inline bold and italic | from the file | none |
+| Joined across pages | full last line, or a sentence that runs on | runs on only (no sentence mark at its end; no `fullLast`) |
+| Trust, fontprints, letter statistics | per font | none (no font): the confidence is the share of known words |
+| Write-out (numbers, Persian letters) | yes | yes |
+
+**OCR lines as positioned text** — so every rule runs the same (not built: about a release of work). Tesseract
+gives word boxes and a line's baseline (the core exposes `GetIterator()` → `ResultIterator`, `BoundingBox` at
+`RIL_WORD` / `RIL_TEXTLINE`, `Baseline`; `GetTSVText` too). What it would take:
+1. OCR moves before the layout: after `read`, the step `ocr` (the progress order holds), each OCR page's pixels read
+   then — with Tesseract's own page layout (psm 3 or 6) and its iterator for words, or ours for lines and its
+   iterator within each line (our line finder keeps the lines Tesseract's layout drops).
+2. A glyph per character as `extract.js` makes them: its word's box split by the characters, set out in drawing
+   order (right to left for Persian), `size` from the line's ink, `y` its baseline, in a font of its own (`ocr`: no
+   program, trusted, no fontprint, no letter statistics, no garbled check; bold from the stroke width later).
+3. The rules and frames `ocr.js` finds become the page's `hsegs` / `vsegs` (in points), so tables and boxes are found;
+   the rest of the page's picture becomes a figure only where no line lies.
+4. The ladder: the page now has glyphs, so its rung is decided as any page's — never `ocr` again —; its confidence
+   from the share of known words, its `ocrLayer` note replaced by the report's OCR list.
+5. The lab: the scans' expectations hold; columns, a list and a table on a scan to add (`make-scans.js`).
+Kept from 3.4: the engine, the line finder, `postCorrect`, the progress and the Cancel, the report.
 
 **The textContent rung reads pdf.js's items as glyphs**, not as strings sorted by position (which gave «۱۴۰۳» →
 «3041», «2024-05-12» → «12-05-2024», «(NAS)» → «)NAS(», a list item «مورد اول با Google Chrome» → «Google Chrome

@@ -47,7 +47,7 @@ const mean = (rows, k) => { const v = rows.map((r) => r[k]).filter((x) => typeof
     const r = await page.evaluate(async (b64) => {
       const bin = atob(b64), u = new Uint8Array(bin.length);
       for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
-      try { const r = await PdfImporter.create({ images: 'drop', asciiNumbers: false, persianLetters: false }).fromArrayBuffer(u.buffer); return { markdown: r.markdown, html: r.html }; }
+      try { const r = await PdfImporter.create({ images: 'drop', asciiNumbers: false, persianLetters: false, ocr: 'read' }).fromArrayBuffer(u.buffer); return { markdown: r.markdown, html: r.html }; }
       catch (e) { return { error: String(e && e.stack || e) }; }
     }, b64);
     const row = { name: s.name, seed: s.seed, style: s, ms: Date.now() - t0 };   // the style apart: its `code` is not the score's
