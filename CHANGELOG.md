@@ -2,6 +2,54 @@
 
 All notable changes to Kelk. Dates are those of the release tags.
 
+## [3.5] — 2026-11-22
+
+### Added
+
+- **PDF import reads Arabic-script fonts it has never seen, as a cipher.** This completes 3.2's reading of fonts Kelk
+  does not know. A Persian font that neither the file nor Kelk can name, and that is not close to a font Kelk ships (an
+  old font with no names and no usable ToUnicode, for one), is solved as a substitution cipher: from the outlines of its
+  glyphs, which glyphs join, and how Persian words are written. The reading is kept only when it reads as language. The
+  report says «recovered, approximate», with the fonts and pages (Settings → Import → *Fonts Kelk does not know*, as in
+  3.2): check that text against the PDF.
+- **How well, on our lab files** (letters right, 3.4 → 3.5): body text in an unknown font 96.8 → 100 %, a CID-keyed CFF
+  page 87.2 → 100 %, 3.3's CID-keyed page 85.2 → 100 %. Against fontprints, on fonts both can read: 99.6 % of 1,239
+  letters on four faces the model never saw (digits and marks are less sure there: 57 % of 28 digits, 73 % of 37 marks).
+- **The order**: fontprints (and rough prints) first, then the decipherment for Arabic-script fonts, then 3.2's shapes.
+  Where the shapes and the decipherment both read a font, Kelk keeps the reading whose words fit Persian better.
+- **Subsets**: many subsets of one font in one file are read together, as one font, with all their text.
+- **Digits** come from the document itself: page numbers, numbered lists and years. On the lab's digits file, 47 of 47
+  digits right (3.4: 66 %).
+- **OCR's help for very short texts**, through 3.4's engine (the same progress steps, Cancel and report): a title and a
+  year alone in an unknown font, a font read with doubt, or digits nothing counts. They follow Settings → *Scanned
+  pages*: with «Read with OCR» they are read in the import; with «Ask» the report names the font (a new note) and offers
+  «Read with OCR». Our lab case of a title and a year alone in an old Titr font: wrong without OCR, right with it.
+- **The ToUnicode cross-check**: a file that names one glyph as two letters («ها» for a glyph drawn «ه»), where the
+  text reads better with the glyph's shape, is now reported (a new note). The text stays as the file names it: never
+  rewritten. A real ligature («لم») is not reported.
+
+### Limits
+
+- **Slower**: the step takes several seconds. On 15 pages of the lab's hardest files, about 8 s, and about twice that
+  with OCR's help; on real files with such fonts, about 1.5–3 s, and up to about 15 s with OCR. The 3 s target was not
+  met.
+- **Not read yet**: a font with too few joining letters to tell it is Arabic script (our lab's title of 11 glyphs stays
+  reported garbled); hollow (outline) faces are reported, not read; a digit with nothing to count it can still be read
+  as a letter (one year in a lab file).
+- **Persian only.** Arabic text needs a language model of its own.
+
+### Changed
+
+- **The PDF lab**: 258 PDFs (fourteen new: the decipherment's cases in typefaces Kelk neither ships nor fingerprints,
+  and three in an old Titr face, with our own text). On 3.4's 244 files none scores worse and three read better:
+  `distiller-cff--cff-cid-fa` 51.9 → 100, `distiller-cff--cff-type1c-fa` 68.9 → 100, `driver-print--unknown-serif-fa`
+  71.1 → 100. Corpus mean 93.6 → 94.9; golden, random-style, metamorphic and held-out means unchanged. The feature model
+  was set on the fonts Kelk ships only, never on the lab files.
+- **Size**: the decipherment's parts (about 85 KB) and the Persian model 3.4's OCR already uses (about 560 KB) load
+  only when a PDF needs them, never at startup, from file:// too. The app zip stays about 22 MB.
+- **PdfImporter is 1.5** (its own version; Kelk's libraries are 3.5). The startup size budget rose by 1 KB (1,069,500 →
+  1,070,500 bytes), for the new step's loader, its progress step and the report's two notes.
+
 ## [3.4] — 2026-11-22
 
 ### Added
