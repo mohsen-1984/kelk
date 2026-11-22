@@ -56,8 +56,8 @@ const CHECKS = [
     { file: 'tools/bidi-lab.html', re: /<title>BiDi Lab ([^ ]+) /g, form: 'release', why: 'page title' },
     { file: 'tools/bidi-lab.html', re: HEADER, form: 'release', why: 'inlined BidiCore / BidiView headers', count: 2 },
     { file: 'tools/bidi-lab.html', re: /var BidiView = \{ version: '([^']+)'/g, form: 'release', why: 'inlined BidiView.version' },
-    { file: 'lib/PdfImporter.js', re: HEADER, fixed: '1.3', why: 'PdfImporter\'s own version, not Kelk\'s (1.0 from Kelk 2.0, 1.1 from 3.1, 1.2 from 3.2, 1.3 from 3.3: the owner\'s decision, 2026-11-17)' },
-    { file: 'lib/PdfImporter.js', re: /PdfImporter\.VERSION = '([^']+)'/g, fixed: '1.3', why: 'PdfImporter.VERSION, as above' }
+    { file: 'lib/PdfImporter.js', re: HEADER, fixed: '1.4', why: 'PdfImporter\'s own version, not Kelk\'s (1.0 from Kelk 2.0, 1.1 from 3.1, 1.2 from 3.2, 1.3 from 3.3, 1.4 from 3.4: the owner\'s decision, 2026-11-17)' },
+    { file: 'lib/PdfImporter.js', re: /PdfImporter\.VERSION = '([^']+)'/g, fixed: '1.4', why: 'PdfImporter.VERSION, as above' }
 ];
 
 let bad = 0;
