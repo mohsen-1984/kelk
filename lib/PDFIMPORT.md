@@ -970,8 +970,9 @@ cipher before 3.2's shapes: each glyph a symbol, the plain text Persian.
 8. **The ToUnicode cross-check** (`_decCrossCheck`): a font the judge accepts whose file names some glyphs as two
    letters or more (lam-alef aside) on 0.5 % of its uses (`decMultiShare`) is deciphered too; where the reading is
    `read` and reads such a glyph as one of the letters the file names it (an extra letter in the name: «ها» for a glyph
-   drawn «ه»), the note **`toUnicodeDoubt`** names the font and its glyphs («ها→ه»); a ligature the reading cannot name
-   is no doubt. The text stays the file's: it is reported, never rewritten.
+   drawn «ه»), and the font's words read better (the language model) with the shape's letter than with the file's
+   name, the note **`toUnicodeDoubt`** names the font and its glyphs («ها→ه»). A real ligature («لم», «بر») cut to its
+   first letter reads worse, so it is no doubt. The text stays the file's: it is reported, never rewritten.
 9. **Progress and Cancel**: the step is named a font at a time («Reading fonts Kelk does not know: font N of M»); the
    search lets the page breathe every 256 steps, and OCR's lines one by one, where Cancel stops it.
 
