@@ -200,6 +200,9 @@ list number at a line's end), `.tcBrackets` (brackets named logically, renamed a
 | ↳ `_arbiterApply` | `_arbiterPage`, `_fontArbiter` | The glyphs of a decided font take the face's characters (`_arbiterSame`, `_arbiterFew`: where they may) |
 | `_fontArbiter` | `fromArrayBuffer` | After the last page: the fonts no page could decide alone; the note `fontprintRead` |
 | `_fontApprox` | `fromArrayBuffer` | Then a font Kelk does not know, which the file does not name: read by its glyphs' shapes (shape.js, loaded then) when the reading reads as language; the note `fontApprox`, `this._approx` |
+| ↳ `_decipherFonts` | `_fontApprox` | 3.5: the fonts of Arabic script read as a cipher (decipher.js, loaded then by `_loadDecipher`), their subsets pooled; `read` taken (`_decUsage`, `_decLexicon`, `_decNamedRight`) |
+| ↳ `_approxShapes` | `_fontApprox` | 3.2's reading by shapes; where both read a font, the language chooses (`decipher.js` `fit`) |
+| ↳ `_decipherSide` | `_fontApprox` | The lab's side-by-side check only (`options.decipherKnown`): the fonts fontprints read, deciphered and compared |
 | `_noteLang` | `_hiddenItems` | The language of a note Kelk writes into the document: the trusted text, a Persian or Arabic `/Lang`, the interface (`options.uiLang`), English |
 
 `_hiddenText` (the marking) is `extract.js`'s, after `_watermark`.
@@ -336,4 +339,17 @@ Vazirmatn and Sahel, B Nazanin, B Nazanin Bold, B Mitra —, counts per group of
 | `font` | the build script, the tests | A TrueType or CFF program → its glyphs' paths and advances |
 | `context`, `features`, `holes`, `profile` | the build script, the tests | The font's single dot; a glyph's joins, dots, bar, body, descender, tall strokes, kashida; its counters; its top edge |
 | `bins`, `build` | the build script | The features made discrete; the counts per letter and form |
-| `model`, `logp` | the tests | `featmodel.js`'s groups summed; log P(features \| letter, joins forward) |
+| `model`, `logp` | `decipher.js`, the tests | `featmodel.js`'s groups summed; log P(features \| letter, joins forward) |
+
+## decipher.js — a font Kelk does not know, read as a cipher (3.5)
+
+Not among `PdfImporter.PARTS`: loaded with `glyphfeat.js`, `featmodel.js` and `lm-fa.js` by `trust.js` `_loadDecipher`
+when a PDF has such a font. Adds `PdfImporter._decipher` (pure, async where it searches).
+
+| Function | Used by | Step |
+|---|---|---|
+| `lm` | `_decipherFonts`, the tests | `lm-fa.js`'s counts → a word's log-probability (built once) |
+| `prepare` | `_decipherFonts` | A font's glyphs (features, form, marks' shapes, a hollow face) and its words |
+| `run` | `_decipherFonts` | The search, the verdict, the marks |
+| `pool` | `_decipherFonts` | Subsets of one font, by shared outlines |
+| `joinShare`, `fit` | `_decipherFonts`, `_fontApprox` | Arabic script or not; how well a reading fits Persian |

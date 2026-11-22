@@ -32,7 +32,8 @@ const MEASURED = ['glyph-index-fa.md', 'renumbered-en.md', 'unknown-serif-fa.md'
   'scan-plain-fa.md', 'scan-framed-fa.md', 'scan-low-fa.md', 'scan-headings-fa.md', 'scan-columns-fa.md',
   'decipher-body-fa.md', 'decipher-cid-fa.md', 'decipher-subsets-fa.md', 'decipher-digits-fa.md', 'decipher-marks-fa.md',
   'decipher-short-fa.md', 'decipher-hollow-fa.md', 'decipher-cyrillic-ru.md', 'decipher-cross-fa.md',
-  'decipher-ocr-terms-fa.md', 'decipher-ocr-digits-fa.md'];
+  'decipher-ocr-terms-fa.md', 'decipher-ocr-digits-fa.md',
+  'decipher-titr-small-fa.md', 'decipher-titr-large-fa.md'];
 const fold = (t) => t.normalize('NFKC').replace(/[ً-ٰٟـ]/g, '').replace(/[يى]/g, 'ی').replace(/ك/g, 'ک');
 
 /** the letter pairs of the lab's expected Markdown (as tools/build-letterstats.js counts them: seen twice or more) */

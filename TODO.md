@@ -152,9 +152,12 @@ wrong) is read as a cipher: each glyph a symbol, the plain text Persian. The evi
 - **The order**: fontprints first; then the decipherment, for Arabic-script fonts only (a forward-joining share of 0.3 or
   more); then 3.2's shapes as the fallback. The reading is shown as approximate in the import report only (`fontApprox`),
   as 3.2's — never marked in the Markdown — under the same setting (Settings → Import → *Fonts Kelk does not know*).
+  Done in the decipherment's pull request, with one change for the owner to approve: where the decipherment and 3.2's
+  shapes both read a font, the reading whose words fit Persian better per letter is taken (a real font close to one Kelk
+  ships read worse deciphered than by its shapes: its contextual alternates cost letters).
 - **The verdict** comes from the reading's own signals (how well the letters fit, how far the searches agree): `read` is
   taken; `low` is not — that font goes to 3.2's shapes, and when they do not read it either it is reported garbled, with a
-  note that OCR may help; `garbled` is not taken.
+  note that OCR may help (the note comes with OCR's votes, the next pull request); `garbled` is not taken.
 - **The feature model** is counted on the fonts Kelk ships only (`tools/build-featmodel.js`: every weight of Vazirmatn and
   Sahel, B Nazanin, B Nazanin Bold, B Mitra), never on a lab file; the B fonts are a group of their own in
   `featmodel.js`, removed with them. B Mitra Bold is the same family as a calibration face: wherever accuracy is
@@ -179,7 +182,11 @@ wrong) is read as a cipher: each glyph a symbol, the plain text Persian. The evi
   `decipher-cross-fa`, `decipher-ocr-terms-fa`, `decipher-ocr-digits-fa` — in DejaVu Sans and FreeSerif, typefaces Kelk
   neither ships, fingerprints, has the Arabic shapes of nor calibrates on (DejaVu Sans's shapes in `shapes.js` are its Latin
   letters only). Their text is ours, in no text the language model counted, out of `letterstats.js` and
-  `calibrate-shapes.js` for good.
+  `calibrate-shapes.js` for good. Two more, `decipher-titr-small-fa` and `decipher-titr-large-fa`, in an old Titr face the
+  owner supplied (never committed: only the lab PDFs with their subsets): rough prints (B Titr Bold's) know about half its
+  glyphs and name them right (the ones that differ only by a digit's or the comma's code are no errors: digits and commas
+  follow the import settings) — a small subset under the arbiter's 80 % is the decipherment's to read; a larger one over
+  it stays the rough prints' (the order).
 - **Real samples** are checked in the session only, reported in general words. One weak case is known: a font in many
   subsets with very little text each, where OCR's votes are noisy — it is reported, not tuned for.
 - **The closest reference family first** (3.2's shapes, «The serif shapes and the sans Latin readings» below) joins 3.5
