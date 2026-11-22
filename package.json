@@ -18,7 +18,7 @@
     "test:docx": "node tests/docx-validate.js",
     "test:builders": "node tests/pdf-lab/scripts/roundtrip.js",
     "check:links": "lychee --config .github/lychee.toml \"**/*.md\" index.html",
-    "check:fresh": "node tools/build-icons.js && node tools/build-samples.js && node tests/pdf-lab/scripts/build-corpus-js.js && node tools/build-letterstats.js && node tools/build-fontprints.js && node tools/build-shapes.js && node tools/build-lm.js --js && git diff --exit-code -- assets/icons.js docs/about-kelk-and-samples.js docs/slides-samples.js docs/excel-samples.js tests/pdf-lab/corpus.js lib/pdfimport/fontprints.js lib/pdfimport/letterstats.js lib/pdfimport/shapes.js lib/pdfimport/lm-fa.js",
+    "check:fresh": "node tools/build-icons.js && node tools/build-samples.js && node tests/pdf-lab/scripts/build-corpus-js.js && node tools/build-letterstats.js && node tools/build-fontprints.js && node tools/build-shapes.js && node tools/build-featmodel.js && node tools/build-lm.js --js && git diff --exit-code -- assets/icons.js docs/about-kelk-and-samples.js docs/slides-samples.js docs/excel-samples.js tests/pdf-lab/corpus.js lib/pdfimport/fontprints.js lib/pdfimport/letterstats.js lib/pdfimport/shapes.js lib/pdfimport/featmodel.js lib/pdfimport/lm-fa.js",
     "check:a11y": "node tools/check-a11y.js",
     "check:size": "node tools/check-size.js"
   },

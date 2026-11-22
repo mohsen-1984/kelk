@@ -81,6 +81,7 @@ counts the reasons a paragraph group was opened.
 | `_formsByOrder` | `fromArrayBuffer` | glyphs with no Unicode (ligatures, small capitals, Arabic forms): by order of the codes in a row |
 | ↳ `_formsRuns` | `_formsByOrder` | step 1: a letter's codes in a row whose widths agree with the forms' order |
 | ↳ `_formsPlaces` | `_formsByPlace`, `_formsByOutline` | where each code of a font stands (allows a back join, a forward one) |
+| ↳ `_formsRows` | `_formsPlaces` | each page's glyphs in rows, made once for every font of the step (not again for each) |
 | ↳ `_formsByPlace` | `_formsByOrder` | step 2: a letter with fewer codes in a row, by where they stand |
 | ↳ `_formsByOutline` | `_formsByOrder` | step 3: forms by outline (`_outlineJoins`) |
 | ↳ `_formsByWidth` | `_formsByOrder` | step 4: a letter with fewer codes, by width against its skeleton's read forms |
@@ -322,3 +323,17 @@ else script tags beside `trust.js`, else `require`). `shape.js` adds `PdfImporte
 | `script`, `read` | `_fontApprox`, `tools/calibrate-shapes.js` | A font's script; its glyphs read, the letter pairs choosing among the three nearest |
 | `fromPolygons` | `glyphs`, `tools/calibrate-shapes.js` | One glyph's shape from its polygons |
 | `source`, `expand` | the build script; the readers | `shapes.js` as text — the one writer of that file; the data read back |
+
+## glyphfeat.js and featmodel.js — what an outline says of a letter (3.5)
+
+Not among `PdfImporter.PARTS`: the decipherment of a font Kelk does not know (3.5) loads them with it. `glyphfeat.js` adds
+`PdfImporter._glyphfeat` (pure functions over a font program's bytes, using `_fontprint.outlines`, TrueType or CFF);
+`featmodel.js` is its data, generated (`tools/build-featmodel.js`) from the fonts Kelk ships only — every weight of
+Vazirmatn and Sahel, B Nazanin, B Nazanin Bold, B Mitra —, counts per group of faces (the B fonts a group of their own).
+
+| Function | Used by | Step |
+|---|---|---|
+| `font` | the build script, the tests | A TrueType or CFF program → its glyphs' paths and advances |
+| `context`, `features`, `holes`, `profile` | the build script, the tests | The font's single dot; a glyph's joins, dots, bar, body, descender, tall strokes, kashida; its counters; its top edge |
+| `bins`, `build` | the build script | The features made discrete; the counts per letter and form |
+| `model`, `logp` | the tests | `featmodel.js`'s groups summed; log P(features \| letter, joins forward) |

@@ -143,9 +143,49 @@ become ه, in every import — Arabic keeps ى, a text with Urdu or Kurdish lett
 files stays out of `letterstats.js` and of `calibrate-shapes.js`'s letter pairs for good. The lab's generators write
 TrueType programs with a fixed date (`rtl_pdf.fixed`).
 
-**3.5 — candidates** (after 3.4's OCR; the owner, 2026-11-21): **the closest reference family first** — pick the
-reference family nearest the unknown font, then rank within it, to win back the sans Latin acceptance the serif
-shapes cost («The serif shapes and the sans Latin readings» below).
+**3.5 — fonts Kelk does not know, read by decipherment** (the owner's plan, 2026-11-22; four pull requests: lab, decipher,
+digits and OCR votes, release). An Arabic-script font that no fontprint knows and whose file names no letter (or names them
+wrong) is read as a cipher: each glyph a symbol, the plain text Persian. The evidence: the outline's features
+(`lib/pdfimport/glyphfeat.js`), the page (word breaks, which glyphs follow a joining one), the language model
+(`tools/lm/lm.json`, already in the repository: used as it is). Its decisions:
+
+- **The order**: fontprints first; then the decipherment, for Arabic-script fonts only (a forward-joining share of 0.3 or
+  more); then 3.2's shapes as the fallback. The reading is shown as approximate in the import report only (`fontApprox`),
+  as 3.2's — never marked in the Markdown — under the same setting (Settings → Import → *Fonts Kelk does not know*).
+- **The verdict** comes from the reading's own signals (how well the letters fit, how far the searches agree): `read` is
+  taken; `low` is not — that font goes to 3.2's shapes, and when they do not read it either it is reported garbled, with a
+  note that OCR may help; `garbled` is not taken.
+- **The feature model** is counted on the fonts Kelk ships only (`tools/build-featmodel.js`: every weight of Vazirmatn and
+  Sahel, B Nazanin, B Nazanin Bold, B Mitra), never on a lab file; the B fonts are a group of their own in
+  `featmodel.js`, removed with them. B Mitra Bold is the same family as a calibration face: wherever accuracy is
+  reported, it is reported apart, never among the unknown fonts.
+- **Subsets of one font** (sharing enough outlines) are one font, read once. **A hollow face** (most glyph uses with a
+  counter) is capped at `low`. **Marks** are settled by their drawn shape after the search; a kashida used in runs of itself
+  is a kashida.
+- **Digits** come from the document's own counting — page numbers, numbered lists, years; the ones nothing counts are
+  listed as uncertain in the report.
+- **OCR votes** (3.4's engine, its line reading, progress steps, Cancel and report patterns) for fonts that come out
+  `low`, short fonts and digits nothing counts. They follow Settings → *Scanned pages*: «Read with OCR» — they run in the
+  import; «Ask» — the report names the fonts OCR could help and offers «Read with OCR»; «Leave as pictures» — none.
+- **A ToUnicode the judge accepts** but with values of two letters or more is read too and compared: the report names the
+  font and its glyphs; nothing is rewritten.
+- **The side-by-side check** (a lab script, not a gate): the decipherment against fontprints on every file whose fonts
+  fontprints know, letters, digits and marks apart, calibration faces and B Mitra Bold reported apart.
+- **Expectations**: `driver-print--unreadable-fa` and `distiller-cff--cff-unreadable-fa` stay garbled;
+  `word-cover--glyph-index-fa` (garbled, the owner's decision of 2026-11-19) is shown with the OCR votes' result, and its
+  expectation changes only with the owner's approval — as does any other expectation the decipherment turns around.
+- **The lab files** (`make-decipher35.py`): `decipher-body-fa`, `decipher-cid-fa`, `decipher-subsets-fa`,
+  `decipher-digits-fa`, `decipher-marks-fa`, `decipher-short-fa`, `decipher-hollow-fa`, `decipher-cyrillic-ru`,
+  `decipher-cross-fa`, `decipher-ocr-terms-fa`, `decipher-ocr-digits-fa` — in DejaVu Sans and FreeSerif, typefaces Kelk
+  neither ships, fingerprints, has the Arabic shapes of nor calibrates on (DejaVu Sans's shapes in `shapes.js` are its Latin
+  letters only). Their text is ours, in no text the language model counted, out of `letterstats.js` and
+  `calibrate-shapes.js` for good.
+- **Real samples** are checked in the session only, reported in general words. One weak case is known: a font in many
+  subsets with very little text each, where OCR's votes are noisy — it is reported, not tuned for.
+- **The closest reference family first** (3.2's shapes, «The serif shapes and the sans Latin readings» below) joins 3.5
+  as a commit of its own in the OCR votes' pull request, dropped if any lab file gets worse.
+- Not in 3.5: the offset solver for a ToUnicode that holds glyph ids (the decipherment reads those fonts), Arabic text
+  (its own language model, «A session of its own» below).
 
 **Standing rules from 3.4** (the owner's decisions; done — `CHANGELOG.md` 3.4): OCR is Tesseract through
 tesseract.js-core 7.0.0's SIMD-LSTM build (never the relaxed-SIMD one, which aborts with the `best` models), called
@@ -167,7 +207,7 @@ Open from 3.4:
   (`columns`, lab `scan-300--scan-columns-fa`).
 - **OCR votes for decipherment** (unknown fonts read with OCR's help) — 3.5.
 
-**3.5 candidate — OCR lines as positioned text** (the owner, 2026-11-21): an OCR page's words enter the layout as
+**3.6 — OCR lines as positioned text** (the owner, 2026-11-21; moved from 3.5's candidates, 2026-11-22): an OCR page's words enter the layout as
 glyphs (Tesseract's word boxes and baselines), so columns, running heads, lists, tables and every other rule run on it
 as on a page with a text layer; today it skips them (`lib/PDFIMPORT.md`, "What an OCR page goes through"). About a
 release of work: OCR before the layout, glyphs in a font of its own, the rules found as segments, the ladder.
@@ -187,7 +227,7 @@ release of work: OCR before the layout, glyphs in a font of its own, the rules f
   - **The serif shapes and the sans Latin readings** (measured on the fonts Kelk ships): with DejaVu Serif among the
     references, a Vazirmatn page playing an unknown Latin font is accepted less often — 9 → 5 of 12 at 30 letters, 12 → 3
     at 150 and 12 → 3 at 600 (reported garbled, never read wrong; wrong readings still accepted 0 %). The idea to win it
-    back is a 3.5 candidate above.
+    back joins 3.5 above.
   - **IranNastaliq is still reported garbled after the tatweel fix** (seen in a real Word file): its tatweels are gone,
     but the judge still doubts the font. Find out what it objects to — the Nastaliq title's spacing, words drawn
     touching, or its letters — before changing anything.

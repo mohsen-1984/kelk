@@ -1,11 +1,11 @@
 // The character accuracy of an import: the imported Markdown (out/<name>.md) against the document it should come back
 // as (corpus/<doc>.md), letters and digits only (no Markdown marks, spaces or signs; Arabic-script letters folded as
 // the judge folds them), as 1 − the edit distance over the expected letters. Run run-import.js first.
-//   node scripts/char-accuracy.js [filter]      (default: the lab's files in fonts Kelk does not know)
+//   node scripts/char-accuracy.js [filter]      (default: the lab's files in fonts Kelk does not know, 3.5's decipher-* too)
 'use strict';
 const fs = require('fs'), path = require('path');
 const LAB = path.join(__dirname, '..'), OUT = require('./env.js').OUT;
-const filter = new RegExp(process.argv[2] || 'unknown-serif|unreadable|renumbered-en|glyph-index-fa');
+const filter = new RegExp(process.argv[2] || 'unknown-serif|unreadable|renumbered-en|glyph-index-fa|decipher-');
 const norm = (t) => t.normalize('NFKC').replace(/[يى]/g, 'ی').replace(/ك/g, 'ک').replace(/[ً-ٰٟـ]/g, '')
   .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 0x6F0)).replace(/[^\p{L}\p{N}]/gu, '');
 function edit(a, b) {
