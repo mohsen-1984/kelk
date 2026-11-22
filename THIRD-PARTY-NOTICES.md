@@ -45,13 +45,13 @@ to 200 Languages*, Proceedings of LREC 2012.
 
 | Font | Version | License | Where | License file |
 |---|---|---|---|---|
-| Vazirmatn | 33.003 | SIL Open Font License 1.1 | web font; PDF font; .ttf to install for Word | `assets/fonts/rastikerdar/webfonts/VAZIRMATN-LICENSE-OFL.txt`, `lib/pdf-base64-ttf-fonts/VAZIRMATN-LICENSE-OFL.txt`, `vazirmatn/OFL.txt` in `assets/fonts/download/persian-fonts-ttf.zip` |
-| Sahel | 3.4.0 | SIL Open Font License 1.1 | web font; PDF font; .ttf to install for Word | `…/SAHEL-LICENSE-OFL.txt` (both folders), `sahel/OFL.txt` in the zip |
+| Vazirmatn | 33.003 | SIL Open Font License 1.1 | web font; PDF font; .ttf to install for Word; counts of its outlines' features in `lib/pdfimport/featmodel.js` (PDF import, 3.5: no font data) | `assets/fonts/rastikerdar/webfonts/VAZIRMATN-LICENSE-OFL.txt`, `lib/pdf-base64-ttf-fonts/VAZIRMATN-LICENSE-OFL.txt`, `vazirmatn/OFL.txt` in `assets/fonts/download/persian-fonts-ttf.zip` |
+| Sahel | 3.4.0 | SIL Open Font License 1.1 | web font; PDF font; .ttf to install for Word; counts in `featmodel.js`, as Vazirmatn | `…/SAHEL-LICENSE-OFL.txt` (both folders), `sahel/OFL.txt` in the zip |
 | Vazir Code (Hack variant) | 1.1.2 | changes in the public domain; Hack glyphs MIT; Bitstream Vera license | web font; PDF font | `assets/fonts/vazir-code/VAZIR-CODE-LICENSE.txt`, `lib/pdf-base64-ttf-fonts/VAZIR-CODE-LICENSE.txt` |
 | DejaVu Sans, DejaVu Sans Mono | 2.37 | Bitstream Vera and Arev licenses (DejaVu changes in the public domain) | web fonts; PDF fonts | `assets/fonts/dejavu/DEJAVU-LICENSE.txt`, `lib/pdf-base64-ttf-fonts/DEJAVU-LICENSE.txt` |
 | DejaVu Serif (regular, bold) | 2.37 | Bitstream Vera and Arev licenses (DejaVu changes in the public domain) | build input only: the glyph shapes of its ASCII letters in `lib/pdfimport/shapes.js` (PDF import); the TTFs are in the repository, not in the app zip | `assets/fonts/dejavu/DEJAVU-LICENSE.txt` |
 | Noto Emoji | — | SIL Open Font License 1.1 | PDF font (monochrome) | `lib/pdf-base64-ttf-fonts/NOTO-EMOJI-LICENSE-OFL.txt` |
-| B Nazanin, B Mitra, B Titr | 2.01 | (c) Borna Rayaneh, no published license, see borna-rayaneh/NOTICE.txt | preview font (B Nazanin, B Mitra: the TTFs as they are); PDF font; .ttf to install for Word | `lib/pdf-base64-ttf-fonts/borna-rayaneh/NOTICE.txt`, `borna-rayaneh/NOTICE.txt` in the zip |
+| B Nazanin, B Mitra, B Titr | 2.01 | (c) Borna Rayaneh, no published license, see borna-rayaneh/NOTICE.txt | preview font (B Nazanin, B Mitra: the TTFs as they are); PDF font; .ttf to install for Word; counts in `featmodel.js` (B Nazanin, B Nazanin Bold, B Mitra: a group of its own) | `lib/pdf-base64-ttf-fonts/borna-rayaneh/NOTICE.txt`, `borna-rayaneh/NOTICE.txt` in the zip |
 
 Vazirmatn, Sahel and Vazir Code are the work of the late Saber Rastikerdar
 (https://github.com/rastikerdar).
