@@ -2,17 +2,44 @@
 
 All notable changes to Kelk. Dates are those of the release tags.
 
-## [Unreleased]
+## [3.4] — 2026-11-22
 
 ### Added
 
-- **OCR of scanned Persian pages**: a page that is only a picture can now be read as text. Settings → Import →
-  *Scanned pages*: «Ask» (the default: the page stays a picture and the import report offers «Read with OCR», with a
-  page range), «Read with OCR», «Leave as pictures». Tesseract (tesseract.js-core 7.0.0) and its Persian `best` model
-  load only the first time a page is read (about 9 MB). Kelk finds the lines itself and Tesseract reads each one, about
-  a second or two a page; the import's progress names the page and line, and Cancel stops within a line. The report
-  lists the pages read with OCR in a section of their own, with a confidence (the share of their words Kelk knows) and
-  notes. Persian text only. On our lab's five scanned pages: 0.2 % of the letters and 1.0 % of the words wrong.
+- **OCR of scanned Persian pages**: a PDF page that is only a picture can now be read as text. Settings → Import →
+  *Scanned pages*: «Ask» (the default), «Read with OCR», «Leave as pictures». With «Ask», the page stays a picture
+  and the import report offers «Read with OCR» with a page range (the pages that need it, which you can narrow:
+  `1-3, 7`). The import's progress names the page and line being read, and Cancel works as in any import; it stops
+  within a line.
+- **The engine**: Tesseract, through tesseract.js-core 7.0.0 and its Persian `fas` model from tessdata_best
+  (Apache-2.0). Kelk finds the lines itself and Tesseract reads each one. The engine loads only on the first page
+  read with OCR, never at startup. It adds about 9 MB to the app once unzipped; the app zip grows by about 5 MB
+  (17.0 → 22.0 MB).
+- **The report's own OCR section**: the pages read with OCR, each with a confidence (the share of its words Kelk
+  knows) and notes: no line found, low confidence (under 70 %), may have columns, could not be read.
+- **The figures**: on the lab's five one-column scanned pages of our own text, 0.21 % of the letters and 1.0 % of
+  the words are wrong. On a real scan of about 300 pages from 1994, about 0.83 of the words are known words, about 2.6 s a page,
+  and about a tenth of the pages are marked low-confidence.
+
+### Limits
+
+- **OCR pages are read as one column.** Columns, tables, lists, running heads and footers, and pictures inside the
+  page are not handled yet. A page that seems to have two columns is noted «may have columns: the reading order may be
+  wrong».
+- **Persian text only.**
+- **For a very large scanned file, read a page range at a time.** The import runs in the browser's memory, and a scan
+  of hundreds of pages can be more than a browser tab holds.
+
+### Changed
+
+- **The PDF lab**: 244 PDFs (five new: scanned pages of our own text, read with OCR, and a page in two columns that
+  must be noted). On 3.3's 239 files none scores worse. The scans read 100, 100, 99.4, 99.2 and 83.9 (the two-column
+  page: its words are right, their order is not); without OCR they read 25–33. The headings scan's answer key was
+  corrected to level 1 like the lab's other 46 one-level files, so its 74.2 → 99.2 comes from our key, not the
+  importer. Golden, random-style and held-out means unchanged.
+- **PdfImporter is 1.4** (its own version; Kelk's libraries are 3.4). The startup size budget rose by 7 KB
+  (1,062,500 → 1,069,500 bytes), for the setting, the report's OCR data and the import's OCR steps; the report's OCR section, its button and their
+  words load with the PDF importer.
 
 ## [3.3] — 2026-11-21
 
