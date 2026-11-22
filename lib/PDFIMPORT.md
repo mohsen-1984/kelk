@@ -963,7 +963,9 @@ cipher before 3.2's shapes: each glyph a symbol, the plain text Persian.
 `decipher-ocr-terms-fa` 98.1 → 99.6 %, `decipher-ocr-digits-fa` 96.0 → 98.9 %, `decipher-titr-small-fa` 97.5 → 99.2 %,
 `cff-cid-fa` 85.2 → 100 %, `cff-type1c-fa` 96.6 → 99.3 %, `unknown-serif-fa` 97.9 → 99.8 %; unchanged: the hollow face
 (`low`: 3.2's shapes), the marks file (the language chose the shapes), the Russian page and the two unreadable files
-(garbled), `decipher-titr-large-fa` (rough prints read it first).
+(garbled), `decipher-titr-large-fa` (rough prints read it first). **The side-by-side check**
+(`tests/pdf-lab/scripts/decipher-side.js`: the fonts fontprints read, deciphered as if unknown, glyph by glyph) reports
+faces unknown to the model, B Mitra Bold (the same family as a calibration face) and the calibration faces apart.
 
 ### The font arbiter: who names a glyph (`trust.js`)
 

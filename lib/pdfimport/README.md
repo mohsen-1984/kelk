@@ -202,6 +202,7 @@ list number at a line's end), `.tcBrackets` (brackets named logically, renamed a
 | `_fontApprox` | `fromArrayBuffer` | Then a font Kelk does not know, which the file does not name: read by its glyphs' shapes (shape.js, loaded then) when the reading reads as language; the note `fontApprox`, `this._approx` |
 | ↳ `_decipherFonts` | `_fontApprox` | 3.5: the fonts of Arabic script read as a cipher (decipher.js, loaded then by `_loadDecipher`), their subsets pooled; `read` taken (`_decUsage`, `_decLexicon`, `_decNamedRight`) |
 | ↳ `_approxShapes` | `_fontApprox` | 3.2's reading by shapes; where both read a font, the language chooses (`decipher.js` `fit`) |
+| ↳ `_decipherSide` | `_fontApprox` | The lab's side-by-side check only (`options.decipherKnown`): the fonts fontprints read, deciphered and compared |
 | `_noteLang` | `_hiddenItems` | The language of a note Kelk writes into the document: the trusted text, a Persian or Arabic `/Lang`, the interface (`options.uiLang`), English |
 
 `_hiddenText` (the marking) is `extract.js`'s, after `_watermark`.

@@ -660,6 +660,7 @@ python3 scripts/make-cover29-rtl.py   # word-cover--glyph-index-fa (and its corp
 python3 scripts/make-unknown32.py     # driver-print--unknown-serif-fa, --unknown-serif-en, --unreadable-fa (and their corpus files)
 python3 scripts/make-decipher35.py    # driver-print--decipher-*, distiller-cff--decipher-cid-fa (and their corpus files; TWIN=<folder> for the named twins, TITRBOLD=<.ttf> for the two TitrBold files)
 node scripts/char-accuracy.js [filter]   # an import's letters against the expected ones (default: the files in fonts Kelk does not know)
+node scripts/decipher-side.js [filter]   # the decipherment against fontprints on the fonts they read (3.5; letters, digits, marks; not a gate)
 node scripts/shape-accuracy.js [--misses]  # how well the glyph shapes name those files' fonts (FreeSerif, Liberation Serif installed)
 python3 scripts/make-tables30-rtl.py # word-report--ruled-header-fa, --span-header-fa, --nested-rows-fa, --tall-header-fa, --group-header-fa, --chart-fa, --frame-head-fa, word-lines--heads-fa (and their corpus files)
 node scripts/make-booklet.js          # chrome-booklet--booklet-cards-fa (and corpus/booklet-cards-fa.md)
