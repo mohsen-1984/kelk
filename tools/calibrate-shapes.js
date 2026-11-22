@@ -29,7 +29,10 @@ const FAMILIES = [['Vazirmatn', 'vazirmatn/Vazirmatn-Regular.ttf'], ['Sahel', 's
   ['B Mitra', 'borna-rayaneh/BMITRA.TTF'], ['B Titr', 'borna-rayaneh/BTITRBD.TTF'], ['DejaVu Sans', 'dejavu'], ['DejaVu Serif', 'dejavu-serif']];
 const MEASURED = ['glyph-index-fa.md', 'renumbered-en.md', 'unknown-serif-fa.md', 'unknown-serif-en.md', 'unreadable-fa.md',
   'cff-cid-fa.md', 'cff-type1c-fa.md', 'cff-known-fa.md', 'cff-unreadable-fa.md', 'cff-zwnj-fa.md', 'teh-fa.md', 'tatweel-fa.md',
-  'scan-plain-fa.md', 'scan-framed-fa.md', 'scan-low-fa.md', 'scan-headings-fa.md', 'scan-columns-fa.md'];
+  'scan-plain-fa.md', 'scan-framed-fa.md', 'scan-low-fa.md', 'scan-headings-fa.md', 'scan-columns-fa.md',
+  'decipher-body-fa.md', 'decipher-cid-fa.md', 'decipher-subsets-fa.md', 'decipher-digits-fa.md', 'decipher-marks-fa.md',
+  'decipher-short-fa.md', 'decipher-hollow-fa.md', 'decipher-cyrillic-ru.md', 'decipher-cross-fa.md',
+  'decipher-ocr-terms-fa.md', 'decipher-ocr-digits-fa.md'];
 const fold = (t) => t.normalize('NFKC').replace(/[ً-ٰٟـ]/g, '').replace(/[يى]/g, 'ی').replace(/ك/g, 'ک');
 
 /** the letter pairs of the lab's expected Markdown (as tools/build-letterstats.js counts them: seen twice or more) */
