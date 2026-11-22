@@ -25,7 +25,8 @@ const MEASURED = ['glyph-index-fa.md', 'renumbered-en.md', 'unknown-serif-fa.md'
   'decipher-body-fa.md', 'decipher-cid-fa.md', 'decipher-subsets-fa.md', 'decipher-digits-fa.md', 'decipher-marks-fa.md',
   'decipher-short-fa.md', 'decipher-hollow-fa.md', 'decipher-cyrillic-ru.md', 'decipher-cross-fa.md',
   'decipher-ocr-terms-fa.md', 'decipher-ocr-digits-fa.md',
-  'decipher-titr-small-fa.md', 'decipher-titr-large-fa.md'];
+  'decipher-titr-small-fa.md', 'decipher-titr-large-fa.md',
+  'decipher-titr-alone-fa.md'];
 const files = [];
 const take = (dir, re, lang) => fs.readdirSync(path.join(root, dir)).filter((f) => re.test(f) && !(dir === 'tests/pdf-lab/corpus' && MEASURED.indexOf(f) >= 0)).sort().forEach((f) => files.push([path.join(root, dir, f), lang(f)]));
 const byName = (f) => /[-.]fa\.md$/.test(f) ? 'fa' : /[-.]ar\.md$/.test(f) ? 'ar' : 'en';
