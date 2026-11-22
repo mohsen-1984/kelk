@@ -51,9 +51,10 @@ const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
         const cov = q.reduce((a, x) => [a[0] + x.covered, a[1] + x.glyphs], [0, 0]);
         return { markdown: r.markdown, html: r.html, messages: r.messages, pic: cov[1] ? cov[0] / cov[1] : 0, rules: r.rules, ladder: r.report && r.report.summary,
           // the report's finding codes (flags and notes): what expect.json is checked against (report-expect.js)
-          // (and ocrRead: a page read with OCR — the report's own list, 3.4)
+          // (and ocrRead: a page read with OCR — the report's own list, 3.4 —, and its pages' notes as ocr<Note>: ocrColumns)
           findings: r.report ? (r.report.flags || []).concat(r.report.notes || []).map((x) => x.code)
-            .concat((r.report.ocr || []).some((x) => x.lines > 0) ? ['ocrRead'] : []) : null };
+            .concat((r.report.ocr || []).some((x) => x.lines > 0) ? ['ocrRead'] : [])
+            .concat([...new Set([].concat(...(r.report.ocr || []).map((x) => x.notes)))].filter((n) => n !== 'failed').map((n) => 'ocr' + n[0].toUpperCase() + n.slice(1))) : null };
       } catch (e) { return { error: e.stack || String(e) }; }
     }, { b64, mode });
     const ms = Date.now() - t0;

@@ -1761,7 +1761,7 @@ times its ratio); the page's blocks replace its picture. Its
 confidence is the share of its words the language model knows (as `tools/build-lm.js` counts them: Tesseract's own
 scores read high on lines that are wrong); the report lists the pages read in a category of
 their own, `report.ocr` `[{ page, conf, lines, notes }]` — `noLines`, `lowConf` (under 0.7, `ladOcrLowConf`),
-`failed` —, apart from the findings. A page that cannot be drawn (no canvas: Node) keeps its picture and
+`columns`, `failed` —, apart from the findings. A page that cannot be drawn (no canvas: Node) keeps its picture and
 `ocrNeeded`; a page Tesseract fails on, `ocrPageFailed`; an engine that does not start, `ocrFailed`. The lab runs with OCR on
 (`run-import.js`, `golden.js`, the fuzz and meta runs: `ocr: 'read'`; `expect.json`'s `ocrRead`). Its scans
 (`tests/pdf-lab/scripts/ocr-check.js`, five pages): 0.21 % of the letters and 1.0 % of the words wrong, about 1 s a
@@ -1774,7 +1774,7 @@ that run on the whole document see them:
 | Step | A page with a text layer | An OCR page (3.4) |
 |---|---|---|
 | Lines | glyphs to lines (`lines.js`): baselines, sizes, fonts, bold and italic, ZWNJ | ink rows (`ocr.js`), one box a line across the page; Tesseract's text in its own reading order |
-| Columns and reading order | `regions.js`, `order.js` | none: one column assumed — two columns side by side are read across, line by line |
+| Columns and reading order | `regions.js`, `order.js` | none: one column assumed — two columns side by side are read across, line by line; noted `columns` when an empty gap runs down the middle of every line (`ocr.js` `columns()`) |
 | Running heads, feet, page numbers | removed (§6) | kept, as paragraphs |
 | Headings | size, weight, family, numbering, the structure tree; levels by size | size only (the ink's middle, `_ladParas`); levels by size as any page (`_toHtml`) |
 | Paragraphs | gaps, indents, justification (`fullLast`) | gaps (`_ladParas`) |

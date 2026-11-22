@@ -20,7 +20,7 @@ const fold = (s) => s.normalize('NFKC').replace(/[\u064B-\u065F\u0670\u0640]/g, 
 
 const MEASURED = ['glyph-index-fa.md', 'renumbered-en.md', 'unknown-serif-fa.md', 'unknown-serif-en.md', 'unreadable-fa.md',
   'cff-cid-fa.md', 'cff-type1c-fa.md', 'cff-known-fa.md', 'cff-unreadable-fa.md', 'cff-zwnj-fa.md', 'teh-fa.md', 'tatweel-fa.md',
-  'scan-plain-fa.md', 'scan-framed-fa.md', 'scan-low-fa.md', 'scan-headings-fa.md'];
+  'scan-plain-fa.md', 'scan-framed-fa.md', 'scan-low-fa.md', 'scan-headings-fa.md', 'scan-columns-fa.md'];
 const files = [];
 const take = (dir, re, lang) => fs.readdirSync(path.join(root, dir)).filter((f) => re.test(f) && !(dir === 'tests/pdf-lab/corpus' && MEASURED.indexOf(f) >= 0)).sort().forEach((f) => files.push([path.join(root, dir, f), lang(f)]));
 const byName = (f) => /[-.]fa\.md$/.test(f) ? 'fa' : /[-.]ar\.md$/.test(f) ? 'ar' : 'en';

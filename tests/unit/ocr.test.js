@@ -50,6 +50,18 @@ test('the line finder: no line a few pixels high, nor a picture a sixth of the p
   assert.equal(O.page(px, w, h).boxes.length, 1, 'only the text line: not the two-pixel row, not the picture');
 });
 
+test('the line finder: two columns side by side are noticed (a gap down the middle in every line), one column is not', function () {
+  const w = 1000, h = 1200, two = [], one = [];
+  for (let k = 0; k < 8; k++) {
+    two.push(...line(100 + 80 * k, 80, 460), ...line(100 + 80 * k, 540, 920));
+    one.push(...line(100 + 80 * k, 80, 920));
+  }
+  const c = O.page(draw(w, h, two), w, h).columns;
+  assert.ok(c && c.x0 >= 460 && c.x1 <= 560, 'the gap between the columns');
+  assert.equal(O.page(draw(w, h, one), w, h).columns, null, 'one column: no gap');
+  assert.equal(O.page(draw(w, h, two.slice(0, 40)), w, h).columns, null, 'too few lines to tell');
+});
+
 test('the line finder: a frame and a table rule are taken out, the text between them stays', function () {
   const w = 800, h = 400;
   const frame = [[20, 10, 780, 14], [20, 386, 780, 390], [20, 10, 24, 390], [776, 10, 780, 390]];
