@@ -7,9 +7,19 @@
 //   · scan-300--scan-headings-fa   one page, B Titr headings over B Nazanin paragraphs, 300 dpi, 1-bit
 //   · scan-300--scan-columns-fa    one page in two columns, B Nazanin, 300 dpi, 1-bit (3.4: OCR reads it as one column —
 //                                  the report notes it, ocrColumns; the answer key is the right order, column by column)
+// Kelk 3.6's scans, for OCR lines laid out as any page's (written for 3.6, 2026-11-22; measured with 3.5's importer first):
+//   · scan-300--scan-list-fa       one page: a numbered list (one item wrapped), bullets set in under an item
+//   · scan-300--scan-table-fa      one page: a ruled table under its «جدول ۱- …» title
+//   · scan-300--scan-index-fa      one page: a two-column index without borders, as a book's index
+//   · scan-300--scan-heads-fa      three pages under a running head (title, page number, a rule), paragraphs running on
+//                                  from one page to the next
+//   · scan-300--scan-picture-fa    one page: a line drawing between two paragraphs, its caption under it
+//   · scan-300--scan-columns2-fa   one page: a running head, a full-width title over two columns
+// node scripts/make-scans.js [name …] makes only the files named (each scan's pixels follow Chromium's drawing, so
+// regenerating one file leaves the others as they are).
 // A book page of 5.5 × 8.5 in (396 × 612 pt), as an older scanned book. IMITATED: a real scan is often JBIG2 or
 // CCITT, which we cannot write here; pdf.js decodes every one of them, so the page's pixels are what OCR reads.
-// The text is ours, written for these files (2026-11-21), so it is in no corpus the language model counted
+// The text is ours, written for these files (2026-11-21 and 2026-11-22), so it is in no corpus the language model counted
 // (tools/lm/lm.json: Kelk's text up to 2026-11-21 and the Leipzig corpora); it also stays out of letterstats.js
 // (MEASURED in tools/build-letterstats.js). Lab files carry no personal metadata: Producer, Creator and Title only.
 //   node scripts/make-scans.js   → pdf/rtl/scan-*.pdf and corpus/scan-*-fa.md
@@ -43,6 +53,72 @@ const COLUMNS = ['ایستگاه قطار شهر در سال‌های نخست �
   'سال گذشته موزهٔ کوچکی در یکی از اتاق‌های ایستگاه گشایش یافت. در این موزه بلیت‌های قدیمی، فانوس‌های سوزنبانان و عکس‌هایی از نخستین قطارها نگهداری می‌شود. دانش‌آموزان مدرسه‌های شهر هر ماه برای دیدن آن می‌آیند و راهنمای موزه داستان ساختن راه‌آهن را برایشان می‌گوید.',
   'شهرداری می‌خواهد میدان جلوی ایستگاه را به باغی کوچک بدل کند. در طرح تازه درختان چنار کاشته می‌شوند و راهی سنگفرش از خیابان تا در ورودی کشیده می‌شود تا مسافران بی‌آنکه از میان خودروها بگذرند به ایستگاه برسند.'];
 
+// 3.6's text (ours, 2026-11-22). Digits are drawn Persian and written ASCII in the answer key (Kelk's default).
+const LIST = {
+  title: 'راهنمای امانت کتاب',
+  intro: 'کتابخانهٔ محله برای امانت گرفتن کتاب چند قاعدهٔ ساده دارد. این قاعده‌ها را شورای کتابخانه نوشته است تا همهٔ اعضا بتوانند به یک اندازه از کتاب‌ها بهره ببرند.',
+  items: [['هر عضو می‌تواند در هر نوبت تا سه کتاب به امانت بگیرد.'],
+    ['زمان امانت دو هفته است و می‌توان آن را یک بار دیگر تمدید کرد:', ['تمدید از راه تلفن کتابخانه', 'تمدید با آمدن به میز امانت']],
+    ['کتاب‌های مرجع، مانند فرهنگ‌ها و دانشنامه‌ها، تنها در سالن مطالعه خوانده می‌شوند و نمی‌توان آن‌ها را به خانه برد، حتی برای یک شب.'],
+    ['اگر کتابی گم شود، عضو باید نسخهٔ تازه‌ای از همان کتاب را بخرد و به کتابخانه بدهد.']],
+  outro: 'پرسش‌های دیگر را می‌توان از کتابدار میز امانت پرسید.'
+};
+const TABLE = {
+  title: 'ساعت کار بخش‌های کتابخانه',
+  intro: 'بخش‌های کتابخانه در روزهای هفته ساعت‌های کار گوناگونی دارند. جدول زیر ساعت باز بودن هر بخش را نشان می‌دهد.',
+  caption: 'جدول 1- ساعت کار بخش‌ها',
+  rows: [['بخش', 'شنبه تا چهارشنبه', 'پنجشنبه', 'جمعه'],
+    ['سالن مطالعه', '8 تا 20', '8 تا 14', 'بسته'],
+    ['میز امانت', '9 تا 17', '9 تا 12', 'بسته'],
+    ['بخش کودکان', '10 تا 18', '10 تا 13', '10 تا 12'],
+    ['بخش نشریات', '8 تا 16', 'بسته', 'بسته']],
+  outro: 'در روزهای تعطیل رسمی همهٔ بخش‌ها بسته‌اند و برنامهٔ روزهای ویژه از پیش روی تابلوی در ورودی نوشته می‌شود.'
+};
+const INDEX = {
+  title: 'نمایهٔ موضوعی',
+  rows: [['موضوع', 'صفحه'], ['آب‌انبار', '12، 45'], ['بازار', '3، 7، 19'], ['پل سنگی', '28'], ['چاپخانه', '33، 34'],
+    ['حمام عمومی', '21'], ['راه‌آهن', '40، 41، 52'], ['فرهنگسرا', '15'], ['قنات', '9، 10، 47'], ['کاروانسرا', '5، 6'], ['موزه', '42']]
+};
+const HEADS = {
+  head: 'تاریخچهٔ شهر', first: 24, title: 'راه‌ها و سفرها',
+  paras: ['پیش از آنکه جادهٔ تازه ساخته شود، شهر تنها از راه‌های کوهستانی به جهان بیرون می‌پیوست. کاروان‌ها از گردنهٔ شمالی می‌گذشتند و در زمستان، هنگامی که برف راه را می‌بست، گاه هفته‌ها در کاروانسراهای میان راه می‌ماندند. بازرگانان پیر هنوز نام این کاروانسراها را به یاد دارند و از شب‌هایی می‌گویند که در کنار آتش داستان سفرهای دور را برای هم بازگو می‌کردند.',
+    'نخستین جادهٔ خاکی در زمان پدربزرگ‌های امروزی کشیده شد. کارگران آن از روستاهای پیرامون آمده بودند و بیشتر کار را با بیل و کلنگ انجام می‌دادند. ساختن این جاده چهار سال طول کشید و در این مدت دو پل سنگی بر روی رود بزرگ برپا شد که یکی از آن‌ها هنوز بر جای مانده است و مردم برای دیدن غروب آفتاب به آنجا می‌روند.',
+    'با آمدن نخستین کامیون‌ها کار کاروان‌ها کم‌کم به پایان رسید. قاطرداران یا به کشاورزی روی آوردند یا در گاراژهای تازه‌ای که در ورودی شهر ساخته شده بود به کار پرداختند. برخی از آنان رانندگی آموختند و سال‌ها بار بازار را با کامیون به شهرهای دیگر بردند. پسران آنان امروز شرکت‌های باربری کوچکی دارند که هنوز نام پدران را بر خود دارد.',
+    'در دههٔ بعد راه‌آهن به شهر رسید و ایستگاه سنگی آن در دشت جنوبی ساخته شد. مردم شهر روز گشایش ایستگاه را جشن گرفتند و بسیاری از آنان برای نخستین بار سوار قطار شدند. از آن پس سفر به پایتخت که پیش‌تر دو هفته طول می‌کشید، در یک روز و یک شب انجام می‌شد و نامه‌ها نیز زودتر از همیشه به دست خانواده‌ها می‌رسید.',
+    'امروز جادهٔ آسفالته، راه‌آهن و فرودگاه کوچک شمال شهر آن را به همه جای کشور می‌پیوندند. با این همه، راه کهنهٔ کاروان‌ها هنوز گذرگاه کوهنوردانی است که در بهار و تابستان از گردنه بالا می‌روند و در کاروانسرای نیمه‌ویران میان راه شب را به صبح می‌رسانند. گروهی از جوانان شهر هر سال در پاییز این راه را پاکسازی می‌کنند و نشانه‌های آن را از نو رنگ می‌زنند.',
+    'شورای شهر می‌خواهد کاروانسرای میان راه را بازسازی کند تا کوهنوردان و گردشگران جای امنی برای ماندن داشته باشند. در این طرح اتاق‌های کاروانسرا به همان شکل کهن ساخته می‌شوند و تنها یک آشپزخانهٔ کوچک و چشمه‌ای برای آب آشامیدنی به آن افزوده می‌شود. کار ساختن از بهار آینده آغاز می‌شود.',
+    'در کنار این طرح، موزهٔ ایستگاه نیز گسترش می‌یابد. اتاقی تازه برای نشان دادن ابزارهای قاطرداران و زین‌ها و فانوس‌های کاروان‌ها آماده می‌شود و پیرمردهای شهر قرار است داستان سفرهای خود را برای ضبط در آرشیو موزه بازگو کنند. دانش‌آموزان مدرسه‌های شهر نیز در گردآوری عکس‌های قدیمی خانواده‌ها به موزه یاری می‌دهند.',
+    'کسانی که این راه‌ها را دیده‌اند می‌گویند که شهر بی آن‌ها هرگز به آنچه امروز هست نمی‌رسید. راه‌ها کالا و مسافر می‌آوردند، اما بیش از آن خبر و اندیشه و آشنایی با مردم سرزمین‌های دیگر را به شهر می‌رساندند. از همین رو شورای شهر نام راه کهنه را بر خیابان تازه‌ای نهاده است که از بازار به ایستگاه می‌رود.',
+    'نقشهٔ همهٔ این راه‌ها، از راه کاروان‌ها تا راه‌آهن، در تالار فرهنگسرا بر دیوار آویخته شده است. بازدیدکنندگان می‌توانند بر روی آن ببینند که هر راه در چه سالی ساخته شد و از کدام روستاها می‌گذشت. کتابچهٔ کوچکی نیز در کنار نقشه هست که داستان هر راه را به زبانی ساده بازگو می‌کند.']
+};
+const PICTURE = {
+  title: 'باغ ملی',
+  before: 'در میانهٔ شهر باغی هست که مردم آن را باغ ملی می‌نامند. این باغ را صد سال پیش یکی از حاکمان شهر ساخت و پس از او به شهرداری سپرده شد. نقشهٔ ساده‌ای از بخش‌های باغ در شکل زیر آمده است.',
+  caption: 'شکل 1- نقشهٔ ساده‌ای از باغ ملی',
+  after: 'آبنمای بزرگ در میانهٔ باغ است و چهار راه سنگفرش از آن به چهار در باغ می‌رسد. درختان چنار کهن در دو سوی راه‌ها کاشته شده‌اند و در تابستان سایهٔ خنکی برای رهگذران می‌سازند.'
+};
+const COLUMNS2 = {
+  head: 'راهنمای شهر', page: 8, title: 'گردشگری در شهر',
+  paras: ['گردشگران بیشتر در بهار و پاییز به شهر می‌آیند، هنگامی که هوا نه سرد است و نه گرم. بیشتر آنان نخست به بازار کهنه سر می‌زنند و سپس از کاروانسرا و آب‌انبار زیر آن دیدن می‌کنند.',
+    'در کنار میدان بزرگ دفتر کوچکی برای راهنمایی گردشگران باز شده است. کارکنان این دفتر نقشهٔ شهر را به رایگان می‌دهند و برای کسانی که بخواهند راهنمایی همراه می‌کنند که زبان‌های دیگر را نیز می‌داند.',
+    'مهمان‌خانه‌های شهر بیشترشان خانه‌های قدیمی‌اند که خانواده‌ها آن‌ها را برای پذیرایی از مسافران آماده کرده‌اند. صبحانه در حیاط خانه داده می‌شود و میزبانان از داستان خانه و محله برای مهمانان می‌گویند.',
+    'برای رفتن به کوه و دیدن راه کاروان‌ها بهتر است گردشگران صبح زود به راه بیفتند و آب و خوراک کافی همراه داشته باشند. در نیمهٔ راه چشمه‌ای هست که آب آن در همهٔ سال روان است.']
+};
+const fa = (t) => t.replace(/[0-9]/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[d]);
+// a garden's plan, drawn in black lines only (no text in it): a wall, four paths to a round pool, trees as hatched discs
+const GARDEN = (() => {
+  const t = [];
+  for (const [x, y] of [[50, 30], [90, 30], [150, 30], [190, 30], [50, 110], [90, 110], [150, 110], [190, 110]]) {
+    t.push(`<circle cx="${x}" cy="${y}" r="11" fill="url(#h)" stroke="#000" stroke-width="1.6"/>`);
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="240pt" height="140pt" viewBox="0 0 240 140">
+    <defs><pattern id="h" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="#000" stroke-width="1.6"/></pattern></defs>
+    <rect x="6" y="6" width="228" height="128" fill="none" stroke="#000" stroke-width="3"/>
+    <path d="M120 6 V48 M120 92 V134 M6 70 H98 M142 70 H234" stroke="#000" stroke-width="7" fill="none"/>
+    <circle cx="120" cy="70" r="22" fill="none" stroke="#000" stroke-width="3"/><circle cx="120" cy="70" r="12" fill="#000"/>
+    ${t.join('')}</svg>`;
+})();
+
 // ---- a page's HTML ------------------------------------------------------------------------------------------------------
 function html(fonts, body, opts) {
   const ff = Object.entries(fonts).map(([n, f]) => `@font-face{font-family:${n};src:url(${env.fileUrl(f)})}`).join('');
@@ -52,8 +128,26 @@ function html(fonts, body, opts) {
     .page{box-sizing:border-box;width:${W_PT}pt;height:${H_PT}pt;padding:54pt 50pt 60pt 50pt}
     .block{${frame}height:100%;box-sizing:border-box${opts.cols ? ';column-count:' + opts.cols + ';column-gap:26pt' : ''}}
     p{font-family:${opts.body};font-size:${opts.size || 12}pt;line-height:1.75;text-align:justify;margin:0 0 9pt 0;color:#000}
-    h1{font-family:${opts.head || opts.body};font-size:15pt;font-weight:normal;margin:6pt 0 6pt 0;color:#000}
-    </style></head><body><div class="page"><div class="block">${body}</div></div></body></html>`;
+    h1{font-family:${opts.head || opts.body};font-size:15pt;font-weight:normal;margin:6pt 0 6pt 0;color:#000}${opts.rh ? EXTRA(opts) : ''}
+    </style></head><body><div class="page">${opts.rh && opts.rh.length ? `<div class="rh"><span>${opts.rh[0]}</span><span>${opts.rh[1]}</span></div>` : ''}<div class="block">${body}</div></div></body></html>`;
+}
+// 3.6's pages (opts.rh: a running head [title, page number], or [] for none): lists, tables, a figure, a page's flow
+function EXTRA(opts) {
+  const rh = opts.rh.length ? 30 : 0;
+  return `
+    .rh{display:flex;justify-content:space-between;font-family:${opts.body};font-size:10pt;line-height:1.4;border-bottom:1px solid #000;padding-bottom:3pt;margin-bottom:${rh - 18}pt;color:#000}
+    .page>.block{height:calc(100% - ${rh}pt)}
+    ol,ul{margin:0 0 9pt 0;padding-right:22pt;font-family:${opts.body};font-size:${opts.size || 12}pt;line-height:1.75}
+    ol{list-style-type:persian} ul{list-style-type:disc;margin:0}
+    li{text-align:justify}
+    table{border-collapse:collapse;width:100%;margin:0 0 12pt 0}
+    td{font-family:${opts.body};font-size:11pt;line-height:1.5;color:#000;text-align:center;padding:3pt 5pt}
+    table.ruled td{border:1.2px solid #000}
+    table.idx{width:70%;margin:0 auto 12pt auto} table.idx td{padding:1pt 4pt} table.idx td:first-child{text-align:right} table.idx td:last-child{text-align:left}
+    .cap{text-align:center;text-align-last:center;margin:4pt 0 9pt 0}
+    .fig{text-align:center;margin:6pt 0 0 0}
+    .vp{overflow:hidden;width:100%;height:100%}
+    .flow{column-width:${W_PT - 100}pt;column-gap:40pt;column-fill:auto;height:100%;width:${W_PT - 100}pt}`;
 }
 
 // ---- the scanner, in the page: skew, blur, noise, Otsu ------------------------------------------------------------------
@@ -123,7 +217,10 @@ function writePdf(file, pages, title) {
   const b = await chromium.launch(), page = await b.newPage({ viewport: { width: Math.round(W_PT * 96 / 72), height: Math.round(H_PT * 96 / 72) }, deviceScaleFactor: 300 / 96 });
   const shot = async (h) => { const f = path.join(tmp, 'p.html'); fs.writeFileSync(f, h); await page.goto(env.fileUrl(f)); await page.evaluate(() => document.fonts.ready); return page.screenshot({ type: 'png' }); };
   const P = (t) => `<p>${t}</p>`;
+  const only = process.argv.slice(2);
+  const want = (name) => !only.length || only.some((o) => name.indexOf(o) >= 0);
   const make = async (name, list, title) => {
+    if (!want(name)) return;
     const pages = [];
     for (const [k, it] of list.entries()) pages.push(await scan(page, await shot(html(F, it.body, it.opts)), Object.assign({ seed: 1000 + k + name.length }, it.scan)));
     writePdf(env.pdfPath(name + '.pdf'), pages, title);
@@ -134,13 +231,36 @@ function writePdf(file, pages, title) {
   await make('scan-150--scan-low-fa', [{ body: LOW.map(P).join(''), opts: { body: 'Vazir', size: 11 }, scan: { scale: 0.5, angle: 0.2, blur: 0.6, noise: 8, jpeg: 0.35 } }], 'scan-low-fa');
   await make('scan-300--scan-columns-fa', [{ body: COLUMNS.map(P).join(''), opts: { body: 'Nazanin', size: 11, cols: 2 }, scan: Object.assign({}, S300, { angle: 0.3 }) }], 'scan-columns-fa');
   await make('scan-300--scan-headings-fa', [{ body: HEADINGS.map(([hd, p]) => `<h1>${hd}</h1>` + P(p)).join(''), opts: { body: 'Nazanin', head: 'Titr' }, scan: Object.assign({}, S300, { angle: 0.6 }) }], 'scan-headings-fa');
+  // 3.6
+  const NO = { body: 'Nazanin', head: 'Titr', rh: [] };
+  const H1 = (t) => `<h1>${t}</h1>`;
+  const li = (it) => `<li>${it[0]}${it[1] ? '<ul>' + it[1].map((x) => `<li>${x}</li>`).join('') + '</ul>' : ''}</li>`;
+  await make('scan-300--scan-list-fa', [{ body: H1(LIST.title) + P(LIST.intro) + '<ol>' + LIST.items.map(li).join('') + '</ol>' + P(LIST.outro), opts: NO, scan: Object.assign({}, S300, { angle: 0.4 }) }], 'scan-list-fa');
+  const rows = (rs) => rs.map((r) => '<tr>' + r.map((c) => `<td>${fa(c)}</td>`).join('') + '</tr>').join('');
+  await make('scan-300--scan-table-fa', [{ body: H1(TABLE.title) + P(TABLE.intro) + `<p class="cap">${fa(TABLE.caption)}</p><table class="ruled">${rows(TABLE.rows)}</table>` + P(TABLE.outro), opts: NO, scan: Object.assign({}, S300, { angle: -0.3 }) }], 'scan-table-fa');
+  await make('scan-300--scan-index-fa', [{ body: H1(INDEX.title) + `<table class="idx">${rows(INDEX.rows)}</table>`, opts: NO, scan: Object.assign({}, S300, { angle: 0.25 }) }], 'scan-index-fa');
+  const flow = H1(HEADS.title) + HEADS.paras.map(P).join('');
+  await make('scan-300--scan-heads-fa', [0, 1, 2].map((k) => ({
+    body: `<div class="vp"><div class="flow" style="transform:translateX(${k * (W_PT - 60)}pt)">${flow}</div></div>`,
+    opts: Object.assign({}, NO, { size: 13, rh: [HEADS.head, fa(String(HEADS.first + k))] }), scan: Object.assign({}, S300, { angle: [0.3, -0.35, 0.45][k] })
+  })), 'scan-heads-fa');
+  await make('scan-300--scan-picture-fa', [{ body: H1(PICTURE.title) + P(PICTURE.before) + `<div class="fig">${GARDEN}</div><p class="cap">${fa(PICTURE.caption)}</p>` + P(PICTURE.after), opts: NO, scan: Object.assign({}, S300, { angle: -0.4 }) }], 'scan-picture-fa');
+  await make('scan-300--scan-columns2-fa', [{ body: H1(COLUMNS2.title) + `<div style="column-count:2;column-gap:26pt">${COLUMNS2.paras.map(P).join('')}</div>`, opts: Object.assign({}, NO, { size: 11, rh: [COLUMNS2.head, fa(String(COLUMNS2.page))] }), scan: Object.assign({}, S300, { angle: 0.3 }) }], 'scan-columns2-fa');
   await b.close();
   const md = (ps) => ps.join('\n\n') + '\n';
-  const corpus = (n, t) => { fs.writeFileSync(path.join(env.LAB, 'corpus', n), t); console.log('corpus/' + n); };
+  const corpus = (n, t) => { if (!want(n.replace(/\.md$/, ''))) return; fs.writeFileSync(path.join(env.LAB, 'corpus', n), t); console.log('corpus/' + n); };
   corpus('scan-plain-fa.md', md([].concat(...PLAIN)));
   corpus('scan-framed-fa.md', md(FRAMED));
   corpus('scan-columns-fa.md', md(COLUMNS));
   corpus('scan-low-fa.md', md(LOW));
   corpus('scan-headings-fa.md', HEADINGS.map(([hd, p]) => '# ' + hd + '\n\n' + p).join('\n\n') + '\n');
+  const mdItem = (it, k) => `${k + 1}. ${it[0]}` + (it[1] ? it[1].map((x) => `\n   - ${x}`).join('') : '');
+  corpus('scan-list-fa.md', md(['# ' + LIST.title, LIST.intro, LIST.items.map(mdItem).join('\n'), LIST.outro]));
+  const gfm = (rs) => [rs[0], rs[0].map(() => '---')].concat(rs.slice(1)).map((r) => '| ' + r.join(' | ') + ' |').join('\n');
+  corpus('scan-table-fa.md', md(['# ' + TABLE.title, TABLE.intro, '**' + TABLE.caption + '**', gfm(TABLE.rows), TABLE.outro]));
+  corpus('scan-index-fa.md', md(['# ' + INDEX.title, gfm(INDEX.rows)]));
+  corpus('scan-heads-fa.md', md(['# ' + HEADS.title].concat(HEADS.paras)));
+  corpus('scan-picture-fa.md', md(['# ' + PICTURE.title, PICTURE.before, PICTURE.caption, PICTURE.after]));
+  corpus('scan-columns2-fa.md', md(['# ' + COLUMNS2.title].concat(COLUMNS2.paras)));
   fs.rmSync(tmp, { recursive: true, force: true });
 })();

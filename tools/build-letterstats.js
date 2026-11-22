@@ -9,8 +9,8 @@
  * Left out: the lab's files in fonts Kelk does not know (MEASURED). Their text is what the approximate reading (3.2)
  * must find and its accuracy is measured on: in the stats, the answer would help pick the letters and flatter the score.
  * 3.3's font files (tests/pdf-lab/scripts/make-cff33.py: the CFF programs, Word's ت, the tatweel ToUnicode) are left out
- * the same way, for good (the owner's decision, 2026-11-21), and so are 3.4's scans and 3.5's decipherment files
- * (tests/pdf-lab/scripts/make-decipher35.py).
+ * the same way, for good (the owner's decision, 2026-11-21), and so are 3.4's and 3.6's scans and 3.5's decipherment
+ * files (tests/pdf-lab/scripts/make-decipher35.py).
  */
 'use strict';
 const fs = require('fs'), path = require('path');
@@ -22,6 +22,7 @@ const fold = (s) => s.normalize('NFKC').replace(/[\u064B-\u065F\u0670\u0640]/g, 
 const MEASURED = ['glyph-index-fa.md', 'renumbered-en.md', 'unknown-serif-fa.md', 'unknown-serif-en.md', 'unreadable-fa.md',
   'cff-cid-fa.md', 'cff-type1c-fa.md', 'cff-known-fa.md', 'cff-unreadable-fa.md', 'cff-zwnj-fa.md', 'teh-fa.md', 'tatweel-fa.md',
   'scan-plain-fa.md', 'scan-framed-fa.md', 'scan-low-fa.md', 'scan-headings-fa.md', 'scan-columns-fa.md',
+  'scan-list-fa.md', 'scan-table-fa.md', 'scan-index-fa.md', 'scan-heads-fa.md', 'scan-picture-fa.md', 'scan-columns2-fa.md',
   'decipher-body-fa.md', 'decipher-cid-fa.md', 'decipher-subsets-fa.md', 'decipher-digits-fa.md', 'decipher-marks-fa.md',
   'decipher-short-fa.md', 'decipher-hollow-fa.md', 'decipher-cyrillic-ru.md', 'decipher-cross-fa.md',
   'decipher-ocr-terms-fa.md', 'decipher-ocr-digits-fa.md',
