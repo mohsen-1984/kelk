@@ -328,7 +328,7 @@ else script tags beside `trust.js`, else `require`). `shape.js` adds `PdfImporte
 Not among `PdfImporter.PARTS`: the decipherment of a font Kelk does not know (3.5) loads them with it. `glyphfeat.js` adds
 `PdfImporter._glyphfeat` (pure functions over a font program's bytes, using `_fontprint.outlines`, TrueType or CFF);
 `featmodel.js` is its data, generated (`tools/build-featmodel.js`) from the fonts Kelk ships only — every weight of
-Vazirmatn and Sahel —, counts per group of faces.
+Vazirmatn and Sahel, B Nazanin, B Nazanin Bold, B Mitra —, counts per group of faces (the B fonts a group of their own).
 
 | Function | Used by | Step |
 |---|---|---|

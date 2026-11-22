@@ -47,13 +47,32 @@ test('glyphfeat: dots, joins, tall strokes, the kashida and holes, from a face\'
 
 test('featmodel: counted on the fonts Kelk ships only, a group a licence, summed when loaded', function () {
   assert.deepEqual(data.feats, Object.keys(G.FEATS));
-  assert.equal(data.groups[0].name, 'ofl');
-  assert.equal(data.groups[0].faces.length, 14);
+  assert.deepEqual(data.groups.map((g) => g.name), ['ofl', 'borna-rayaneh']);
   const faces = [].concat(...data.groups.map((g) => g.faces));
+  assert.equal(faces.length, 17);
+  // the faces held out to test the reading are not in it
+  ['BMITRABD.TTF', 'BTITRBD.TTF', 'BNAZANNO.TTF'].forEach((x) => assert.ok(faces.indexOf(x) < 0, x));
   assert.ok(!faces.some((x) => /dejavu|free|noto|liberation/i.test(x)));
   const m = G.model(data), n = (key) => data.groups.reduce((s, g) => s + (g.classes[key] ? g.classes[key][0] : 0), 0);
   assert.equal(m['ب|1'].n, n('ب|1'));
   assert.equal(m['ب|1'].c.b.reduce((a, b) => a + b, 0), m['ب|1'].n);
   assert.ok(G.logp(m, 'پ', false, { a: 0, b: 3, t: 1, d: 0, h: 0, k: 0, s: 0, w: 2 }) > G.logp(m, 'ت', false, { a: 0, b: 3, t: 1, d: 0, h: 0, k: 0, s: 0, w: 2 }));
   assert.equal(G.logp(m, 'no such letter', false, {}), null);
+});
+
+test('featmodel: a face it never saw (B Titr Bold) — the true letter among the five likeliest for most letters', async function () {
+  const { f, gid } = await face('borna-rayaneh/BTITRBD.TTF');
+  const m = G.model(data);
+  const keys = Object.keys(gid).filter((c) => /^[ا-يپچژکگی]$/.test(c) && c !== 'ي');
+  const cx = G.context(f, keys.map((c) => gid[c]));
+  const rows = keys.map((c) => G.features(f, gid[c], cx)).filter((e) => !e.blank);
+  const tops = rows.map((e) => e.bodyTop).sort((a, b) => a - b), H = tops[Math.floor(tops.length * 0.9)];
+  const letters = [...new Set(Object.keys(m).filter((k) => k.endsWith('|0')).map((k) => k.slice(0, -2)).filter((l) => keys.indexOf(l) >= 0))];
+  let top5 = 0;
+  keys.forEach((c) => {
+    const b = G.bins(G.features(f, gid[c], cx), H, G.holes(f, gid[c]), G.profile(f, gid[c]));
+    const r = letters.map((l) => [l, G.logp(m, l, false, b)]).sort((x, y) => y[1] - x[1]).findIndex((x) => x[0] === c);
+    if (r >= 0 && r < 5) top5++;
+  });
+  assert.ok(top5 / keys.length >= 0.6, top5 + ' of ' + keys.length);
 });

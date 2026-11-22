@@ -4,14 +4,17 @@
  * (lib/pdfimport/glyphfeat.js) comes with each letter and form, counted on the fonts Kelk ships only.
  *   node tools/build-featmodel.js     (`npm run check:fresh` runs it: the file must equal what its sources give)
  *
- * Calibration faces, from assets/fonts/download/persian-fonts-ttf.zip: every weight of Vazirmatn (9) and Sahel (5). Each glyph the face's cmap gives a letter, a presentation form, a Persian digit
+ * Calibration faces, from assets/fonts/download/persian-fonts-ttf.zip: every weight of Vazirmatn (9) and Sahel (5), and
+ * B Nazanin, B Nazanin Bold and B Mitra. Each glyph the face's cmap gives a letter, a presentation form, a Persian digit
  * or one of the marks below is a sample: its letter (the form's letter after NFKC; ي ى → ی, ك → ک), whether that form
  * joins forward (initial, medial, the tatweel), its features.
  *
- * Never read here: any lab file or its fonts, DejaVu Sans and every font Kelk does not ship.
+ * Never read here: any lab file or its fonts, and the faces held out to test the reading — B Mitra Bold (the same family
+ * as a calibration face: reported apart), B Titr Bold, B Nazanin Outline, DejaVu Sans and every font Kelk does not ship.
  *
- * The counts are written per group of faces — «ofl» (Vazirmatn, Sahel) — and summed when loaded, so a group can leave
- * this file in one commit. Counts only, never a font.
+ * The counts are written per group of faces — «ofl» (Vazirmatn, Sahel) and «borna-rayaneh» (the B fonts, (c) Borna
+ * Rayaneh, no published license: lib/pdf-base64-ttf-fonts/borna-rayaneh/NOTICE.txt) — and summed when loaded, so the B
+ * fonts leave this file with them in one commit (their group, and their names below). Counts only, never a font.
  */
 'use strict';
 const fs = require('fs'), path = require('path');
@@ -26,7 +29,9 @@ const OUT = path.join(root, 'lib', 'pdfimport', 'featmodel.js');
 const WEIGHTS = ['Thin', 'ExtraLight', 'Light', 'Regular', 'Medium', 'SemiBold', 'Bold', 'ExtraBold', 'Black'];
 const GROUPS = [
   { name: 'ofl', faces: WEIGHTS.map((w) => 'vazirmatn/Vazirmatn-' + w + '.ttf')
-      .concat(['sahel/Sahel.ttf', 'sahel/Sahel-Light.ttf', 'sahel/Sahel-SemiBold.ttf', 'sahel/Sahel-Bold.ttf', 'sahel/Sahel-Black.ttf']) }
+      .concat(['sahel/Sahel.ttf', 'sahel/Sahel-Light.ttf', 'sahel/Sahel-SemiBold.ttf', 'sahel/Sahel-Bold.ttf', 'sahel/Sahel-Black.ttf']) },
+  // the B fonts, (c) Borna Rayaneh: their counts only, removed with them in one commit
+  { name: 'borna-rayaneh', faces: ['borna-rayaneh/BNAZANIN.TTF', 'borna-rayaneh/BNAZNNBD.TTF', 'borna-rayaneh/BMITRA.TTF'] }
 ];
 
 // The Arabic presentation forms and their kinds (1 isolated, 2 final, 3 initial, 4 medial), from the Unicode
