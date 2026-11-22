@@ -322,3 +322,17 @@ else script tags beside `trust.js`, else `require`). `shape.js` adds `PdfImporte
 | `script`, `read` | `_fontApprox`, `tools/calibrate-shapes.js` | A font's script; its glyphs read, the letter pairs choosing among the three nearest |
 | `fromPolygons` | `glyphs`, `tools/calibrate-shapes.js` | One glyph's shape from its polygons |
 | `source`, `expand` | the build script; the readers | `shapes.js` as text — the one writer of that file; the data read back |
+
+## glyphfeat.js and featmodel.js — what an outline says of a letter (3.5)
+
+Not among `PdfImporter.PARTS`: the decipherment of a font Kelk does not know (3.5) loads them with it. `glyphfeat.js` adds
+`PdfImporter._glyphfeat` (pure functions over a font program's bytes, using `_fontprint.outlines`, TrueType or CFF);
+`featmodel.js` is its data, generated (`tools/build-featmodel.js`) from the fonts Kelk ships only — every weight of
+Vazirmatn and Sahel —, counts per group of faces.
+
+| Function | Used by | Step |
+|---|---|---|
+| `font` | the build script, the tests | A TrueType or CFF program → its glyphs' paths and advances |
+| `context`, `features`, `holes`, `profile` | the build script, the tests | The font's single dot; a glyph's joins, dots, bar, body, descender, tall strokes, kashida; its counters; its top edge |
+| `bins`, `build` | the build script | The features made discrete; the counts per letter and form |
+| `model`, `logp` | the tests | `featmodel.js`'s groups summed; log P(features \| letter, joins forward) |
