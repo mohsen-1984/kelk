@@ -24,11 +24,11 @@
 #     does not use — too little text to read alone (OCR's votes, 3.5);
 #   · driver-print--decipher-ocr-digits-fa: single digits in lines of text, no page numbers, no list, no year
 #     (DejaVu Sans) — digits only their shapes, or OCR, can tell;
-#   · driver-print--decipher-titr-small-fa and --decipher-titr-large-fa: an old Titr face the repository does not
-#     hold, only with TITRBOLD=<its .ttf> (below).
+#   · driver-print--decipher-titr-small-fa, --decipher-titr-large-fa and --decipher-titr-alone-fa: an old Titr face the
+#     repository does not hold, only with TITRBOLD=<its .ttf> (below).
 # IMITATED: we cannot run a print driver or Distiller here; the files follow what such files hold.
 #   python3 scripts/make-decipher35.py   → pdf/producers/<the eleven files>.pdf and their corpus files
-#   TITRBOLD=<TitrBold.ttf> python3 scripts/make-decipher35.py   → the two TitrBold files too
+#   TITRBOLD=<TitrBold.ttf> python3 scripts/make-decipher35.py   → the three TitrBold files too
 # Fonts: DejaVu Sans (DEJAVU=<folder>, else the Linux folders) and FreeSerif (FREEFONT=…). Their text stays out of
 # letterstats.js (MEASURED in tools/build-letterstats.js) and of calibrate-shapes.js, for good. Lab files carry no
 # personal metadata: Producer, Creator and Title only.
@@ -407,7 +407,12 @@ simple({'F': Renum(Font(REG, 'AAJAAA+DemoSansBook'))}, OCRDIG, 'driver-print--de
 #     body text in DejaVu Sans: rough prints know part of the subset, under the 80 % the arbiter needs, so the
 #     decipherment has to read it — with the body's words and OCR's votes;
 #   · driver-print--decipher-titr-large-fa: a page set in a larger TitrBold subset whose glyphs rough prints mostly know
-#     (over 80 %): the arbiter reads it through B Titr's rough prints, and the decipherment must leave that reading.
+#     (over 80 %): the arbiter reads it through B Titr's rough prints, and the decipherment must leave that reading;
+#   · driver-print--decipher-titr-alone-fa: the title and the year alone in that small subset (14 glyph uses, no other
+#     text in the font), its /ToUnicode naming each code by its glyph id (as such old fonts' files do: the "2" series'
+#     behaviour), over body text in Vazirmatn named right (a face fontprints know): no font of its script is read
+#     approximately beside it, so 3.2's short-font rule does not take its shapes' reading, and the decipherment finds it
+#     `low` — garbled today, as a real file of this kind; OCR's votes are its reading (3.5).
 TITR = os.environ.get('TITRBOLD')
 
 # (an old face has no Persian initial and medial yeh, U+FBFE and U+FBFF: Word draws the Arabic yeh's, U+FEF3 and U+FEF4)
@@ -456,5 +461,22 @@ if TITR:
     for p in TL: P.para(p)
     P.done(); D.write(out('driver-print--decipher-titr-large-fa.pdf'), PRODUCER, 'decipher-titr-large-fa')
     corpus('decipher-titr-large-fa.md', md(['# ' + TL_T] + TL))
+    # 14. the title and the year alone, over a body fontprints know
+    import zipfile
+    ZIP = os.path.join(LAB, '..', '..', 'assets', 'fonts', 'download', 'persian-fonts-ttf.zip')
+    V = Font(io.BytesIO(zipfile.ZipFile(ZIP).read('vazirmatn/Vazirmatn-Regular.ttf')), 'AAMAAB+Vazirmatn')
+    named = {}
+    for t in [TS_T] + TS:
+        for c, n in brackets(visual(t)): named.setdefault(V.gid(c), n)
+    # (its ToUnicode names each code by the glyph's id in the whole font, as a code point)
+    H = only(TITR, 'AAMAAA+TitrBold', [TS_HEAD, TS_YEAR]); whole = TTFont(TITR); order = H.font.getGlyphOrder()
+    D = Doc2({'H': Renum(H, names=lambda g: chr(whole.getGlyphID(order[g]))), 'F': Renum(V, names=lambda g: named.get(g, ''))})
+    D.line(1, TS_HEAD, TOP, 16, 0, 'H', center=D.w / 2)
+    D.line(1, TS_YEAR, TOP - 24, 12, R, 'H')
+    P = Pages(D, {'body': 'F'}); P.y = TOP - 70
+    P.para(TS_T)
+    for p in TS: P.para(p)
+    P.done(); D.write(out('driver-print--decipher-titr-alone-fa.pdf'), PRODUCER, 'decipher-titr-alone-fa')
+    corpus('decipher-titr-alone-fa.md', md(['**' + TS_HEAD + '**', '**' + TS_YEAR + '**', TS_T] + TS))
 else:
-    print('TITRBOLD not set: the two TitrBold files are left as they are')
+    print('TITRBOLD not set: the three TitrBold files are left as they are')

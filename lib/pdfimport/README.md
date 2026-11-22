@@ -201,6 +201,9 @@ list number at a line's end), `.tcBrackets` (brackets named logically, renamed a
 | `_fontArbiter` | `fromArrayBuffer` | After the last page: the fonts no page could decide alone; the note `fontprintRead` |
 | `_fontApprox` | `fromArrayBuffer` | Then a font Kelk does not know, which the file does not name: read by its glyphs' shapes (shape.js, loaded then) when the reading reads as language; the note `fontApprox`, `this._approx` |
 | ↳ `_decipherFonts` | `_fontApprox` | 3.5: the fonts of Arabic script read as a cipher (decipher.js, loaded then by `_loadDecipher`), their subsets pooled; `read` taken (`_decUsage`, `_decLexicon`, `_decNamedRight`) |
+| ↳ `_decLines`, `_decPages` | `_decipherFonts` | A group's lines for the digit anchors; the pages it is drawn on |
+| ↳ `_decVotes`, `_decOcrEngine` | `_decipherFonts` | OCR's votes: each line's run of the font cut from the page, read by Tesseract, lined up with the glyphs (3.4's engine) |
+| ↳ `_decCrossCheck` | `_fontApprox` | A ToUnicode the judge accepts that names glyphs as two letters: deciphered and compared; the note `toUnicodeDoubt` |
 | ↳ `_approxShapes` | `_fontApprox` | 3.2's reading by shapes; where both read a font, the language chooses (`decipher.js` `fit`) |
 | ↳ `_decipherSide` | `_fontApprox` | The lab's side-by-side check only (`options.decipherKnown`): the fonts fontprints read, deciphered and compared |
 | `_noteLang` | `_hiddenItems` | The language of a note Kelk writes into the document: the trusted text, a Persian or Arabic `/Lang`, the interface (`options.uiLang`), English |
@@ -350,6 +353,7 @@ when a PDF has such a font. Adds `PdfImporter._decipher` (pure, async where it s
 |---|---|---|
 | `lm` | `_decipherFonts`, the tests | `lm-fa.js`'s counts → a word's log-probability (built once) |
 | `prepare` | `_decipherFonts` | A font's glyphs (features, form, marks' shapes, a hollow face) and its words |
-| `run` | `_decipherFonts` | The search, the verdict, the marks |
+| `run` | `_decipherFonts` | The search (with OCR's votes when given), the verdict, the marks, the digits |
+| `anchors` | `run`, the tests | Digits from page numbers, numbered lists and years |
 | `pool` | `_decipherFonts` | Subsets of one font, by shared outlines |
 | `joinShare`, `fit` | `_decipherFonts`, `_fontApprox` | Arabic script or not; how well a reading fits Persian |

@@ -11,6 +11,8 @@
  *                                        the reader typed it otherwise; an invalid range refused with a toast naming
  *                                        the pages. entries []: hidden (a custom view)
  *   KelkOcrReport.scans(entries)         the pages the report says need OCR
+ *   KelkOcrReport.fonts(entries)         whether it says OCR could read fonts Kelk does not know (fontOcr, 3.5): the
+ *                                        button shows for them too, without the range (onOcr([]): the whole document)
  *   KelkOcrReport.rangeText(pages)       → «1-3, 7» (ASCII, whatever the language)
  *   KelkOcrReport.rangePages(text, allowed)  the range typed (Persian or Arabic digits, dashes, spaces) → the pages of
  *                                        `allowed` in it, or null (none, or not a range)
@@ -23,6 +25,8 @@
     const STRINGS = {
         fa: {
             pdf_ocrFailed: 'تشخیص نویسه (OCR) آغاز نشد؛ صفحه‌های اسکن‌شده به شکل تصویر ماندند.',
+            pdf_fontOcr: 'برخی قلم‌های ناشناخته از روی شکل حروفشان با اطمینان خوانده نشدند؛ تشخیص نویسه (OCR) می‌تواند آن‌ها را بخواند (صفحهٔ {0}). «خواندن با OCR» را بزنید.',
+            pdf_toUnicodeDoubt: 'نام برخی نویسه‌های یک قلم در فایل با شکل آن‌ها نمی‌خواند (صفحهٔ {0}). متن همان است که فایل نام می‌برد؛ آن را با PDF مقایسه کنید.',
             pdf_ocrPageFailed: 'برخی صفحه‌ها با تشخیص نویسه (OCR) خوانده نشدند و به شکل تصویر ماندند (صفحهٔ {0}).',
             rep_colNotes: 'یادداشت',
             rep_ocrHead: 'صفحه‌هایی که با تشخیص نویسه (OCR) خوانده شدند',
@@ -39,6 +43,8 @@
         },
         en: {
             pdf_ocrFailed: 'Character recognition (OCR) could not start; the scanned pages were kept as pictures.',
+            pdf_fontOcr: 'Some fonts Kelk does not know could not be read for sure from the shapes of their letters; OCR can read them (page {0}). Use «Read with OCR».',
+            pdf_toUnicodeDoubt: 'The file names some characters of a font otherwise than their shapes read (page {0}). The text is what the file names; compare it with the PDF.',
             pdf_ocrPageFailed: 'Some pages could not be read with character recognition (OCR) and were kept as pictures (page {0}).',
             rep_colNotes: 'Notes',
             rep_ocrHead: 'Pages read with character recognition (OCR)',
@@ -55,6 +61,8 @@
         },
         ar: {
             pdf_ocrFailed: 'تعذّر بدء التعرّف الضوئي على الحروف (OCR)؛ بقيت الصفحات الممسوحة ضوئيًا صورًا.',
+            pdf_fontOcr: 'تعذّرت قراءة بعض الخطوط المجهولة بثقة من أشكال حروفها؛ يمكن للتعرّف الضوئي (OCR) قراءتها (الصفحة {0}). استخدم «القراءة بالتعرّف الضوئي».',
+            pdf_toUnicodeDoubt: 'يسمّي الملف بعض حروف خطٍّ بغير ما تقرؤه أشكالها (الصفحة {0}). النص هو ما يسمّيه الملف؛ قارنه بملف PDF.',
             pdf_ocrPageFailed: 'تعذّرت قراءة بعض الصفحات بالتعرّف الضوئي على الحروف (OCR) فبقيت صورًا (الصفحة {0}).',
             rep_colNotes: 'ملاحظات',
             rep_ocrHead: 'صفحات قُرئت بالتعرّف الضوئي على الحروف (OCR)',
@@ -89,6 +97,10 @@
         const ps = [];
         (entries || []).forEach(function (e) { (e.report ? e.report.notes : []).forEach(function (n) { if (n.code === 'ocrNeeded') Array.prototype.push.apply(ps, n.pages || []); }); });
         return nums(ps);
+    }
+    /** whether a report says OCR could read fonts Kelk does not know (the note fontOcr, 3.5) */
+    function fonts(entries) {
+        return (entries || []).some(function (e) { return (e.report ? e.report.notes : []).some(function (n) { return n.code === 'fontOcr'; }); });
     }
     function rangeText(ps) {
         const out = [];
@@ -128,7 +140,9 @@
         K.ui.icons(btn);
         const input = field.querySelector('input');
         const read = function () {
-            const all = scans(cur.entries), pages = rangePages(input.value, all), run = cur.onOcr;
+            const all = scans(cur.entries), run = cur.onOcr;
+            // (no scanned page: OCR for the fonts alone, the whole document)
+            const pages = all.length ? rangePages(input.value, all) : [];
             if (!pages) { K.ui.toast(t('rep_ocrPagesBad', rangeText(all)), 'error'); input.focus(); return; }
             if (cur.close) cur.close();
             if (run) run(pages);
@@ -138,7 +152,7 @@
         return { field: field, input: input, btn: btn, hint: hint };
     }
     function show(entries, onOcr, close) {
-        const all = scans(entries), on = !!onOcr && all.length > 0;
+        const all = scans(entries), on = !!onOcr && (all.length > 0 || fonts(entries));
         if (!ui && on) ui = make();
         if (!ui) return;
         if (entries !== cur.entries) ui.input.value = rangeText(all);
@@ -147,6 +161,7 @@
         ui.btn.querySelector('span').textContent = t('rep_ocrRead');
         ui.hint.textContent = t('rep_ocrHint');
         [ui.field, ui.btn, ui.hint].forEach(function (x) { x.hidden = !on; });
+        ui.field.hidden = !on || !all.length;                // (the range: for scanned pages only)
     }
 
     // its words join Kelk.i18n's tables
@@ -155,7 +170,7 @@
         Object.keys(STRINGS).forEach(function (l) { if (all[l]) Object.assign(all[l], STRINGS[l]); });
     }
 
-    const api = { table: table, show: show, scans: scans, rangeText: rangeText, rangePages: rangePages, NOTES: NOTES, STRINGS: STRINGS };
+    const api = { table: table, show: show, scans: scans, fonts: fonts, rangeText: rangeText, rangePages: rangePages, NOTES: NOTES, STRINGS: STRINGS };
     root.KelkOcrReport = api;
     if (K) K.ocrReport = api;
 })(typeof window !== 'undefined' ? window : globalThis);

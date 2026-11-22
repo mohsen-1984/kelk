@@ -177,6 +177,11 @@ wrong) is read as a cipher: each glyph a symbol, the plain text Persian. The evi
 - **Expectations**: `driver-print--unreadable-fa` and `distiller-cff--cff-unreadable-fa` stay garbled;
   `word-cover--glyph-index-fa` (garbled, the owner's decision of 2026-11-19) is shown with the OCR votes' result, and its
   expectation changes only with the owner's approval — as does any other expectation the decipherment turns around.
+- **Found in the digits and OCR pull request**: `word-cover--glyph-index-fa` stays garbled — its unknown font's two short
+  lines (11 glyphs) join forward on 0.25 of their uses, under the 0.3 that marks Arabic script, so they are never
+  deciphered and get no votes (a lower bar for very short fonts would be its own item). `decipher-titr-large-fa`: the
+  rough prints read its letters 99.0 % right (lam and a final ح as marks), the decipherment 100 % — the order
+  (rough prints first) is kept; a later item may let the decipherment check a font rough prints read on few glyphs.
 - **The lab files** (`make-decipher35.py`): `decipher-body-fa`, `decipher-cid-fa`, `decipher-subsets-fa`,
   `decipher-digits-fa`, `decipher-marks-fa`, `decipher-short-fa`, `decipher-hollow-fa`, `decipher-cyrillic-ru`,
   `decipher-cross-fa`, `decipher-ocr-terms-fa`, `decipher-ocr-digits-fa` — in DejaVu Sans and FreeSerif, typefaces Kelk
@@ -186,7 +191,10 @@ wrong) is read as a cipher: each glyph a symbol, the plain text Persian. The evi
   owner supplied (never committed: only the lab PDFs with their subsets): rough prints (B Titr Bold's) know about half its
   glyphs and name them right (the ones that differ only by a digit's or the comma's code are no errors: digits and commas
   follow the import settings) — a small subset under the arbiter's 80 % is the decipherment's to read; a larger one over
-  it stays the rough prints' (the order).
+  it stays the rough prints' (the order). A third, `decipher-titr-alone-fa`, is a real file's case: a title and a year
+  alone in that small subset (14 glyph uses), its ToUnicode naming the glyph ids, over a body fontprints know. The small
+  file reads (its body is a font Kelk does not know, deciphered, so 3.2's short-font rule takes the title's shapes);
+  this one is garbled, as the real file, and is the target of OCR's votes.
 - **Real samples** are checked in the session only, reported in general words. One weak case is known: a font in many
   subsets with very little text each, where OCR's votes are noisy — it is reported, not tuned for.
 - **The closest reference family first** (3.2's shapes, «The serif shapes and the sans Latin readings» below) joins 3.5
