@@ -23,9 +23,12 @@
 #   · driver-print--decipher-ocr-terms-fa: body text in DejaVu Sans, a few terms in FreeSerif Bold whose words the body
 #     does not use — too little text to read alone (OCR's votes, 3.5);
 #   · driver-print--decipher-ocr-digits-fa: single digits in lines of text, no page numbers, no list, no year
-#     (DejaVu Sans) — digits only their shapes, or OCR, can tell.
+#     (DejaVu Sans) — digits only their shapes, or OCR, can tell;
+#   · driver-print--decipher-titr-small-fa and --decipher-titr-large-fa: an old Titr face the repository does not
+#     hold, only with TITRBOLD=<its .ttf> (below).
 # IMITATED: we cannot run a print driver or Distiller here; the files follow what such files hold.
 #   python3 scripts/make-decipher35.py   → pdf/producers/<the eleven files>.pdf and their corpus files
+#   TITRBOLD=<TitrBold.ttf> python3 scripts/make-decipher35.py   → the two TitrBold files too
 # Fonts: DejaVu Sans (DEJAVU=<folder>, else the Linux folders) and FreeSerif (FREEFONT=…). Their text stays out of
 # letterstats.js (MEASURED in tools/build-letterstats.js) and of calibrate-shapes.js, for good. Lab files carry no
 # personal metadata: Producer, Creator and Title only.
@@ -394,3 +397,64 @@ corpus('decipher-ocr-terms-fa.md', md(blocks))
 
 # 11. single digits, nothing to count them by
 simple({'F': Renum(Font(REG, 'AAJAAA+DemoSansBook'))}, OCRDIG, 'driver-print--decipher-ocr-digits-fa.pdf', 'decipher-ocr-digits-fa')
+
+# ---- TitrBold (an old Titr, not in the repository): only with TITRBOLD=<its .ttf> -------------------------------------
+# An old Titr face that behaves like the MRT "2" series. No fontprint matches it; rough prints (B Titr Bold's) match
+# about half its glyphs, and where they do they name them right. The font file is never committed and nothing but this
+# script reads it: without TITRBOLD the two files below are left as they are (the lab reads the committed PDFs and their
+# corpus files).
+#   · driver-print--decipher-titr-small-fa: a short title «باسمه تعالی» and a year in a small TitrBold subset, over
+#     body text in DejaVu Sans: rough prints know part of the subset, under the 80 % the arbiter needs, so the
+#     decipherment has to read it — with the body's words and OCR's votes;
+#   · driver-print--decipher-titr-large-fa: a page set in a larger TitrBold subset whose glyphs rough prints mostly know
+#     (over 80 %): the arbiter reads it through B Titr's rough prints, and the decipherment must leave that reading.
+TITR = os.environ.get('TITRBOLD')
+
+# (an old face has no Persian initial and medial yeh, U+FBFE and U+FBFF: Word draws the Arabic yeh's, U+FEF3 and U+FEF4)
+OLD_YEH = {0xFBFE: 0xFEF3, 0xFBFF: 0xFEF4}
+class Old(Font):
+    def gid(self, code): return Font.gid(self, OLD_YEH.get(code, code))
+    def adv(self, code, size): return Font.adv(self, OLD_YEH.get(code, code), size)
+
+def only(path, ps, lines):
+    """a Font subset to the glyphs the lines draw (and the space): a subset as small as a real file's"""
+    keep = rtl_pdf.CODES
+    rtl_pdf.CODES = {OLD_YEH.get(c, c) for t in lines for c, _ in brackets(visual(t))} | {0x20}
+    try: return Old(path, ps)
+    finally: rtl_pdf.CODES = keep
+
+TS_HEAD, TS_YEAR = 'باسمه تعالی', '۱۳۸۵'
+TS_T = 'دعوت به همکاری در طرح کتابخانه‌های روستایی'
+TS = [
+    'با سلام و احترام، به آگاهی می‌رساند که طرح کتابخانه‌های روستایی از آغاز سال ۱۳۸۵ در ده روستای استان اجرا می‌شود. هدف '
+    'این طرح رساندن کتاب به خانواده‌هایی است که از کتابخانه شهر دور هستند و در راه تعالی فرهنگ روستا گام برمی‌دارد.',
+    'از همه دبیران و کارمندان آموزش و پرورش که در این روستاها زندگی می‌کنند دعوت می‌شود در نگهداری قفسه‌های کتاب و برگزاری '
+    'جلسه‌های کتابخوانی همکاری کنند. هر روستا یک قفسه کوچک و دویست جلد کتاب خواهد داشت.',
+    'کسانی که مایل به همکاری هستند می‌توانند نام خود را تا پایان ماه به دفتر اداره بدهند. برنامه آموزش همکاران در هفته اول '
+    'ماه آینده برگزار می‌شود و گواهی شرکت در آن داده خواهد شد.']
+
+TL_T = 'اطلاعیه برگزاری جشنواره فرهنگی مدارس'
+TL = [
+    'به اطلاع همه دانش‌آموزان و اولیای گرامی می‌رساند که جشنواره فرهنگی مدارس امسال در سالن اجتماعات شهر برگزار می‌شود.',
+    'بخش‌های جشنواره شامل نقاشی، خوشنویسی، داستان کوتاه، شعر، عکاسی و سرود است و هر دانش‌آموز می‌تواند در دو بخش شرکت کند.',
+    'آثار باید تا پایان آبان به دفتر مدرسه تحویل داده شود. داوران از میان استادان دانشگاه و هنرمندان شهر انتخاب شده‌اند.',
+    'به برگزیدگان هر بخش لوح تقدیر و جایزه نقدی داده خواهد شد و آثار برتر در نمایشگاهی یک هفته‌ای به نمایش درمی‌آید.']
+
+if TITR:
+    # 12. the first sample's case: a short title and a year in a small subset
+    D = Doc2({'H': Renum(only(TITR, 'AAKAAA+TitrBold', [TS_HEAD, TS_YEAR])), 'F': Renum(Font(REG, 'AAKAAB+DemoSansBook'))})
+    D.line(1, TS_HEAD, TOP, 16, 0, 'H', center=D.w / 2)
+    D.line(1, TS_YEAR, TOP - 24, 12, R, 'H')
+    P = Pages(D, {'body': 'F'}); P.y = TOP - 70
+    P.para(TS_T)
+    for p in TS: P.para(p)
+    P.done(); D.write(out('driver-print--decipher-titr-small-fa.pdf'), PRODUCER, 'decipher-titr-small-fa')
+    corpus('decipher-titr-small-fa.md', md(['**' + TS_HEAD + '**', '**' + TS_YEAR + '**', TS_T] + TS))   # (a bold face's lines: bold)
+    # 13. the second sample's case: a page in a larger subset that rough prints read
+    D = Doc2({'F': Renum(only(TITR, 'AALAAA+TitrBold', [TL_T] + TL))})
+    P = Pages(D, {'body': 'F'}, lead=1.9); P.title(TL_T)
+    for p in TL: P.para(p)
+    P.done(); D.write(out('driver-print--decipher-titr-large-fa.pdf'), PRODUCER, 'decipher-titr-large-fa')
+    corpus('decipher-titr-large-fa.md', md(['# ' + TL_T] + TL))
+else:
+    print('TITRBOLD not set: the two TitrBold files are left as they are')
