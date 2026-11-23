@@ -197,8 +197,6 @@ Open from 3.5:
 - **Very short fonts that barely join**: `word-cover--glyph-index-fa`'s unknown font (11 glyphs) joins forward on 0.25 of
   its uses, under the 0.3 that marks Arabic script, so it is never deciphered (a lower bar for very short fonts).
 - **Hollow (outline) faces** are capped at `low`: reported, not read (`decipher-hollow-fa`).
-- **A digit read as a letter**: in `decipher-titr-small-fa` the body's year comes out «۵ئ۱۳» (its 8 read as «ئ», the
-  number then out of order); 3.4 gave «١٢٨٥». No anchor reaches it: a year in running text with no other use of 8.
 - **Rough prints on few glyphs**: `decipher-titr-large-fa` is read 99.0 % by rough prints, 100 % deciphered; the order
   stays, but the decipherment could check a font rough prints read on few glyphs.
 - **A font in many subsets with very little text each**: OCR's votes are noisy there (a real sample; reported, not
@@ -247,7 +245,8 @@ The owner's decisions (2026-11-22):
 
 From 3.5, taken into 3.6: **the stress check's margin** (a pause between pages in 3.2's steps, `_approxLines` and
 `_approxGarbled`, PR 2 — measured: its cause is elsewhere and not small, so it stays open, «Open from 3.5») and **a
-digit read as a letter** (`decipher-titr-small-fa`, PR 3; «Open from 3.5» until done).
+digit read as a letter** (`decipher-titr-small-fa`: done in PR 3, `decipher.js` `digitInRun`, Arabic-script digits only
+— the year reads «۱۳۸۵»).
 
 Found in PR 2 (OCR lines as glyphs), left for later:
 
@@ -266,7 +265,20 @@ Found in PR 2 (OCR lines as glyphs), left for later:
   Persian ones while the lab keeps the digits as drawn (`asciiNumbers: false`): with the digits matched its words would
   read 51.4 % instead of 28.6 % (total 39.4, not 31.4). The same holds, less, for `scan-table-fa` (words 65.2 → 67.4)
   and `scan-picture-fa`'s caption (96.4 → 97.6). The keys were made in PR 1 by the same script
-  (`make-scans.js`); changing them is the owner's decision (agreement 14).
+  (`make-scans.js`); changing them is the owner's decision (agreement 14). The owner (2026-11-23): not to Persian
+  digits — Kelk's defaults (numbers in ASCII digits and signs, Arabic ي/ك → Persian ی/ک) are the basis; whether the lab
+  runs with Kelk's defaults is the owner's decision still (with them, 23 of 141 corpus keys and 21 of 50 golden keys
+  change, almost all in digits and signs; the three scan keys do not).
+
+Found in PR 3 (pictures and rules), left for later:
+
+- **Numbers with a Persian comma** (`scan-index-fa`): Tesseract gives a line's digit groups in visual order, left to
+  right, and drops the comma between them — «۳، ۷، ۱۹» comes back «۱۹۷۳», «۱۲، ۴۵» «۴۵۵۲» (one digit misread too). The
+  comma's place is not in what it returns (its TSV makes the run one word), so it cannot be put back from the text: it
+  would take reading the number's own boxes (the ink's gaps inside the word) or a model that keeps the comma. Not small.
+- **A framed or shaded box whose rows run together** (a real scan's credits page: a frame, a shaded box, an ornament)
+  is one run of ink too tall for a line: a picture, its text not read. 3.4 and 3.5 read nothing there either (two
+  lines of nothing). The frame's and the shading's rows would have to be taken out before the lines are found.
 
 
 **A session of its own: real Arabic PDFs and Arabic fonts** (the owner's request, 2026-11-18) — «Left from 3.1» below.
