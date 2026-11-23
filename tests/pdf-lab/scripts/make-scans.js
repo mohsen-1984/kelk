@@ -15,6 +15,8 @@
 //                                  from one page to the next
 //   · scan-300--scan-picture-fa    one page: a line drawing between two paragraphs, its caption under it
 //   · scan-300--scan-columns2-fa   one page: a running head, a full-width title over two columns
+//   · scan-300--scan-pageframe-fa      two pages in a page frame, a running head over a thick rule on each: a lone rule, or a
+//                                  frame, is no table — no `---` between paragraphs, the running heads still dropped
 //   · scan-300--scan-specks-fa     one page of paragraphs, dust in its margins beside a few lines (a dot, a comma): a speck
 //                                  Tesseract reads at a line's end, far from its words, is no column of its own
 // node scripts/make-scans.js [name …] makes only the files named (each scan's pixels follow Chromium's drawing, so
@@ -115,6 +117,13 @@ const SPECKS = {
 // (dust: a dot or a comma in a margin, beside a line, in points from the page's top-left — the left margin's text edge at
 // 50 pt, the right's at 346 pt; the body's lines 21 pt apart from about 95 pt down)
 const DUST = [['.', 22, 102], ['،', 368, 146], ['.', 26, 186], ['.', 364, 228], ['،', 20, 267]];
+const FRAME = {
+  head: 'گزارش سالانه', first: 12,
+  paras: [['بخش نخست گزارش به کارهای انجام شده در سال گذشته می‌پردازد. در این سال کتابخانهٔ تازه‌ای در محلهٔ شرقی گشوده شد و شمار اعضای کتابخانه‌ها به بیش از دو برابر رسید.',
+    'برنامهٔ کتابخوانی کودکان در تابستان برگزار شد و صدها کودک در آن شرکت کردند. هر هفته یکی از نویسندگان شهر برای کودکان داستان خواند و دربارهٔ کار نوشتن با آنان سخن گفت.'],
+  ['بخش دوم گزارش برنامه‌های سال آینده را بازگو می‌کند. شورای کتابخانه‌ها می‌خواهد یک کتابخانهٔ سیار راه بیندازد تا کتاب به روستاهای پیرامون شهر نیز برسد.',
+    'همچنین قرار است تالار مطالعهٔ کتابخانهٔ مرکزی بازسازی شود و ساعت کار آن تا پاسی از شب افزایش یابد. هزینهٔ این کارها از بودجهٔ شهرداری و کمک مردم فراهم می‌شود.']]
+};
 const fa = (t) => t.replace(/[0-9]/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[d]);
 // a garden's plan, drawn in black lines only (no text in it): a wall, four paths to a round pool, trees as hatched discs
 const GARDEN = (() => {
@@ -258,6 +267,8 @@ function writePdf(file, pages, title) {
   await make('scan-300--scan-picture-fa', [{ body: H1(PICTURE.title) + P(PICTURE.before) + `<div class="fig">${GARDEN}</div><p class="cap">${fa(PICTURE.caption)}</p>` + P(PICTURE.after), opts: NO, scan: Object.assign({}, S300, { angle: -0.4 }) }], 'scan-picture-fa');
   await make('scan-300--scan-columns2-fa', [{ body: H1(COLUMNS2.title) + `<div style="column-count:2;column-gap:26pt">${COLUMNS2.paras.map(P).join('')}</div>`, opts: Object.assign({}, NO, { size: 11, rh: [COLUMNS2.head, fa(String(COLUMNS2.page))] }), scan: Object.assign({}, S300, { angle: 0.3 }) }], 'scan-columns2-fa');
   const dust = DUST.map((d) => `<span style="position:absolute;left:${d[1]}pt;top:${d[2]}pt;font-family:Nazanin;font-size:14pt;line-height:1">${d[0]}</span>`).join('');
+  const frameRh = (k) => `<div style="display:flex;justify-content:space-between;font-family:Nazanin;font-size:10pt;border-bottom:2.5pt solid #000;padding-bottom:3pt;margin-bottom:12pt"><span>${FRAME.head}</span><span>${fa(String(FRAME.first + k))}</span></div>`;
+  await make('scan-300--scan-pageframe-fa', [0, 1].map((k) => ({ body: `<div style="border:1.5pt solid #000;padding:12pt 14pt;height:calc(100% - 30pt)">${frameRh(k)}${FRAME.paras[k].map(P).join('')}</div>`, opts: NO, scan: Object.assign({}, S300, { angle: [0.2, -0.3][k] }) })), 'scan-pageframe-fa');
   await make('scan-300--scan-specks-fa', [{ body: H1(SPECKS.title) + SPECKS.paras.map(P).join('') + dust, opts: NO, scan: Object.assign({}, S300, { angle: 0.2 }) }], 'scan-specks-fa');
   await b.close();
   const md = (ps) => ps.join('\n\n') + '\n';
@@ -274,6 +285,7 @@ function writePdf(file, pages, title) {
   corpus('scan-index-fa.md', md(['# ' + INDEX.title, gfm(INDEX.rows)]));
   corpus('scan-heads-fa.md', md(['# ' + HEADS.title].concat(HEADS.paras)));
   corpus('scan-picture-fa.md', md(['# ' + PICTURE.title, PICTURE.before, PICTURE.caption, PICTURE.after]));
+  corpus('scan-pageframe-fa.md', md(FRAME.paras[0].concat(FRAME.paras[1])));
   corpus('scan-specks-fa.md', md(['# ' + SPECKS.title].concat(SPECKS.paras)));
   corpus('scan-columns2-fa.md', md(['# ' + COLUMNS2.title].concat(COLUMNS2.paras)));
   fs.rmSync(tmp, { recursive: true, force: true });
