@@ -209,6 +209,42 @@ Open from 3.5:
 glyphs (Tesseract's word boxes and baselines), so columns, running heads, lists, tables and every other rule run on it
 as on a page with a text layer; today it skips them (`lib/PDFIMPORT.md`, "What an OCR page goes through"). About a
 release of work: OCR before the layout, glyphs in a font of its own, the rules found as segments, the ladder.
+Persian only. The pull requests, in order:
+
+1. **`pdf/3.6-lab`**: the lab scans of our own text (`make-scans.js`), measured with 3.5's importer before any change —
+   `scan-list-fa` (a numbered list, one item wrapped, bullets set in under an item), `scan-table-fa` (a ruled table
+   under its «جدول 1- …» title), `scan-index-fa` (a two-column index without borders), `scan-heads-fa` (three pages
+   under a running head with the page number and a rule, paragraphs running on from page to page),
+   `scan-picture-fa` (a drawing between two paragraphs, its caption), `scan-columns2-fa` (a full-width title over
+   two columns, a running head). Their text stays out of `lm.json`, `letterstats.js` and `calibrate-shapes.js`.
+2. **`pdf/3.6-ocr-glyphs`**: the pages to read are picked after `read` (the `ocr` rung's own test) and read before
+   `fonts`; each line still found by `ocr.js` and read alone (psm 13), then `postCorrect`; Tesseract's word and
+   character boxes and the line's baseline (its result iterator; its TSV as the fallback) become glyphs in user
+   space, in a font of their own (`ocr`) that the arbiter, fontprints, letter statistics, the decipherment, 3.2's
+   shapes, the garbled check and the hidden text pass by. The page then goes through the layout and the ladder as any
+   page with text; its confidence the share of known words; the report's OCR section as it is. Kept: the progress
+   steps, Cancel within a line, «Ask» and the page range, each page's pixels freed once read, nothing at startup, one
+   engine shared with 3.5's OCR votes. Also: the stress check's margin (below).
+3. **`pdf/3.6-ocr-rules`**: the rules and frames `ocr.js` finds become the page's `hsegs` / `vsegs` (tables, boxes);
+   ink where no line lies is cut from the page as a figure, the rest of the scan dropped (a page with no line stays
+   one picture). Also: the digit read as a letter (below), if no lab file gets worse.
+4. **`release/3.6`**: the version, `CHANGELOG.md`, the README (fa / en / ar), the guide, the release notes.
+
+The owner's decisions (2026-11-22):
+
+- `scan-columns-fa` no longer wants `ocrColumns` in `expect.json` once the layout reads its columns (PR 2); the note
+  stays in the code for a page whose columns the layout cannot settle.
+- PR 2 reports the time per OCR page before and after, on the lab scans and on the real scan (3.4: about 2.6 s a
+  page). No 3.4 scan may score worse, and the `decipher-ocr-*` files must not change.
+- The digit rule (a four-character number in running text whose other three characters are digits) reads Arabic-script
+  digits only, never inside Latin text or code.
+- The real scan is run outside the repository and reported in general words only: its pages carry running heads with
+  a page number and a rule, numbered and lettered clauses, a framed box, and a long index set as a two-column table
+  without borders.
+
+From 3.5, taken into 3.6: **the stress check's margin** (a pause between pages in 3.2's steps, `_approxLines` and
+`_approxGarbled`, PR 2) and **a digit read as a letter** (`decipher-titr-small-fa`, PR 3). Both are in «Open from 3.5»
+above until done.
 
 
 **A session of its own: real Arabic PDFs and Arabic fonts** (the owner's request, 2026-11-18) — «Left from 3.1» below.
@@ -321,7 +357,9 @@ release of work: OCR before the layout, glyphs in a font of its own, the rules f
 **Optional, later**
 
 - A layout model as an optional download (http(s) only, never from `file://`), as a second opinion on headings and tables
-- OCR for scanned PDFs: Persian done in 3.4; Arabic and English models (each about 10 MB with `best`) — not placed
+- **Arabic and English OCR** (lower priority, no release yet; the owner, 2026-11-22): Persian OCR done in 3.4 and laid
+  out in 3.6. Arabic and English models (each about 10 MB with `best`) come only once Persian OCR is stable and its
+  quality is checked.
 
 ## Backlog
 

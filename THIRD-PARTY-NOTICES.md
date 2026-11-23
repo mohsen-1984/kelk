@@ -41,6 +41,24 @@ which are not in the repository; `tools/build-lm.js` rebuilds it from them. As t
 T. Eckart, U. Quasthoff (2012), *Building Large Monolingual Dictionaries at the Leipzig Corpora Collection: From 100
 to 200 Languages*, Proceedings of LREC 2012.
 
+## Test documents (not shipped)
+
+PDF import was checked, outside the repository, on public Persian PDFs from the **Iran Data Portal** of Syracuse
+University (https://irandataportal.syr.edu/), with thanks:
+
+- older text PDFs from the 2000s whose fonts Kelk did not know, such as the energy balance sheets of 1380–1383 on its
+  *Energy & Environment* page (https://irandataportal.syr.edu/energy-environment), the case the reading of unknown
+  fonts (3.2, 3.5) was built for;
+- newer reports and statistical yearbooks, whose fonts Kelk already knows, as a check that nothing got worse;
+- scanned-only documents, such as the development plans on its *Annual Budgets and Five-Year Development Plans*
+  page (https://irandataportal.syr.edu/annual-budgets-development-plans/), for OCR (3.4).
+
+A few public reports of the Majlis Research Center were used the same way. Old documents were wanted because their
+fonts are the ones nobody fingerprints, while one such font is used across many documents of its time.
+
+None of these files, their names or their text are in the repository or the app. Each problem they showed is
+reproduced by a lab file made from Kelk's own text (`tests/pdf-lab/`).
+
 ## Fonts
 
 | Font | Version | License | Where | License file |
