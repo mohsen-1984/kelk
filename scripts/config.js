@@ -18,9 +18,10 @@
         // (libs: pdf.js and the importer on the first PDF; file: the file read into memory; open: pdf.js opens the
         // document, its metadata and structure tree — not measured, small)
         // (ocrLoad, ocr: only in an import that reads its scanned pages with OCR — scripts/importer.js leaves them out
-        // otherwise —, on top of the rest: about a second or two a page, against a tenth for everything else, 3.4)
+        // otherwise —, on top of the rest: about a second or two a page, against a tenth for everything else; 3.4, read
+        // before the fonts from 3.6)
         // (decipher: named inside the fonts' share — font N of M —, no share of its own: few files have such a font, 3.5)
-        importProgress: { libs: 0.02, file: 0.01, open: 0.02, read: 0.31, fonts: 0.17, decipher: 0, lines: 0.08, layout: 0.34, ocrLoad: 0.1, ocr: 2, markdown: 0.05 },
+        importProgress: { libs: 0.02, file: 0.01, open: 0.02, read: 0.31, ocrLoad: 0.1, ocr: 2, fonts: 0.17, decipher: 0, lines: 0.08, layout: 0.34, markdown: 0.05 },
         // a PowerPoint export's progress bar (deck.js blob): each step's share, measured on decks of 200–430 slides
         // (libs: PptxGenJS on the first export, not measured)
         pptxProgress: { libs: 0.02, model: 0.05, build: 0.03, write: 0.5, slides: 0.22, zip: 0.2 },

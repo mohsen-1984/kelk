@@ -183,3 +183,26 @@ test('pdf.js\'s text taken for lost glyphs only where it lost demonstrably fewer
   assert.equal(imp._ladTcBetter(blk('abcd'.repeat(25)), sig), true);                 // none lost
   assert.equal(imp._ladTcBetter(blk('abcd'.repeat(10)), sig), false);                // too little of it kept
 });
+
+test('OCR words placed (3.6): a box out of the line\'s order shares its neighbours\' room; words never overlap; dust left out', function () {
+  const box = { x0: 0, y0: 0, x1: 1000, y1: 40 };
+  // (right to left: «یک» at the right, a box across the line for «دو», «سه» at the left)
+  const ws = [{ text: 'یکی', x0: 900, x1: 990 }, { text: 'دوتا', x0: 10, x1: 980 }, { text: 'سه‌تا', x0: 600, x1: 700 }];
+  const out = L.ocrPlace(ws, box, 2.5, 3);
+  assert.equal(out.length, 3);
+  assert.ok(out[1].x1 <= out[0].x0 && out[1].x0 >= out[2].x1, 'the wide box now between its neighbours: ' + JSON.stringify(out[1]));
+  const near = L.ocrPlace([{ text: 'یکی', x0: 500, x1: 600 }, { text: 'دوتا', x0: 390, x1: 505 }], box, 2.5, 3);
+  assert.ok(near[1].x1 < near[0].x0, 'two words that touched are apart');
+  const dust = L.ocrPlace([{ text: 'یکی', x0: 800, x1: 900 }, { text: 'دوتا', x0: 650, x1: 780 }, { text: '.', x0: 20, x1: 28 }], box, 2.5, 3);
+  assert.deepEqual(dust.map((w) => w.text), ['یکی', 'دوتا'], 'a speck far from the line is dust');
+  const num = L.ocrPlace([{ text: 'یکی', x0: 800, x1: 900 }, { text: 'دوتا', x0: 650, x1: 780 }, { text: '۷', x0: 20, x1: 28 }], box, 2.5, 3);
+  assert.equal(num.length, 3, 'a lone digit stays: a table\'s cell');
+});
+
+test('OCR word glyphs (3.6): visual order — a Persian word reversed, its digits left to right — marks with their letter', function () {
+  const toPt = (u) => [u / 2, 0];
+  const g = L.ocrWordGlyphs({ text: 'خانهٔ ۱۲،', x0: 0, x1: 160 }, toPt, 100, 12, 0);
+  assert.equal(g.map((x) => x.ch).join('|'), '،|۱|۲| |هٔ|ن|ا|خ');
+  assert.ok(g.every((x) => x.font === L.OCR_FONT && x.ocr && x.y === 100 && x.size === 12));
+  assert.ok(g[0].x === 0 && Math.abs(g[g.length - 1].x + g[0].w - 80) < 1e-9, 'spread over the word\'s box, in points');
+});
