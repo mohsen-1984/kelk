@@ -189,8 +189,11 @@ Open from 3.5:
 - **Speed**: the unknown-font step takes several seconds on 15 pages (the 3 s target is not met): a short font is read
   twice (with and without the lexicon), each reading two or three runs of the search; OCR's votes add more.
 - **The stress check's margin**: the merged document's longest hold is 0.5 s on most runners but came to 1.04 s once
-  (a slow runner, the release PR's push run; its pull-request run 0.52 s). The rest is 3.2's steps over every page in one
-  task (`_approxLines`, `_approxGarbled`): a yield between pages there would give the margin back.
+  (a slow runner, the release PR's push run; its pull-request run 0.52 s). Measured in 3.6 (each long task against the
+  steps that ran in it): the longest is `_toHtml`, the Markdown step, over the whole document in one go (about 0.8 s in
+  a measuring run); then a page's `_lines` (0.5 s) and the GSUB check (0.6 s, several steps). 3.2's `_approxGarbled` is
+  0.4 s; a pause between blocks in `_lostOut` changed nothing measurable (tried, dropped). Not small: `_toHtml` would
+  have to become async and pause between blocks — kept here, not in 3.6.
 - **Very short fonts that barely join**: `word-cover--glyph-index-fa`'s unknown font (11 glyphs) joins forward on 0.25 of
   its uses, under the 0.3 that marks Arabic script, so it is never deciphered (a lower bar for very short fonts).
 - **Hollow (outline) faces** are capped at `low`: reported, not read (`decipher-hollow-fa`).
@@ -243,8 +246,27 @@ The owner's decisions (2026-11-22):
   without borders.
 
 From 3.5, taken into 3.6: **the stress check's margin** (a pause between pages in 3.2's steps, `_approxLines` and
-`_approxGarbled`, PR 2) and **a digit read as a letter** (`decipher-titr-small-fa`, PR 3). Both are in «Open from 3.5»
-above until done.
+`_approxGarbled`, PR 2 — measured: its cause is elsewhere and not small, so it stays open, «Open from 3.5») and **a
+digit read as a letter** (`decipher-titr-small-fa`, PR 3; «Open from 3.5» until done).
+
+Found in PR 2 (OCR lines as glyphs), left for later:
+
+- **A bold title in the body's size**: B Titr over B Nazanin has about the same ink height, so a title set so is a
+  paragraph (`scan-heads-fa`, `scan-specks-fa`; 3.4 the same). The stroke width would tell bold from regular.
+- **A running head misread on one page** is not dropped: running heads are found by their text repeating, and OCR read
+  one page's otherwise («تاریخچو شور» for «تاریخچهٔ شهر», `scan-heads-fa`). A head's place (the top line, over a rule)
+  could count as well as its text.
+- **A list's number without its period**: Tesseract drops the period after «۱» (`scan-list-fa`), so a numbered list
+  is paragraphs that start with a number.
+- **The index without borders** (`scan-index-fa`, 31.4 in 3.5 and in 3.6): the line finder does join an index row's
+  two cells into one line, but Tesseract reads that line's words well; laid out from their boxes, the rows now come out
+  as a table, in pieces. What is lost is in the reading: a number with a Persian comma, «۱۲، ۴۵», comes back as one
+  run of digits out of order with the comma gone («۴۵۵۲»), and a one-word line read alone comes back reversed, in
+  visual order (so reading each cell alone is worse). Its answer key also writes ASCII digits where the scan draws
+  Persian ones while the lab keeps the digits as drawn (`asciiNumbers: false`): with the digits matched its words would
+  read 51.4 % instead of 28.6 % (total 39.4, not 31.4). The same holds, less, for `scan-table-fa` (words 65.2 → 67.4)
+  and `scan-picture-fa`'s caption (96.4 → 97.6). The keys were made in PR 1 by the same script
+  (`make-scans.js`); changing them is the owner's decision (agreement 14).
 
 
 **A session of its own: real Arabic PDFs and Arabic fonts** (the owner's request, 2026-11-18) — «Left from 3.1» below.

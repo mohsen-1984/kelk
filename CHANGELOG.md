@@ -2,6 +2,16 @@
 
 All notable changes to Kelk. Dates are those of the release tags.
 
+## [Unreleased]
+
+### Changed
+
+- **Scanned pages are laid out like any page.** OCR now runs before the layout, and each word Tesseract reads becomes
+  text placed where it was seen on the page. So a scanned page gets the same rules as a page with text: columns and
+  reading order, running heads and page numbers, paragraphs joined across pages, lists, and tables without borders. On
+  our lab scans: two columns 83.9 → 91.0 and 63.7 → 92.1, a table 66.1 → 75.1; none worse. The time a page is unchanged
+  (about 1.5 s on the lab's scans, 2.2 s on a real scanned book).
+
 ## [3.5] — 2026-11-22
 
 ### Added

@@ -83,6 +83,27 @@ test('the line finder: a rule scanned askew (a row lower every 60 pixels) is tak
   assert.equal(pg.clean[209 * w + 600], 255, 'the rule is white');
 });
 
+test('the line finder: a line\'s baseline is its row with the most ink (3.6)', function () {
+  const pieces = [[20, 40, 30, 70], [100, 44, 110, 70], [200, 40, 210, 70]];
+  for (let x = 20; x < 380; x += 30) pieces.push([x, 64, x + 24, 68]);         // (letters joined on their baseline, word by word)
+  const w = 400, h = 400, px = draw(w, h, pieces);
+  const b = O.page(px, w, h).boxes[0];
+  assert.ok(b.base >= 64 && b.base < 68, 'the heavy row, ' + b.base);
+});
+
+test('tsvWords: the words of Tesseract\'s TSV (level 5), moved to the page; its bidi marks dropped (3.6)', function () {
+  const tsv = ['1\t1\t0\t0\t0\t0\t0\t0\t100\t20\t-1\t', '4\t1\t1\t1\t1\t0\t0\t0\t100\t20\t-1\t',
+    '5\t1\t1\t1\t1\t1\t60\t2\t40\t18\t91\tکتاب', '5\t1\t1\t1\t1\t2\t5\t3\t30\t17\t88\t\u200Fخانه\u200E', '5\t1\t1\t1\t1\t3\t1\t1\t2\t2\t10\t '].join('\n');
+  assert.deepEqual(O.tsvWords(tsv, 100, 200), [{ text: 'کتاب', x0: 160, y0: 202, x1: 200, y1: 220 }, { text: 'خانه', x0: 105, y0: 203, x1: 135, y1: 220 }]);
+  assert.deepEqual(O.tsvWords('', 0, 0), []);
+});
+
+test('postCorrect: a bullet read as a zero, alone at a line\'s start, is a bullet (3.6)', function () {
+  assert.equal(O.postCorrect('۰ تمدید با تلفن', null), '• تمدید با تلفن');
+  assert.equal(O.postCorrect('۰۱ تمدید', null), '۰۱ تمدید', 'a number stays');
+  assert.equal(O.postCorrect('سال ۰ تا ۱', null), 'سال ۰ تا ۱', 'not at the start');
+});
+
 test('postCorrect: the comma Tesseract mistakes, ة where only ه makes a known word', function () {
   const vocab = new Set(['خانه', 'کتاب', 'هوا']);
   assert.equal(O.postCorrect('کتاب, خانه', vocab), 'کتاب، خانه');
@@ -121,6 +142,7 @@ test('Tesseract under Node: the core and the Persian model load; a line is read 
   const w = 300, h = 60, pg = { w: w, h: h, clean: new Uint8Array(w * h).fill(255), boxes: [{ x0: 0, y0: 0, x1: w, y1: h }] };
   const r = eng.line(pg, 0);
   assert.equal(r.text, '', 'a blank line reads as nothing');
+  assert.deepEqual(r.words, [], 'and has no words');
   assert.ok(r.conf >= 0 && r.conf <= 1, 'a confidence 0–1');
   eng.end();
   eng.end();                                    // (twice: no harm)

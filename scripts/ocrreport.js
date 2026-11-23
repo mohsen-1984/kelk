@@ -16,7 +16,7 @@
  *   KelkOcrReport.rangeText(pages)       → «1-3, 7» (ASCII, whatever the language)
  *   KelkOcrReport.rangePages(text, allowed)  the range typed (Persian or Arabic digits, dashes, spaces) → the pages of
  *                                        `allowed` in it, or null (none, or not a range)
- *   KelkOcrReport.NOTES                  a page's OCR notes (lib/pdfimport/ladder.js _ladOcrPass) → their keys
+ *   KelkOcrReport.NOTES                  a page's OCR notes (lib/pdfimport/ladder.js _ladOcrRead) → their keys
  *   KelkOcrReport.STRINGS                its words, fa / en / ar: added to Kelk.i18n's tables when it loads
  */
 (function (root) {

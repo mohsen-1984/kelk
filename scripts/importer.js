@@ -258,7 +258,7 @@
                         } catch (err) { return uri; }
                     }
                 };
-                const hooks = { onStage: step };          // 'open', 'read', 'fonts', 'lines', 'layout', 'ocrLoad', 'ocr', 'markdown'
+                const hooks = { onStage: step };          // 'open', 'read', 'ocrLoad', 'ocr', 'fonts', 'lines', 'layout', 'markdown'
                 if (mode) opts.mode = hooks.mode = mode;
                 if (ocr) opts.ocr = 'read';
                 if (ocr && o && Array.isArray(o.ocrPages)) opts.ocrPages = o.ocrPages.slice();
