@@ -15,6 +15,8 @@ All notable changes to Kelk. Dates are those of the release tags.
   page, no longer as lines of stray characters (our lab scan with a drawing: 73.2 → 98.2). A table's ruled grid reaches
   the layout; a lone rule, such as the line under a running head, or a page's frame, does not, so it no longer comes
   out as `---` between paragraphs.
+- **PDF import, unknown fonts:** a digit read as a letter inside a number is read as a digit when the font uses that
+  glyph nowhere else (a year whose 8 came out as a letter now reads «۱۳۸۵»).
 
 ## [3.5] — 2026-11-22
 

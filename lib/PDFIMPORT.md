@@ -949,7 +949,11 @@ cipher before 3.2's shapes: each glyph a symbol, the plain text Persian.
    spike's): page numbers — a page's top or bottom line holding only the font's digits, counting up page by page (5
    votes a digit) —, numbered lists — the glyphs at the start of a line counting up line by line, a bracket, dash or
    dot beside them kept the same and given the likeliest mark (2) —, years — four-digit numbers mostly 13xx or 14xx
-   (3). The rest by the top profile among the digits left; those nothing counts are the uncertain digits.
+   (3). The rest by the top profile among the digits left; those nothing counts are the uncertain digits. Then a
+   glyph read as a letter inside a number — four characters alone between gaps, the other three digits — is a digit
+   when the font uses it nowhere else (`digitInRun`, 3.6): the digit no other glyph has that its profile fits best
+   (`decipher-titr-small-fa`'s year, its 8 read «ئ» and the number out of order: «۱۳۸۵» from 3.6). Arabic-script
+   digits only — the fonts deciphered are Arabic script.
 5. **The verdict**, from the reading's own signals: the mean log-probability per glyph use (−4.5 and up) and the runs'
    agreement (0.9 and up) — `read`; −7 and 0.6 — `low`; else `garbled`. A hollow face (most glyph uses with a counter)
    is never `read`. Only `read` is taken; `low` and `garbled` go to 3.2's shapes.
