@@ -91,6 +91,19 @@ test('the line finder: a line\'s baseline is its row with the most ink (3.6)', f
   assert.ok(b.base >= 64 && b.base < 68, 'the heavy row, ' + b.base);
 });
 
+test('the line finder: the rules it takes out, as segments; a run too tall for a line, as a picture\'s place (3.6)', function () {
+  const w = 1200, h = 1200, box = [[100, 300, 1100, 304], [100, 500, 1100, 504], [100, 300, 104, 504], [1096, 300, 1100, 504]];
+  const pic = [];                                // (a picture: a diagonal hatch — ink in every row, no run of a rule's length)
+  for (let y = 600; y < 880; y++) for (let x = 300 + ((y * 7) % 10); x < 900; x += 10) pic.push([x, y, x + 3, y + 1]);
+  const pg = O.page(draw(w, h, box.concat(line(380, 200, 1000), line(940, 200, 1000), pic)), w, h);
+  assert.equal(pg.rules.h.length, 2, 'two horizontal rules: ' + JSON.stringify(pg.rules.h));
+  assert.equal(pg.rules.v.length, 2, 'two vertical rules');
+  pg.rules.h.forEach(function (r) { assert.ok(r.b0 <= 101 && r.b1 >= 1099, 'its whole length'); });
+  assert.equal(pg.tall.length, 1, 'the block of ink is no line: ' + JSON.stringify(pg.tall));
+  assert.ok(pg.tall[0].y0 <= 600 && pg.tall[0].y1 >= 880);
+  assert.equal(pg.boxes.length, 2, 'the two lines of text stay lines');
+});
+
 test('tsvWords: the words of Tesseract\'s TSV (level 5), moved to the page; its bidi marks dropped (3.6)', function () {
   const tsv = ['1\t1\t0\t0\t0\t0\t0\t0\t100\t20\t-1\t', '4\t1\t1\t1\t1\t0\t0\t0\t100\t20\t-1\t',
     '5\t1\t1\t1\t1\t1\t60\t2\t40\t18\t91\tکتاب', '5\t1\t1\t1\t1\t2\t5\t3\t30\t17\t88\t\u200Fخانه\u200E', '5\t1\t1\t1\t1\t3\t1\t1\t2\t2\t10\t '].join('\n');

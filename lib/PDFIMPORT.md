@@ -1836,7 +1836,20 @@ table's cells, as in a PDF that draws its spaces (a space filling the gutter had
 size is the height of the middle 80 % of its ink over `ladOcrInkEm` (0.52: B Nazanin at 12 pt, 300 dpi, 26 px of 50);
 sizes less than 12 % apart are one size (`ladOcrSizeGap`), and a line from 0.75 to 1.2 times the body's size takes the
 body's (`ladOcrBodyLo`, `ladOcrBodyHi`: a paragraph's last line read a fifth smaller started a paragraph of its own).
-The scan itself is dropped from the page's pictures (pictures inside the page: 3.6's next step). The page's pixels,
+The scan itself is dropped from the page's pictures.
+
+**Pictures and rules (3.6).** A line with no letter whose rows are more than `ladOcrPicLine` (1.4) times the page's
+usual line height — a drawing's parts, read «0 ۵ 6 ۵» —, a line of brackets and marks alone, and every run of ink too
+tall to be a line (`ocr.js` `page`, its `tall`) are a picture's place: places closer than a line height are one, with
+the rules that touch them (a drawing's frame and paths are its own); a text line inside one is no line. Each becomes a
+picture of the page (`p.images`, `ocr: true`), cropped from the page as any page's figure (`scan-picture-fa`: 73.2 →
+98.2). The rules `ocr.js` took out (`rules`: runs of a twelfth of the width, a 25th of the height, row by row joined
+into one segment) go to the page's `hsegs` / `vsegs` only as a table's grid — rules that meet one another, three or
+more each way (`ladOcrGridMin`): a lone rule, the line under a running head, came out as `---` between paragraphs on a
+real scanned book, and a page's frame with that line kept the running heads (`scan-pageframe-fa`; the score does not
+count `---`). A word's box that reaches over a grid's vertical rule keeps to the side that holds most of it («مطالع |
+ه»). A framed or shaded box whose rows run together is one run too tall for a line, so a picture: its text is not read
+(as in 3.4 and 3.5, which read nothing there either). The page's pixels,
 and pdf.js's decoded image of it, are freed as soon as its lines are read.
 
 The page then goes through the fonts, the lines, the layout and the ladder as any page with text; the ladder
@@ -1862,9 +1875,9 @@ engine: 1.1 % and 3.2 %, the frame's remnant read as a line of letters).
 | Headings | size, weight, family, numbering, the structure tree; levels by size | size only (from the ink: a bold title font in the body's size, B Titr over B Nazanin, is not found) |
 | Paragraphs | gaps, indents, justification (`fullLast`) | the same |
 | Lists | markers, indents, nesting | the same, when Tesseract reads the marker (it drops the period after «۱») |
-| Tables | rules and gutters (`_tables`) | gutters only: the rules are taken out before reading (3.6's next step) |
+| Tables | rules and gutters (`_tables`) | gutters, and a grid's rules (three or more each way) |
 | Code, quotes, boxes, footnotes | detected | the same, from positions only |
-| Pictures inside the page | cropped figures | lost: the scan is dropped (3.6's next step) |
+| Pictures inside the page | cropped figures | cropped figures: ink no text line holds (a line with no letter much taller than a line of text, a run too tall for a line) |
 | Links, inline bold and italic | from the file | none |
 | Joined across pages | full last line, or a sentence that runs on | the same |
 | Trust, fontprints, letter statistics | per font | none (the `kelk-ocr` font): the confidence is the share of known words |
