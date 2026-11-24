@@ -30,7 +30,7 @@ function kind(family, face) {
     const side = await page.evaluate(async ({ b64 }) => {
       const bin = atob(b64), u = new Uint8Array(bin.length);
       for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
-      const imp = PdfImporter.create({ images: 'drop', asciiNumbers: false, persianLetters: false, decipherKnown: true, ocr: 'leave' });
+      const imp = PdfImporter.create({ images: 'drop', decipherKnown: true, ocr: 'leave' });
       await imp.fromArrayBuffer(u.buffer);
       return imp._decSide || [];
     }, { b64: fs.readFileSync(p).toString('base64') });

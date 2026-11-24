@@ -19,7 +19,7 @@ const { chromium } = env.req('playwright');
       const h = DOMPurify.sanitize(marked.parse(md, { gfm: true }), { ADD_ATTR: ['target', 'dir', 'align', 'data-tex', 'data-display'] });
       const bld = PdfBuilder.create(opts || {}); bld.registerFonts(window.PdfFonts || {});
       const blob = await bld.addFromHtml(h).toBlob();
-      return PdfImporter.create({ images: 'drop', asciiNumbers: false, persianLetters: false }).fromArrayBuffer(await blob.arrayBuffer());
+      return PdfImporter.create({ images: 'drop' }).fromArrayBuffer(await blob.arrayBuffer());
     };
     const norm = (s) => s.replace(/\s+/g, ' ').trim();
     for (const [group, name, tex, display] of MATH_CASES) {

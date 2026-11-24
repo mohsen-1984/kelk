@@ -23,6 +23,10 @@ All notable changes to Kelk. Dates are those of the release tags.
   kept in the text.
 - **PDF import, unknown fonts:** a digit read as a letter inside a number is read as a digit when the font uses that
   glyph nowhere else (a year whose 8 came out as a letter now reads «۱۳۸۵»).
+- **The PDF lab reads with Kelk's defaults**, as the page does: numbers in ASCII digits and signs, ی/ک in a Persian
+  document. The answer keys were written out the same way (23 corpus, 21 golden), with the importer's own write-out.
+  No file scores worse; files whose digits or letters had been counted as wrong now read right (the real sheets
+  72.8–92.6 → 96.4–99.4, the index scan 31.4 → 40.6). Corpus mean 94.1 → 94.9, real held-out 84.6 → 92.8.
 
 ## [3.5] — 2026-11-22
 

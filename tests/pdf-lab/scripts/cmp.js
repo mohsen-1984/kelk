@@ -13,7 +13,7 @@ const {chromium} = require('./env.js').req('playwright');
     const r = await page.evaluate(async (b64) => {
       const bin = atob(b64), u = new Uint8Array(bin.length);
       for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
-      try { const x = await PdfImporter.create({ images: 'drop', asciiNumbers: false, persianLetters: false }).fromArrayBuffer(u.buffer); return x.markdown || ''; } catch (e) { return 'ERROR ' + e; }
+      try { const x = await PdfImporter.create({ images: 'drop' }).fromArrayBuffer(u.buffer); return x.markdown || ''; } catch (e) { return 'ERROR ' + e; }
     }, fs.readFileSync(file).toString('base64')).catch((e) => 'ERROR ' + e);
     await page.close(); return r;
   };

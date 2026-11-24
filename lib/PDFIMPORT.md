@@ -583,9 +583,11 @@ The text is read as the file names it; two settings then write it out, both on b
 
 Why these defaults: some producers name the Persian letters by the Arabic ones whatever was typed (GDI /
 Microsoft Print to PDF's ToUnicode, some Word exports), and a document's numbers are easier to search, sort and
-align in ASCII; the user who wants the file's own characters turns either setting off (Settings → Import). The
-lab's scoring runs both off — it measures the reading, not the writing out (`scripts/writeout.js` checks the
-writing out on its own).
+align in ASCII; the user who wants the file's own characters turns either setting off (Settings → Import). The page's defaults
+are the importer's own (`scripts/config.js`, both on). The lab runs with them too (3.6, the owner's decision,
+2026-11-24): no lab script sets either, and the answer keys hold ASCII digits and signs, and ی/ک in a Persian
+document, as Kelk writes them — `tests/pdf-lab/scripts/keys-writeout.js` passes a key through `_writeOut` itself.
+`scripts/writeout.js` still checks the writing out on its own, both settings on and off.
 
 ### Shapes that lie
 

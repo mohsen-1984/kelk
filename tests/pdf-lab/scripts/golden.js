@@ -12,6 +12,7 @@
 // mean of those files (_scores.json heldout: { n, errors, mean }), compared by gate.js as a mean; a filtered run leaves
 // them out. summarise() and report() are pure (tests/unit/heldout.test.js checks that no held-out name gets out).
 const fs = require('fs'), path = require('path');
+const { writeOut } = require('./keys-writeout.js');
 
 const METRICS = ['recall', 'order', 'headings', 'lists', 'tables', 'code', 'quotes', 'total'];
 const EXTRA = ['rtl', 'zwnj', 'yehKaf', 'digits', 'brackets'];
@@ -96,7 +97,7 @@ async function main() {
         const bin = atob(b64), u = new Uint8Array(bin.length);
         for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
         try {
-          const r = await PdfImporter.create({ images: 'markdown', onImage: (src, o) => 'img-' + o.page + '-' + o.index, asciiNumbers: false, persianLetters: false, ocr: 'read' }).fromArrayBuffer(u.buffer);
+          const r = await PdfImporter.create({ images: 'markdown', onImage: (src, o) => 'img-' + o.page + '-' + o.index, ocr: 'read' }).fromArrayBuffer(u.buffer);
           return { markdown: r.markdown };
         } catch (e) { return { error: e.stack || String(e) }; }
       }, b64);
@@ -105,7 +106,8 @@ async function main() {
       if (into === rows) fs.writeFileSync(path.join(GOUT, name + '.md'), r.markdown);
       // the pictures out before scoring, as run-import.js does (a golden has none)
       const md = r.markdown.replace(/!\[[^\]]*\]\(img-[\d-]+\)/g, '').replace(/\n[ \t]*\n([ \t]*\n)+/g, '\n\n');
-      const want = fs.readFileSync(path.join(DIR, name + '.md'), 'utf8');
+      // (written out as Kelk writes its Markdown — the lab's golden keys already are; a held-out one, read nowhere else)
+      const want = writeOut(fs.readFileSync(path.join(DIR, name + '.md'), 'utf8'));
       const s = score(want, md), row = { name, ms };
       METRICS.concat(EXTRA, ['extra']).forEach((k) => { if (typeof s[k] === 'number') row[k] = +s[k].toFixed(4); });
       row.struct = structDiff(want, md);
