@@ -534,6 +534,7 @@ test('Read with OCR: the range, the pages it asks for, the setting (Ask, Read wi
     assert.equal(R.rangeText([1, 2, 3, 7, 9, 10]), '1-3, 7, 9-10');
     assert.deepEqual(Array.from(R.rangePages('1-3, 7', [1, 2, 3, 5, 7])), [1, 2, 3, 7]);
     assert.deepEqual(Array.from(R.rangePages('۲ – ۳،٥', [1, 2, 3, 5])), [2, 3, 5]);
+    assert.deepEqual(Array.from(R.rangePages('1\u22122, 3\u20105', [1, 2, 3, 5])), [1, 2, 3, 5], 'a minus sign and a hyphen are dashes');
     assert.equal(R.rangePages('4', [1, 2]), null, 'no page that needs OCR');
     assert.equal(R.rangePages('3-1', [1, 2, 3]), null);
     assert.equal(R.rangePages('a', [1]), null);
@@ -562,7 +563,8 @@ test('Read with OCR: the range, the pages it asks for, the setting (Ask, Read wi
       range = d.getElementById('report-ocr-pages');
     assert.equal(btn.hidden, false);
     assert.equal(d.getElementById('report-ocr-field').hidden, false);
-    assert.equal(range.value, '2-3');
+    assert.equal(range.value, '', 'empty, as a print dialog: every scanned page');
+    assert.ok(range.placeholder.includes('1-5'), 'the placeholder shows how to write a range');
     range.value = '9';
     btn.click();
     assert.equal(calls.length, 1, 'an invalid range reads nothing');
@@ -578,7 +580,13 @@ test('Read with OCR: the range, the pages it asks for, the setting (Ask, Read wi
     assert.equal(K.editor.value(), 'متن\n');
     assert.equal(d.querySelectorAll('.report-ocr tbody tr').length, 1, 'the page read, in its own table');
     assert.equal(btn.hidden, false, 'page 3 can still be read');
-    assert.equal(range.value, '3');
+    assert.equal(range.value, '', 'empty again');
+    // a second run: the pages read before come with it, from the file's cache (the same one), not read again (3.6)
+    btn.click();
+    for (let i = 0; i < 50 && calls.length < 3; i++) await new Promise((r) => setTimeout(r, 10));
+    assert.equal(calls.length, 3);
+    assert.deepEqual(Array.from(calls[2].opts.ocrPages), [2, 3], 'page 2 read before, page 3 now (empty: every scanned page left)');
+    assert.ok(calls[2].opts.ocrCache && calls[2].opts.ocrCache === calls[1].opts.ocrCache, 'one cache for the file');
     // Read with OCR: every such page read at once; Leave as pictures: no button
     K.store.setUi('importer', Object.assign({}, K.store.getUi('importer'), { scannedPages: 'read' }));
     calls = fakePdf(w, scan);

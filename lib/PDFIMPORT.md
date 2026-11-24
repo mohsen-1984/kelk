@@ -1884,7 +1884,11 @@ reports it as mode `ocr` (`why` `noText`), its confidence the share of its words
 `tools/build-lm.js` counts them: Tesseract's own scores read high on lines that are wrong). The report lists the
 pages read in a category of their own, `report.ocr` `[{ page, conf, lines, notes }]` — `noLines`, `lowConf` (under
 0.7, `ladOcrLowConf`), `columns` (two columns side by side that a word Tesseract read runs across, so the layout
-cannot tell them apart), `turned` (a part printed sideways, kept as a picture), `failed` —, apart from the findings. A page with no line read keeps its picture; a page
+cannot tell them apart), `turned` (a part printed sideways, kept as a picture), `failed` —, apart from the findings. A scanned page OCR has not read (`ocr` not `'read'`, or outside `ocrPages`) is mode `scan`
+in `report.pages` (3.6): no confidence, out of the summary's mean, counted in `summary.scan` — before, it was `ocr` at
+0 %, and a 291-page scan left unread said «OCR 291, mean confidence 0 %». `options.ocrCache`, a Map the caller keeps
+for one file, holds each page's OCR result: a page in it is taken from it, not read again (the app's «Read with OCR»
+adds a range to the pages read before). A page with no line read keeps its picture; a page
 that cannot be drawn (no canvas) keeps its picture and `ocrNeeded`; a page Tesseract fails on, `ocrPageFailed`; an
 engine that does not start, `ocrFailed`. The engine stays for the decipherment's OCR votes (`trust.js`
 `_decOcrEngine`) and is given back after the fonts (`_ladOcrEnd`, and in the import's `finally`). The lab runs with
