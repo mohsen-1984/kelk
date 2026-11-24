@@ -1834,7 +1834,9 @@ neighbours', «زممینری‌ابا‌ک‌…»), and two words never overla
 letters before it is no word break: the words ran together with a ZWNJ). `ocrWordGlyphs` sets a word out as a PDF
 draws it: each character with its marks and ZWNJ, in visual order (a right-to-left word reversed, its digits and Latin
 kept left to right), spread evenly over the word's box, on the line's baseline, in a font of its own (`kelk-ocr`,
-`g.ocr`: no program, no ToUnicode, no fontprint — the font steps pass it by). A space between two words is a font's
+`g.ocr`: no program, no ToUnicode, no fontprint, no glyph id — the font steps pass it by; with one id for every
+letter, the lines' form rule, keyed by font and id, saw one shape at a word's end and at its start and put a ZWNJ
+between letters across a whole page). A space between two words is a font's
 own width at most (`ladOcrSpaceEm`, 0.28 em, at the left word's end): a wider gap stays a gap, a column's gutter or a
 table's cells, as in a PDF that draws its spaces (a space filling the gutter had kept two columns one line). A line's
 size is the height of the middle 80 % of its ink over `ladOcrInkEm` (0.52: B Nazanin at 12 pt, 300 dpi, 26 px of 50);

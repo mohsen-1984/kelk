@@ -199,6 +199,11 @@ test('OCR words placed (3.6): a box out of the line\'s order shares its neighbou
   assert.equal(num.length, 3, 'a lone digit stays: a table\'s cell');
 });
 
+test('OCR word glyphs (3.6 fix): no glyph id — the form rule keyed by font and id saw one shape in every OCR letter', function () {
+  const g = L.ocrWordGlyphs({ text: 'خانه', x0: 0, x1: 80 }, (u) => [u, 0], 100, 12, 0);
+  assert.ok(g.every((x) => x.cid === undefined));
+});
+
 test('OCR word glyphs (3.6): visual order — a Persian word reversed, its digits left to right — marks with their letter', function () {
   const toPt = (u) => [u / 2, 0];
   const g = L.ocrWordGlyphs({ text: 'خانهٔ ۱۲،', x0: 0, x1: 160 }, toPt, 100, 12, 0);
