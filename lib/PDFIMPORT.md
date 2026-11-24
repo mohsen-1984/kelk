@@ -1866,7 +1866,12 @@ more each way (`ladOcrGridMin`): a lone rule, the line under a running head, cam
 real scanned book, and a page's frame with that line kept the running heads (`scan-pageframe-fa`; the score does not
 count `---`). A word's box that reaches over a grid's vertical rule keeps to the side that holds most of it («مطالع |
 ه»). A framed or shaded box whose rows run together is one run too tall for a line, so a picture: its text is not read
-(as in 3.4 and 3.5, which read nothing there either). The page's pixels,
+(as in 3.4 and 3.5, which read nothing there either). Two places with a text line between them are not joined. A
+place that holds a line of known words — at least two words of three letters or more, two thirds of them known to the
+language model — is no picture: the text wins, as in 3.5 (a cover's frame and its hatched band had taken its title,
+`scan-cover-fa`). A drawing with only short lines inside it (`ladOcrLabelChars`, 24 letters) keeps its picture, and
+those lines become its description, joined by « · » (`scan-labels-fa`; a label on the same pixel rows as the drawing
+is still part of its picture, TODO). The page's pixels,
 and pdf.js's decoded image of it, are freed as soon as its lines are read.
 
 The page then goes through the fonts, the lines, the layout and the ladder as any page with text; the ladder
