@@ -258,7 +258,7 @@ Open from 3.6:
   page with a text layer; Tesseract reads it glued to the word after it. Telling it from a list's dash would take the
   lines around it (a list's items share their indent and their dash).
 
-Found with the scan report PR (sample-U in the app, 2026-11-24), left for later:
+Found with the scan report PR (a real scan in the app, 2026-11-24), left for later — 3.7 below:
 
 - **Each scanned page is decoded twice**: once when read (its operator list), again when its picture is cut (a
   render) — about 20 s of a 291-page book's 48. The picture could be cut from the image already decoded.
@@ -268,7 +268,82 @@ Found with the scan report PR (sample-U in the app, 2026-11-24), left for later:
   others come from the session's cache): reading the new pages and putting them in place would take seconds.
 - **The OCR cache lives in memory**, for the session: a reload reads the pages again.
 
+**3.7: the app and large documents** (the owner's scope, 2026-11-24; four pull requests: the report's actions and the
+measuring → scans → storage → release). From «Found with the scan report PR» above and «Open from 3.5» (the stress
+check's margin):
+
+1. **The import report's actions**: each action a framed group, its button with its own description — «Read with OCR»
+   with its page range, «Re-import in safe mode»; «Copy report» apart. The panel does not collapse by itself while it
+   holds an action (the user may be typing a range). Done in the first pull request.
+2. **Large scans**: each scanned page decoded once — its picture cut from the image pdf.js already decoded, not drawn
+   again; «Read with OCR» reads only the new pages and puts them in place, without importing the whole file again. A
+   picture may differ from 3.6's in its pixels, never in a lower quality (the owner, 2026-11-24).
+3. **Large documents kept**: pictures as files (Blobs) and the OCR cache in IndexedDB instead of base64 text in
+   `localStorage`. The logo stays in `localStorage`. The move from `localStorage` deletes the old copy only once the
+   new one is stored and read back; any failure keeps the user's document (the owner, 2026-11-24). Where IndexedDB
+   does not work from `file://` (`tests/storage-check.html`, run by the owner in Chrome, Edge and Firefox), 3.6's
+   one-line notice stays.
+4. **The stress check's margin**: `_toHtml` pauses between blocks, if it fits (dropped if a lab file or the stress
+   check gets worse).
+
+Measured on our own long scan (`make-longscan.js`, 290 pages, 1-bit Flate; `run-longscan.js`, the app from `file://`,
+Scanned pages «Ask»), 3.6: the import 26 s, every page drawn once more after it was read (291 renders), the
+renderer's memory at most 0.6 GB; «Read with OCR» on 3 pages 30 s and on 2 more 30 s (the whole file imported again
+each time, 287–291 pages drawn again); after a reload the text is back and none of its 285 pictures (the browser's
+storage refused them; the report says so). A real scanned book of about 300 pages, JBIG2 (checked in the session only):
+the import 41 s, the renderer's memory up to about 5.3 GB during it, «Read with OCR» about 43 s a range. Our long scan
+does not show that memory: its pages are Flate, and decoding JBIG2 is what costs; a lab scan in JBIG2 needs an encoder
+of our own (none in the lab's tools).
+
 **A session of its own: real Arabic PDFs and Arabic fonts** (the owner's request, 2026-11-18) — «Left from 3.1» below.
+
+**3.8: tables in digitally born PDFs** (a session of its own, with the owner's samples; proposed 2026-11-24). The items
+that belong to it:
+
+- «Left from 3.1»: a table row cut by the page break is dropped (`chrome-cutrow--cut-row`).
+- «Left from 3.0»: a table's outer double rules come out «---» around it (`word-report--span-header-fa`); a bar chart
+  drawn of rules and bars as one picture (`word-report--chart-fa`).
+- «Right-to-left borderless tables, what is left»: `zebra` right to left, cells wrapping onto two or three lines,
+  two-column pages, a short page's header row breaking off as headings.
+- «High»: right-to-left fuzz tables (the weakest with quotes); Chrome's browser-default style losing tables in Persian
+  and Arabic («From the right-to-left corpus» below).
+- «Digits and form boxes» and «Medium»: bordered form boxes as tables.
+- «Layout» below: tagged tables the geometry did not make a table; tables inside quotes; bare HTML tables whose cells
+  hold inline code; rotated (vertical) table heads.
+- «From the right-to-left corpus» below: LibreOffice HTML tables whose cells stand a word space apart.
+- «Left from real files» below: a title over a ruled table stays a paragraph.
+- «From the metamorphic net and the coverage matrix» below: a picture in a table cell.
+- «Infrastructure» below: two columns — the rows at a table's ends, small headings beside a table's rows; the fuzz
+  files' two-column tables (a zebra table cut by the column break, a wrapped row cut by a page break).
+
+**3.9: fonts, with old Persian PDFs** (a session of its own, with the owner's samples; proposed 2026-11-24). Real
+Arabic fonts keep their own session (above). The items that belong to it:
+
+- «Left from 3.2»: short fonts alone (`word-cover--glyph-index-fa` stays reported garbled unless the owner decides
+  otherwise); FreeSerif's alef read «أ».
+- «Left from 3.3»: the serif shapes and the sans Latin readings; IranNastaliq still reported garbled; the Persian
+  letters folding checked on a real file; CFF not read yet (a CFF table inside OpenType, a plain CFF font remapped by
+  `/Differences`, seac accents); Word's ت in a short font; a real file with CID-keyed CFF fonts importing slowly.
+- «A shape's scale and split subsets» and «Many subsets of one font».
+- «Open from 3.5»: the unknown-font step's speed; very short fonts that barely join; hollow (outline) faces; rough
+  prints on few glyphs; a font in many subsets with very little text each; the closest reference family first; the
+  offset solver for a ToUnicode that holds glyph ids.
+- «Left from 3.1»: wkhtmltopdf's ZWNJs and its lines run together (`wk-rtl--fa-article`, `--fa-brackets`; the owner,
+  2026-11-24); a blank glyph of no advance read as a ZWNJ (a lab file first).
+- «Digits and form boxes» and «Medium»: Persian digits that share a glyph with Arabic-Indic ones come back
+  Arabic-Indic; fonts with no ToUnicode at all in Type 3 programs.
+
+**4.0: OCR** (the owner, 2026-11-24): the layout quality of scanned pages, then Arabic and English OCR. The items that
+belong to it:
+
+- «Open from 3.6» above: a bold title in the body's size (its stroke width would tell bold from regular); running heads
+  by their place (the top line, over a rule), on the lab's pages and on real scanned books; a list's number whose period
+  Tesseract dropped; the index without borders and numbers with a Persian comma; a framed or shaded box whose rows run
+  together; a part printed sideways read turned; a drawing's label on the drawing's own pixel rows; a paragraph's line
+  read a size smaller; a dash at a line's start inside a paragraph.
+- «Open from 3.4»: the whole real scan crashing the headless browser's tab now and then.
+- «Optional, later»: Arabic and English OCR (each model about 10 MB with `best`), once Persian OCR is stable and its
+  quality checked.
 
 **Not placed in a release yet** (moved out of 2.8's scope, 2026-11-11):
 
@@ -378,7 +453,7 @@ Found with the scan report PR (sample-U in the app, 2026-11-24), left for later:
 **Optional, later**
 
 - A layout model as an optional download (http(s) only, never from `file://`), as a second opinion on headings and tables
-- **Arabic and English OCR** (lower priority, no release yet; the owner, 2026-11-22): Persian OCR done in 3.4 and laid
+- **Arabic and English OCR** (placed in 4.0 above, the owner, 2026-11-24; lower priority, 2026-11-22): Persian OCR done in 3.4 and laid
   out in 3.6. Arabic and English models (each about 10 MB with `best`) come only once Persian OCR is stable and its
   quality is checked.
 
