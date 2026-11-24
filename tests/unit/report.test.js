@@ -524,6 +524,40 @@ test('the report follows its document (Clear hides it, Undo brings it back colla
   w.close();
 });
 
+test('each action in a frame of its own with its description, Copy report apart; the panel stays open while it holds an action (3.7)', async function () {
+  const { window: w, errors } = await appWindow(OPENED);
+  const K = w.Kelk,
+    d = w.document,
+    box = d.getElementById('import-report');
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  K.config.reportOpenMs = 30;
+  K.editor.set('# Imported\n', 'a.pdf');
+  const rep = clone(SAMPLE);
+  rep.notes = (rep.notes || []).concat([{ code: 'ocrNeeded', pages: [9, 10] }]);
+  K.ui.report(rep, { name: 'a.pdf', onSafe: function () {}, onOcr: function () {} });
+  const safe = d.getElementById('report-safe-group'),
+    ocr = d.getElementById('report-ocr-group');
+  assert.ok(safe && ocr, 'a frame for each action');
+  assert.equal(safe.hidden, false);
+  assert.equal(ocr.hidden, false);
+  assert.ok(safe.contains(d.getElementById('report-safe')) && safe.contains(d.getElementById('report-safe-hint')), 'the safe re-import with its text');
+  ['report-ocr-field', 'report-ocr', 'report-ocr-hint'].forEach(function (id) {
+    assert.ok(ocr.contains(d.getElementById(id)), id + ' in the OCR frame');
+  });
+  assert.equal(ocr.nextElementSibling, safe, 'Read with OCR first, then the safe re-import');
+  assert.equal(d.getElementById('report-copy').closest('.report-act'), null, 'Copy report apart');
+  await wait(90);
+  assert.ok(!box.classList.contains('collapsed'), 'an action held: it stays open');
+  // without an action, the same report collapses as before
+  K.ui.report(clone(SAMPLE), { name: 'a.pdf' });
+  assert.equal(safe.hidden, true);
+  assert.equal(ocr.hidden, true);
+  await wait(90);
+  assert.ok(box.classList.contains('collapsed'), 'no action: collapsed after reportOpenMs');
+  assert.deepEqual(errors, []);
+  w.close();
+});
+
 test('a document too large to keep: the browser refuses its pictures, the report says so in one line (3.6)', async function () {
   const { window: w, errors } = await appWindow(OPENED);
   try {

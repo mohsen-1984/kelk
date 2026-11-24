@@ -4,6 +4,12 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+### Changed
+
+- **The import report's actions** each sit in a frame of their own, the button with its description: «Read with OCR»
+  with its page range, then «Re-import in safe mode». «Copy report» stands apart. While the panel holds an action it
+  no longer collapses by itself.
+
 ## [3.6] — 2026-11-24
 
 ### Changed
