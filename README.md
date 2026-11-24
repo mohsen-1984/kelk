@@ -11,7 +11,7 @@ Kurdish** mixed with English — and works just as well for **every left-to-righ
 Free and open source (MIT).
 
 **▶ [Open Kelk online](https://mohsen-1984.github.io/kelk/)** ·
-**⬇ [Download kelk_3.5.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_3.5.zip)** ·
+**⬇ [Download kelk_3.6.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_3.6.zip)** ·
 [فارسی ↓](#fa) · [العربية ↓](#ar) · Contact: [mhn.com@gmail.com](mailto:mhn.com@gmail.com)
 
 ![Kelk — Markdown to DOCX and PDF converter, English interface](docs/screenshots/kelk-en.png)
@@ -103,7 +103,7 @@ Free and open source (MIT).
 ## Use it
 
 - **Online:** [mohsen-1984.github.io/kelk](https://mohsen-1984.github.io/kelk/).
-- **On your computer:** [download kelk_3.5.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_3.5.zip) (about 22 MB),
+- **On your computer:** [download kelk_3.6.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_3.6.zip) (about 22 MB),
   unpack it and open `index.html` — offline, for personal use or inside a company network.
 - **On your own host:** upload the folder to any static web host.
 
@@ -146,7 +146,7 @@ tools/         bidi-lab.html (every direction rule) · build_pdf_fonts.py · bui
 package.json   the dev tools CI installs (npm ci) — the app itself has no build step and no dependencies to install
 ```
 
-Release downloads: `kelk_3.5.zip` is the app (what most people want: the app, its sample documents, this README,
+Release downloads: `kelk_3.6.zip` is the app (what most people want: the app, its sample documents, this README,
 the license and the notices — no tests, tools or other docs); `kelk-with-pdf-lab_3.4.zip` is the whole repository,
 `tests/pdf-lab/` (258 PDFs, about 31 MB) included, for working on Kelk and its PDF importer.
 
@@ -180,7 +180,7 @@ B Nazanin, B Mitra and B Titr: (c) Borna Rayaneh, no published license, see born
 English و العربية است. رایگان و متن‌باز (MIT).
 
 **▶ [کِلک برخط](https://mohsen-1984.github.io/kelk/)** ·
-**⬇ [دریافت kelk_3.5.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_3.5.zip)** ·
+**⬇ [دریافت kelk_3.6.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_3.6.zip)** ·
 تماس: [mhn.com@gmail.com](mailto:mhn.com@gmail.com)
 
 ![کِلک — رابط فارسی](docs/screenshots/kelk-fa.png)
@@ -226,7 +226,7 @@ English و العربية است. رایگان و متن‌باز (MIT).
 ### استفاده
 
 - **برخط:** [mohsen-1984.github.io/kelk](https://mohsen-1984.github.io/kelk/)
-- **روی رایانه:** [kelk_3.5.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_3.5.zip) (حدود 22 مگابایت) را دریافت کنید، باز کنید و `index.html` را باز کنید؛ بدون اینترنت، برای استفادهٔ شخصی یا در شبکهٔ داخلی شرکت.
+- **روی رایانه:** [kelk_3.6.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_3.6.zip) (حدود 22 مگابایت) را دریافت کنید، باز کنید و `index.html` را باز کنید؛ بدون اینترنت، برای استفادهٔ شخصی یا در شبکهٔ داخلی شرکت.
 - **روی میزبان خودتان:** پوشه را روی هر میزبان وب ایستا بارگذاری کنید.
 
 سند معرفی و راهنما در نخستین بازدید به زبان رابط کاربری باز می‌شود:
@@ -261,7 +261,7 @@ Vazirmatn، Vazir Code و Sahel کار زنده‌یاد [صابر راستی‌
 الواجهة بالعربية والفارسية والإنجليزية. مجاني ومفتوح المصدر (MIT).
 
 **▶ [كِلك على الإنترنت](https://mohsen-1984.github.io/kelk/)** ·
-**⬇ [تنزيل kelk_3.5.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_3.5.zip)** ·
+**⬇ [تنزيل kelk_3.6.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_3.6.zip)** ·
 للتواصل: [mhn.com@gmail.com](mailto:mhn.com@gmail.com)
 
 ![كِلك — الواجهة العربية](docs/screenshots/kelk-ar.png)
@@ -308,7 +308,7 @@ Vazirmatn، Vazir Code و Sahel کار زنده‌یاد [صابر راستی‌
 ### الاستخدام
 
 - **على الإنترنت:** [mohsen-1984.github.io/kelk](https://mohsen-1984.github.io/kelk/)
-- **على حاسوبك:** نزّل [kelk_3.5.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_3.5.zip) (نحو 22 ميغابايت) وافتحه ثم افتح `index.html`؛ يعمل دون إنترنت، للاستخدام الشخصي أو داخل شبكة المؤسسة.
+- **على حاسوبك:** نزّل [kelk_3.6.zip](https://github.com/mohsen-1984/kelk/releases/latest/download/kelk_3.6.zip) (نحو 22 ميغابايت) وافتحه ثم افتح `index.html`؛ يعمل دون إنترنت، للاستخدام الشخصي أو داخل شبكة المؤسسة.
 - **على استضافتك:** ارفع المجلد إلى أي استضافة ويب ثابتة.
 
 يُفتح مستند التعريف والدليل في الزيارة الأولى بلغة الواجهة:
