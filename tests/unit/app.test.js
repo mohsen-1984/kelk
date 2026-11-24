@@ -254,3 +254,35 @@ test('Kelk.libs.need("pdfimport") loads each file once, in order; a load that fa
   assert.deepEqual(errors, []);
   w.close();
 });
+
+test('the preview loads its pictures lazily; every export still carries every picture (3.6)', async function () {
+  const { window: w, errors } = await appWindow(OPENED);
+  const K = w.Kelk;
+  const PNG = [
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC',
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGNg+M8AAAICAQB7CYF4AAAAAElFTkSuQmCC',
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGNgYPgPAAEDAQAIicLsAAAAAElFTkSuQmCC'
+  ];
+  for (let i = 0; i < PNG.length; i++) await K.images.addUri('pic' + i, 'data:image/png;base64,' + PNG[i], true);
+  K.editor.set('# Pictures\n\n' + PNG.map((p, i) => '![page ' + i + '](pic' + i + ')').join('\n\n'), 'pictures');
+  K.preview.render();
+  const pane = Array.from(w.document.querySelectorAll('#preview img'));
+  assert.equal(pane.length, 3);
+  assert.ok(pane.every((img) => img.getAttribute('loading') === 'lazy'), 'the pane: lazy');
+  const clean = K.preview.html();
+  assert.doesNotMatch(clean, /loading=/, 'the HTML the exports are built from: no lazy loading');
+  PNG.forEach((p) => assert.ok(clean.includes(p), 'every picture in it'));
+  const html = await exportText(w, 'html');
+  assert.doesNotMatch(html, /<img[^>]*loading=/);
+  PNG.forEach((p, i) => assert.ok(html.includes(p), 'HTML export: picture ' + i));
+  // every other export (DOCX, DOC, PDF, slides) is built from that same HTML: the exporter hands each builder
+  // K.preview.html() — read from its source, so a builder given other input fails here
+  const src = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', '..', 'scripts', 'exporter.js'), 'utf8');
+  assert.match(src, /const html = K\.preview\.html\(\);/);
+  const all = (src.match(/\.addFromHtml\(/g) || []).length;
+  const fromPreview = (src.match(/\.addFromHtml\((?:html|K\.preview\.html\(\))\)/g) || []).length;
+  assert.ok(all >= 4, 'the builders: ' + all);
+  assert.equal(fromPreview, all, 'every builder is given the preview\'s HTML');
+  assert.deepEqual(errors, []);
+  w.close();
+});

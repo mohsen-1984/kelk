@@ -314,6 +314,9 @@
             let html = marked.parse(md, { breaks: K.store.get('text.breaks') !== false });
             box.innerHTML = sanitize(html);
             taskBoxes(box);                              // task-list checkboxes, disabled
+            // (the pane's pictures load as they scroll into view, 3.6 — a scanned book's 291 page pictures were all
+            // decoded at once; for display only: `clean`, which every export is built from, is taken without it)
+            K.$$('img', box).forEach(function (img) { img.setAttribute('loading', 'lazy'); });
             K.images.resolve(box);                       // ![x](name) → registered image
             fixLinks(box);
 
@@ -328,7 +331,7 @@
                     if (!declared) code.className = code.className.replace(/(?:^|\s)language-\S+/g, '').trim();
                 });
             }
-            clean = box.innerHTML;                       // for the builders: before any page decoration
+            clean = box.innerHTML.replace(/(<img\b[^>]*?) loading="lazy"/g, '$1');   // for the builders: before any page decoration
 
             // the rest is PreviewBuilder (lib): HtmlBuilder's logic and stylesheet, in the pane
             const pb = this.builder();
