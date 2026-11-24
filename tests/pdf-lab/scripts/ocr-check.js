@@ -42,7 +42,7 @@ const plain = (md) => md.replace(/^#+\s*/gm, '').replace(/^\s*[-*+]\s+/gm, '').r
       for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
       const stages = [];
       const t0 = performance.now();
-      const r = await PdfImporter.create({ images: 'drop', asciiNumbers: false, persianLetters: false, ocr: 'read' })
+      const r = await PdfImporter.create({ images: 'drop', ocr: 'read' })
         .fromArrayBuffer(u.buffer, { onStage: (s, d, n, a) => { if (/^ocr/.test(s)) stages.push([s, d, n, a]); } });
       return { md: r.markdown, ms: performance.now() - t0, ocr: r.report.ocr, notes: r.report.notes.map((x) => x.code), stages };
     }, { b64 });

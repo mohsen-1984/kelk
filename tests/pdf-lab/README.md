@@ -58,6 +58,12 @@ runs and the tools need none of those — only Node and Playwright.
 
 ## The corpus
 
+The lab reads with Kelk's own defaults, as the page does: numbers in ASCII digits and signs, and Arabic ي/ك as
+Persian ی/ک in a Persian document (`asciiNumbers`, `persianLetters`; no lab script sets them). So the expected
+Markdown holds them too: `node scripts/keys-writeout.js --write [key.md …]` passes keys through the importer's own
+write-out (no file: every `corpus/` and `golden/` key; without `--write` it lists those that would change). Run it
+after a script that writes a key (below).
+
 | Document | What it exercises |
 |---|---|
 | `article.md` | prose, emphasis, nested list, numbered list, quote, code block, table with right-aligned numbers, rule, link |
@@ -630,7 +636,8 @@ of a page (`pdftoppm -f N -l N -r 200 -x … -y … -W … -H … -png`) settles
 
 ## Regenerating the PDFs
 
-The PDFs are ordinary git files marked `binary` (no LFS).
+The PDFs are ordinary git files marked `binary` (no LFS). A script that writes an expected Markdown too writes it
+as drawn: pass it through `node scripts/keys-writeout.js --write` afterwards (The corpus, above).
 Every regeneration writes a whole new binary (creation dates and IDs are not pinned), and the old one stays in history
 for good — so commit a regenerated PDF only when its content changed, and pin timestamps where a producer allows it.
 

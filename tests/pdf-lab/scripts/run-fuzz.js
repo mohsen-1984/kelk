@@ -13,6 +13,7 @@ const fs = require('fs'), path = require('path');
 const { chromium } = require('./env.js').req('playwright');
 const { score } = require('./score.js');
 const { markupLoss } = require('./markup.js');
+const { writeOut } = require('./keys-writeout.js');
 const { LAB, OUT, FUZZ, lab } = require('./env.js');
 
 // rtl: right-to-left documents only, outside the total (score.js: ZWNJ, yeh / kaf, digits, brackets) — its mean is over
@@ -47,7 +48,7 @@ const mean = (rows, k) => { const v = rows.map((r) => r[k]).filter((x) => typeof
     const r = await page.evaluate(async (b64) => {
       const bin = atob(b64), u = new Uint8Array(bin.length);
       for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
-      try { const r = await PdfImporter.create({ images: 'drop', asciiNumbers: false, persianLetters: false, ocr: 'read' }).fromArrayBuffer(u.buffer); return { markdown: r.markdown, html: r.html }; }
+      try { const r = await PdfImporter.create({ images: 'drop', ocr: 'read' }).fromArrayBuffer(u.buffer); return { markdown: r.markdown, html: r.html }; }
       catch (e) { return { error: String(e && e.stack || e) }; }
     }, b64);
     const row = { name: s.name, seed: s.seed, style: s, ms: Date.now() - t0 };   // the style apart: its `code` is not the score's
@@ -55,9 +56,10 @@ const mean = (rows, k) => { const v = rows.map((r) => r[k]).filter((x) => typeof
     else {
       if (show) fs.writeFileSync(path.join(outDir, s.name + '.md'), r.markdown);     // (held-out: in memory only)
       // case folded: a style may set headings in capitals (text-transform), which no PDF can undo
-      // the source as printed: <name>.md beside the PDF when make-fuzz.js rewrote its digits, else corpus/<doc>.md
+      // the source as printed: <name>.md beside the PDF when make-fuzz.js rewrote its digits, else corpus/<doc>.md —
+      // written out as Kelk writes its Markdown (ASCII digits and signs, ی/ک in a Persian text: keys-writeout.js)
       const src = s.source ? path.join(dir, s.source) : path.join(LAB, 'corpus', s.doc + '.md');
-      Object.assign(row, score(fs.readFileSync(src, 'utf8'), r.markdown, { fold: true }));
+      Object.assign(row, score(writeOut(fs.readFileSync(src, 'utf8')), r.markdown, { fold: true }));
       row.markup = markupLoss(r.html, r.markdown).lost;
     }
     rows.push(row); process.stdout.write('.');

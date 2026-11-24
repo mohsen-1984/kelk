@@ -46,7 +46,7 @@ const KELK = require('./env.js').KELK, OUT = require('./env.js').OUT;
       try {
         // pictures kept, each as a short name (the crops themselves are not scored, where they land is); a page that is
         // one picture read with OCR (3.4: the lab runs with OCR on)
-        const r = await PdfImporter.create({ images: 'markdown', onImage: (src, o) => 'img-' + o.page + '-' + o.index, asciiNumbers: false, persianLetters: false, ocr: 'read', mode }).fromArrayBuffer(u.buffer);
+        const r = await PdfImporter.create({ images: 'markdown', onImage: (src, o) => 'img-' + o.page + '-' + o.index, ocr: 'read', mode }).fromArrayBuffer(u.buffer);
         const q = (r.quality && r.quality.pages) || [];
         const cov = q.reduce((a, x) => [a[0] + x.covered, a[1] + x.glyphs], [0, 0]);
         return { markdown: r.markdown, html: r.html, messages: r.messages, pic: cov[1] ? cov[0] / cov[1] : 0, rules: r.rules, ladder: r.report && r.report.summary,

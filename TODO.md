@@ -261,14 +261,10 @@ Found in PR 2 (OCR lines as glyphs), left for later:
   two cells into one line, but Tesseract reads that line's words well; laid out from their boxes, the rows now come out
   as a table, in pieces. What is lost is in the reading: a number with a Persian comma, «۱۲، ۴۵», comes back as one
   run of digits out of order with the comma gone («۴۵۵۲»), and a one-word line read alone comes back reversed, in
-  visual order (so reading each cell alone is worse). Its answer key also writes ASCII digits where the scan draws
-  Persian ones while the lab keeps the digits as drawn (`asciiNumbers: false`): with the digits matched its words would
-  read 51.4 % instead of 28.6 % (total 39.4, not 31.4). The same holds, less, for `scan-table-fa` (words 65.2 → 67.4)
-  and `scan-picture-fa`'s caption (96.4 → 97.6). The keys were made in PR 1 by the same script
-  (`make-scans.js`); changing them is the owner's decision (agreement 14). The owner (2026-11-23): not to Persian
-  digits — Kelk's defaults (numbers in ASCII digits and signs, Arabic ي/ك → Persian ی/ک) are the basis; whether the lab
-  runs with Kelk's defaults is the owner's decision still (with them, 23 of 141 corpus keys and 21 of 50 golden keys
-  change, almost all in digits and signs; the three scan keys do not).
+  visual order (so reading each cell alone is worse). Its answer key writes ASCII digits where the scan draws Persian
+  ones; the lab now runs with Kelk's defaults (the owner, 2026-11-24: numbers in ASCII digits and signs, ی/ک in a
+  Persian document — the lab scripts set neither, 23 corpus and 21 golden keys written out the same way), so its digits
+  are matched.
 
 Found in PR 3 (pictures and rules), left for later:
 
