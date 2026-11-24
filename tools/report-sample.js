@@ -30,7 +30,7 @@ module.exports = {
     ],
     ocr: [
         { page: 10, conf: 0.91, lines: 28, notes: ['columns'] },
-        { page: 13, conf: 0.52, lines: 6, notes: ['lowConf'] },
+        { page: 13, conf: 0.52, lines: 6, notes: ['lowConf', 'turned'] },
         { page: 14, conf: 0, lines: 0, notes: ['noLines'] },
         { page: 15, conf: null, lines: 0, notes: ['failed'] }
     ],

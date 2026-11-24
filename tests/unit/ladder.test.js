@@ -199,6 +199,37 @@ test('OCR words placed (3.6): a box out of the line\'s order shares its neighbou
   assert.equal(num.length, 3, 'a lone digit stays: a table\'s cell');
 });
 
+test('OCR words placed (3.6 fix): dust by the line\'s own letter size; a bullet and a period stay; an end run by its letters; the ends pinned to the ink', function () {
+  const box = { x0: 0, y0: 0, x1: 1000, y1: 50, ink: 50, size: 30 };
+  const w = (text, x0, x1, y0, y1) => ({ text: text, x0: x0, x1: x1, y0: y0 === undefined ? 10 : y0, y1: y1 === undefined ? 40 : y1 });
+  const words = [w('یکی', 820, 900), w('دوتا', 700, 800), w('سه‌تا', 560, 680)];
+  // (a dot 7 px at the line's start in reading order — its right end — is dust; a bullet 11 px stays)
+  const speck = L.ocrPlace([w('۰', 950, 957, 20, 27)].concat(words), box, 2.5, 3, 0.18);
+  assert.deepEqual(speck.map((x) => x.text), ['یکی', 'دوتا', 'سه‌تا'], 'a speck at the start is dust');
+  const bullet = L.ocrPlace([w('•', 935, 946, 18, 29)].concat(words), box, 2.5, 3, 0.18);
+  assert.equal(bullet[0].text, '•', 'a bullet of letter size stays');
+  // (a period close to its word at the line's end stays, a speck far past it goes)
+  const period = L.ocrPlace(words.concat([w('.', 548, 555, 33, 40)]), box, 2.5, 3, 0.18);
+  assert.equal(period[period.length - 1].text, '.', 'a period at the end stays');
+  const far = L.ocrPlace(words.concat([w('.', 20, 27, 33, 40)]), box, 2.5, 3, 0.18);
+  assert.equal(far.length, 3, 'a speck far past the end is dust');
+  // (a known two-letter word far from the rest is a word: a cover spaces its words widely)
+  const known = L.ocrPlace(words.concat([w('از', 20, 60)]), box, 2.5, 3, 0.18, (t) => t === 'از');
+  assert.equal(known.length, 4);
+  // (a run at the line's end with no kept word after it takes its letters' width, not the box out to its edge)
+  const run = L.ocrPlace(words.concat([w('چهار', 10, 990)]), box, 2.5, 3, 0.18);
+  const r = run[3], per = 80 / 3;
+  assert.ok(r.x1 <= run[2].x0 && r.x0 > 300, 'the end run is about four letters wide: ' + JSON.stringify(r) + ' ' + per);
+  // (the outer words end where the line's ink does)
+  const pinned = L.ocrPlace(words, Object.assign({}, box, { inkL: 540, inkR: 930 }), 2.5, 3, 0.18);
+  assert.equal(pinned[0].x1, 930); assert.equal(pinned[2].x0, 540);
+});
+
+test('OCR word glyphs (3.6 fix): no glyph id — the form rule keyed by font and id saw one shape in every OCR letter', function () {
+  const g = L.ocrWordGlyphs({ text: 'خانه', x0: 0, x1: 80 }, (u) => [u, 0], 100, 12, 0);
+  assert.ok(g.every((x) => x.cid === undefined));
+});
+
 test('OCR word glyphs (3.6): visual order — a Persian word reversed, its digits left to right — marks with their letter', function () {
   const toPt = (u) => [u / 2, 0];
   const g = L.ocrWordGlyphs({ text: 'خانهٔ ۱۲،', x0: 0, x1: 160 }, toPt, 100, 12, 0);

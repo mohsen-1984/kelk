@@ -17,6 +17,14 @@
 //   · scan-300--scan-columns2-fa   one page: a running head, a full-width title over two columns
 //   · scan-300--scan-pageframe-fa      two pages in a page frame, a running head over a thick rule on each: a lone rule, or a
 //                                  frame, is no table — no `---` between paragraphs, the running heads still dropped
+//   · scan-300--scan-dust-fa       dot-sized dust just before some lines' starts and past some lines' ends, beside a real
+//                                  bullet list and real periods at lines' ends: dust goes, the bullets and periods stay
+//   · scan-300--scan-cover-fa      a cover in a frame, a hatched picture at its top touching the frame, its title and credits
+//                                  below: the picture grows along the frame's rules over the text — the text wins
+//   · scan-300--scan-labels-fa     a drawing with two short labels inside it: one picture, its labels its description (and
+//                                  OCR's letters are no word-end forms: no ZWNJ between them)
+//   · scan-300--scan-sideways-fa   a table printed sideways under an upright title: its text mostly one-letter words, the
+//                                  page keeps its picture
 //   · scan-300--scan-specks-fa     one page of paragraphs, dust in its margins beside a few lines (a dot, a comma): a speck
 //                                  Tesseract reads at a line's end, far from its words, is no column of its own
 // node scripts/make-scans.js [name …] makes only the files named (each scan's pixels follow Chromium's drawing, so
@@ -123,6 +131,27 @@ const FRAME = {
     'برنامهٔ کتابخوانی کودکان در تابستان برگزار شد و صدها کودک در آن شرکت کردند. هر هفته یکی از نویسندگان شهر برای کودکان داستان خواند و دربارهٔ کار نوشتن با آنان سخن گفت.'],
   ['بخش دوم گزارش برنامه‌های سال آینده را بازگو می‌کند. شورای کتابخانه‌ها می‌خواهد یک کتابخانهٔ سیار راه بیندازد تا کتاب به روستاهای پیرامون شهر نیز برسد.',
     'همچنین قرار است تالار مطالعهٔ کتابخانهٔ مرکزی بازسازی شود و ساعت کار آن تا پاسی از شب افزایش یابد. هزینهٔ این کارها از بودجهٔ شهرداری و کمک مردم فراهم می‌شود.']]
+};
+const DUSTP = {
+  title: 'نکته‌های نگهداری کتاب',
+  p1: 'کتاب‌ها اگر درست نگهداری شوند سال‌ها می‌مانند. کاغذ کهنه به نور و رطوبت حساس است و جلد کتاب با گذشت زمان سست می‌شود. چند نکتهٔ ساده به نگهداری بهتر کتاب‌ها کمک می‌کند.',
+  items: ['کتاب را دور از نور مستقیم آفتاب بگذارید.', 'قفسه را در جای خشک و خنک بگذارید.', 'کتاب را از گوشهٔ جلد بیرون نکشید.'],
+  p2: 'اگر کتابی آسیب دیده است، آن را به میز امانت بسپارید تا کارشناسان کتابخانه آن را مرمت کنند. هزینهٔ مرمت را کتابخانه می‌پردازد و کتاب پس از چند هفته به قفسه بازمی‌گردد.'
+};
+// (dust: dots a point and a half wide, in points from the page's top-left — the text runs from 50 to 346 pt; beside the
+// right edge, just before a line's start; past the left edge, far from a line's end)
+const DOTS = [[352, 110], [352, 223], [352, 265], [20, 86], [22, 178], [20, 245]];
+const COVER = {
+  title: 'تاریخچهٔ شهر',
+  sub: 'از کاروان‌ها تا راه‌آهن',
+  credit: 'گروه نویسندگان مدرسهٔ شهر',
+  more: ['با یاری آموزگاران و پیران محله‌ها', 'چاپ نخست، کتابخانهٔ شهر', 'عکس‌ها از آلبوم‌های خانوادگی مردم شهر']
+};
+const LABELS = { title: 'نقشهٔ باغ', before: 'نقشهٔ ساده‌ای از باغ و دو بخش آن در زیر آمده است.', after: 'در باغ از بامداد تا شامگاه باز است.', labels: ['حوض', 'درختان'] };
+const SIDEWAYS = {
+  title: 'شمار کتاب‌ها و اعضا در سال‌های گذشته',
+  rows: [['سال', 'کتاب', 'نشریه', 'عضو', 'امانت', 'تالار', 'هزینه']].concat([1390, 1391, 1392, 1393, 1394, 1395, 1396, 1397, 1398, 1399, 1400, 1401, 1402].map((y, k) =>
+    [String(y), String(9100 + 610 * k), String(240 + 9 * k), String(1300 + 150 * k), String(22000 + 1350 * k), String(4 + (k % 3)), String(310 + 27 * k) + '/' + (k % 10)]))
 };
 const fa = (t) => t.replace(/[0-9]/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[d]);
 // a garden's plan, drawn in black lines only (no text in it): a wall, four paths to a round pool, trees as hatched discs
@@ -269,6 +298,20 @@ function writePdf(file, pages, title) {
   const dust = DUST.map((d) => `<span style="position:absolute;left:${d[1]}pt;top:${d[2]}pt;font-family:Nazanin;font-size:14pt;line-height:1">${d[0]}</span>`).join('');
   const frameRh = (k) => `<div style="display:flex;justify-content:space-between;font-family:Nazanin;font-size:10pt;border-bottom:2.5pt solid #000;padding-bottom:3pt;margin-bottom:12pt"><span>${FRAME.head}</span><span>${fa(String(FRAME.first + k))}</span></div>`;
   await make('scan-300--scan-pageframe-fa', [0, 1].map((k) => ({ body: `<div style="border:1.5pt solid #000;padding:12pt 14pt;height:calc(100% - 30pt)">${frameRh(k)}${FRAME.paras[k].map(P).join('')}</div>`, opts: NO, scan: Object.assign({}, S300, { angle: [0.2, -0.3][k] }) })), 'scan-pageframe-fa');
+  // 3.6's fixes (PR 4)
+  const dots = DOTS.map((d) => `<span style="position:absolute;left:${d[0]}pt;top:${d[1]}pt;width:1.5pt;height:1.5pt;border-radius:50%;background:#000"></span>`).join('');
+  await make('scan-300--scan-dust-fa', [{ body: H1(DUSTP.title) + P(DUSTP.p1) + '<ul>' + DUSTP.items.map((x) => `<li>${x}</li>`).join('') + '</ul>' + P(DUSTP.p2) + dots, opts: NO, scan: Object.assign({}, S300, { angle: -0.2 }) }], 'scan-dust-fa');
+  const hatch = (h) => `<svg xmlns="http://www.w3.org/2000/svg" width="296pt" height="${h}pt" viewBox="0 0 296 ${h}"><defs><pattern id="c${h}" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#000" stroke-width="2"/></pattern></defs><rect width="296" height="${h}" fill="url(#c${h})"/></svg>`;
+  await make('scan-300--scan-cover-fa', [{ body: `<div style="border:1.5pt solid #000;padding:6pt;height:calc(100% - 20pt)">${hatch(110)}<h1 style="text-align:center;font-size:24pt;margin:30pt 0 6pt 0">${COVER.title}</h1><p class="cap" style="font-size:15pt">${COVER.sub}</p><p class="cap" style="margin-top:60pt">${COVER.credit}</p>${COVER.more.map((x) => `<p class="cap">${x}</p>`).join('')}</div>`, opts: NO, scan: Object.assign({}, S300, { angle: 0.2 }) }], 'scan-cover-fa');
+  // (a garden's plan with its labels in a row of their own inside its frame — the rows a label shares with the drawing's
+  // ink are read with it, as the drawing)
+  const labelled = '<svg xmlns="http://www.w3.org/2000/svg" width="240pt" height="170pt" viewBox="0 0 240 170"><defs><pattern id="lh" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="#000" stroke-width="1.6"/></pattern></defs>' +
+    '<rect x="6" y="6" width="228" height="158" fill="none" stroke="#000" stroke-width="3"/>' +
+    `<text x="170" y="30" font-family="Nazanin" font-size="13" text-anchor="middle">${LABELS.labels[0]}</text><text x="70" y="30" font-family="Nazanin" font-size="13" text-anchor="middle">${LABELS.labels[1]}</text>` +
+    '<path d="M120 50 V82 M120 122 V160 M10 102 H98 M142 102 H230" stroke="#000" stroke-width="7" fill="none"/><circle cx="120" cy="102" r="20" fill="none" stroke="#000" stroke-width="3"/><circle cx="120" cy="102" r="10" fill="#000"/>' +
+    [[50, 70], [90, 70], [150, 70], [190, 70], [50, 136], [90, 136], [150, 136], [190, 136]].map((c) => `<circle cx="${c[0]}" cy="${c[1]}" r="11" fill="url(#lh)" stroke="#000" stroke-width="1.6"/>`).join('') + '</svg>';
+  await make('scan-300--scan-labels-fa', [{ body: H1(LABELS.title) + P(LABELS.before) + `<div class="fig">${labelled}</div>` + P(LABELS.after), opts: NO, scan: Object.assign({}, S300, { angle: -0.3 }) }], 'scan-labels-fa');
+  await make('scan-300--scan-sideways-fa', [{ body: `<p class="cap">${fa(SIDEWAYS.title)}</p><div style="position:absolute;top:90pt;left:360pt;transform-origin:top left;transform:rotate(90deg);width:470pt"><table class="ruled" style="width:470pt">${rows(SIDEWAYS.rows)}</table></div>`, opts: NO, scan: Object.assign({}, S300, { angle: 0.2 }) }], 'scan-sideways-fa');
   await make('scan-300--scan-specks-fa', [{ body: H1(SPECKS.title) + SPECKS.paras.map(P).join('') + dust, opts: NO, scan: Object.assign({}, S300, { angle: 0.2 }) }], 'scan-specks-fa');
   await b.close();
   const md = (ps) => ps.join('\n\n') + '\n';
@@ -286,6 +329,10 @@ function writePdf(file, pages, title) {
   corpus('scan-heads-fa.md', md(['# ' + HEADS.title].concat(HEADS.paras)));
   corpus('scan-picture-fa.md', md(['# ' + PICTURE.title, PICTURE.before, PICTURE.caption, PICTURE.after]));
   corpus('scan-pageframe-fa.md', md(FRAME.paras[0].concat(FRAME.paras[1])));
+  corpus('scan-dust-fa.md', md(['# ' + DUSTP.title, DUSTP.p1, DUSTP.items.map((x) => '- ' + x).join('\n'), DUSTP.p2]));
+  corpus('scan-cover-fa.md', md(['# ' + COVER.title, COVER.sub, COVER.credit].concat(COVER.more)));
+  corpus('scan-labels-fa.md', md(['# ' + LABELS.title, LABELS.before, LABELS.after]));
+  corpus('scan-sideways-fa.md', md(['**' + SIDEWAYS.title + '**']));
   corpus('scan-specks-fa.md', md(['# ' + SPECKS.title].concat(SPECKS.paras)));
   corpus('scan-columns2-fa.md', md(['# ' + COLUMNS2.title].concat(COLUMNS2.paras)));
   fs.rmSync(tmp, { recursive: true, force: true });

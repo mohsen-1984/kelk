@@ -1831,10 +1831,23 @@ word when they agree in number (else each word is corrected on its own; no boxes
 `ladOcrWordWide` (2.5) times its letters at the line's usual width a letter; the words between two kept ones share
 the room between them by their letters (now and then a box runs across half the line: its letters fell among its
 neighbours', «زممینری‌ابا‌ک‌…»), and two words never overlap — a third of a letter apart (a space glyph over the
-letters before it is no word break: the words ran together with a ZWNJ). `ocrWordGlyphs` sets a word out as a PDF
+letters before it is no word break: the words ran together with a ZWNJ). A run at the line's start or end with no
+kept word beyond it takes its letters' width at the line's usual width a letter, not the line's box out to its edge
+(specks and margins widen that box: the line stood past the margin and a paragraph broke at it); then the line's
+outer words are pinned to where its ink starts and ends (the first and last runs of ink at least half a letter wide:
+Tesseract's boxes at a line's ends wander by half a word). Dust goes first, a word at either end of the line in reading
+order: one or two characters, no digit, not a two-letter word the language model knows, further than
+`ladOcrStrayGap` (3) letters from the rest (a speck read as «.», «،» or a letter); or one character smaller both ways
+than `ladOcrDust` (0.18) of the line's own ink height — its tallest letter's top to its deepest's bottom, steady from
+line to line — at the line's start, or at its end and that far (a speck read as «۰»: at the start a bullet, the
+paragraph broken there). A lone character at a line's end is first fitted to its own ink (Tesseract gave a dot a box
+the line's height). A real bullet and a real period are larger than that and stand close to their words: both stay
+(`scan-dust-fa`). `ocrWordGlyphs` sets a word out as a PDF
 draws it: each character with its marks and ZWNJ, in visual order (a right-to-left word reversed, its digits and Latin
 kept left to right), spread evenly over the word's box, on the line's baseline, in a font of its own (`kelk-ocr`,
-`g.ocr`: no program, no ToUnicode, no fontprint — the font steps pass it by). A space between two words is a font's
+`g.ocr`: no program, no ToUnicode, no fontprint, no glyph id — the font steps pass it by; with one id for every
+letter, the lines' form rule, keyed by font and id, saw one shape at a word's end and at its start and put a ZWNJ
+between letters across a whole page). A space between two words is a font's
 own width at most (`ladOcrSpaceEm`, 0.28 em, at the left word's end): a wider gap stays a gap, a column's gutter or a
 table's cells, as in a PDF that draws its spaces (a space filling the gutter had kept two columns one line). A line's
 size is the height of the middle 80 % of its ink over `ladOcrInkEm` (0.52: B Nazanin at 12 pt, 300 dpi, 26 px of 50);
@@ -1853,7 +1866,15 @@ more each way (`ladOcrGridMin`): a lone rule, the line under a running head, cam
 real scanned book, and a page's frame with that line kept the running heads (`scan-pageframe-fa`; the score does not
 count `---`). A word's box that reaches over a grid's vertical rule keeps to the side that holds most of it («مطالع |
 ه»). A framed or shaded box whose rows run together is one run too tall for a line, so a picture: its text is not read
-(as in 3.4 and 3.5, which read nothing there either). The page's pixels,
+(as in 3.4 and 3.5, which read nothing there either). Two places with a text line between them are not joined. A
+place that holds a line of known words — at least two words of three letters or more, two thirds of them known to the
+language model — is no picture: the text wins, as in 3.5 (a cover's frame and its hatched band had taken its title,
+`scan-cover-fa`). A drawing with only short lines inside it (`ladOcrLabelChars`, 24 letters) keeps its picture, and
+those lines become its description, joined by « · » (`scan-labels-fa`; a label on the same pixel rows as the drawing
+is still part of its picture, TODO). A page whose text is at least ten words, `ladOcrOneLetter` (half) of them one
+letter long, has a part printed sideways (read upright, a turned table of figures is one-letter words): its lines that
+are not lines of known words, with its picture places, become one picture, the kept lines stay text, and the page gets
+the report's note `turned` (`scan-sideways-fa`; reading it turned is in TODO). The page's pixels,
 and pdf.js's decoded image of it, are freed as soon as its lines are read.
 
 The page then goes through the fonts, the lines, the layout and the ladder as any page with text; the ladder
@@ -1861,7 +1882,7 @@ reports it as mode `ocr` (`why` `noText`), its confidence the share of its words
 `tools/build-lm.js` counts them: Tesseract's own scores read high on lines that are wrong). The report lists the
 pages read in a category of their own, `report.ocr` `[{ page, conf, lines, notes }]` — `noLines`, `lowConf` (under
 0.7, `ladOcrLowConf`), `columns` (two columns side by side that a word Tesseract read runs across, so the layout
-cannot tell them apart), `failed` —, apart from the findings. A page with no line read keeps its picture; a page
+cannot tell them apart), `turned` (a part printed sideways, kept as a picture), `failed` —, apart from the findings. A page with no line read keeps its picture; a page
 that cannot be drawn (no canvas) keeps its picture and `ocrNeeded`; a page Tesseract fails on, `ocrPageFailed`; an
 engine that does not start, `ocrFailed`. The engine stays for the decipherment's OCR votes (`trust.js`
 `_decOcrEngine`) and is given back after the fonts (`_ladOcrEnd`, and in the import's `finally`). The lab runs with

@@ -34,6 +34,7 @@
             rep_ocr_lowConf: 'اطمینان کم: متن را با تصویر صفحه مقایسه کنید',
             rep_ocr_columns: 'شاید چند ستونی باشد: ترتیب خواندن ممکن است نادرست باشد',
             rep_ocr_failed: 'خوانده نشد؛ تصویر صفحه ماند',
+            rep_ocr_turned: 'به نظر می‌رسد بخشی از صفحه چرخیده چاپ شده است؛ تصویر آن بخش ماند',
             rep_ocrRead: 'خواندن با تشخیص نویسه (OCR)',
             rep_ocrPages: 'صفحه‌ها',
             rep_ocrHint: 'متن فارسی تصویر صفحه‌ها را می‌خواند، حدود 1 تا 2 ثانیه برای هر صفحه؛ «لغو» آن را متوقف می‌کند. واگرد (Ctrl+Z) متن کنونی را برمی‌گرداند.',
@@ -52,6 +53,7 @@
             rep_ocr_lowConf: 'low confidence: compare the text with the page',
             rep_ocr_columns: 'may have columns: the reading order may be wrong',
             rep_ocr_failed: 'not read; the page\'s picture was kept',
+            rep_ocr_turned: 'part of the page seems printed sideways; its picture was kept',
             rep_ocrRead: 'Read with OCR',
             rep_ocrPages: 'Pages',
             rep_ocrHint: 'Reads the Persian text of the pages\' pictures, about 1–2 seconds a page; Cancel stops it. Undo (Ctrl+Z) brings the current text back.',
@@ -70,6 +72,7 @@
             rep_ocr_lowConf: 'ثقة منخفضة: قارن النص بصورة الصفحة',
             rep_ocr_columns: 'قد تكون متعددة الأعمدة: قد يكون ترتيب القراءة خاطئًا',
             rep_ocr_failed: 'لم تُقرأ؛ بقيت صورة الصفحة',
+            rep_ocr_turned: 'يبدو أن جزءًا من الصفحة مطبوع بالعرض؛ بقيت صورة هذا الجزء',
             rep_ocrRead: 'القراءة بالتعرّف الضوئي (OCR)',
             rep_ocrPages: 'الصفحات',
             rep_ocrHint: 'يقرأ النص الفارسي من صور الصفحات، نحو ثانية إلى ثانيتين للصفحة؛ «إلغاء» يوقفه. التراجع (Ctrl+Z) يعيد النص الحالي.',
@@ -78,7 +81,7 @@
             imp_ocrStart: 'تهيئة التعرّف الضوئي على الحروف (OCR)…'
         }
     };
-    const NOTES = { noLines: 'rep_ocr_noLines', lowConf: 'rep_ocr_lowConf', columns: 'rep_ocr_columns', failed: 'rep_ocr_failed' };
+    const NOTES = { noLines: 'rep_ocr_noLines', lowConf: 'rep_ocr_lowConf', columns: 'rep_ocr_columns', failed: 'rep_ocr_failed', turned: 'rep_ocr_turned' };
 
     const K = root.Kelk;
     const t = function () { return K.i18n.t.apply(K.i18n, arguments); };
