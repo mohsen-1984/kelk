@@ -218,7 +218,10 @@ jobs:
         run: |
           {
             qpdf --empty --pages $(ls tests/pdf-lab/pdf/*/*.pdf | grep -v ocr-) -- "$RUNNER_TEMP/big.pdf"
-            node tests/pdf-lab/scripts/run-stress.js "$RUNNER_TEMP/big.pdf" tests/pdf-lab/pdf/en/chrome-github-bg--report.pdf
+            # (a long scan, our own text: the lab's 300-dpi scans joined eight times, about 150 pages — the renderer's memory)
+            scans=$(ls tests/pdf-lab/pdf/rtl/scan-300--*.pdf | tr '\n' ' ')
+            qpdf --empty --pages $scans $scans $scans $scans $scans $scans $scans $scans -- "$RUNNER_TEMP/scan.pdf"
+            node tests/pdf-lab/scripts/run-stress.js "$RUNNER_TEMP/big.pdf" tests/pdf-lab/pdf/en/chrome-github-bg--report.pdf "$RUNNER_TEMP/scan.pdf"
           } 2>&1 | tee "$RUNNER_TEMP/logs/stress.log"
 
       - name: Provenance profile
