@@ -9,6 +9,8 @@
 
     let map = {};
     let held = 0, dirty = false;      // hold() … flush(): images stored once for a batch
+    let stored = true;                // the last write to the browser's storage went through (stored(): the import's report says so, 3.6)
+    const save = function (map) { stored = !!K.store.saveImages(map); return stored; };
 
     function slug(fileName) {
         return String(fileName || '').replace(/\.[^.]+$/, '').normalize('NFC')
@@ -54,7 +56,7 @@
             while (name === 'logo' || (map[name] && map[name] !== uri)) name = base + '-' + n++;
             map[name] = uri;
             if (held) dirty = true;                 // an import adding many pictures: stored once, at flush()
-            else if (!K.store.saveImages(map)) K.ui.toast(K.i18n.t('imagesSession'), 'warn');
+            else if (!save(map)) K.ui.toast(K.i18n.t('imagesSession'), 'warn');
             return name;
         },
 
@@ -74,7 +76,7 @@
             while (name === 'logo' || (map[name] && map[name] !== uri)) name = base + '-' + n++;
             map[name] = uri;
             if (held) dirty = true;
-            else if (!K.store.saveImages(map)) K.ui.toast(K.i18n.t('imagesSession'), 'warn');
+            else if (!save(map)) K.ui.toast(K.i18n.t('imagesSession'), 'warn');
             return name;
         },
 
@@ -98,13 +100,16 @@
             return list.length ? out.replace(/\s*$/, '\n\n') + list.join('\n') + '\n' : out;
         },
 
+        /** whether the pictures are kept after the page is closed: false when the browser's storage refused them */
+        stored: function () { return stored; },
+
         /** Hold the storing of added images until flush() (a PDF with forty figures: one write, one message). */
         hold: function () { held++; },
         flush: function () {
             held = Math.max(0, held - 1);
             if (held || !dirty) return;
             dirty = false;
-            if (!K.store.saveImages(map)) K.ui.toast(K.i18n.t('imagesSession'), 'warn');
+            if (!save(map)) K.ui.toast(K.i18n.t('imagesSession'), 'warn');
         },
 
         /** Forget images the text no longer uses. */
@@ -114,7 +119,7 @@
             Object.keys(map).forEach(function (k) {
                 if (text.indexOf('(' + k) < 0 && text.indexOf('(' + encodeURI(k)) < 0 && text.indexOf('"' + k + '"') < 0) { delete map[k]; changed = true; }
             });
-            if (changed) K.store.saveImages(map);
+            if (changed) save(map);
         },
 
         /** Swap registered names for data URIs in rendered HTML. */

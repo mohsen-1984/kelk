@@ -416,6 +416,11 @@
             // the bytes: held by the panel's actions only, not by parts, the task's promise or this function's scope
             // (again: a closure of its own — one here would share the scope with the task's); Read with OCR unless
             // Settings → Import → Scanned pages says to leave them
+            // (the browser's storage refused the pictures: the document is gone when the page closes — said in the
+            // report, where the reader looks after an import, as well as in its toast, 3.6)
+            if (K.images.stored && !K.images.stored()) reports.forEach(function (p) {
+                if (p.report && p.report.notes && !p.report.notes.some(function (n) { return n.code === 'tooLargeToKeep'; })) p.report.notes.push({ code: 'tooLargeToKeep' });
+            });
             const act = one && one.bytes ? again(one.bytes, one.name, o && o.mode, o && o.ocrState) : null;
             parts.forEach(function (p) { p.bytes = null; });
             K.ui.report(reports.map(function (p) { return { name: p.name, report: p.report || K.importReport.none(), info: p.info, kind: p.kind }; }), {

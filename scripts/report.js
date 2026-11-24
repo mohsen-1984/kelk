@@ -83,9 +83,11 @@
         kelkMath: { key: 'pdf_kelkMath', quiet: true },
         monoBody: { key: 'pdf_monoBody', quiet: true },
         pageSimplified: { key: 'pdf_pageSimplified' },
-        pageTextOnly: { key: 'pdf_pageTextOnly' }
+        pageTextOnly: { key: 'pdf_pageTextOnly' },
+        // (the app's own, not the importer's: the browser's storage refused the document's pictures, 3.6)
+        tooLargeToKeep: { key: 'imagesSession', warn: true }
     };
-    const MODE_KEYS = { full: 'rep_mode_full', simplified: 'rep_mode_simplified', textContent: 'rep_mode_textContent', ocr: 'rep_mode_ocr', failed: 'rep_mode_failed' };
+    const MODE_KEYS = { full: 'rep_mode_full', simplified: 'rep_mode_simplified', textContent: 'rep_mode_textContent', ocr: 'rep_mode_ocr', scan: 'rep_mode_scan', failed: 'rep_mode_failed' };
     const WHY_KEYS = {
         lowConf: 'rep_why_lowConf', suspectSpaces: 'rep_why_suspectSpaces', lostGlyphs: 'rep_why_lostGlyphs',
         layoutFailed: 'rep_why_layoutFailed', extractFailed: 'rep_why_extractFailed', noText: 'rep_why_noText',

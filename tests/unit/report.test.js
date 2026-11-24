@@ -524,6 +524,27 @@ test('the report follows its document (Clear hides it, Undo brings it back colla
   w.close();
 });
 
+test('a document too large to keep: the browser refuses its pictures, the report says so in one line (3.6)', async function () {
+  const { window: w, errors } = await appWindow(OPENED);
+  try {
+    const K = w.Kelk, d = w.document;
+    K.store.saveImages = function () { return false; };
+    fakePdf(w, function (opts) {
+      return { markdown: 'x\n', notes: [], messages: [], report: { mode: 'auto', summary: { pages: 1, full: 1 }, pages: [], flags: [], ocr: [], notes: [] } };
+    });
+    const r = await K.images.add(new w.File([new Uint8Array([137, 80, 78, 71])], 'a.png', { type: 'image/png' }));
+    assert.ok(r);
+    assert.equal(K.images.stored(), false);
+    await K.importer.fromFile(pdfFile(w));
+    const li = d.querySelector('.report-findings [data-code="tooLargeToKeep"]');
+    assert.ok(li, 'a line in the report');
+    assert.equal(li.textContent, K.i18n.t('imagesSession'));
+    assert.deepEqual(errors, []);
+  } finally {
+    w.close();
+  }
+});
+
 test('Read with OCR: the range, the pages it asks for, the setting (Ask, Read with OCR, Leave as pictures)', async function () {
   const { window: w, errors } = await appWindow(OPENED);
   try {
