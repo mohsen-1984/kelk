@@ -30,7 +30,7 @@ const FAMILIES = [['Vazirmatn', 'vazirmatn/Vazirmatn-Regular.ttf'], ['Sahel', 's
 const MEASURED = ['glyph-index-fa.md', 'renumbered-en.md', 'unknown-serif-fa.md', 'unknown-serif-en.md', 'unreadable-fa.md',
   'cff-cid-fa.md', 'cff-type1c-fa.md', 'cff-known-fa.md', 'cff-unreadable-fa.md', 'cff-zwnj-fa.md', 'teh-fa.md', 'tatweel-fa.md',
   'scan-plain-fa.md', 'scan-framed-fa.md', 'scan-low-fa.md', 'scan-headings-fa.md', 'scan-columns-fa.md',
-  'scan-list-fa.md', 'scan-table-fa.md', 'scan-index-fa.md', 'scan-heads-fa.md', 'scan-picture-fa.md', 'scan-columns2-fa.md', 'scan-specks-fa.md', 'scan-pageframe-fa.md',
+  'scan-list-fa.md', 'scan-table-fa.md', 'scan-index-fa.md', 'scan-heads-fa.md', 'scan-picture-fa.md', 'scan-columns2-fa.md', 'scan-specks-fa.md', 'scan-pageframe-fa.md', 'scan-dust-fa.md', 'scan-cover-fa.md', 'scan-labels-fa.md', 'scan-sideways-fa.md',
   'decipher-body-fa.md', 'decipher-cid-fa.md', 'decipher-subsets-fa.md', 'decipher-digits-fa.md', 'decipher-marks-fa.md',
   'decipher-short-fa.md', 'decipher-hollow-fa.md', 'decipher-cyrillic-ru.md', 'decipher-cross-fa.md',
   'decipher-ocr-terms-fa.md', 'decipher-ocr-digits-fa.md',
