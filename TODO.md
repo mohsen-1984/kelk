@@ -280,6 +280,23 @@ Found in PR 3 (pictures and rules), left for later:
   is one run of ink too tall for a line: a picture, its text not read. 3.4 and 3.5 read nothing there either (two
   lines of nothing). The frame's and the shading's rows would have to be taken out before the lines are found.
 
+Found in the fix PR (before the release), left for later:
+
+- **Running heads on a real scan** (the owner, 2026-11-24: for later; the release notes say so): on the lab's pages
+  they are dropped, on a real scanned book they stay. OCR reads a head a little differently from page to page, so its
+  text does not repeat; its place (the top line, over a rule) could count as well.
+- **A part printed sideways** is kept as a picture (`scan-sideways-fa`, the report's note `turned`); reading it turned
+  — the part rotated a quarter turn and read again — is for later.
+- **A drawing's label on the same pixel rows as the drawing** stays part of its picture, not its description: the
+  line finder sees one run of ink there (`scan-labels-fa` has its labels in a row of their own).
+- **A paragraph's line read a size smaller** still starts a paragraph of its own now and then (`scan-dust-fa`'s first
+  paragraph): its ink's middle reads under 0.75 of the body's size (`ladOcrBodyLo`). Sizes from the whole ink height
+  were tried and dropped (agreement 12): `scan-heads-fa` 99.2 → 74.2, `scan-list-fa` 78.0 → 58.0, `scan-columns2-fa`
+  92.1 → 67.1 (titles and body came out one size).
+- **A dash printed at a line's start inside a paragraph** (once on the real scan) starts a list item, as it would on a
+  page with a text layer; Tesseract reads it glued to the word after it. Telling it from a list's dash would take the
+  lines around it (a list's items share their indent and their dash).
+
 
 **A session of its own: real Arabic PDFs and Arabic fonts** (the owner's request, 2026-11-18) — «Left from 3.1» below.
 
