@@ -3,7 +3,7 @@
 //   node scripts/make-ladder.js
 //   ladder/scan--article.pdf     the page images make-ocr.js reads (chrome-plain-hf--article.pdf rendered, here by
 //                                pdf.js in Chromium at 2×, since pdftoppm is not everywhere), with no text layer:
-//                                every page → 'ocr' (a note, the picture kept)
+//                                every page → 'scan' (OCR not run: a note, the picture kept; 'ocr' before 3.6)
 //   ladder/t3-glued--lost.pdf    a Type 3 font of drawn boxes whose ToUnicode maps one code in twelve to U+FFFD, set
 //                                with no word spaces (the words glued): suspectSpaces + lostGlyphs → 'simplified'
 //   ladder/t3-glued--lost25.pdf  the same with one code in four lost: lost ≥ 20 % → 'simplified' (why lostGlyphs).

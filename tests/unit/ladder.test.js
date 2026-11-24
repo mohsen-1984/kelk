@@ -168,6 +168,16 @@ test('the report — failed pages, an unknown confidence, a Kelk source', functi
   assert.equal(k.report.summary.full, 3);
 });
 
+test('a scanned page OCR has not read (3.6): mode scan, out of the mean, counted apart', function () {
+  const imp = PdfImporter.create({});
+  imp._pageModes = [{ page: 1, mode: 'full', conf: 0.8, why: [] }, { page: 2, mode: 'scan', conf: null, why: ['noText'] }, { page: 3, mode: 'scan', conf: null, why: ['noText'] }];
+  imp.notes = []; imp._notePages = {};
+  const r = imp._ladReport({}, 3).report;
+  assert.equal(r.summary.scan, 2);
+  assert.equal(r.summary.ocr, 0);
+  assert.equal(r.summary.conf, 0.8, 'the pages not read are no 0 % in the mean');
+});
+
 test('only a valid hooks.mode overrides options.mode', function () {
   const imp = PdfImporter.create({ mode: 'safe' });
   imp._runMode = 'Safe'; assert.equal(imp._ladMode(), 'safe');

@@ -123,7 +123,7 @@ test('fromResult: a result without r.report → the contract, from r.notes, r.qu
   });
   assert.deepEqual(clone(rep), {
     mode: 'full',
-    summary: { pages: 4, full: 3, simplified: 0, textContent: 0, ocr: 0, failed: 1, conf: null },
+    summary: { pages: 4, full: 3, simplified: 0, textContent: 0, ocr: 0, scan: 0, failed: 1, conf: null },
     pages: [],
     flags: [{ code: 'suspectSpaces', pages: [2, 4] }],
     ocr: [],
@@ -253,7 +253,12 @@ for (const lang of ['fa', 'en', 'ar']) {
     assert.equal(box.hidden, false);
     // (the pages read with OCR are in their own table, not in the pages not read in full)
     const byOcr = (p) => SAMPLE.ocr.some((x) => x.page === p.page);
-    assert.equal(box.querySelectorAll('.report-pages:not(.report-ocr) tbody tr').length, SAMPLE.pages.filter((p) => !byOcr(p)).length);
+    // (one row a page, but consecutive pages alike are one: the sample's scanned pages 16–18, 3.6)
+    const pageRows = box.querySelectorAll('.report-pages:not(.report-ocr) tbody tr');
+    assert.equal(pageRows.length, SAMPLE.pages.filter((p) => !byOcr(p)).length - 2);
+    const scanRow = Array.from(pageRows).find((r) => r.getAttribute('data-mode') === 'scan');
+    assert.equal(scanRow.querySelector('th').textContent, '\u206616–18\u2069', 'pages 16 to 18 in one row');
+    assert.ok(scanRow.textContent.includes('—'), 'a page not read has no confidence');
     // the pages read with OCR: a table of their own, each page with its confidence and its notes
     const ocrRows = box.querySelectorAll('.report-ocr tbody tr');
     assert.equal(ocrRows.length, SAMPLE.ocr.length);
@@ -384,9 +389,9 @@ test('the panel: focus in on open, back on close (×, Escape); Copy report; Re-i
   d.getElementById('editor').focus();
   K.ui.report(null);
   assert.equal(d.activeElement, d.getElementById('editor'));
-  // one page: its own words (en: "1 page read", not "1 pages read")
+  // one page: its own words (en: "1 page", not "1 pages")
   K.ui.report({ mode: 'auto', summary: { pages: 1, full: 0, simplified: 1 }, pages: [{ page: 1, mode: 'simplified', conf: 0.5, why: ['lowConf'] }], flags: [], notes: [] });
-  assert.ok(box.querySelector('.report-summary').textContent.startsWith('1 page read'));
+  assert.ok(box.querySelector('.report-summary').textContent.startsWith('1 page') && !box.querySelector('.report-summary').textContent.startsWith('1 pages'));
   K.ui.report.close();
   // release (a new import starts): the safe-mode action goes, the report stays
   let kept = 0;

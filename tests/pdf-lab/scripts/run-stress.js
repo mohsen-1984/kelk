@@ -17,7 +17,7 @@
 //         caches of each page go once it is read, else every page's decoded scan stayed until its layout (a
 //         291-page scanned book: 5.3 GB; 3.6)
 // ladder: the files of tests/pdf-lab/ladder/ (scripts/make-ladder.js) given in the mode each must be demoted to —
-//         a scan with no text 'ocr', glued words with lost glyphs 'simplified', a quarter of them lost 'simplified' too
+//         a scan with no text 'scan' (OCR not run: kept as its picture, 3.6), glued words with lost glyphs 'simplified', a quarter of them lost 'simplified' too
 //         (pdf.js's text, the glyphs' source, loses the same: taken only where it loses demonstrably fewer)
 const fs = require('fs');
 const path = require('path');
@@ -81,7 +81,7 @@ const rss = () => { try { const v = +execSync("ps -eo rss,args | grep -- '--type
   console.log('faults (mode full)', brief(ff));
   console.log('abort   ', JSON.stringify(a));
   // the ladder's own files: every page in the mode named (tests/pdf-lab/ladder/, made by scripts/make-ladder.js)
-  const LADDER = { 'scan--article.pdf': 'ocr', 't3-glued--lost.pdf': 'simplified', 't3-glued--lost25.pdf': 'simplified' };
+  const LADDER = { 'scan--article.pdf': 'scan', 't3-glued--lost.pdf': 'simplified', 't3-glued--lost25.pdf': 'simplified' };
   const lad = {};
   for (const n of Object.keys(LADDER)) {
     const file = path.join(LAB, 'ladder', n);
