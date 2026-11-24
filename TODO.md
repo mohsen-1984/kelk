@@ -158,9 +158,7 @@ Open from 3.4:
   ended, with or without OCR and with 3.3's importer too, its JavaScript heap staying under 100 MB — to look into
   (memory outside the heap: pdf.js's JBIG2 decoder?). Runs of up to 250 pages never crashed. The release notes say: for
   a very large scanned file, read a page range at a time.
-- **OCR pages skip the page layout** (one column; no running heads, lists, tables, boxes or pictures inside the page):
-  `lib/PDFIMPORT.md`, "What an OCR page goes through". A page that seems to have two columns is only noted
-  (`columns`, lab `scan-300--scan-columns-fa`).
+- **OCR pages skip the page layout**: done in 3.6 (OCR lines laid out as positioned text; what is left: «Open from 3.6»).
 - **OCR votes for decipherment** (unknown fonts read with OCR's help): done in 3.5.
 
 **Standing rules from 3.5** (the owner's decisions; done — `CHANGELOG.md` 3.5): an Arabic-script font that no fontprint
@@ -206,58 +204,31 @@ Open from 3.5:
 - Not in 3.5: the offset solver for a ToUnicode that holds glyph ids (the decipherment reads those fonts), Arabic text
   (its own language model, «A session of its own» below).
 
-**3.6 — OCR lines as positioned text** (the owner, 2026-11-21; moved from 3.5's candidates, 2026-11-22): an OCR page's words enter the layout as
-glyphs (Tesseract's word boxes and baselines), so columns, running heads, lists, tables and every other rule run on it
-as on a page with a text layer; today it skips them (`lib/PDFIMPORT.md`, "What an OCR page goes through"). About a
-release of work: OCR before the layout, glyphs in a font of its own, the rules found as segments, the ladder.
-Persian only. The pull requests, in order:
+**Standing rules from 3.6** (the owner's decisions; done — `CHANGELOG.md` 3.6): an OCR page is read before the
+layout; Tesseract's word boxes and baselines become glyphs in a font of their own (`kelk-ocr`, no glyph id) that the
+font steps pass by, and the page then goes through the layout and the ladder as any page with text
+(`lib/PDFIMPORT.md`, OCR). Only a table's grid (three rules or more each way, meeting) reaches the layout; a lone rule
+or a frame does not. A place that holds a line of known words is no picture: the text wins; a drawing with only short
+labels keeps its picture, the labels its description. A part printed sideways (half its words one letter long) stays
+a picture, noted `turned`. Dust is told by its size against the line's own ink height. The year-digit rule reads
+Arabic-script digits only. Kept from 3.4 and 3.5: the progress steps, Cancel, «Ask» and the page range, each page's
+pixels freed once read, nothing at startup, one engine shared with 3.5's OCR votes. The lab runs with Kelk's defaults
+(numbers in ASCII digits and signs, ی/ک in a Persian document); its answer keys are written out the same way
+(`tests/pdf-lab/scripts/keys-writeout.js`); the three 3.6 scan keys are in ASCII. Real scans are run outside the
+repository and reported in general words only. Persian only: Arabic and English OCR wait (below).
 
-1. **`pdf/3.6-lab`**: the lab scans of our own text (`make-scans.js`), measured with 3.5's importer before any change —
-   `scan-list-fa` (a numbered list, one item wrapped, bullets set in under an item), `scan-table-fa` (a ruled table
-   under its «جدول 1- …» title), `scan-index-fa` (a two-column index without borders), `scan-heads-fa` (three pages
-   under a running head with the page number and a rule, paragraphs running on from page to page),
-   `scan-picture-fa` (a drawing between two paragraphs, its caption), `scan-columns2-fa` (a full-width title over
-   two columns, a running head). Their text stays out of `lm.json`, `letterstats.js` and `calibrate-shapes.js`.
-2. **`pdf/3.6-ocr-glyphs`**: the pages to read are picked after `read` (the `ocr` rung's own test) and read before
-   `fonts`; each line still found by `ocr.js` and read alone (psm 13), then `postCorrect`; Tesseract's word and
-   character boxes and the line's baseline (its result iterator; its TSV as the fallback) become glyphs in user
-   space, in a font of their own (`ocr`) that the arbiter, fontprints, letter statistics, the decipherment, 3.2's
-   shapes, the garbled check and the hidden text pass by. The page then goes through the layout and the ladder as any
-   page with text; its confidence the share of known words; the report's OCR section as it is. Kept: the progress
-   steps, Cancel within a line, «Ask» and the page range, each page's pixels freed once read, nothing at startup, one
-   engine shared with 3.5's OCR votes. Also: the stress check's margin (below).
-3. **`pdf/3.6-ocr-rules`**: the rules and frames `ocr.js` finds become the page's `hsegs` / `vsegs` (tables, boxes);
-   ink where no line lies is cut from the page as a figure, the rest of the scan dropped (a page with no line stays
-   one picture). Also: the digit read as a letter (below), if no lab file gets worse.
-4. **`release/3.6`**: the version, `CHANGELOG.md`, the README (fa / en / ar), the guide, the release notes.
-
-The owner's decisions (2026-11-22):
-
-- `scan-columns-fa` no longer wants `ocrColumns` in `expect.json` once the layout reads its columns (PR 2); the note
-  stays in the code for a page whose columns the layout cannot settle.
-- PR 2 reports the time per OCR page before and after, on the lab scans and on the real scan (3.4: about 2.6 s a
-  page). No 3.4 scan may score worse, and the `decipher-ocr-*` files must not change.
-- The digit rule (a four-character number in running text whose other three characters are digits) reads Arabic-script
-  digits only, never inside Latin text or code.
-- The real scan is run outside the repository and reported in general words only: its pages carry running heads with
-  a page number and a rule, numbered and lettered clauses, a framed box, and a long index set as a two-column table
-  without borders.
-
-From 3.5, taken into 3.6: **the stress check's margin** (a pause between pages in 3.2's steps, `_approxLines` and
-`_approxGarbled`, PR 2 — measured: its cause is elsewhere and not small, so it stays open, «Open from 3.5») and **a
-digit read as a letter** (`decipher-titr-small-fa`: done in PR 3, `decipher.js` `digitInRun`, Arabic-script digits only
-— the year reads «۱۳۸۵»).
-
-Found in PR 2 (OCR lines as glyphs), left for later:
+Open from 3.6:
 
 - **A bold title in the body's size**: B Titr over B Nazanin has about the same ink height, so a title set so is a
   paragraph (`scan-heads-fa`, `scan-specks-fa`; 3.4 the same). The stroke width would tell bold from regular.
+  `scan-dust-fa` reads worse in 3.6 than in 3.5 for it (79.6 → 72.9): 3.5, reading one column, kept its title a
+  heading; 3.6's text there is cleaner (no «0» specks, the list read as a list).
 - **A running head misread on one page** is not dropped: running heads are found by their text repeating, and OCR read
   one page's otherwise («تاریخچو شور» for «تاریخچهٔ شهر», `scan-heads-fa`). A head's place (the top line, over a rule)
   could count as well as its text.
 - **A list's number without its period**: Tesseract drops the period after «۱» (`scan-list-fa`), so a numbered list
   is paragraphs that start with a number.
-- **The index without borders** (`scan-index-fa`, 31.4 in 3.5 and in 3.6): the line finder does join an index row's
+- **The index without borders** (`scan-index-fa`, 40.6 in 3.5 and in 3.6, both with Kelk's defaults): the line finder does join an index row's
   two cells into one line, but Tesseract reads that line's words well; laid out from their boxes, the rows now come out
   as a table, in pieces. What is lost is in the reading: a number with a Persian comma, «۱۲، ۴۵», comes back as one
   run of digits out of order with the comma gone («۴۵۵۲»), and a one-word line read alone comes back reversed, in
@@ -265,9 +236,6 @@ Found in PR 2 (OCR lines as glyphs), left for later:
   ones; the lab now runs with Kelk's defaults (the owner, 2026-11-24: numbers in ASCII digits and signs, ی/ک in a
   Persian document — the lab scripts set neither, 23 corpus and 21 golden keys written out the same way), so its digits
   are matched.
-
-Found in PR 3 (pictures and rules), left for later:
-
 - **Numbers with a Persian comma** (`scan-index-fa`): Tesseract gives a line's digit groups in visual order, left to
   right, and drops the comma between them — «۳، ۷، ۱۹» comes back «۱۹۷۳», «۱۲، ۴۵» «۴۵۵۲» (one digit misread too). The
   comma's place is not in what it returns (its TSV makes the run one word), so it cannot be put back from the text: it
@@ -275,9 +243,6 @@ Found in PR 3 (pictures and rules), left for later:
 - **A framed or shaded box whose rows run together** (a real scan's credits page: a frame, a shaded box, an ornament)
   is one run of ink too tall for a line: a picture, its text not read. 3.4 and 3.5 read nothing there either (two
   lines of nothing). The frame's and the shading's rows would have to be taken out before the lines are found.
-
-Found in the fix PR (before the release), left for later:
-
 - **Running heads on a real scan** (the owner, 2026-11-24: for later; the release notes say so): on the lab's pages
   they are dropped, on a real scanned book they stay. OCR reads a head a little differently from page to page, so its
   text does not repeat; its place (the top line, over a rule) could count as well.
@@ -293,6 +258,15 @@ Found in the fix PR (before the release), left for later:
   page with a text layer; Tesseract reads it glued to the word after it. Telling it from a list's dash would take the
   lines around it (a list's items share their indent and their dash).
 
+Found with the scan report PR (sample-U in the app, 2026-11-24), left for later:
+
+- **Each scanned page is decoded twice**: once when read (its operator list), again when its picture is cut (a
+  render) — about 20 s of a 291-page book's 48. The picture could be cut from the image already decoded.
+- **Pictures are kept as base64 text** (a 291-page book: 76 MB) and saved whole in the browser's storage, which
+  refuses them (said in one line since 3.6). Files (Blobs) in IndexedDB would keep a large document.
+- **«Read with OCR» re-imports the whole file** (about 45 s on 291 pages) though only the new pages are read (the
+  others come from the session's cache): reading the new pages and putting them in place would take seconds.
+- **The OCR cache lives in memory**, for the session: a reload reads the pages again.
 
 **A session of its own: real Arabic PDFs and Arabic fonts** (the owner's request, 2026-11-18) — «Left from 3.1» below.
 

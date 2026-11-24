@@ -4,29 +4,56 @@ All notable changes to Kelk. Dates are those of the release tags.
 
 ## [Unreleased]
 
+## [3.6] — 2026-11-24
+
 ### Changed
 
-- **Scanned pages are laid out like any page.** OCR now runs before the layout, and each word Tesseract reads becomes
-  text placed where it was seen on the page. So a scanned page gets the same rules as a page with text: columns and
-  reading order, running heads and page numbers, paragraphs joined across pages, lists, and tables without borders. On
-  our lab scans: two columns 83.9 → 91.0 and 63.7 → 92.1, a table 66.1 → 75.1; none worse. The time a page is unchanged
-  (about 1.5 s on the lab's scans, 2.2 s on a real scanned book).
-- **Pictures and tables on scanned pages.** A drawing inside a scanned page comes out as a picture, cropped from the
-  page, no longer as lines of stray characters (our lab scan with a drawing: 73.2 → 98.2). A table's ruled grid reaches
-  the layout; a lone rule, such as the line under a running head, or a page's frame, does not, so it no longer comes
-  out as `---` between paragraphs.
-- **Scanned pages, cleaner text.** Fewer stray zero-width non-joiners between letters. Dust is told from punctuation
-  by its size against the line's own letters: a speck no longer becomes a bullet or breaks a paragraph, while a real
-  bullet and a real period stay (our lab page with dust: 59.6 → 72.9). A scanned cover in a frame keeps its title and
-  text (our lab cover: 25.0 → 71.2). A drawing's short labels go into its picture's description (40.9 → 70.5). A part
-  printed sideways stays a picture, noted in the report (72.2 → 92.6). Running heads on real scanned books are still
-  kept in the text.
+- **Scanned pages are laid out like any page.** OCR now runs before the layout: each word Tesseract reads becomes
+  text placed where it was seen, so a scanned Persian page gets the same rules as a page with text. On our lab scans,
+  against 3.5 measured the same way:
+  - **Columns and reading order**: two columns 83.9 → 91.2; a title over two columns 63.7 → 92.3.
+  - **Tables**: a ruled table 67.0 → 76.0. On a real scanned book, its table pages come out as tables (3.5: none).
+  - **Pictures**: a drawing inside a page is cropped as a picture, no longer lines of stray characters (73.8 → 98.8).
+    A drawing's short labels go into its description. A lone rule or a page's frame no longer comes out as `---`.
+  - **The index**: on a real scanned book, an index set without borders comes out as table rows, with far fewer
+    paragraphs broken in the middle of a sentence. On our lab index the score is unchanged (40.6): its numbers with a
+    Persian comma are still misread (below).
+  - **A scanned cover** keeps its title and text, as 3.5 did (71.2).
+  - Cleaner text: dust no longer becomes a bullet or a «0», and fewer stray zero-width non-joiners.
+  - The time a page is about the same (1.6 s on our lab scans, about 2.2 s on a real scanned book).
+- **Scanned books in the app.** Importing a long scan no longer holds every page's scan in memory: a 291-page book
+  went from 5.3 GB to about 0.7 GB, in the same time. The preview loads its pictures as they scroll into view (every
+  export still carries them all).
+- **The import report is honest about scanned pages.** A page OCR has not read yet says so («scanned, not read yet»),
+  has no confidence and stays out of the mean; consecutive pages alike are one row («1–291»).
+- **«Read with OCR» and its page range**: the range is empty by default — every scanned page —, with an example in the
+  interface's language; Persian digits and every dash are accepted. A second range adds to the pages read before,
+  which are kept for the session and not read again (before, a second range lost the first one's text). The button
+  sits level with the range.
+- **A document too large to keep**: when the browser's storage refuses its pictures, one line in the report says it
+  will be gone once the page is closed.
+- **PdfImporter 1.6** (the library): `report.pages` has the mode `scan` — a scanned page OCR has not read, its picture
+  kept, `conf` null and out of `summary.conf`; `summary.scan` counts them; `ocr` is a page OCR read, or tried.
+  `options.ocrCache`: a Map the caller keeps for one file, page number → its OCR result, taken and not read again.
 - **PDF import, unknown fonts:** a digit read as a letter inside a number is read as a digit when the font uses that
-  glyph nowhere else (a year whose 8 came out as a letter now reads «۱۳۸۵»).
-- **The PDF lab reads with Kelk's defaults**, as the page does: numbers in ASCII digits and signs, ی/ک in a Persian
-  document. The answer keys were written out the same way (23 corpus, 21 golden), with the importer's own write-out.
-  No file scores worse; files whose digits or letters had been counted as wrong now read right (the real sheets
-  72.8–92.6 → 96.4–99.4, the index scan 31.4 → 40.6). Corpus mean 94.1 → 94.9, real held-out 84.6 → 92.8.
+  glyph nowhere else (a year whose 8 came out as a letter now reads 1385).
+- **The PDF lab**: 270 PDFs (twelve new scans of our own text: columns, a list, a table, an index, running heads, a
+  picture, a page frame, dust, a cover, labels, a part printed sideways). It now reads with Kelk's defaults, as the
+  page does: numbers in ASCII digits and signs, ی/ک in a Persian document; its answer keys are written out the same
+  way. Against 3.5 so measured, one file reads worse (below) and none other; corpus mean 94.5 → 94.9; golden and
+  held-out means unchanged.
+
+### Not yet
+
+- **Running heads on real scanned books** stay in the text. OCR reads a head a little differently on each page, so
+  its text does not repeat, and repetition is how running heads are found.
+- **A dash printed at a line's start inside a paragraph** starts a list item. Tesseract reads it glued to the next
+  word, and nothing yet compares it with the lines around it.
+- **A part printed sideways** is kept as a picture, noted in the report: it is not read turned yet.
+- **Numbers with a Persian comma** («۱۲، ۴۵») come back as one run of digits. Tesseract drops the comma and gives the
+  digit groups in visual order.
+- **A title set at about the body's size** comes out as a paragraph. On our lab page with dust this makes 3.6 score
+  lower than 3.5 (79.6 → 72.9), though its text is cleaner.
 
 ## [3.5] — 2026-11-22
 
