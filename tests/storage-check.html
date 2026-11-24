@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kelk — storage check (file://)</title>
+<!--
+  Kelk 3.7: can the app keep a large document's pictures, and the pages OCR has read, in the browser's IndexedDB
+  when it runs from file://? Open this file from disk (double-click it, or drag it into the browser) in Chrome, Edge
+  and Firefox, press «Run the checks», then «Reload and check again», and copy the results. Nothing leaves the
+  browser; «Clear the test data» removes what the check stored (about 80 MB).
+  Checks: IndexedDB opens; 80 pictures of 1 MB each (Blobs) are stored and read back the same; they are still there
+  after a reload; SHA-256 (crypto.subtle) works, to know a file again; BroadcastChannel works, to keep two tabs in
+  step; how much the browser lets the page keep (navigator.storage).
+-->
+<style>
+  body { font: 15px/1.5 system-ui, sans-serif; max-width: 760px; margin: 24px auto; padding: 0 16px; color: #1d2a26; }
+  h1 { font-size: 20px; }
+  button { font: inherit; padding: 6px 12px; margin: 0 6px 6px 0; border: 1px solid #9bb3aa; border-radius: 6px; background: #eef5f2; cursor: pointer; }
+  table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+  th, td { text-align: start; padding: 6px 8px; border-bottom: 1px solid #dde6e2; vertical-align: top; }
+  .ok { color: #11724f; font-weight: 700; }
+  .no { color: #b3261e; font-weight: 700; }
+  .wait { color: #6b7d76; }
+  #out { width: 100%; height: 160px; margin-top: 12px; font: 12px/1.4 ui-monospace, monospace; }
+</style>
+</head>
+<body>
+<h1>Kelk — storage check from <code>file://</code></h1>
+<p>Open this file from disk in each browser (Chrome, Edge, Firefox). Press <b>Run the checks</b>, then
+  <b>Reload and check again</b>, then <b>Copy the results</b> and send them. Nothing leaves your browser.</p>
+<p dir="rtl" lang="fa">این فایل را مستقیم از دیسک در هر مرورگر (Chrome، Edge، Firefox) باز کنید؛ «Run the checks» و سپس
+  «Reload and check again» را بزنید و نتیجه را با «Copy the results» کپی کنید. هیچ داده‌ای از مرورگر بیرون نمی‌رود.</p>
+<div>
+  <button id="run" type="button">Run the checks</button>
+  <button id="reload" type="button">Reload and check again</button>
+  <button id="copy" type="button">Copy the results</button>
+  <button id="clear" type="button">Clear the test data</button>
+</div>
+<table aria-describedby="out">
+  <thead><tr><th scope="col">Check</th><th scope="col">Result</th><th scope="col">Detail</th></tr></thead>
+  <tbody id="rows"></tbody>
+</table>
+<label for="out">Results to copy</label>
+<textarea id="out" readonly></textarea>
+<script>
+'use strict';
+(function () {
+  const DB = 'kelk-storage-check', STORE = 'blobs', N = 80, MB = 1024 * 1024;
+  const rows = document.getElementById('rows'), out = document.getElementById('out');
+  const results = [];
+  function row(name, ok, detail) {
+    results.push({ name: name, ok: ok, detail: detail || '' });
+    const tr = document.createElement('tr');
+    const cls = ok === null ? 'wait' : ok ? 'ok' : 'no';
+    tr.innerHTML = '<td></td><td class="' + cls + '"></td><td></td>';
+    tr.children[0].textContent = name;
+    tr.children[1].textContent = ok === null ? '—' : ok ? 'yes' : 'NO';
+    tr.children[2].textContent = detail || '';
+    rows.appendChild(tr);
+    out.value = text();
+  }
+  function text() {
+    const ua = navigator.userAgent;
+    return ['Kelk storage check — ' + new Date().toISOString(), 'Browser: ' + ua, 'Page: ' + location.protocol + ' (origin ' + String(location.origin) + ')']
+      .concat(results.map(function (r) { return '- ' + r.name + ': ' + (r.ok === null ? '—' : r.ok ? 'yes' : 'NO') + (r.detail ? ' (' + r.detail + ')' : ''); })).join('\n');
+  }
+  function req(r) { return new Promise(function (ok, no) { r.onsuccess = function () { ok(r.result); }; r.onerror = function () { no(r.error); }; }); }
+  function done(tx) { return new Promise(function (ok, no) { tx.oncomplete = function () { ok(); }; tx.onerror = tx.onabort = function () { no(tx.error); }; }); }
+  function open() {
+    return new Promise(function (ok, no) {
+      if (!window.indexedDB) { no(new Error('no window.indexedDB')); return; }
+      let r;
+      try { r = indexedDB.open(DB, 1); } catch (e) { no(e); return; }
+      r.onupgradeneeded = function () { r.result.createObjectStore(STORE); };
+      r.onsuccess = function () { ok(r.result); };
+      r.onerror = function () { no(r.error); };
+      r.onblocked = function () { no(new Error('blocked')); };
+    });
+  }
+  // a picture-sized Blob whose bytes say which one it is (checked on reading back)
+  function blobOf(i) {
+    const a = new Uint8Array(MB);
+    for (let k = 0; k < a.length; k += 4096) { a[k] = i & 255; a[k + 1] = (k >> 12) & 255; }
+    return new Blob([a], { type: 'image/png' });
+  }
+  async function same(b, i) {
+    if (!(b instanceof Blob) || b.size !== MB) return false;
+    const a = new Uint8Array(await b.arrayBuffer());
+    for (let k = 0; k < a.length; k += 4096) if (a[k] !== (i & 255) || a[k + 1] !== ((k >> 12) & 255)) return false;
+    return true;
+  }
+  async function readAll(db) {
+    // (every get in one transaction first: reading a Blob's bytes in between would let the transaction end)
+    const st = db.transaction(STORE, 'readonly').objectStore(STORE), gets = [];
+    for (let i = 0; i < N; i++) gets.push(req(st.get('p' + i)));
+    const mark = req(st.get('written'));
+    const blobs = await Promise.all(gets);
+    let good = 0;
+    for (let i = 0; i < N; i++) if (blobs[i] && await same(blobs[i], i)) good++;
+    return { good: good, mark: await mark };
+  }
+  async function estimate() {
+    try {
+      if (!navigator.storage || !navigator.storage.estimate) { row('Storage estimate', null, 'navigator.storage not available'); return; }
+      const e = await navigator.storage.estimate();
+      const p = navigator.storage.persisted ? await navigator.storage.persisted() : null;
+      row('Storage estimate', true, 'used ' + Math.round((e.usage || 0) / MB) + ' MB of ' + Math.round((e.quota || 0) / MB) + ' MB' + (p === null ? '' : ', persisted: ' + p));
+    } catch (err) { row('Storage estimate', false, String(err && err.message || err)); }
+  }
+  async function hash() {
+    try {
+      if (!window.crypto || !crypto.subtle) { row('SHA-256 (crypto.subtle)', false, 'crypto.subtle not available (isSecureContext: ' + window.isSecureContext + ')'); return; }
+      const d = new Uint8Array(await crypto.subtle.digest('SHA-256', await blobOf(1).arrayBuffer()));
+      row('SHA-256 (crypto.subtle)', d.length === 32, 'isSecureContext: ' + window.isSecureContext);
+    } catch (err) { row('SHA-256 (crypto.subtle)', false, String(err && err.message || err)); }
+  }
+  function channel() {
+    return new Promise(function (ok) {
+      if (!window.BroadcastChannel) { row('BroadcastChannel', false, 'not available'); ok(); return; }
+      try {
+        const a = new BroadcastChannel('kelk-storage-check'), b = new BroadcastChannel('kelk-storage-check');
+        const t = setTimeout(function () { row('BroadcastChannel', false, 'no message within 1 s'); a.close(); b.close(); ok(); }, 1000);
+        b.onmessage = function (e) { clearTimeout(t); row('BroadcastChannel', e.data === 'hello', 'a message between two channels of this page'); a.close(); b.close(); ok(); };
+        a.postMessage('hello');
+      } catch (err) { row('BroadcastChannel', false, String(err && err.message || err)); ok(); }
+    });
+  }
+  async function run() {
+    rows.textContent = ''; results.length = 0;
+    let db;
+    try { db = await open(); row('IndexedDB opens', true, 'database «' + DB + '»'); } catch (err) { row('IndexedDB opens', false, String(err && err.message || err)); }
+    if (db) {
+      try {
+        const t0 = performance.now();
+        const tx = db.transaction(STORE, 'readwrite'), st = tx.objectStore(STORE);
+        for (let i = 0; i < N; i++) st.put(blobOf(i), 'p' + i);
+        st.put(new Date().toISOString(), 'written');
+        await done(tx);
+        row('80 pictures of 1 MB stored (Blobs)', true, Math.round(performance.now() - t0) + ' ms');
+        const t1 = performance.now(), r = await readAll(db);
+        row('Read back the same', r.good === N, r.good + ' of ' + N + ', ' + Math.round(performance.now() - t1) + ' ms');
+      } catch (err) { row('80 pictures of 1 MB stored (Blobs)', false, String(err && err.name || '') + ' ' + String(err && err.message || err)); }
+      db.close();
+    }
+    await hash(); await channel(); await estimate();
+  }
+  // after «Reload and check again»: what the first run stored, still there?
+  async function after() {
+    let ran = null;
+    try { ran = sessionStorage.getItem('kelk-storage-check'); sessionStorage.removeItem('kelk-storage-check'); } catch (e) { /* ignore */ }
+    if (ran !== 'reload') return;
+    try {
+      const db = await open(), r = await readAll(db);
+      db.close();
+      row('Still there after a reload', r.good === N && !!r.mark, r.good + ' of ' + N + (r.mark ? ', stored ' + r.mark : ', nothing stored'));
+    } catch (err) { row('Still there after a reload', false, String(err && err.message || err)); }
+    await hash(); await channel(); await estimate();
+  }
+  document.getElementById('run').addEventListener('click', run);
+  document.getElementById('reload').addEventListener('click', function () {
+    try { sessionStorage.setItem('kelk-storage-check', 'reload'); } catch (e) { /* ignore */ }
+    location.reload();
+  });
+  document.getElementById('copy').addEventListener('click', function () {
+    out.value = text(); out.select();
+    try { navigator.clipboard.writeText(out.value).catch(function () { document.execCommand('copy'); }); } catch (e) { document.execCommand('copy'); }
+  });
+  document.getElementById('clear').addEventListener('click', function () {
+    try { indexedDB.deleteDatabase(DB); rows.textContent = ''; results.length = 0; row('Test data cleared', true, ''); } catch (err) { row('Test data cleared', false, String(err && err.message || err)); }
+  });
+  after();
+})();
+</script>
+</body>
+</html>

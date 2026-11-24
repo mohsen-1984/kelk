@@ -200,6 +200,8 @@ node scripts/math-roundtrip.js        # formulas through Kelk and back: every ca
 DIR=folder node scripts/run-real.js   # any PDFs: words found (recall) and their order, against pdftotext
 node scripts/run-crash.js [folder]    # stability: every PDF under a folder (default pdf/ and ladder/, subfolders too); exit 1 on an error or timeout
 node scripts/run-stress.js big.pdf small.pdf   # a long file (thread held < 1 s by the importer's steps; opening the file is counted apart, < 3 s), injected faults (the ladder's rungs), an abort, ladder/*.pdf demoted
+node scripts/make-longscan.js [pages]         # out/longscan.pdf: the lab's 300 dpi scans joined to a 290-page book (3.7; made when needed, never committed)
+node scripts/run-longscan.js [file.pdf]        # that book in the app (index.html, «Ask»): import time, pages drawn, memory, the report; «Read with OCR» on two ranges; a reload — numbers for a PR's text, not a gate
 node scripts/make-ladder.js                    # ladder/: PDFs the fallback ladder must demote (a scan, glued Type 3 words) — not corpus files
 node scripts/run-import.js --mode safe         # the corpus in safe mode (its own LAB_OUT): means of words and order ≥ 70
 node scripts/cmp.js A B dir…             # two versions of the importer (a Kelk folder or its lib/PdfImporter.js): what changed
@@ -625,6 +627,7 @@ When a score drops, look at what the importer saw, layer by layer:
 | `shapes.js file.pdf page yFrom yTo` | small marks (bullets, checkboxes and their ticks), images, vector parts, rectangles with colours |
 | `lines.js file.pdf yMin yMax` | the lines (segments) handed to the layout: page, y, x-range, size, bold share, `cell` flag, marker, monospace share |
 | `kelk-app.js import|pdf|trip …` | Kelk itself, headless (index.html): a PDF imported as the app imports it, Markdown exported to PDF as the app exports it (its settings, fonts loaded on demand), or both — the owner's round trip end to end |
+| `run-longscan.js [file.pdf] [range] [range] [out.json]` | Kelk on a long scan as a user meets it (3.7): the import's time, how often pdf.js drew and read each page, the renderer's memory at its height, the report's head and actions; «Read with OCR» on two ranges through the report's own field; a reload (the text, its pictures kept). Its 1-bit pages are Flate: a real scan's JBIG2 pages cost far more memory to decode, which this book does not show |
 | `md.js <kelk folder or lib/PdfImporter.js> file.pdf` | the Markdown of one file with a given version of the importer (its core and `lib/pdfimport/` parts); `IMAGES=1` keeps the pictures (shortened) to show where they land |
 | `dbg.js file.pdf "<js>"` | runs JavaScript in the page after the import (`r` is the result) |
 
