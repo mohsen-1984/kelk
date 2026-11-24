@@ -18,7 +18,8 @@ All notable changes to Kelk. Dates are those of the release tags.
 - **Scanned pages, cleaner text.** Fewer stray zero-width non-joiners between letters. Dust is told from punctuation
   by its size against the line's own letters: a speck no longer becomes a bullet or breaks a paragraph, while a real
   bullet and a real period stay (our lab page with dust: 59.6 → 72.9). A scanned cover in a frame keeps its title and
-  text (our lab cover: 25.0 → 71.2). A drawing's short labels go into its picture's description (40.9 → 70.5).
+  text (our lab cover: 25.0 → 71.2). A drawing's short labels go into its picture's description (40.9 → 70.5). A part
+  printed sideways stays a picture, noted in the report (72.2 → 92.6).
 - **PDF import, unknown fonts:** a digit read as a letter inside a number is read as a digit when the font uses that
   glyph nowhere else (a year whose 8 came out as a letter now reads «۱۳۸۵»).
 

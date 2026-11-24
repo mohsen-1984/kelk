@@ -1871,7 +1871,10 @@ place that holds a line of known words — at least two words of three letters o
 language model — is no picture: the text wins, as in 3.5 (a cover's frame and its hatched band had taken its title,
 `scan-cover-fa`). A drawing with only short lines inside it (`ladOcrLabelChars`, 24 letters) keeps its picture, and
 those lines become its description, joined by « · » (`scan-labels-fa`; a label on the same pixel rows as the drawing
-is still part of its picture, TODO). The page's pixels,
+is still part of its picture, TODO). A page whose text is at least ten words, `ladOcrOneLetter` (half) of them one
+letter long, has a part printed sideways (read upright, a turned table of figures is one-letter words): its lines that
+are not lines of known words, with its picture places, become one picture, the kept lines stay text, and the page gets
+the report's note `turned` (`scan-sideways-fa`; reading it turned is in TODO). The page's pixels,
 and pdf.js's decoded image of it, are freed as soon as its lines are read.
 
 The page then goes through the fonts, the lines, the layout and the ladder as any page with text; the ladder
@@ -1879,7 +1882,7 @@ reports it as mode `ocr` (`why` `noText`), its confidence the share of its words
 `tools/build-lm.js` counts them: Tesseract's own scores read high on lines that are wrong). The report lists the
 pages read in a category of their own, `report.ocr` `[{ page, conf, lines, notes }]` — `noLines`, `lowConf` (under
 0.7, `ladOcrLowConf`), `columns` (two columns side by side that a word Tesseract read runs across, so the layout
-cannot tell them apart), `failed` —, apart from the findings. A page with no line read keeps its picture; a page
+cannot tell them apart), `turned` (a part printed sideways, kept as a picture), `failed` —, apart from the findings. A page with no line read keeps its picture; a page
 that cannot be drawn (no canvas) keeps its picture and `ocrNeeded`; a page Tesseract fails on, `ocrPageFailed`; an
 engine that does not start, `ocrFailed`. The engine stays for the decipherment's OCR votes (`trust.js`
 `_decOcrEngine`) and is given back after the fonts (`_ladOcrEnd`, and in the import's `finally`). The lab runs with
