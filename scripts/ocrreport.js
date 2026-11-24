@@ -127,13 +127,15 @@
         return got.length ? nums(got) : null;
     }
 
-    // the button, its range and its hint: made once, in the panel's row of buttons, before «Re-import in safe mode»
+    // the range, the button and its hint: made once, in a frame of their own (3.7), before «Re-import in safe mode»
     const cur = { entries: [], onOcr: null, close: null };
     let ui = null, ui_dir = null;
     function make() {
         const acts = K.$('#import-report .report-actions');
         if (!acts) return null;
-        const before = K.$('#report-safe');
+        const before = K.$('#report-safe-group') || K.$('#report-safe');
+        const group = document.createElement('div');
+        group.className = 'report-act'; group.id = 'report-ocr-group';
         const field = document.createElement('label');
         field.className = 'field report-ocr-pages'; field.id = 'report-ocr-field';
         field.innerHTML = '<span></span><input id="report-ocr-pages" type="text" dir="ltr" inputmode="numeric" autocomplete="off" aria-describedby="report-ocr-hint">';
@@ -142,7 +144,8 @@
         btn.innerHTML = '<i data-lucide="scan-text"></i><span></span>';
         const hint = document.createElement('p');
         hint.className = 'report-safe-hint'; hint.id = 'report-ocr-hint';
-        acts.insertBefore(field, before); acts.insertBefore(btn, before); acts.appendChild(hint);
+        group.appendChild(field); group.appendChild(btn); group.appendChild(hint);
+        acts.insertBefore(group, before);
         K.ui.icons(btn);
         const input = field.querySelector('input');
         const read = function () {
@@ -159,7 +162,7 @@
         ui_dir = dir;
         btn.addEventListener('click', read);
         input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); read(); } });
-        return { field: field, input: input, btn: btn, hint: hint };
+        return { group: group, field: field, input: input, btn: btn, hint: hint };
     }
     function show(entries, onOcr, close) {
         const all = scans(entries), on = !!onOcr && (all.length > 0 || fonts(entries));
@@ -173,7 +176,7 @@
         ui.field.querySelector('span').textContent = t('rep_ocrPages');
         ui.btn.querySelector('span').textContent = t('rep_ocrRead');
         ui.hint.textContent = t('rep_ocrHint');
-        [ui.field, ui.btn, ui.hint].forEach(function (x) { x.hidden = !on; });
+        [ui.group, ui.field, ui.btn, ui.hint].forEach(function (x) { x.hidden = !on; });
         ui.field.hidden = !on || !all.length;                // (the range: for scanned pages only)
     }
 

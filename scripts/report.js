@@ -25,12 +25,12 @@
  *     the panel «Import report» instead of «PDF import report».
  *   Kelk.ui.report(rep | [{ name, report }] | null, { name, onSafe, onOcr })
  *     shows #import-report for every PDF import, the same way whatever the file: a clean one too (its summary, the
- *     calm color), one with something to tell in the warning color (worth). Open for config.reportOpenMs, then
- *     collapsed to its head (summary and a toggle: open again, collapse again); 0 keeps it open. Its × closes it
+ *     calm color), one with something to tell in the warning color (worth). Open for config.reportOpenMs (for as long
+ *     as it holds an action, 3.7), then collapsed to its head (summary and a toggle: open again, collapse again); 0 keeps it open. Its × closes it
  *     for good. It belongs to the document it reports on (Kelk.editor.doc()): replacing the text (Clear, a sample,
  *     another import) hides it, an undo back to that document shows it again (collapsed). null: hidden. The focus moves into the panel and
  *     goes back where it was when it closes (its ×, Escape, or a clean import that closes it). onSafe: the
- *     "Re-import in safe mode" button's action, its explanation shown under it (no button without it, nor for a
+ *     "Re-import in safe mode" button's action, in a frame with its explanation (3.7) (no button without it, nor for a
  *     report that already ran in safe mode). onOcr(pages): "Read with OCR" (3.4) with a page range, when a report says
  *     pages need OCR (scripts/ocrreport.js, loaded with the PDF importer: the button, the range, the OCR table, their words). Kelk.ui.report.release(): a new import starts — onSafe, onOcr (and the
  *     file bytes it holds) goes. No live region of its
@@ -328,7 +328,7 @@
         const box = K.$('#import-report'), body = K.$('#import-report-body'), v = state.view;
         body.textContent = '';
         v.body(body);
-        ['#report-safe', '#report-safe-hint'].forEach(function (s) { const x = K.$(s); if (x) x.hidden = true; });
+        ['#report-safe-group', '#report-safe', '#report-safe-hint'].forEach(function (s) { const x = K.$(s); if (x) x.hidden = true; });
         if (K.ocrReport) K.ocrReport.show([], null);
         const name = K.$('#import-report-name'); if (name) name.textContent = '';
         const brief = K.$('#import-report-brief'); if (brief) brief.textContent = v.brief();
@@ -376,11 +376,12 @@
         });
         // (Read with OCR and its page range: scripts/ocrreport.js)
         if (K.ocrReport) K.ocrReport.show(state.entries, state.o.onOcr, close);
-        const safe = K.$('#report-safe'), hint = K.$('#report-safe-hint');
+        const safe = K.$('#report-safe'), hint = K.$('#report-safe-hint'), group = K.$('#report-safe-group');
         // (a clean import has nothing safe mode would do better: no button)
         const noSafe = !state.o.onSafe || state.entries.every(function (e) { return e.report.mode === 'safe' || !worth(e.report); });
         if (safe) safe.hidden = noSafe;
         if (hint) hint.hidden = noSafe;
+        if (group) group.hidden = noSafe;
         const name = K.$('#import-report-name');
         if (name) name.textContent = state.entries.length === 1 ? state.entries[0].name : '';
         // the head's own line, read while the panel is collapsed: the summary of one file, or how many files
@@ -410,14 +411,21 @@
         tg.title = label; tg.setAttribute('aria-label', label);
         K.ui.setIcon(tg, shut ? 'chevron-down' : 'chevron-up');
     }
-    /** collapse after config.reportOpenMs — later while the pointer is over it or the focus on one of its controls */
+    /** the panel holds an action (Re-import in safe mode, Read with OCR): it stays open until the user collapses it (3.7) */
+    function holds() {
+        return Array.prototype.some.call(document.querySelectorAll('#import-report .report-act'), function (g) { return !g.hidden; });
+    }
+    /**
+     * collapse after config.reportOpenMs — later while the pointer is over it or the focus on one of its controls; never
+     * while it holds an action, whose page range the user may be typing (3.7)
+     */
     function collapseLater(ms) {
         clearTimeout(state.timer); state.timer = 0;
         const wait = ms == null ? +K.config.reportOpenMs : ms;
-        if (!(wait > 0)) return;
+        if (!(wait > 0) || holds()) return;
         state.timer = setTimeout(function () {
             const box = K.$('#import-report');
-            if (!box || box.hidden) return;
+            if (!box || box.hidden || holds()) return;
             const a = document.activeElement, busy = box.matches(':hover') || (box.contains(a) && a !== box && a.id !== 'import-report-toggle');
             if (busy) collapseLater(1000); else collapse(true);
         }, wait);

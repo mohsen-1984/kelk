@@ -111,14 +111,18 @@
 .report-findings { margin: 0; padding-inline-start: 18px; display: grid; gap: 6px; }
 .report-findings li.warn::marker { color: var(--warn); }
 .report-findings li.info::marker { color: var(--accent); }
-.report-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.report-actions { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; }
+/* each action in a frame of its own, its button with its description (3.7); Copy report apart, at the end */
+.report-act { flex: 1 1 280px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padding: 8px; border: 1px solid var(--line); border-radius: 8px; }
+.report-act[hidden] { display: none; }
+.report-copy { margin-inline-start: auto; align-self: flex-end; }
 /* Read with OCR's page range, beside its button (3.4) */
 /* (.report-actions first: .field, further down, would make it a grid — its label over the box, and the button beside it
    centred on both, higher than the box; 3.6) */
 .report-actions .report-ocr-pages { display: flex; align-items: center; gap: 6px; }
 .report-actions .report-ocr-pages input[type="text"] { width: 12em; }
-/* what the safe-mode button does: visible beside the buttons (the button's description, aria-describedby) */
-.report-safe-hint { flex: 1 1 240px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+/* what an action's button does: under it, in its frame (the button's description, aria-describedby) */
+.report-safe-hint { flex: 1 1 100%; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
 .editor-wrap { position: relative; flex: 1; min-height: 240px; display: flex; }
 /* (before the narrow layouts' rules below, which change it: after them, it undid their fixed height on a phone —
    the preview grew to the document's length, and its overscroll-behavior kept a finger on it from scrolling the page) */
