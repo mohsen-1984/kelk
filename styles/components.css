@@ -113,8 +113,10 @@
 .report-findings li.info::marker { color: var(--accent); }
 .report-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 /* Read with OCR's page range, beside its button (3.4) */
-.report-ocr-pages { display: flex; align-items: center; gap: 6px; }
-.report-ocr-pages input[type="text"] { width: 9em; }
+/* (.report-actions first: .field, further down, would make it a grid — its label over the box, and the button beside it
+   centred on both, higher than the box; 3.6) */
+.report-actions .report-ocr-pages { display: flex; align-items: center; gap: 6px; }
+.report-actions .report-ocr-pages input[type="text"] { width: 12em; }
 /* what the safe-mode button does: visible beside the buttons (the button's description, aria-describedby) */
 .report-safe-hint { flex: 1 1 240px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
 .editor-wrap { position: relative; flex: 1; min-height: 240px; display: flex; }
