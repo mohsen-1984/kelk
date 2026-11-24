@@ -72,6 +72,9 @@ test('the line finder: a frame and a table rule are taken out, the text between 
   assert.equal(pg.clean[12 * w + 400], 255, 'the frame is white in the page Tesseract reads');
   assert.equal(pg.clean[91 * w + 400], 255, 'the rule too');
   assert.equal(pg.clean[45 * w + 105], 0, 'the text stays');
+  assert.equal(pg.ink[45 * w + 105], 1, 'the ink map (3.6 fix): the text is ink');
+  assert.equal(pg.ink[91 * w + 400], 0, 'the rule is not');
+  assert.ok(pg.boxes.every((b) => b.ink > 0 && b.ink <= b.y1 - b.y0), 'each line has its ink height');
 });
 
 test('the line finder: a rule scanned askew (a row lower every 60 pixels) is taken out too', function () {

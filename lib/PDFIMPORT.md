@@ -1831,7 +1831,18 @@ word when they agree in number (else each word is corrected on its own; no boxes
 `ladOcrWordWide` (2.5) times its letters at the line's usual width a letter; the words between two kept ones share
 the room between them by their letters (now and then a box runs across half the line: its letters fell among its
 neighbours', «زممینری‌ابا‌ک‌…»), and two words never overlap — a third of a letter apart (a space glyph over the
-letters before it is no word break: the words ran together with a ZWNJ). `ocrWordGlyphs` sets a word out as a PDF
+letters before it is no word break: the words ran together with a ZWNJ). A run at the line's start or end with no
+kept word beyond it takes its letters' width at the line's usual width a letter, not the line's box out to its edge
+(specks and margins widen that box: the line stood past the margin and a paragraph broke at it); then the line's
+outer words are pinned to where its ink starts and ends (the first and last runs of ink at least half a letter wide:
+Tesseract's boxes at a line's ends wander by half a word). Dust goes first, a word at either end of the line in reading
+order: one or two characters, no digit, not a two-letter word the language model knows, further than
+`ladOcrStrayGap` (3) letters from the rest (a speck read as «.», «،» or a letter); or one character smaller both ways
+than `ladOcrDust` (0.18) of the line's own ink height — its tallest letter's top to its deepest's bottom, steady from
+line to line — at the line's start, or at its end and that far (a speck read as «۰»: at the start a bullet, the
+paragraph broken there). A lone character at a line's end is first fitted to its own ink (Tesseract gave a dot a box
+the line's height). A real bullet and a real period are larger than that and stand close to their words: both stay
+(`scan-dust-fa`). `ocrWordGlyphs` sets a word out as a PDF
 draws it: each character with its marks and ZWNJ, in visual order (a right-to-left word reversed, its digits and Latin
 kept left to right), spread evenly over the word's box, on the line's baseline, in a font of its own (`kelk-ocr`,
 `g.ocr`: no program, no ToUnicode, no fontprint, no glyph id — the font steps pass it by; with one id for every
