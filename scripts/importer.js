@@ -262,6 +262,8 @@
                 if (mode) opts.mode = hooks.mode = mode;
                 if (ocr) opts.ocr = 'read';
                 if (ocr && o && Array.isArray(o.ocrPages)) opts.ocrPages = o.ocrPages.slice();
+                // (the pages OCR read before in this file, kept for the session: taken again, not read again, 3.6)
+                if (ocr && o && o.ocrState) opts.ocrCache = o.ocrState.cache;
                 const r = await PdfImporter.create(opts).fromArrayBuffer(buf, hooks);
                 if (r.messages && r.messages.length) console.info('PdfImporter:', r.messages);
                 return { md: r.markdown, report: K.importReport.fromResult(r), bytes: bytes, info: fi ? fi.fromPdf(r) : null, kind: 'pdf' };
@@ -273,14 +275,22 @@
      * A PDF imported on its own, read again from its report: "Re-import in safe mode" (safe) and "Read with OCR"
      * (ocr(pages): its mode kept) — the actions, the only holders of the file's bytes, used once by either
      */
-    function again(bytes, name, mode) {
+    function again(bytes, name, mode, state) {
+        // (state: the file's OCR so far — the pages read, each page's result in its cache —, carried from one «Read with
+        // OCR» to the next, 3.6: a new range adds to the pages read before, which come from the cache, not read again)
+        const st = state || { read: [], cache: new Map() };
         const run = function (o) {
             const b = bytes; bytes = null;
             return b ? K.importer.fromFiles([new File([b], name, { type: 'application/pdf' })], o) : undefined;
         };
         return {
             safe: function () { return run({ mode: 'safe' }); },
-            ocr: function (pages) { return run(Object.assign(mode ? { mode: mode } : {}, { ocr: 'read', ocrPages: pages })); }
+            ocr: function (pages) {
+                // (no scanned page — OCR for the fonts alone — reads every page, as before)
+                const all = pages && pages.length ? Array.from(new Set(st.read.concat(pages))).sort(function (a, b) { return a - b; }) : pages;
+                if (all && all.length) st.read = all;
+                return run(Object.assign(mode ? { mode: mode } : {}, { ocr: 'read', ocrPages: all, ocrState: st }));
+            }
         };
     }
 
@@ -406,7 +416,12 @@
             // the bytes: held by the panel's actions only, not by parts, the task's promise or this function's scope
             // (again: a closure of its own — one here would share the scope with the task's); Read with OCR unless
             // Settings → Import → Scanned pages says to leave them
-            const act = one && one.bytes ? again(one.bytes, one.name, o && o.mode) : null;
+            // (the browser's storage refused the pictures: the document is gone when the page closes — said in the
+            // report, where the reader looks after an import, as well as in its toast, 3.6)
+            if (K.images.stored && !K.images.stored()) reports.forEach(function (p) {
+                if (p.report && p.report.notes && !p.report.notes.some(function (n) { return n.code === 'tooLargeToKeep'; })) p.report.notes.push({ code: 'tooLargeToKeep' });
+            });
+            const act = one && one.bytes ? again(one.bytes, one.name, o && o.mode, o && o.ocrState) : null;
             parts.forEach(function (p) { p.bytes = null; });
             K.ui.report(reports.map(function (p) { return { name: p.name, report: p.report || K.importReport.none(), info: p.info, kind: p.kind }; }), {
                 name: one ? one.name : '',

@@ -337,9 +337,10 @@ async function check(browser, url, lang, theme, allow) {
                 if (!rp || !rp.open) bad.push('the import report panel did not open');
                 else {
                     if (!rp.focused) bad.push('the import report panel did not take the focus');
-                    if (rp.rows !== REPORT_SAMPLE.pages.length)
+                    // (consecutive pages alike are one row, 3.6: the sample's three scanned pages, 16–18)
+                    if (rp.rows !== REPORT_SAMPLE.pages.length - 2)
                         bad.push(
-                            'the import report shows ' + rp.rows + ' page rows, not ' + REPORT_SAMPLE.pages.length
+                            'the import report shows ' + rp.rows + ' page rows, not ' + (REPORT_SAMPLE.pages.length - 2)
                         );
                     if (rp.missing.length) bad.push('the import report has no row for ' + rp.missing.join(', '));
                 }

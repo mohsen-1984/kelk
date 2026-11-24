@@ -1,5 +1,6 @@
 // Stress: one big PDF and injected faults, through the importer in Chromium.
-//   node scripts/run-stress.js big.pdf [small.pdf]      (big.pdf: e.g. qpdf --empty --pages pdf/*.pdf -- big.pdf)
+//   node scripts/run-stress.js big.pdf [small.pdf [scan.pdf]]      (big.pdf: e.g. qpdf --empty --pages pdf/*.pdf -- big.pdf;
+//                                       scan.pdf: e.g. the scans of pdf/rtl/scan-300--*.pdf joined eight times)
 // Exit code 1 when one of the expectations below fails.
 // big:    total time, and the longest the main thread was held (PerformanceObserver 'longtask', and a timer
 //         heartbeat's longest gap) — a page that
@@ -11,12 +12,20 @@
 //         reject: in auto mode the fallback ladder (lib/pdfimport/ladder.js) gives the first as pdf.js's text
 //         ('textContent') and the second simplified, with no 'pageFailed'; in 'full' mode both are 'pageFailed' as
 //         before the ladder; an AbortSignal must stop it with err.code 'aborted'
+// scan:   a long scan (the third argument: e.g. the lab's scans joined several times by qpdf, our own text), its pages
+//         cut as pictures as the app does: the renderer's memory at its height (Linux: ps), under SCAN_MB — pdf.js's
+//         caches of each page go once it is read, else every page's decoded scan stayed until its layout (a
+//         291-page scanned book: 5.3 GB; 3.6)
 // ladder: the files of tests/pdf-lab/ladder/ (scripts/make-ladder.js) given in the mode each must be demoted to —
-//         a scan with no text 'ocr', glued words with lost glyphs 'simplified', a quarter of them lost 'simplified' too
+//         a scan with no text 'scan' (OCR not run: kept as its picture, 3.6), glued words with lost glyphs 'simplified', a quarter of them lost 'simplified' too
 //         (pdf.js's text, the glyphs' source, loses the same: taken only where it loses demonstrably fewer)
 const fs = require('fs');
 const path = require('path');
 const { lab, req, LAB } = require('./env.js');
+const { execSync } = require('child_process');
+const SCAN_MB = 1500;
+// the renderer's resident memory in MB (Linux; null elsewhere): the largest renderer process
+const rss = () => { try { const v = +execSync("ps -eo rss,args | grep -- '--type=renderer' | grep -v grep | sort -n | tail -1 | awk '{print $1}'").toString().trim(); return v ? Math.round(v / 1024) : null; } catch (e) { return null; } };
 (async () => {
   const { chromium } = req('playwright');
   const browser = await chromium.launch(), page = await browser.newPage();
@@ -41,7 +50,7 @@ const { lab, req, LAB } = require('./env.js');
     if (mode === 'abort') setTimeout(() => ac.abort(), 300);
     const t0 = performance.now(); let out;
     try {
-      const r = await PdfImporter.create({ images: 'drop', signal: ac.signal, mode: ladder || 'auto' }).fromArrayBuffer(u.buffer, { onProgress: () => {} });
+      const r = await PdfImporter.create(Object.assign({ images: 'drop', signal: ac.signal, mode: ladder || 'auto' }, mode === 'scan' ? { images: 'markdown', onImage: () => 'img' } : {})).fromArrayBuffer(u.buffer, { onProgress: () => {} });
       out = { ok: true, chars: r.markdown.length, notes: r.notes, messages: r.messages.filter((m) => /page/i.test(m)).slice(0, 3),
               modes: (r.pages || []).map((p) => p.mode), failed: r.failedPages, report: r.report };
     } catch (e) { out = { ok: false, code: e.code || null, error: String(e.message || e).slice(0, 120) }; }
@@ -54,6 +63,16 @@ const { lab, req, LAB } = require('./env.js');
     out.longTasks = longs.length; out.heartbeatGap = Math.round(gap);
     return out;
   }, { b64: fs.readFileSync(file).toString('base64'), mode, ladder });
+  // a long scan, first: the renderer's memory sampled while it imports (first, in a renderer nothing else has used —
+  // after the big file the renderer keeps what that took, 2.5 GB on CI's runner)
+  let sc = null;
+  if (process.argv[4]) {
+    let peak = null, on = true;
+    const watch = (async () => { while (on) { const v = rss(); if (v !== null) peak = Math.max(peak || 0, v); await new Promise((r) => setTimeout(r, 250)); } })();
+    sc = await run(process.argv[4], 'scan'); on = false; await watch;
+    sc.peakMB = peak;
+    console.log('scan    ', JSON.stringify({ ok: sc.ok, pages: (sc.modes || []).length, ms: sc.ms, peakMB: sc.peakMB, error: sc.error }));
+  }
   const big = process.argv[2], small = process.argv[3] || big;
   const b = await run(big, 'plain'), f = await run(small, 'faults'), ff = await run(small, 'faults-full', 'full'), a = await run(big, 'abort');
   const brief = (x) => JSON.stringify(Object.assign({}, x, { report: x.report ? { summary: x.report.summary, pages: x.report.pages } : undefined }));
@@ -62,7 +81,7 @@ const { lab, req, LAB } = require('./env.js');
   console.log('faults (mode full)', brief(ff));
   console.log('abort   ', JSON.stringify(a));
   // the ladder's own files: every page in the mode named (tests/pdf-lab/ladder/, made by scripts/make-ladder.js)
-  const LADDER = { 'scan--article.pdf': 'ocr', 't3-glued--lost.pdf': 'simplified', 't3-glued--lost25.pdf': 'simplified' };
+  const LADDER = { 'scan--article.pdf': 'scan', 't3-glued--lost.pdf': 'simplified', 't3-glued--lost25.pdf': 'simplified' };
   const lad = {};
   for (const n of Object.keys(LADDER)) {
     const file = path.join(LAB, 'ladder', n);
@@ -89,6 +108,8 @@ const { lab, req, LAB } = require('./env.js');
     if (!x.ok) fails.push('ladder ' + n + ': ' + x.error);
     else if (!x.modes.length || x.modes.some((m) => m !== LADDER[n])) fails.push('ladder ' + n + ': ' + x.modes.join(',') + ', not ' + LADDER[n]);
   });
+  if (sc && !sc.ok) fails.push('scan: ' + sc.error);
+  else if (sc && sc.peakMB !== null && sc.peakMB > SCAN_MB) fails.push('scan: the renderer held ' + sc.peakMB + ' MB at its height (at most ' + SCAN_MB + ')');
   if (b.ms > 600 && a.code !== 'aborted') fails.push('abort: not aborted (' + (a.code || a.ok) + ')');
   console.log(fails.length ? '\nFAILED\n  ' + fails.join('\n  ') : '\npassed');
   process.exitCode = fails.length ? 1 : 0;

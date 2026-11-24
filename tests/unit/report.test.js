@@ -123,7 +123,7 @@ test('fromResult: a result without r.report → the contract, from r.notes, r.qu
   });
   assert.deepEqual(clone(rep), {
     mode: 'full',
-    summary: { pages: 4, full: 3, simplified: 0, textContent: 0, ocr: 0, failed: 1, conf: null },
+    summary: { pages: 4, full: 3, simplified: 0, textContent: 0, ocr: 0, scan: 0, failed: 1, conf: null },
     pages: [],
     flags: [{ code: 'suspectSpaces', pages: [2, 4] }],
     ocr: [],
@@ -253,7 +253,12 @@ for (const lang of ['fa', 'en', 'ar']) {
     assert.equal(box.hidden, false);
     // (the pages read with OCR are in their own table, not in the pages not read in full)
     const byOcr = (p) => SAMPLE.ocr.some((x) => x.page === p.page);
-    assert.equal(box.querySelectorAll('.report-pages:not(.report-ocr) tbody tr').length, SAMPLE.pages.filter((p) => !byOcr(p)).length);
+    // (one row a page, but consecutive pages alike are one: the sample's scanned pages 16–18, 3.6)
+    const pageRows = box.querySelectorAll('.report-pages:not(.report-ocr) tbody tr');
+    assert.equal(pageRows.length, SAMPLE.pages.filter((p) => !byOcr(p)).length - 2);
+    const scanRow = Array.from(pageRows).find((r) => r.getAttribute('data-mode') === 'scan');
+    assert.equal(scanRow.querySelector('th').textContent, '\u206616–18\u2069', 'pages 16 to 18 in one row');
+    assert.ok(scanRow.textContent.includes('—'), 'a page not read has no confidence');
     // the pages read with OCR: a table of their own, each page with its confidence and its notes
     const ocrRows = box.querySelectorAll('.report-ocr tbody tr');
     assert.equal(ocrRows.length, SAMPLE.ocr.length);
@@ -384,9 +389,9 @@ test('the panel: focus in on open, back on close (×, Escape); Copy report; Re-i
   d.getElementById('editor').focus();
   K.ui.report(null);
   assert.equal(d.activeElement, d.getElementById('editor'));
-  // one page: its own words (en: "1 page read", not "1 pages read")
+  // one page: its own words (en: "1 page", not "1 pages")
   K.ui.report({ mode: 'auto', summary: { pages: 1, full: 0, simplified: 1 }, pages: [{ page: 1, mode: 'simplified', conf: 0.5, why: ['lowConf'] }], flags: [], notes: [] });
-  assert.ok(box.querySelector('.report-summary').textContent.startsWith('1 page read'));
+  assert.ok(box.querySelector('.report-summary').textContent.startsWith('1 page') && !box.querySelector('.report-summary').textContent.startsWith('1 pages'));
   K.ui.report.close();
   // release (a new import starts): the safe-mode action goes, the report stays
   let kept = 0;
@@ -519,6 +524,27 @@ test('the report follows its document (Clear hides it, Undo brings it back colla
   w.close();
 });
 
+test('a document too large to keep: the browser refuses its pictures, the report says so in one line (3.6)', async function () {
+  const { window: w, errors } = await appWindow(OPENED);
+  try {
+    const K = w.Kelk, d = w.document;
+    K.store.saveImages = function () { return false; };
+    fakePdf(w, function (opts) {
+      return { markdown: 'x\n', notes: [], messages: [], report: { mode: 'auto', summary: { pages: 1, full: 1 }, pages: [], flags: [], ocr: [], notes: [] } };
+    });
+    const r = await K.images.add(new w.File([new Uint8Array([137, 80, 78, 71])], 'a.png', { type: 'image/png' }));
+    assert.ok(r);
+    assert.equal(K.images.stored(), false);
+    await K.importer.fromFile(pdfFile(w));
+    const li = d.querySelector('.report-findings [data-code="tooLargeToKeep"]');
+    assert.ok(li, 'a line in the report');
+    assert.equal(li.textContent, K.i18n.t('imagesSession'));
+    assert.deepEqual(errors, []);
+  } finally {
+    w.close();
+  }
+});
+
 test('Read with OCR: the range, the pages it asks for, the setting (Ask, Read with OCR, Leave as pictures)', async function () {
   const { window: w, errors } = await appWindow(OPENED);
   try {
@@ -529,6 +555,7 @@ test('Read with OCR: the range, the pages it asks for, the setting (Ask, Read wi
     assert.equal(R.rangeText([1, 2, 3, 7, 9, 10]), '1-3, 7, 9-10');
     assert.deepEqual(Array.from(R.rangePages('1-3, 7', [1, 2, 3, 5, 7])), [1, 2, 3, 7]);
     assert.deepEqual(Array.from(R.rangePages('۲ – ۳،٥', [1, 2, 3, 5])), [2, 3, 5]);
+    assert.deepEqual(Array.from(R.rangePages('1\u22122, 3\u20105', [1, 2, 3, 5])), [1, 2, 3, 5], 'a minus sign and a hyphen are dashes');
     assert.equal(R.rangePages('4', [1, 2]), null, 'no page that needs OCR');
     assert.equal(R.rangePages('3-1', [1, 2, 3]), null);
     assert.equal(R.rangePages('a', [1]), null);
@@ -557,7 +584,8 @@ test('Read with OCR: the range, the pages it asks for, the setting (Ask, Read wi
       range = d.getElementById('report-ocr-pages');
     assert.equal(btn.hidden, false);
     assert.equal(d.getElementById('report-ocr-field').hidden, false);
-    assert.equal(range.value, '2-3');
+    assert.equal(range.value, '', 'empty, as a print dialog: every scanned page');
+    assert.ok(range.placeholder.includes('1-5'), 'the placeholder shows how to write a range');
     range.value = '9';
     btn.click();
     assert.equal(calls.length, 1, 'an invalid range reads nothing');
@@ -573,7 +601,13 @@ test('Read with OCR: the range, the pages it asks for, the setting (Ask, Read wi
     assert.equal(K.editor.value(), 'متن\n');
     assert.equal(d.querySelectorAll('.report-ocr tbody tr').length, 1, 'the page read, in its own table');
     assert.equal(btn.hidden, false, 'page 3 can still be read');
-    assert.equal(range.value, '3');
+    assert.equal(range.value, '', 'empty again');
+    // a second run: the pages read before come with it, from the file's cache (the same one), not read again (3.6)
+    btn.click();
+    for (let i = 0; i < 50 && calls.length < 3; i++) await new Promise((r) => setTimeout(r, 10));
+    assert.equal(calls.length, 3);
+    assert.deepEqual(Array.from(calls[2].opts.ocrPages), [2, 3], 'page 2 read before, page 3 now (empty: every scanned page left)');
+    assert.ok(calls[2].opts.ocrCache && calls[2].opts.ocrCache === calls[1].opts.ocrCache, 'one cache for the file');
     // Read with OCR: every such page read at once; Leave as pictures: no button
     K.store.setUi('importer', Object.assign({}, K.store.getUi('importer'), { scannedPages: 'read' }));
     calls = fakePdf(w, scan);

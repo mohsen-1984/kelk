@@ -8,7 +8,7 @@
 
 module.exports = {
     mode: 'auto',
-    summary: { pages: 15, full: 5, simplified: 3, textContent: 1, ocr: 5, failed: 1, conf: 0.78 },
+    summary: { pages: 18, full: 5, simplified: 3, textContent: 1, ocr: 5, scan: 3, failed: 1, conf: 0.78 },
     pages: [
         { page: 3, mode: 'simplified', conf: 0.41, why: ['lowConf', 'suspectSpaces'] },
         { page: 4, mode: 'simplified', conf: 0.55, why: ['suspectSpaces', 'lostGlyphs'] },
@@ -21,7 +21,11 @@ module.exports = {
         { page: 12, mode: 'simplified', conf: 0, why: ['extractFailed'], failed: true },
         { page: 13, mode: 'ocr', conf: 0.52, why: ['noText'] },
         { page: 14, mode: 'ocr', conf: 0, why: ['noText'] },
-        { page: 15, mode: 'ocr', conf: 0, why: ['noText'] }
+        { page: 15, mode: 'ocr', conf: 0, why: ['noText'] },
+        // scanned pages OCR has not read (3.6): no confidence, one row «16–18» in the panel
+        { page: 16, mode: 'scan', conf: null, why: ['noText'] },
+        { page: 17, mode: 'scan', conf: null, why: ['noText'] },
+        { page: 18, mode: 'scan', conf: null, why: ['noText'] }
     ],
     flags: [
         { code: 'lostGlyphs', pages: [4] },
@@ -56,6 +60,7 @@ module.exports = {
         { code: 'hiddenText', pages: [2, 6] },
         { code: 'lostText', pages: [4] },
         { code: 'pageSimplified', pages: [3, 4, 11] },
-        { code: 'pageTextOnly', pages: [7] }
+        { code: 'pageTextOnly', pages: [7] },
+        { code: 'tooLargeToKeep' }
     ]
 };

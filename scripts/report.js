@@ -50,7 +50,8 @@
     const own = function (o, k) { return o != null && Object.prototype.hasOwnProperty.call(o, k); };
     /** a report's OCR list (a report made before 3.4 has none) */
     const ocrOf = function (rep) { return Array.isArray(rep.ocr) ? rep.ocr : []; };
-    const MODES = ['full', 'simplified', 'textContent', 'ocr'];
+    // (scan, 3.6: a scanned page OCR has not read — kept as its picture; ocr: a page OCR read)
+    const MODES = ['full', 'simplified', 'textContent', 'ocr', 'scan'];
     /** the panel's own mode of a page that could not be read (the contract: failed: true, mode 'simplified') */
     const FAILED = 'failed';
     /** the quality flags (r.quality.flags): also in r.notes, shown once, as a flag */
@@ -82,9 +83,11 @@
         kelkMath: { key: 'pdf_kelkMath', quiet: true },
         monoBody: { key: 'pdf_monoBody', quiet: true },
         pageSimplified: { key: 'pdf_pageSimplified' },
-        pageTextOnly: { key: 'pdf_pageTextOnly' }
+        pageTextOnly: { key: 'pdf_pageTextOnly' },
+        // (the app's own, not the importer's: the browser's storage refused the document's pictures, 3.6)
+        tooLargeToKeep: { key: 'imagesSession', warn: true }
     };
-    const MODE_KEYS = { full: 'rep_mode_full', simplified: 'rep_mode_simplified', textContent: 'rep_mode_textContent', ocr: 'rep_mode_ocr', failed: 'rep_mode_failed' };
+    const MODE_KEYS = { full: 'rep_mode_full', simplified: 'rep_mode_simplified', textContent: 'rep_mode_textContent', ocr: 'rep_mode_ocr', scan: 'rep_mode_scan', failed: 'rep_mode_failed' };
     const WHY_KEYS = {
         lowConf: 'rep_why_lowConf', suspectSpaces: 'rep_why_suspectSpaces', lostGlyphs: 'rep_why_lostGlyphs',
         layoutFailed: 'rep_why_layoutFailed', extractFailed: 'rep_why_extractFailed', noText: 'rep_why_noText',
@@ -141,13 +144,13 @@
             const pages = (Array.isArray(rep.pages) ? rep.pages : []).filter(function (p) { return p && (p.mode !== 'full' || p.failed); }).map(function (p) {
                 return { page: p.page, mode: p.failed ? FAILED : String(p.mode || ''), conf: confOf(p.conf), why: (Array.isArray(p.why) ? p.why : []).map(String) };
             });
-            const summary = { pages: +s.pages || 0, full: +s.full || 0, simplified: +s.simplified || 0, textContent: +s.textContent || 0, ocr: +s.ocr || 0, failed: +s.failed || 0, conf: confOf(s.conf) };
+            const summary = { pages: +s.pages || 0, full: +s.full || 0, simplified: +s.simplified || 0, textContent: +s.textContent || 0, ocr: +s.ocr || 0, scan: +s.scan || 0, failed: +s.failed || 0, conf: confOf(s.conf) };
             return { mode: rep.mode || 'auto', summary: summary, pages: pages, flags: flags, ocr: ocr, notes: noteList(rep.notes, flags, failed) };
         }
         // from before the fallback ladder: the fields the importer has always given
         const flags = flagList(r.quality && r.quality.flags);
         const per = Array.isArray(r.pages) ? r.pages.filter(function (p) { return p && p.page; }) : null;
-        const summary = { pages: 0, full: 0, simplified: 0, textContent: 0, ocr: 0, failed: failed.length, conf: null };
+        const summary = { pages: 0, full: 0, simplified: 0, textContent: 0, ocr: 0, scan: 0, failed: failed.length, conf: null };
         let pages = [];
         if (per) {
             per.forEach(function (p) { if (MODES.indexOf(p.mode) >= 0) summary[p.mode]++; });
@@ -194,7 +197,26 @@
                     return { mode: pageMode(p), cells: [p.page, modeName(pageMode(p)), pct(p.conf), p.why.map(whyName).join(sep())] };
                 }) },
             K.ocrReport && K.ocrReport.table(rep, pct, sep)
-        ].filter(function (tb) { return tb && tb.rows.length; });
+        ].filter(function (tb) { return tb && tb.rows.length; }).map(function (tb) { return Object.assign({}, tb, { rows: runs(tb.rows) }); });
+    }
+    /**
+     * consecutive pages whose other cells are the same (mode, confidence as shown, reason) are one row, «1–291»
+     * (3.6: a scanned book's 291 rows said one thing); the range isolated left to right, as a percentage is
+     */
+    function runs(rows) {
+        const out = [];
+        rows.forEach(function (r) {
+            const last = out[out.length - 1], same = last && last.to + 1 === r.cells[0] && last.cells.slice(1).join('\u0001') === r.cells.slice(1).join('\u0001');
+            if (same) { last.to = r.cells[0]; return; }
+            out.push(Object.assign({}, r, { from: r.cells[0], to: r.cells[0], cells: r.cells.slice() }));
+        });
+        return out.map(function (r) {
+            const cells = r.cells.slice();
+            if (r.to !== r.from) cells[0] = '\u2066' + r.from + '–' + r.to + '\u2069';
+            const o = { cells: cells };
+            if (r.mode) o.mode = r.mode;
+            return o;
+        });
     }
     const list = function (ps) { return K.ui.pageList(ps, 12); };
 
@@ -208,8 +230,12 @@
 
     /** the flags and the notes of a report as rows { code, text, warn }: what is missing first, then the rest */
     function findings(rep) {
+        // (a PDF with no text whose every page is a scan: the note on scanned pages says it all, 3.6 — «no extractable
+        // text, as Microsoft Print to PDF can do» would mislead)
+        const s = rep.summary || {}, allScans = s.pages > 0 && (s.scan || 0) + (s.ocr || 0) === s.pages && rep.notes.some(function (n) { return n.code === 'ocrNeeded'; });
+        const notes = rep.notes.filter(function (n) { return !(allScans && n.code === 'noText'); });
         const all = rep.flags.map(function (f) { return Object.assign({ code: f.code }, finding(f, true)); })
-            .concat(rep.notes.map(function (n) { return Object.assign({ code: n.code }, finding(n, false)); }));
+            .concat(notes.map(function (n) { return Object.assign({ code: n.code }, finding(n, false)); }));
         return all.filter(function (f) { return f.warn; }).concat(all.filter(function (f) { return !f.warn; }));
     }
 
@@ -223,7 +249,7 @@
     }
 
     function none() {
-        return { mode: null, summary: { pages: 0, full: 0, simplified: 0, textContent: 0, ocr: 0, failed: 0, conf: null }, pages: [], flags: [], ocr: [], notes: [] };
+        return { mode: null, summary: { pages: 0, full: 0, simplified: 0, textContent: 0, ocr: 0, scan: 0, failed: 0, conf: null }, pages: [], flags: [], ocr: [], notes: [] };
     }
     const titleKey = function (entries) { return entries.some(function (e) { return e.kind && e.kind !== 'pdf'; }) ? 'rep_titleImport' : 'rep_title'; };
     const infoOf = function (e) { return e.info && K.fileInfo && K.fileInfo.any(e.info) ? e.info : null; };

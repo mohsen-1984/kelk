@@ -358,12 +358,15 @@ r.failedPages;                  // pages that could not be read or laid out (the
 // options.loadDecipher (null): async () that loads lib/pdfimport/glyphfeat.js, featmodel.js, decipher.js and lm-fa.js
 //   (about 640 KB, 560 KB of it lm-fa.js, shared with OCR); by default as loadShapes — only when a PDF has such a font
 // options.ocr ('picture'): a page that is only a picture (a scan) — 'picture' keeps it, noted 'ocrNeeded'; 'read' reads
-//   its Persian text with OCR (Tesseract, line by line: PDFIMPORT.md, OCR); options.ocrPages (null): the pages to read
+//   its Persian text with OCR (Tesseract, line by line: PDFIMPORT.md, OCR); options.ocrPages (null): the pages to read;
+//   options.ocrCache (null): a Map kept for one file, page number → its OCR result — taken, not read again (3.6)
 // options.loadOcr (null): async () that loads lib/pdfimport/ocr.js, lm-fa.js and vendor/tesseract/ (9 MB); by default
 //   script tags beside ladder.js or require under Node — only when a page is read with OCR
 // hooks.onStage(stage, done, total, args): also 'ocrLoad' and 'ocr' (args [page, line, lines]) when pages are read
 r.report.ocr;                   // the pages read with OCR: [{ page, conf (the share of known words), lines, notes }] —
-                                //   notes: 'noLines', 'lowConf', 'columns', 'failed'
+                                //   notes: 'noLines', 'lowConf', 'columns', 'turned', 'failed'
+// (PdfImporter 1.6, 3.6: r.report.pages' mode 'scan' — a scanned page OCR has not read, its picture kept, conf null and
+//  out of r.report.summary.conf's mean; summary.scan counts them. 'ocr' is a page OCR read, or tried)
 // options.uiLang (''): the interface's language, for a note Kelk writes when the document's own cannot be told
 r.info;                         // the file's own words, as written: { title, author, subject, keywords, creator, producer,
                                 //   creatorTool, xmpProducer, history, created, modified, pdfVersion, pages, pageSize,

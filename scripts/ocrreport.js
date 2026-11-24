@@ -37,6 +37,7 @@
             rep_ocr_turned: 'به نظر می‌رسد بخشی از صفحه چرخیده چاپ شده است؛ تصویر آن بخش ماند',
             rep_ocrRead: 'خواندن با تشخیص نویسه (OCR)',
             rep_ocrPages: 'صفحه‌ها',
+            rep_ocrPagesPh: 'مثلاً 1-5، 8، 11-13',
             rep_ocrHint: 'متن فارسی تصویر صفحه‌ها را می‌خواند، حدود 1 تا 2 ثانیه برای هر صفحه؛ «لغو» آن را متوقف می‌کند. واگرد (Ctrl+Z) متن کنونی را برمی‌گرداند.',
             rep_ocrPagesBad: 'صفحه‌ها را به شکل «1-3, 7» بنویسید، از میان این صفحه‌ها: {0}',
             taskOcr: 'خواندن صفحهٔ {0} با تشخیص نویسه (OCR): خط {1} از {2}',
@@ -56,6 +57,7 @@
             rep_ocr_turned: 'part of the page seems printed sideways; its picture was kept',
             rep_ocrRead: 'Read with OCR',
             rep_ocrPages: 'Pages',
+            rep_ocrPagesPh: 'e.g. 1-5, 8, 11-13',
             rep_ocrHint: 'Reads the Persian text of the pages\' pictures, about 1–2 seconds a page; Cancel stops it. Undo (Ctrl+Z) brings the current text back.',
             rep_ocrPagesBad: 'Write the pages as «1-3, 7», among these: {0}',
             taskOcr: 'Reading page {0} with OCR: line {1} of {2}',
@@ -75,6 +77,7 @@
             rep_ocr_turned: 'يبدو أن جزءًا من الصفحة مطبوع بالعرض؛ بقيت صورة هذا الجزء',
             rep_ocrRead: 'القراءة بالتعرّف الضوئي (OCR)',
             rep_ocrPages: 'الصفحات',
+            rep_ocrPagesPh: 'مثلًا 1-5، 8، 11-13',
             rep_ocrHint: 'يقرأ النص الفارسي من صور الصفحات، نحو ثانية إلى ثانيتين للصفحة؛ «إلغاء» يوقفه. التراجع (Ctrl+Z) يعيد النص الحالي.',
             rep_ocrPagesBad: 'اكتب الصفحات بالشكل «1-3, 7»، من بين هذه: {0}',
             taskOcr: 'قراءة الصفحة {0} بالتعرّف الضوئي على الحروف (OCR): السطر {1} من {2}',
@@ -113,7 +116,7 @@
     function rangePages(s, allowed) {
         const FA = '۰۱۲۳۴۵۶۷۸۹', AR = '٠١٢٣٤٥٦٧٨٩', got = [];
         s = String(s || '').replace(/[۰-۹٠-٩]/g, function (d) { return String(FA.indexOf(d) >= 0 ? FA.indexOf(d) : AR.indexOf(d)); })
-            .replace(/[–—]/g, '-').replace(/\s*-\s*/g, '-');
+            .replace(/[\u2010\u2011\u2012\u2013\u2014\u2212]/g, '-').replace(/\s*-\s*/g, '-');
         for (const p of s.split(/[,،;\s]+/).filter(Boolean)) {
             const m = /^(\d+)(?:-(\d+))?$/.exec(p);
             if (!m) return null;
@@ -126,7 +129,7 @@
 
     // the button, its range and its hint: made once, in the panel's row of buttons, before «Re-import in safe mode»
     const cur = { entries: [], onOcr: null, close: null };
-    let ui = null;
+    let ui = null, ui_dir = null;
     function make() {
         const acts = K.$('#import-report .report-actions');
         if (!acts) return null;
@@ -144,12 +147,16 @@
         const input = field.querySelector('input');
         const read = function () {
             const all = scans(cur.entries), run = cur.onOcr;
-            // (no scanned page: OCR for the fonts alone, the whole document)
-            const pages = all.length ? rangePages(input.value, all) : [];
+            // (no scanned page: OCR for the fonts alone, the whole document; an empty range: every scanned page)
+            const pages = !all.length ? [] : input.value.trim() ? rangePages(input.value, all) : all;
             if (!pages) { K.ui.toast(t('rep_ocrPagesBad', rangeText(all)), 'error'); input.focus(); return; }
             if (cur.close) cur.close();
             if (run) run(pages);
         };
+        // (empty, the placeholder in the interface's direction; a range typed, left to right — «1-3, 7» stays in order)
+        const dir = function () { input.dir = input.value ? 'ltr' : K.i18n.dir(); };
+        input.addEventListener('input', dir);
+        ui_dir = dir;
         btn.addEventListener('click', read);
         input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); read(); } });
         return { field: field, input: input, btn: btn, hint: hint };
@@ -158,7 +165,10 @@
         const all = scans(entries), on = !!onOcr && (all.length > 0 || fonts(entries));
         if (!ui && on) ui = make();
         if (!ui) return;
-        if (entries !== cur.entries) ui.input.value = rangeText(all);
+        // (empty, as a print dialog's pages: every scanned page; the placeholder says how to write a range, 3.6)
+        if (entries !== cur.entries) ui.input.value = '';
+        ui.input.placeholder = t('rep_ocrPagesPh');
+        if (ui_dir) ui_dir();
         cur.entries = entries; cur.onOcr = onOcr || null; cur.close = close || null;
         ui.field.querySelector('span').textContent = t('rep_ocrPages');
         ui.btn.querySelector('span').textContent = t('rep_ocrRead');

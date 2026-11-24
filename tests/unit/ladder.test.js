@@ -168,6 +168,41 @@ test('the report — failed pages, an unknown confidence, a Kelk source', functi
   assert.equal(k.report.summary.full, 3);
 });
 
+test('a scanned page OCR has not read (3.6): mode scan, out of the mean, counted apart', function () {
+  const imp = PdfImporter.create({});
+  imp._pageModes = [{ page: 1, mode: 'full', conf: 0.8, why: [] }, { page: 2, mode: 'scan', conf: null, why: ['noText'] }, { page: 3, mode: 'scan', conf: null, why: ['noText'] }];
+  imp.notes = []; imp._notePages = {};
+  const r = imp._ladReport({}, 3).report;
+  assert.equal(r.summary.scan, 2);
+  assert.equal(r.summary.ocr, 0);
+  assert.equal(r.summary.conf, 0.8, 'the pages not read are no 0 % in the mean');
+});
+
+test('OCR results kept for one file (3.6): a page in options.ocrCache is taken from it, not read again', async function () {
+  const scan = function (num) { return { num: num, view: [0, 0, 100, 100], glyphs: [], images: [{ x0: 0, y0: 0, x1: 100, y1: 100 }], hsegs: [], vsegs: [] }; };
+  const result = function (num) { return { glyphs: [{ ch: 'ب', x: num, y: 10, w: 5, size: 12 }], conf: 0.9, lines: 1, notes: [], figures: [], hsegs: [], vsegs: [] }; };
+  const cache = new Map();
+  let loads = 0, reads = [];
+  const run = async function (nums) {
+    const imp = PdfImporter.create({ ocr: 'read', ocrPages: nums, ocrCache: cache });
+    imp._ladOcrLoad = async function () { loads++; return {}; };
+    imp._ladOcrPage = async function (eng, p) { reads.push(p.num); return result(p.num); };
+    const pages = [scan(1), scan(2), scan(3)];
+    await imp._ladOcrRead(pages);
+    return pages;
+  };
+  const a = await run([1]);
+  assert.deepEqual(reads, [1]); assert.equal(loads, 1); assert.ok(cache.has(1));
+  a[0].glyphs[0].ch = 'x';                                     // (the steps after change the glyphs: the cache keeps its own)
+  const b = await run([1, 2]);
+  assert.deepEqual(reads, [1, 2], 'page 1 from the cache, page 2 read');
+  assert.equal(b[0].glyphs[0].ch, 'ب');
+  assert.equal(b[0].ocrRead.conf, 0.9);
+  assert.equal(b[2].ocrRead, undefined, 'page 3 not asked for');
+  await run([1, 2]);
+  assert.equal(loads, 2, 'every page in the cache: no engine loaded');
+});
+
 test('only a valid hooks.mode overrides options.mode', function () {
   const imp = PdfImporter.create({ mode: 'safe' });
   imp._runMode = 'Safe'; assert.equal(imp._ladMode(), 'safe');
