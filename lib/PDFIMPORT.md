@@ -1888,7 +1888,17 @@ cannot tell them apart), `turned` (a part printed sideways, kept as a picture), 
 in `report.pages` (3.6): no confidence, out of the summary's mean, counted in `summary.scan` — before, it was `ocr` at
 0 %, and a 291-page scan left unread said «OCR 291, mean confidence 0 %». `options.ocrCache`, a Map the caller keeps
 for one file, holds each page's OCR result: a page in it is taken from it, not read again (the app's «Read with OCR»
-adds a range to the pages read before). A page with no line read keeps its picture; a page
+adds a range to the pages read before). `options.pageCache` (3.7), a second Map the caller keeps for the file from its
+first import, holds each scanned page as it was read — its record, copied, and its picture: a page in it is not read
+again unless OCR is to read it now for the first time, so «Read with OCR» decodes only its new pages and the steps after
+the reading run again over every page (`tests/pdf-lab/scripts/page-cache-check.js`: the same Markdown, byte for byte,
+as one import; only a page with no text and no font goes in). A scanned page's picture is cut as the page is read
+(`_scanCut`, 3.7): pdf.js sends the decoded image after the operator list, so the importer waits for it
+(`ladScanWaitMs`), draws it as pdf.js would on a canvas of the size `_crop` renders (smoothed at high quality) and keeps
+it as a PNG; then the page's cleanup closes the bitmap at once. Before, the cleanup came first: the bitmaps that came
+after it were never closed, and a 291-page JBIG2 book held 3–5 GB of them until the browser collected them; and `_crop`
+rendered the page again, decoding its scan a second time. One image, not a mask, on a page not turned — any other
+page is rendered as before. A page with no line read keeps its picture; a page
 that cannot be drawn (no canvas) keeps its picture and `ocrNeeded`; a page Tesseract fails on, `ocrPageFailed`; an
 engine that does not start, `ocrFailed`. The engine stays for the decipherment's OCR votes (`trust.js`
 `_decOcrEngine`) and is given back after the fonts (`_ladOcrEnd`, and in the import's `finally`). The lab runs with

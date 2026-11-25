@@ -13,6 +13,9 @@ All notable changes to Kelk. Dates are those of the release tags.
   the image pdf.js decoded for it — no page is rendered a second time for its picture — and the decoded image is closed
   at once. A 291-page scanned book now peaks at about 0.9 GB during its import, not 3–5 GB, and takes 33 s instead of
   41 s.
+- **«Read with OCR» reads only its new pages.** The file's scanned pages, as read in its first import, are kept for the
+  session; a range decodes only the pages OCR reads for the first time and puts them in place — the same text as a
+  whole import. Three pages of a 291-page book: about 14 s instead of 44 s.
 
 ## [3.6] — 2026-11-24
 

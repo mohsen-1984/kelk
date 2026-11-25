@@ -225,6 +225,8 @@
         try { await K.libs.need('ocrreport'); } catch (e) { /* the report shows its other parts */ }
         step('file', 0, 1);
         const buf = await readBuffer(file), bytes = o && o.keepBytes ? new Uint8Array(buf.slice(0)) : null;
+        // (the file's state for its report's actions, from its first import: pages read with OCR, scanned pages as read)
+        const st = bytes ? fileState(o && o.ocrState) : null;
         // the import's messages come once, at its end (K.ui.batch), and its pictures are stored once
         return K.ui.batch(async function () {
             K.images.hold();
@@ -262,13 +264,24 @@
                 if (mode) opts.mode = hooks.mode = mode;
                 if (ocr) opts.ocr = 'read';
                 if (ocr && o && Array.isArray(o.ocrPages)) opts.ocrPages = o.ocrPages.slice();
-                // (the pages OCR read before in this file, kept for the session: taken again, not read again, 3.6)
-                if (ocr && o && o.ocrState) opts.ocrCache = o.ocrState.cache;
+                // (the pages OCR read before in this file, kept for the session: taken again, not read again, 3.6; its
+                // scanned pages as read, from the first import on: «Read with OCR» reads only its new pages, 3.7)
+                if (ocr && st) opts.ocrCache = st.cache;
+                if (st) opts.pageCache = st.pages;
                 const r = await PdfImporter.create(opts).fromArrayBuffer(buf, hooks);
                 if (r.messages && r.messages.length) console.info('PdfImporter:', r.messages);
-                return { md: r.markdown, report: K.importReport.fromResult(r), bytes: bytes, info: fi ? fi.fromPdf(r) : null, kind: 'pdf' };
+                return { md: r.markdown, report: K.importReport.fromResult(r), bytes: bytes, state: st, info: fi ? fi.fromPdf(r) : null, kind: 'pdf' };
             } finally { K.images.flush(); }
         });
+    }
+
+    /** one file's state for the session: the pages OCR read (read, cache: 3.6) and its scanned pages as read (pages, 3.7) */
+    function fileState(st) {
+        st = st || {};
+        if (!st.read) st.read = [];
+        if (!st.cache) st.cache = new Map();
+        if (!st.pages) st.pages = new Map();
+        return st;
     }
 
     /**
@@ -278,7 +291,7 @@
     function again(bytes, name, mode, state) {
         // (state: the file's OCR so far — the pages read, each page's result in its cache —, carried from one «Read with
         // OCR» to the next, 3.6: a new range adds to the pages read before, which come from the cache, not read again)
-        const st = state || { read: [], cache: new Map() };
+        const st = fileState(state);
         const run = function (o) {
             const b = bytes; bytes = null;
             return b ? K.importer.fromFiles([new File([b], name, { type: 'application/pdf' })], o) : undefined;
@@ -395,7 +408,7 @@
                         const r = await convert(d.file, d.name, t, co);
                         if (r == null) continue;
                         if (Object.keys(set.pics).length) t.progress(1000, 1000, K.i18n.t('imp_pics'));   // the zip's pictures the text names
-                        out.push({ name: d.name, md: await placeImages(r.md, d.path, set.pics), converted: r.converted, report: r.report, bytes: r.bytes,
+                        out.push({ name: d.name, md: await placeImages(r.md, d.path, set.pics), converted: r.converted, report: r.report, bytes: r.bytes, state: r.state,
                             info: r.info, kind: r.kind });
                     }
                     return out;
@@ -421,8 +434,8 @@
             if (K.images.stored && !K.images.stored()) reports.forEach(function (p) {
                 if (p.report && p.report.notes && !p.report.notes.some(function (n) { return n.code === 'tooLargeToKeep'; })) p.report.notes.push({ code: 'tooLargeToKeep' });
             });
-            const act = one && one.bytes ? again(one.bytes, one.name, o && o.mode, o && o.ocrState) : null;
-            parts.forEach(function (p) { p.bytes = null; });
+            const act = one && one.bytes ? again(one.bytes, one.name, o && o.mode, one.state || (o && o.ocrState)) : null;
+            parts.forEach(function (p) { p.bytes = null; p.state = null; });
             K.ui.report(reports.map(function (p) { return { name: p.name, report: p.report || K.importReport.none(), info: p.info, kind: p.kind }; }), {
                 name: one ? one.name : '',
                 onSafe: act ? act.safe : null,

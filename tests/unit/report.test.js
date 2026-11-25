@@ -642,6 +642,9 @@ test('Read with OCR: the range, the pages it asks for, the setting (Ask, Read wi
     assert.equal(calls.length, 3);
     assert.deepEqual(Array.from(calls[2].opts.ocrPages), [2, 3], 'page 2 read before, page 3 now (empty: every scanned page left)');
     assert.ok(calls[2].opts.ocrCache && calls[2].opts.ocrCache === calls[1].opts.ocrCache, 'one cache for the file');
+    // the file's scanned pages as read, from its first import on: each «Read with OCR» reads only its new pages (3.7)
+    assert.ok(calls[0].opts.pageCache instanceof w.Map, 'the first import fills the page cache');
+    assert.ok(calls[1].opts.pageCache === calls[0].opts.pageCache && calls[2].opts.pageCache === calls[0].opts.pageCache, 'one page cache for the file');
     // Read with OCR: every such page read at once; Leave as pictures: no button
     K.store.setUi('importer', Object.assign({}, K.store.getUi('importer'), { scannedPages: 'read' }));
     calls = fakePdf(w, scan);
