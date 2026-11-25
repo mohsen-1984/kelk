@@ -157,7 +157,10 @@ Open from 3.4:
 - **The whole real scan of about 300 pages crashed the headless browser's tab** in 3 of 6 runs before its layout
   ended, with or without OCR and with 3.3's importer too, its JavaScript heap staying under 100 MB — to look into
   (memory outside the heap: pdf.js's JBIG2 decoder?). Runs of up to 250 pages never crashed. The release notes say: for
-  a very large scanned file, read a page range at a time.
+  a very large scanned file, read a page range at a time. **3.7 found the memory outside the heap** («Where the real
+  book's memory went» under 3.7 above): each page's decoded image, never closed, 3–5 GB at the peak; 3.7 closes it as
+  the page is read (peak about 0.9 GB). No crash in this session's runs (seven, before and after); whether the crash is
+  gone is to be checked again on the real file after 3.7.
 - **OCR pages skip the page layout**: done in 3.6 (OCR lines laid out as positioned text; what is left: «Open from 3.6»).
 - **OCR votes for decipherment** (unknown fonts read with OCR's help): done in 3.5.
 
@@ -186,7 +189,8 @@ Open from 3.5:
 
 - **Speed**: the unknown-font step takes several seconds on 15 pages (the 3 s target is not met): a short font is read
   twice (with and without the lexicon), each reading two or three runs of the search; OCR's votes add more.
-- **The stress check's margin**: the merged document's longest hold is 0.5 s on most runners but came to 1.04 s once
+- **The stress check's margin** (`_toHtml`'s part done in 3.7, item 4 above; what is left: the other holds below, and
+  the step that now holds as long as `_toHtml` did on a slow machine): the merged document's longest hold is 0.5 s on most runners but came to 1.04 s once
   (a slow runner, the release PR's push run; its pull-request run 0.52 s). Measured in 3.6 (each long task against the
   steps that ran in it): the longest is `_toHtml`, the Markdown step, over the whole document in one go (about 0.8 s in
   a measuring run); then a page's `_lines` (0.5 s) and the GSUB check (0.6 s, several steps). 3.2's `_approxGarbled` is
@@ -277,23 +281,42 @@ check's margin):
    holds an action (the user may be typing a range). Done in the first pull request.
 2. **Large scans**: each scanned page decoded once — its picture cut from the image pdf.js already decoded, not drawn
    again; «Read with OCR» reads only the new pages and puts them in place, without importing the whole file again. A
-   picture may differ from 3.6's in its pixels, never in a lower quality (the owner, 2026-11-24).
+   picture may differ from 3.6's in its pixels, never in a lower quality (the owner, 2026-11-24). Done in the second
+   pull request (`_scanCut`, `options.pageCache`). Left: a page OCR reads is still decoded twice (once read, once for
+   OCR's pixels at 300 dpi) — keeping its pixels from the reading until OCR runs would cost about 4 MB a page, 1.2 GB
+   for a whole book read with OCR; OCR's own time (about 2.6 s a page) is most of it anyway.
 3. **Large documents kept**: pictures as files (Blobs) and the OCR cache in IndexedDB instead of base64 text in
    `localStorage`. The logo stays in `localStorage`. The move from `localStorage` deletes the old copy only once the
    new one is stored and read back; any failure keeps the user's document (the owner, 2026-11-24). Where IndexedDB
    does not work from `file://` (`tests/storage-check.html`, run by the owner in Chrome, Edge and Firefox), 3.6's
    one-line notice stays.
 4. **The stress check's margin**: `_toHtml` pauses between blocks, if it fits (dropped if a lab file or the stress
-   check gets worse).
+   check gets worse). Done in the second pull request: no task inside `_toHtml` is long any more (about 1.05 s on a slow
+   machine before). The stress check's longest hold hardly moves (1.08 s → 1.06 s there, three runs each): another step
+   now holds as long — not yet told apart (opening the file is counted on its own).
 
-Measured on our own long scan (`make-longscan.js`, 290 pages, 1-bit Flate; `run-longscan.js`, the app from `file://`,
-Scanned pages «Ask»), 3.6: the import 26 s, every page drawn once more after it was read (291 renders), the
-renderer's memory at most 0.6 GB; «Read with OCR» on 3 pages 30 s and on 2 more 30 s (the whole file imported again
-each time, 287–291 pages drawn again); after a reload the text is back and none of its 285 pictures (the browser's
-storage refused them; the report says so). A real scanned book of about 300 pages, JBIG2 (checked in the session only):
-the import 41 s, the renderer's memory up to about 5.3 GB during it, «Read with OCR» about 43 s a range. Our long scan
-does not show that memory: its pages are Flate, and decoding JBIG2 is what costs; a lab scan in JBIG2 needs an encoder
-of our own (none in the lab's tools).
+**How memory is measured from 3.7 on**: the renderer process's peak resident memory *during* the import (Linux `ps`,
+every 250 ms; the largest renderer), Settings → Scanned pages «Ask», as `run-longscan.js` measures it. Not the JS heap
+and not a reading after the import. 3.6's «5.3 GB → about 0.7 GB» for a 291-page book matches what the renderer holds
+*after* the import (about 0.8 GB here); its peak during the import was 3.4–5.3 GB in four runs here (3.6's
+`CHANGELOG.md` entry corrected in 3.7).
+
+Measured on our own long scan (`make-longscan.js`, 290 pages, 1-bit Flate; `run-longscan.js`), 3.6 → 3.7's second pull
+request: the import 26 s → 26 s, pages rendered for their pictures 291 → 0 (each scan decoded once), peak 0.6 →
+0.5 GB; «Read with OCR» on 3 pages 30 s → 13 s and on 2 more 30 s → 12 s (291 pages read again each time → only the
+new ones). A real scanned book of about 300 pages, JBIG2 (checked in the session only): the import 41 s → 33 s, peak
+5.3 → 0.9 GB; «Read with OCR» about 43 s → 13–15 s a range. After a reload the text is back and none of the pictures
+(3.7's third pull request).
+
+**Where the real book's memory went** (3.7, measured page by page in the session): not the picture step (with pictures
+dropped the peak was still 3.9 GB) and not memory still in use (a garbage collection forced after each page kept it
+under 0.9 GB). pdf.js's worker code runs on the main thread under `file://`; the decoded image of a page (an
+`ImageBitmap`, a `VideoFrame` for JBIG2) comes after its operator list, and the importer let the page's caches go
+before it came — so it was never closed, and its memory, outside the JS heap, waited for the browser to collect it.
+The book's pages are each an immediate lossless generic region, arithmetic-coded (template 0, no TPGDON, no symbol
+dictionary), as Acrobat's image conversion writes them. Our long scan's Flate pages decode to `ImageBitmap`s too, but
+peaked at 0.6 GB only; the smallest lab scan of our own that would show it: a JBIG2 generic-region encoder (the MQ
+arithmetic coder, template 0) in the lab's tools, writing a long book of our text — proposed, not written.
 
 **A session of its own: real Arabic PDFs and Arabic fonts** (the owner's request, 2026-11-18) — «Left from 3.1» below.
 
@@ -440,8 +463,8 @@ belong to it:
   ToUnicode at all (3.2 reads a renumbered TrueType program by its shapes; CFF and Type 3 programs not yet — CFF
   in 3.3); Persian digits that share a glyph with Arabic-Indic ones come back Arabic-Indic; bordered form boxes
   as tables
-- Text kept safe: images and text in IndexedDB instead of `localStorage` (≈ 5 MB), and recovery snapshots (Clear and a
-  crash can be undone after a reload)
+- Text kept safe: the pictures move to IndexedDB in 3.7 (item 3 above); left here: the text, still in `localStorage`
+  (≈ 5 MB), and recovery snapshots (Clear and a crash can be undone after a reload)
 - Accessibility and editor: Tab no longer traps the keyboard in the editor; quieter statistics for screen readers;
   find / replace; print stylesheet; automatic theme from the system
 - Speed: the preview redoes every step on each render (cache per block); PDF.js on a real worker over http(s)

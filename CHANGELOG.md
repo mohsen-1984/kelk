@@ -9,6 +9,15 @@ All notable changes to Kelk. Dates are those of the release tags.
 - **The import report's actions** each sit in a frame of their own, the button with its description: «Read with OCR»
   with its page range, then «Re-import in safe mode». «Copy report» stands apart. While the panel holds an action it
   no longer collapses by itself.
+- **Long scans decoded once, and their memory given back.** A scanned page's picture is cut, as the page is read, from
+  the image pdf.js decoded for it — no page is rendered a second time for its picture — and the decoded image is closed
+  at once. A 291-page scanned book now peaks at about 0.9 GB during its import, not 3–5 GB, and takes 33 s instead of
+  41 s.
+- **«Read with OCR» reads only its new pages.** The file's scanned pages, as read in its first import, are kept for the
+  session; a range decodes only the pages OCR reads for the first time and puts them in place — the same text as a
+  whole import. Three pages of a 291-page book: about 14 s instead of 44 s.
+- **A long document's Markdown step breathes**: writing its HTML pauses between blocks, so the page no longer freezes
+  for about a second at the end of a long import.
 
 ## [3.6] — 2026-11-24
 
@@ -27,9 +36,10 @@ All notable changes to Kelk. Dates are those of the release tags.
   - **A scanned cover** keeps its title and text, as 3.5 did (71.2).
   - Cleaner text: dust no longer becomes a bullet or a «0», and fewer stray zero-width non-joiners.
   - The time a page is about the same (1.6 s on our lab scans, about 2.2 s on a real scanned book).
-- **Scanned books in the app.** Importing a long scan no longer holds every page's scan in memory: a 291-page book
-  went from 5.3 GB to about 0.7 GB, in the same time. The preview loads its pictures as they scroll into view (every
-  export still carries them all).
+- **Scanned books in the app.** Importing a long scan no longer keeps every page's scan once the import is done (about
+  0.8 GB after a 291-page book). During the import the browser could still reach 3–5 GB before it freed the pages
+  already read (corrected in 3.7, which fixes it: the earlier «5.3 GB to about 0.7 GB» compared the peak with the memory
+  after the import). The preview loads its pictures as they scroll into view (every export still carries them all).
 - **The import report is honest about scanned pages.** A page OCR has not read yet says so («scanned, not read yet»),
   has no confidence and stays out of the mean; consecutive pages alike are one row («1–291»).
 - **«Read with OCR» and its page range**: the range is empty by default — every scanned page —, with an example in the

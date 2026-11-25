@@ -224,6 +224,10 @@ jobs:
             node tests/pdf-lab/scripts/run-stress.js "$RUNNER_TEMP/big.pdf" tests/pdf-lab/pdf/en/chrome-github-bg--report.pdf "$RUNNER_TEMP/scan.pdf"
           } 2>&1 | tee "$RUNNER_TEMP/logs/stress.log"
 
+      - name: Read with OCR on new pages only (the file's page cache, 3.7)
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
+        run: node tests/pdf-lab/scripts/page-cache-check.js 2>&1 | tee "$RUNNER_TEMP/logs/page-cache.log"
+
       - name: Provenance profile
         if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
         run: node tests/pdf-lab/scripts/profile.js 2>&1 | tee "$RUNNER_TEMP/logs/profile.log"
