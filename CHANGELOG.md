@@ -9,6 +9,10 @@ All notable changes to Kelk. Dates are those of the release tags.
 - **The import report's actions** each sit in a frame of their own, the button with its description: «Read with OCR»
   with its page range, then «Re-import in safe mode». «Copy report» stands apart. While the panel holds an action it
   no longer collapses by itself.
+- **Long scans decoded once, and their memory given back.** A scanned page's picture is cut, as the page is read, from
+  the image pdf.js decoded for it — no page is rendered a second time for its picture — and the decoded image is closed
+  at once. A 291-page scanned book now peaks at about 0.9 GB during its import, not 3–5 GB, and takes 33 s instead of
+  41 s.
 
 ## [3.6] — 2026-11-24
 
