@@ -16,6 +16,8 @@ All notable changes to Kelk. Dates are those of the release tags.
 - **«Read with OCR» reads only its new pages.** The file's scanned pages, as read in its first import, are kept for the
   session; a range decodes only the pages OCR reads for the first time and puts them in place — the same text as a
   whole import. Three pages of a 291-page book: about 14 s instead of 44 s.
+- **A long document's Markdown step breathes**: writing its HTML pauses between blocks, so the page no longer freezes
+  for about a second at the end of a long import.
 
 ## [3.6] — 2026-11-24
 
